@@ -1,0 +1,52 @@
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+name: R-CMD-check
+
+jobs:
+  R-CMD-check:
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::testthat
+            any::here
+            any::config
+            any::stringdist
+            any::digest
+            any::purrr
+            any::dplyr
+            any::readr
+            any::stringr
+            any::stringi
+            any::cli
+
+      - name: Run tests
+        run: |
+          testthat::test_dir("tests/testthat", reporter = "summary")
+        shell: Rscript {0}
+
+      - name: Lint R files
+        run: |
+          if (requireNamespace("lintr", quietly = TRUE)) {
+            lintr::lint_dir("R/")
+          } else {
+            message("lintr not installed, skipping")
+          }
+        shell: Rscript {0}
+        continue-on-error: true

@@ -1,0 +1,61 @@
+default:
+  # --- Conference metadata ---
+  conference:
+    name: "AAGL 2023 Global Congress"
+    date: "2023-11-07"
+    journal: "Journal of Minimally Invasive Gynecology"
+    journal_abbrev: "J Minim Invasive Gynecol"
+    volume: 30
+    supplement_pages: "S1-S226"
+    doi_prefix: "10.1016/j.jmig.2023"
+
+  # --- Data source URLs ---
+  sources:
+    jmig_supplement_url: "https://www.jmig.org/issue/S1553-4650(23)X0012-8"
+    sciencedirect_url: "https://www.sciencedirect.com/journal/journal-of-minimally-invasive-gynecology/vol/30/issue/11/suppl/S"
+    pdf_filename: "AAGL_2023_abstracts.pdf"
+
+  # --- PubMed search parameters ---
+  pubmed:
+    date_start: "2023/11/01"
+    date_end: "2026/04/01"
+    rate_limit_per_sec: 3
+    rate_limit_with_key: 10
+    cache_every_n: 10
+    max_results_per_query: 20
+    exclude_supplement_vol: 30
+    exclude_supplement_year: 2023
+
+  # --- CrossRef / Europe PMC ---
+  crossref:
+    polite_pool: true
+    max_results: 5
+
+  europmc:
+    max_results: 5
+
+  # --- Scoring thresholds ---
+  scoring:
+    title_jaccard_high: 0.80
+    title_jaccard_mid: 0.60
+    title_jaccard_low: 0.40
+    abstract_semantic_high: 0.85
+    abstract_semantic_mid: 0.70
+    author_fuzzy_threshold: 0.90
+    auto_accept: 7
+    manual_review: 4
+    auto_reject_below: 4
+    pre_conference_penalty: -3
+    pub_date_early_months: 18
+    pub_date_late_months: 30
+
+  # --- Validation ---
+  validation:
+    gold_standard_n: 20
+    target_sensitivity: 0.80
+
+  # --- Pipeline ---
+  pipeline:
+    checkpoint_dir: "data/cache/checkpoints"
+    output_dir: "output"
+    seed: 42

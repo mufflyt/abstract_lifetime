@@ -1,0 +1,36 @@
+# R / RStudio
+.Rhistory
+.Rdata
+.RData
+.Ruserdata
+*.Rproj.user/
+.Rproj.user/
+
+# renv
+renv/library/
+renv/local/
+renv/cellar/
+renv/lock/
+renv/python/
+renv/sandbox/
+renv/staging/
+
+# Environment
+.Renviron
+
+# Data
+data/raw/
+data/cache/
+*.pdf
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Output (regenerable)
+output/tables/
+output/figures/
+
+# Misc
+*.log
+.claude/
