@@ -26,12 +26,15 @@ default:
     exclude_supplement_vol: 30
     exclude_supplement_year: 2023
 
-  # --- CrossRef / Europe PMC ---
+  # --- CrossRef / Europe PMC / OpenAlex ---
   crossref:
     polite_pool: true
     max_results: 5
 
   europmc:
+    max_results: 5
+
+  openalex:
     max_results: 5
 
   # --- Scoring thresholds ---
