@@ -40,10 +40,14 @@ low_hit_abstracts <- abstracts |> filter(abstract_id %in% low_hits)
 cr_to_search <- bind_rows(no_hits, low_hit_abstracts) |> distinct(abstract_id, .keep_all = TRUE)
 cli_alert_info("CrossRef: searching {nrow(cr_to_search)} abstracts with 0 or few PubMed hits")
 
+date_start_cr <- gsub("/", "-", cfg$pubmed$date_start)
+date_end_cr <- gsub("/", "-", cfg$pubmed$date_end)
+
 all_cr_results <- list()
 for (i in seq_len(nrow(cr_to_search))) {
   row <- cr_to_search[i, ]
-  cr <- search_crossref(row$title, max_results = cfg$crossref$max_results)
+  cr <- search_crossref(row$title, max_results = cfg$crossref$max_results,
+                        date_start = date_start_cr, date_end = date_end_cr)
   if (nrow(cr) > 0) {
     cr$abstract_id <- row$abstract_id
     all_cr_results <- c(all_cr_results, list(cr))

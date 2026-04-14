@@ -8,16 +8,18 @@ library(cli)
 
 #' Search CrossRef by title
 #' Returns a tibble of candidate matches with DOI and metadata
-search_crossref <- function(title, max_results = 5) {
+search_crossref <- function(title, max_results = 5,
+                            date_start = "2023-11-01", date_end = "2026-04-01") {
   if (is.na(title) || nchar(title) < 10) return(tibble())
 
-  # Use rcrossref if available, otherwise raw API
   base_url <- "https://api.crossref.org/works"
   email <- Sys.getenv("CROSSREF_EMAIL", "")
 
+  # CrossRef uses filter=from-pub-date:YYYY-MM-DD,until-pub-date:YYYY-MM-DD
   query_params <- list(
     query.bibliographic = title,
     rows = max_results,
+    filter = paste0("from-pub-date:", date_start, ",until-pub-date:", date_end),
     select = "DOI,title,author,published-print,published-online,container-title,abstract,type"
   )
   if (nchar(email) > 0) {
