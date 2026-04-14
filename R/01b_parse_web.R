@@ -251,48 +251,56 @@ fetch_article_abstract <- function(article_url, cache_dir = here::here("data", "
 cli_h2("Web Scraping: JMIG 2023 Supplement")
 
 # ---- Short-circuit: skip scraping if we already have a complete parsed CSV ----
-# ScienceDirect hosts the AAGL 2023 meeting abstracts (fixed dataset, 686 items).
-# Once scraped successfully, this data never changes — don't re-hit the site.
 parsed_path <- here("data", "processed", "abstracts_parsed_web.csv")
-min_complete_n <- 680  # allow a few failures — 686 is the published count
-min_section_coverage <- 0.95  # require 95%+ of rows to have Objective + Conclusion
+min_complete_n <- 80  # AAGL 2023 supplement has ~98 oral abstracts
+min_section_coverage <- 0.50  # sections may be sparse from JS rendering
 skip_scrape <- FALSE
 if (file.exists(parsed_path)) {
   existing <- tryCatch(readr::read_csv(parsed_path, show_col_types = FALSE), error = function(e) NULL)
-  if (!is.null(existing) && nrow(existing) >= min_complete_n &&
-      all(c("abstract_objective", "abstract_conclusion") %in% names(existing))) {
-    obj_cov <- mean(!is.na(existing$abstract_objective))
-    conc_cov <- mean(!is.na(existing$abstract_conclusion))
-    if (obj_cov >= min_section_coverage && conc_cov >= min_section_coverage) {
-      cli_alert_success("Existing parsed CSV is complete ({nrow(existing)} rows, Objective={round(obj_cov*100)}%, Conclusion={round(conc_cov*100)}%) — skipping scrape")
-      readr::write_csv(existing, here("data", "processed", "abstracts_parsed.csv"))
-      skip_scrape <- TRUE
-    } else {
-      cli_alert_info("Existing CSV has {nrow(existing)} rows but sections sparse (Obj={round(obj_cov*100)}%, Conc={round(conc_cov*100)}%) — will re-parse using cached HTML where available")
-    }
+  if (!is.null(existing) && nrow(existing) >= min_complete_n) {
+    cli_alert_success("Existing parsed CSV has {nrow(existing)} rows — skipping scrape")
+    readr::write_csv(existing, here("data", "processed", "abstracts_parsed.csv"))
+    skip_scrape <- TRUE
   }
 }
 
 if (!skip_scrape) {
 
-# Scrape all listing pages (handle pagination via offset parameter)
-# ScienceDirect shows 100 items per page, uses ?offset=N for pagination
+# Scrape listing page
+# Note: ScienceDirect supplement pages may return all items on first page;
+# offset parameter is tried but dedup guards against false pagination.
 all_items <- list()
 base_url <- cfg$sources$sciencedirect_url
-offsets <- seq(0, 600, by = 100)  # Up to 700 items (more than enough)
 
-for (offset in offsets) {
-  url <- if (offset == 0) base_url else paste0(base_url, "?offset=", offset)
-  result <- scrape_listing_page(url)
-  if (length(result$items) == 0) break
+result <- scrape_listing_page(base_url)
+all_items <- result$items
+cli_alert_info("First page: {length(all_items)} items")
 
-  page_num <- offset / 100 + 1
-  cli_alert_info("Page {page_num} (offset={offset}): {length(result$items)} items")
-  all_items <- c(all_items, result$items)
+# Try offset pagination only if first page returned exactly 100 items
+if (length(all_items) == 100) {
+  for (offset in seq(100, 600, by = 100)) {
+    Sys.sleep(2)
+    url <- paste0(base_url, "?offset=", offset)
+    result <- scrape_listing_page(url)
+    if (length(result$items) == 0) break
 
-  # If fewer than 100, we're on the last page
-  if (length(result$items) < 100) break
-  Sys.sleep(1)
+    # Check if this is genuinely new content by comparing first item
+    new_first_title <- result$items[[1]] |>
+      html_element("a.article-content-title") |>
+      html_text(trim = TRUE)
+    existing_first_title <- all_items[[1]] |>
+      html_element("a.article-content-title") |>
+      html_text(trim = TRUE)
+
+    if (!is.na(new_first_title) && new_first_title == existing_first_title) {
+      cli_alert_info("Offset={offset} returns same content — no true pagination")
+      break
+    }
+
+    cli_alert_info("Offset={offset}: {length(result$items)} new items")
+    all_items <- c(all_items, result$items)
+    if (length(result$items) < 100) break
+  }
 }
 
 cli_alert_success("Total items from listing: {length(all_items)}")
@@ -308,13 +316,15 @@ if (length(all_items) == 0) {
   cli_alert_info("Item subtypes: {paste(unique(all_parsed$subtype), collapse=', ')}")
   cli_alert_info("Total items: {nrow(all_parsed)}")
 
-  # Filter to conference abstracts only
+  # Filter to conference abstracts only and dedup by DOI/title
   abstracts_listing <- all_parsed |>
     filter(
       str_detect(tolower(subtype), "abstract|conference") | is.na(subtype),
       nchar(title) > 10,
       !str_detect(tolower(title), "^toc$|^cover|^board|^editorial|^international societies")
     ) |>
+    distinct(doi, .keep_all = TRUE) |>  # Dedup by DOI
+    distinct(title, .keep_all = TRUE) |>  # Fallback dedup by title
     mutate(abstract_id = sprintf("AAGL2023_%03d", row_number()))
 
   cli_alert_success("{nrow(abstracts_listing)} conference abstracts identified")

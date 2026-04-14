@@ -1,0 +1,491 @@
+abstract_id,strategy,query,n_results
+AAGL2023_001,title,"""performance evaluation urinary and bladder recognition models""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_001,first_author,"""takenaka S""[1AU] AND 2023/11/01:2026/04/01[PDAT]",14
+AAGL2023_001,last_author,"""hirose Y""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",51
+AAGL2023_001,title_fragment,"""performance evaluation urinary and""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_001,author_broad,"""takenaka S""[AU] AND 2023/11/01:2026/04/01[PDAT]",134
+AAGL2023_002,title,"""impact telehealth academic fibroid center during the covid""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_002,first_author,"""hayden J""[1AU] AND 2023/11/01:2026/04/01[PDAT]",3
+AAGL2023_002,last_author,"""lum D""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",3
+AAGL2023_002,title_fragment,"""telehealth academic fibroid center""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_002,author_broad,"""hayden J""[AU] AND 2023/11/01:2026/04/01[PDAT]",41
+AAGL2023_003,title,"""calculating the burden time outside the body endoscopic""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_003,first_author,"""levin I""[1AU] AND 2023/11/01:2026/04/01[PDAT]",6
+AAGL2023_003,last_author,"""cohen A""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",43
+AAGL2023_003,title_fragment,"""calculating the burden time""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_003,author_broad,"""levin I""[AU] AND 2023/11/01:2026/04/01[PDAT]",30
+AAGL2023_004,title,"""impact training level the first surgical assistant quality""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_004,first_author,"""zhou G""[1AU] AND 2023/11/01:2026/04/01[PDAT]",328
+AAGL2023_004,last_author,"""randle E""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_004,title_fragment,"""training level the first""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_004,author_broad,"""zhou G""[AU] AND 2023/11/01:2026/04/01[PDAT]",2964
+AAGL2023_005,title,"""social determinants and hysterectomy rates approaches and outcomes""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_005,first_author,"""chang P""[1AU] AND 2023/11/01:2026/04/01[PDAT]",43
+AAGL2023_005,last_author,"""le A""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",23
+AAGL2023_005,title_fragment,"""social determinants and hysterectomy""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_005,author_broad,"""chang P""[AU] AND 2023/11/01:2026/04/01[PDAT]",401
+AAGL2023_006,title,"""surgical subspeciality training improves surgical outcomes benign minimally""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_006,first_author,"""pfeuti C""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_006,last_author,"""makai G""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_006,title_fragment,"""surgical subspeciality training improves""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_006,author_broad,"""pfeuti C""[AU] AND 2023/11/01:2026/04/01[PDAT]",3
+AAGL2023_007,title,"""language based disparities surgical route hysterectomy for benign""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_007,first_author,"""gonzalez P""[1AU] AND 2023/11/01:2026/04/01[PDAT]",4
+AAGL2023_007,last_author,"""fajardo O""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_007,title_fragment,"""language based disparities surgical""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_007,author_broad,"""gonzalez P""[AU] AND 2023/11/01:2026/04/01[PDAT]",129
+AAGL2023_008,title,"""pelvic floor and sexual function years after hysterectomy""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_008,first_author,"""johannesson U""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_008,last_author,"""forsgren C""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_008,title_fragment,"""pelvic floor and sexual""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_008,author_broad,"""johannesson U""[AU] AND 2023/11/01:2026/04/01[PDAT]",3
+AAGL2023_009,title,"""effects relugolix uterine fibroid and uterine volume through""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_009,first_author,"""al-hendy A""[1AU] AND 2023/11/01:2026/04/01[PDAT]",3
+AAGL2023_009,last_author,"""zhai D""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",20
+AAGL2023_009,title_fragment,"""relugolix uterine fibroid and""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_009,author_broad,"""al-hendy A""[AU] AND 2023/11/01:2026/04/01[PDAT]",50
+AAGL2023_010,title,"""development and validation simulation model for robotic myomectomy""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_010,first_author,"""schneyer R""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_010,last_author,"""molina A""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",27
+AAGL2023_010,title_fragment,"""development and validation simulation""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_010,author_broad,"""schneyer R""[AU] AND 2023/11/01:2026/04/01[PDAT]",14
+AAGL2023_011,title,"""long term risk reintervention after uterine preserving surgical""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_011,first_author,"""zaritsky E""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_011,last_author,"""wise L""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",7
+AAGL2023_011,title_fragment,"""long term risk reintervention""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_011,author_broad,"""zaritsky E""[AU] AND 2023/11/01:2026/04/01[PDAT]",9
+AAGL2023_012,title,"""steps the successful conservative surgical management prolapsed submucous""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_012,first_author,"""cantor M""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_012,last_author,"""baltazar M""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_012,title_fragment,"""steps the successful conservative""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_012,author_broad,"""cantor M""[AU] AND 2023/11/01:2026/04/01[PDAT]",19
+AAGL2023_013,title,"""agreement analysis fibroid and uterine volumes assessed ultrasound""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_013,first_author,"""flaxman T""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_013,last_author,"""duigenan S""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_013,title_fragment,"""agreement analysis fibroid and""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_013,author_broad,"""flaxman T""[AU] AND 2023/11/01:2026/04/01[PDAT]",5
+AAGL2023_014,title,"""the effect hematologic malignancies perioperative transfusions for patients""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_014,first_author,"""duckworth K""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_014,last_author,"""pothuri B""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",10
+AAGL2023_014,title_fragment,"""the effect hematologic malignancies""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_014,author_broad,"""duckworth K""[AU] AND 2023/11/01:2026/04/01[PDAT]",9
+AAGL2023_015,title,"""comparison rads 2022 and simple rules ultrasound classifications""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_015,first_author,"""solnik M""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_015,last_author,"""nasri F""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_015,title_fragment,"""rads 2022 and simple""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_015,author_broad,"""solnik M""[AU] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_016,title,"""abdominal versus vaginal contained manual morcellation for laparoscopic""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_016,first_author,"""flatow V""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_016,last_author,"""ascher-walsh C""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_016,title_fragment,"""abdominal versus vaginal contained""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_016,author_broad,"""flatow V""[AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_017,title,"""appendiceal endometriosis the eye the beholder predictive value""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_017,first_author,"""urbina P""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_017,last_author,"""yu L""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",985
+AAGL2023_017,title_fragment,"""appendiceal endometriosis the eye""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_017,author_broad,"""urbina P""[AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_018,title,"""endometriosis and pelvic pain look into racial variation""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_018,first_author,"""wicks C""[1AU] AND 2023/11/01:2026/04/01[PDAT]",3
+AAGL2023_018,last_author,"""childs A""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_018,title_fragment,"""endometriosis and pelvic pain""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_018,author_broad,"""wicks C""[AU] AND 2023/11/01:2026/04/01[PDAT]",8
+AAGL2023_019,title,"""ultrasound based decision tree analysis modelling predict aagl""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_019,first_author,"""mak J""[1AU] AND 2023/11/01:2026/04/01[PDAT]",6
+AAGL2023_019,last_author,"""condous G""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",6
+AAGL2023_019,title_fragment,"""ultrasound based decision tree""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_019,author_broad,"""mak J""[AU] AND 2023/11/01:2026/04/01[PDAT]",53
+AAGL2023_020,title,"""association between ultrasound soft markers endometriosis and pathologically""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_020,first_author,"""vandeman H""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_020,last_author,"""wyant H""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_020,title_fragment,"""association between ultrasound soft""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_020,author_broad,"""vandeman H""[AU] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_021,title,"""the effect medical management ovarian endometriomas systematic review""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_021,first_author,"""thiel P""[1AU] AND 2023/11/01:2026/04/01[PDAT]",3
+AAGL2023_021,last_author,"""maheux-lacroix S""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",5
+AAGL2023_021,title_fragment,"""the effect medical management""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_021,author_broad,"""thiel P""[AU] AND 2023/11/01:2026/04/01[PDAT]",7
+AAGL2023_022,title,"""prostaglandin and endometriosis ongoing pain""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_022,first_author,"""ahmad G""[1AU] AND 2023/11/01:2026/04/01[PDAT]",11
+AAGL2023_022,last_author,"""caine R""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_022,title_fragment,"""prostaglandin and endometriosis ongoing""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_022,author_broad,"""ahmad G""[AU] AND 2023/11/01:2026/04/01[PDAT]",50
+AAGL2023_023,title,"""impact time since surgical diagnosis endometriosis outcomes with""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_023,first_author,"""as-sanie S""[1AU] AND 2023/11/01:2026/04/01[PDAT]",5
+AAGL2023_023,last_author,"""reznichenko G""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_023,title_fragment,"""time since surgical diagnosis""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_023,author_broad,"""as-sanie S""[AU] AND 2023/11/01:2026/04/01[PDAT]",23
+AAGL2023_024,title,"""implementation operative hysteroscopy clinic""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_024,first_author,"""demery K""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_024,last_author,"""saad C""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",4
+AAGL2023_024,title_fragment,"""implementation operative hysteroscopy clinic""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_024,author_broad,"""demery K""[AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_025,title,"""comparison resection rates using different hysteroscopic devices simulation""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_025,first_author,"""fisher J""[1AU] AND 2023/11/01:2026/04/01[PDAT]",34
+AAGL2023_025,last_author,"""fisher J""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",52
+AAGL2023_025,title_fragment,"""resection rates using different""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_025,author_broad,"""fisher J""[AU] AND 2023/11/01:2026/04/01[PDAT]",236
+AAGL2023_026,title,"""the correlation between endometrial polyp size and the""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_026,first_author,"""nassie D""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_026,last_author,"""bral P""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_026,title_fragment,"""the correlation between endometrial""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_026,author_broad,"""nassie D""[AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_027,title,"""hysteroscopic treatment retained products conception using see and""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_027,first_author,"""sharvit M""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_027,last_author,"""weinberg S""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_027,title_fragment,"""hysteroscopic treatment retained products""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_027,author_broad,"""sharvit M""[AU] AND 2023/11/01:2026/04/01[PDAT]",4
+AAGL2023_028,title,"""methoxyflurane analgesia for conscious hysteroscopy double blind randomised""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_028,first_author,"""twidale E""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_028,last_author,"""mudzamiri T""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_028,title_fragment,"""methoxyflurane analgesia for conscious""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_028,author_broad,"""twidale E""[AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_029,title,"""barriers office hysteroscopy migs fellowship education and practice""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_029,first_author,"""zelivianskaia A""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_029,last_author,"""robinson J""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",49
+AAGL2023_029,title_fragment,"""barriers office hysteroscopy migs""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_029,author_broad,"""zelivianskaia A""[AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_030,title,"""comparing long term leiomyoma recurrence rates after resection""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_030,first_author,"""fenske B""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_030,last_author,"""breitkopf D""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_030,title_fragment,"""comparing long term leiomyoma""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_030,author_broad,"""fenske B""[AU] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_031,title,"""double blinded randomised placebo controlled trial antibiotic prophylaxis""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_031,first_author,"""lim C""[1AU] AND 2023/11/01:2026/04/01[PDAT]",78
+AAGL2023_031,last_author,"""roydhouse S""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_031,title_fragment,"""double blinded randomised placebo""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",29
+AAGL2023_031,author_broad,"""lim C""[AU] AND 2023/11/01:2026/04/01[PDAT]",441
+AAGL2023_032,title,"""vaginal extraction index predictive model for vaginal extraction""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_032,first_author,"""hollis A""[1AU] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_032,last_author,"""boren T""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_032,title_fragment,"""vaginal extraction index predictive""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_032,author_broad,"""hollis A""[AU] AND 2023/11/01:2026/04/01[PDAT]",21
+AAGL2023_033,title,"""prospective cohort study quantifying the effect the levalap""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_033,first_author,"""orsi F""[1AU] AND 2023/11/01:2026/04/01[PDAT]",3
+AAGL2023_033,last_author,"""azziz R""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",17
+AAGL2023_033,title_fragment,"""cohort study quantifying the""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_033,author_broad,"""orsi F""[AU] AND 2023/11/01:2026/04/01[PDAT]",23
+AAGL2023_034,title,"""analysis sociodemographic factors affecting ambulatory surgical center discharge""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_034,first_author,"""wang S""[1AU] AND 2023/11/01:2026/04/01[PDAT]",4989
+AAGL2023_034,last_author,"""chappell N""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_034,title_fragment,"""analysis sociodemographic factors affecting""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_034,author_broad,"""wang S""[AU] AND 2023/11/01:2026/04/01[PDAT]",33900
+AAGL2023_035,title,"""the long term effect oophoropexy following ovarian torsion""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_035,first_author,"""akdam A""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_035,last_author,"""cohen A""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",43
+AAGL2023_035,title_fragment,"""the long term effect""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_035,author_broad,"""akdam A""[AU] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_036,title,"""prediction outcomes including major complications patients undergoing laparoscopic""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_036,first_author,"""madhvani K""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_036,last_author,"""carpenter T""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_036,title_fragment,"""prediction outcomes including major""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_036,author_broad,"""madhvani K""[AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_037,title,"""measuring the impact augmented reality surgical training kirkpatrick""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_037,first_author,"""rawaf D""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_037,last_author,"""harris M""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",52
+AAGL2023_037,title_fragment,"""measuring the impact augmented""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_037,author_broad,"""rawaf D""[AU] AND 2023/11/01:2026/04/01[PDAT]",4
+AAGL2023_038,title,"""impact minimally invasive gynecologic surgery the management adnexal""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_038,first_author,"""fin K""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_038,last_author,"""chao L""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",33
+AAGL2023_038,title_fragment,"""minimally invasive gynecologic surgery""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",78
+AAGL2023_038,author_broad,"""fin K""[AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_039,title,"""prediction adenomyosis diagnosis based mri external validation study""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_039,first_author,"""rees C""[1AU] AND 2023/11/01:2026/04/01[PDAT]",4
+AAGL2023_039,last_author,"""van boven L""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",5
+AAGL2023_039,title_fragment,"""prediction adenomyosis diagnosis based""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_039,author_broad,"""rees C""[AU] AND 2023/11/01:2026/04/01[PDAT]",38
+AAGL2023_040,title,"""multi disciplinary endometriosis board improving detection die pre""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_040,first_author,"""mansour T""[1AU] AND 2023/11/01:2026/04/01[PDAT]",8
+AAGL2023_040,last_author,"""yano M""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",46
+AAGL2023_040,title_fragment,"""multi disciplinary endometriosis board""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_040,author_broad,"""mansour T""[AU] AND 2023/11/01:2026/04/01[PDAT]",25
+AAGL2023_041,title,"""demographic correlates endometriosis diagnosis among united states women""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_041,first_author,"""giglioayers P""[1AU] AND 2023/11/01:2026/04/01[PDAT]",4
+AAGL2023_041,last_author,"""brown B""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",26
+AAGL2023_041,title_fragment,"""demographic correlates endometriosis diagnosis""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_041,author_broad,"""giglioayers P""[AU] AND 2023/11/01:2026/04/01[PDAT]",4
+AAGL2023_042,title,"""immediate versus delayed urinary catheter removal following non""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_042,first_author,"""mccormack L""[1AU] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_042,last_author,"""ma C""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",679
+AAGL2023_042,title_fragment,"""immediate versus delayed urinary""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_042,author_broad,"""mccormack L""[AU] AND 2023/11/01:2026/04/01[PDAT]",28
+AAGL2023_043,title,"""surgical outcomes hysterectomy via robotic vaginal natural orifice""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_043,first_author,"""thigpen B""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_043,last_author,"""koythong T""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_043,title_fragment,"""surgical outcomes hysterectomy via""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_043,author_broad,"""thigpen B""[AU] AND 2023/11/01:2026/04/01[PDAT]",4
+AAGL2023_044,title,"""sterilization rates following the overturn roe wade""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_044,first_author,"""elsahy D""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_044,last_author,"""ogunmuko K""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_044,title_fragment,"""sterilization rates following the""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_044,author_broad,"""elsahy D""[AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_045,title,"""uterine contractility adenomyosis patients normalises under hormonal contraception""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_045,first_author,"""rees C""[1AU] AND 2023/11/01:2026/04/01[PDAT]",4
+AAGL2023_045,last_author,"""klaassen C""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_045,title_fragment,"""uterine contractility adenomyosis patients""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_045,author_broad,"""rees C""[AU] AND 2023/11/01:2026/04/01[PDAT]",38
+AAGL2023_046,title,"""isolated adenomyosis placental risk""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_046,first_author,"""matot R""[1AU] AND 2023/11/01:2026/04/01[PDAT]",4
+AAGL2023_046,last_author,"""geron Y""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_046,title_fragment,"""isolated adenomyosis placental risk""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_046,author_broad,"""matot R""[AU] AND 2023/11/01:2026/04/01[PDAT]",18
+AAGL2023_047,title,"""development artificial intelligence utilizing neural network based language""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_047,first_author,"""khan Z""[1AU] AND 2023/11/01:2026/04/01[PDAT]",109
+AAGL2023_047,last_author,"""khan Z""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",79
+AAGL2023_047,title_fragment,"""development artificial intelligence utilizing""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_047,author_broad,"""khan Z""[AU] AND 2023/11/01:2026/04/01[PDAT]",585
+AAGL2023_048,title,"""period pain not normal content analysis endometriosis related""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_048,first_author,"""wu J""[1AU] AND 2023/11/01:2026/04/01[PDAT]",2937
+AAGL2023_048,last_author,"""swartz J""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_048,title_fragment,"""period pain not normal""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_048,author_broad,"""wu J""[AU] AND 2023/11/01:2026/04/01[PDAT]",20705
+AAGL2023_049,title,"""not your mother powder burn lesion field guide""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_049,first_author,"""manning C""[1AU] AND 2023/11/01:2026/04/01[PDAT]",6
+AAGL2023_049,last_author,"""mackenzie M""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",4
+AAGL2023_049,title_fragment,"""not your mother powder""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_049,author_broad,"""manning C""[AU] AND 2023/11/01:2026/04/01[PDAT]",53
+AAGL2023_050,title,"""does specimen weight correlate with surgical complexity during""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_050,first_author,"""denny K""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_050,last_author,"""lee T""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",121
+AAGL2023_050,title_fragment,"""does specimen weight correlate""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_050,author_broad,"""denny K""[AU] AND 2023/11/01:2026/04/01[PDAT]",13
+AAGL2023_051,title,"""intraoperative concordance batwing endometriosis with preoperative imaging and""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_051,first_author,"""fenske B""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_051,last_author,"""vanburen W""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",5
+AAGL2023_051,title_fragment,"""intraoperative concordance batwing endometriosis""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_051,author_broad,"""fenske B""[AU] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_052,title,"""understanding tiktok source medical information about endometriosis""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_052,first_author,"""lehembre-shiah E""[1AU] AND 2023/11/01:2026/04/01[PDAT]",3
+AAGL2023_052,last_author,"""grunebaum A""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",9
+AAGL2023_052,title_fragment,"""understanding tiktok source medical""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_052,author_broad,"""lehembre-shiah E""[AU] AND 2023/11/01:2026/04/01[PDAT]",3
+AAGL2023_053,title,"""porcine models for rectal shaving training""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_053,first_author,"""sarofim M""[1AU] AND 2023/11/01:2026/04/01[PDAT]",29
+AAGL2023_053,last_author,"""cario G""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_053,title_fragment,"""porcine models for rectal""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_053,author_broad,"""sarofim M""[AU] AND 2023/11/01:2026/04/01[PDAT]",50
+AAGL2023_054,title,"""the squeaky wheel call action create change ergonomics""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_054,first_author,"""wong J""[1AU] AND 2023/11/01:2026/04/01[PDAT]",72
+AAGL2023_054,last_author,"""king C""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",42
+AAGL2023_054,title_fragment,"""the squeaky wheel call""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_054,author_broad,"""wong J""[AU] AND 2023/11/01:2026/04/01[PDAT]",600
+AAGL2023_055,title,"""marwah confluence point evaluating safety insertion veress needle""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_055,first_author,"""marwah V""[1AU] AND 2023/11/01:2026/04/01[PDAT]",10
+AAGL2023_055,last_author,"""tongaria K""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_055,title_fragment,"""marwah confluence point evaluating""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_055,author_broad,"""marwah V""[AU] AND 2023/11/01:2026/04/01[PDAT]",19
+AAGL2023_056,title,"""predictors interest surgical management for chronic pelvic pain""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_056,first_author,"""ciesielski K""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_056,last_author,"""till S""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_056,title_fragment,"""predictors interest surgical management""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_056,author_broad,"""ciesielski K""[AU] AND 2023/11/01:2026/04/01[PDAT]",9
+AAGL2023_057,title,"""effect fda and health canada warnings power morcellation""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_057,first_author,"""chen I""[1AU] AND 2023/11/01:2026/04/01[PDAT]",24
+AAGL2023_057,last_author,"""belland L""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_057,title_fragment,"""fda and health canada""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_057,author_broad,"""chen I""[AU] AND 2023/11/01:2026/04/01[PDAT]",94
+AAGL2023_058,title,"""effect video based coaching gynecologic resident laparoscopic salpingectomy""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_058,first_author,"""muir T""[1AU] AND 2023/11/01:2026/04/01[PDAT]",3
+AAGL2023_058,last_author,"""donnellan N""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_058,title_fragment,"""video based coaching gynecologic""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_058,author_broad,"""muir T""[AU] AND 2023/11/01:2026/04/01[PDAT]",12
+AAGL2023_059,title,"""pre operative tamsulosin before minimally invasive hysterectomy and""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_059,first_author,"""mccann L""[1AU] AND 2023/11/01:2026/04/01[PDAT]",4
+AAGL2023_059,last_author,"""shah J""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",64
+AAGL2023_059,title_fragment,"""pre operative tamsulosin before""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_059,author_broad,"""mccann L""[AU] AND 2023/11/01:2026/04/01[PDAT]",35
+AAGL2023_060,title,"""preoperative pelvic pain syndromes are risk factor for""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_060,first_author,"""rakes K""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_060,last_author,"""casey J""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",4
+AAGL2023_060,title_fragment,"""preoperative pelvic pain syndromes""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_060,author_broad,"""rakes K""[AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_061,title,"""essentials minimally invasive gynecologic surgery emigs skills exam""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_061,first_author,"""pando C""[1AU] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_061,last_author,"""beran B""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_061,title_fragment,"""essentials minimally invasive gynecologic""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_061,author_broad,"""pando C""[AU] AND 2023/11/01:2026/04/01[PDAT]",6
+AAGL2023_062,title,"""laparoscopic management spontaneous heterotopic pregnancy with abdominal implantation""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_062,first_author,"""namazi G""[1AU] AND 2023/11/01:2026/04/01[PDAT]",3
+AAGL2023_062,last_author,"""groszmann Y""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_062,title_fragment,"""laparoscopic management spontaneous heterotopic""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_062,author_broad,"""namazi G""[AU] AND 2023/11/01:2026/04/01[PDAT]",10
+AAGL2023_063,title,"""surgical management isolated fallopian tube torsion the pediatric""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_063,first_author,"""gallant T""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_063,last_author,"""clay J""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_063,title_fragment,"""surgical management isolated fallopian""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_063,author_broad,"""gallant T""[AU] AND 2023/11/01:2026/04/01[PDAT]",8
+AAGL2023_064,title,"""laparoscopic inguinal lymph node dissection vulval cancer""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_064,first_author,"""puntambekar S""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_064,last_author,"""puntambekar S""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_064,title_fragment,"""laparoscopic inguinal lymph node""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_064,author_broad,"""puntambekar S""[AU] AND 2023/11/01:2026/04/01[PDAT]",6
+AAGL2023_065,title,"""simulation laparoscopic myomectomy using gynesim real tissue model""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_065,first_author,"""hudson""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_065,last_author,"""desai V""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",8
+AAGL2023_065,title_fragment,"""simulation laparoscopic myomectomy using""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_065,author_broad,"""hudson""[AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_066,title,"""technical considerations for total laparoscopic hysterectomy for large""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_066,first_author,"""covert E""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_066,last_author,"""wilson-leedy J""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_066,title_fragment,"""technical considerations for total""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_066,author_broad,"""covert E""[AU] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_067,title,"""essentials minimally invasive gynecology pro tips""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_067,first_author,"""karlson K""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_067,last_author,"""miles S""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",3
+AAGL2023_067,title_fragment,"""essentials minimally invasive gynecology""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_067,author_broad,"""karlson K""[AU] AND 2023/11/01:2026/04/01[PDAT]",3
+AAGL2023_068,title,"""vascular injury during gynecologic surgery hands simulation model""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_068,first_author,"""berkowitz L""[1AU] AND 2023/11/01:2026/04/01[PDAT]",4
+AAGL2023_068,last_author,"""schieler A""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_068,title_fragment,"""vascular injury during gynecologic""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_068,author_broad,"""berkowitz L""[AU] AND 2023/11/01:2026/04/01[PDAT]",16
+AAGL2023_069,title,"""hysteroscopic multiple myomectomy robotic endoscope updates""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_069,first_author,"""harvey L""[1AU] AND 2023/11/01:2026/04/01[PDAT]",6
+AAGL2023_069,last_author,"""couget A""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_069,title_fragment,"""hysteroscopic multiple myomectomy robotic""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_069,author_broad,"""harvey L""[AU] AND 2023/11/01:2026/04/01[PDAT]",35
+AAGL2023_070,title,"""robotic approach mild endometriosis and vascular entrapment the""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_070,first_author,"""crispi C""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_070,last_author,"""dantas T""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_070,title_fragment,"""robotic approach mild endometriosis""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_070,author_broad,"""crispi C""[AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_071,title,"""high complexity robotic assisted myomectomy and endometriosis treatment""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_071,first_author,"""zlotnik M""[1AU] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_071,last_author,"""nazareth D""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_071,title_fragment,"""high complexity robotic assisted""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_071,author_broad,"""zlotnik M""[AU] AND 2023/11/01:2026/04/01[PDAT]",3
+AAGL2023_072,title,"""instillation icg dye into ureters for intra operative""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_072,first_author,"""ortiz B""[1AU] AND 2023/11/01:2026/04/01[PDAT]",6
+AAGL2023_072,last_author,"""russel O""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_072,title_fragment,"""instillation icg dye into""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_072,author_broad,"""ortiz B""[AU] AND 2023/11/01:2026/04/01[PDAT]",15
+AAGL2023_073,title,"""expanding the scope the use indocyanine green minimally""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_073,first_author,"""ramirez L""[1AU] AND 2023/11/01:2026/04/01[PDAT]",4
+AAGL2023_073,last_author,"""mourad J""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_073,title_fragment,"""expanding the scope the""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_073,author_broad,"""ramirez L""[AU] AND 2023/11/01:2026/04/01[PDAT]",75
+AAGL2023_074,title,"""management caesarean scar ectopic pregnancy via robotic caesarean""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_074,first_author,"""rook C""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_074,last_author,"""lam A""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",15
+AAGL2023_074,title_fragment,"""management caesarean scar ectopic""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_074,author_broad,"""rook C""[AU] AND 2023/11/01:2026/04/01[PDAT]",5
+AAGL2023_075,title,"""robotic assisted gravid hysterectomy for management second trimester""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_075,first_author,"""lelea L""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_075,last_author,"""janco J""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_075,title_fragment,"""robotic assisted gravid hysterectomy""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_075,author_broad,"""lelea L""[AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_076,title,"""robotic hysterectomy cesarean scar ectopic with placenta accreta""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_076,first_author,"""varma S""[1AU] AND 2023/11/01:2026/04/01[PDAT]",26
+AAGL2023_076,last_author,"""rivera N""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",4
+AAGL2023_076,title_fragment,"""robotic hysterectomy cesarean scar""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_076,author_broad,"""varma S""[AU] AND 2023/11/01:2026/04/01[PDAT]",150
+AAGL2023_077,title,"""complex bladder endometriosis with ureteral obstruction tenets surgical""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_077,first_author,"""lee E""[1AU] AND 2023/11/01:2026/04/01[PDAT]",236
+AAGL2023_077,last_author,"""lee T""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",121
+AAGL2023_077,title_fragment,"""complex bladder endometriosis with""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_077,author_broad,"""lee E""[AU] AND 2023/11/01:2026/04/01[PDAT]",1444
+AAGL2023_078,title,"""from imaging visualization seeing the future endometriosis care""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_078,first_author,"""warshafsky C""[1AU] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_078,last_author,"""singh S""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",922
+AAGL2023_078,title_fragment,"""from imaging visualization seeing""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_078,author_broad,"""warshafsky C""[AU] AND 2023/11/01:2026/04/01[PDAT]",6
+AAGL2023_079,title,"""clinical features and minimally invasive surgery for bladder""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_079,first_author,"""sakate S""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_079,last_author,"""andou M""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",14
+AAGL2023_079,title_fragment,"""clinical features and minimally""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_079,author_broad,"""sakate S""[AU] AND 2023/11/01:2026/04/01[PDAT]",10
+AAGL2023_080,title,"""double discoid excision with connell closure icg dye""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_080,first_author,"""nguyen A""[1AU] AND 2023/11/01:2026/04/01[PDAT]",106
+AAGL2023_080,last_author,"""downing K""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_080,title_fragment,"""double discoid excision with""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_080,author_broad,"""nguyen A""[AU] AND 2023/11/01:2026/04/01[PDAT]",744
+AAGL2023_081,title,"""transvaginal natural orifice specimen extraction nose step approach""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_081,first_author,"""mangeshikar A""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_081,last_author,"""moawad G""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",5
+AAGL2023_081,title_fragment,"""transvaginal natural orifice specimen""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",10
+AAGL2023_081,author_broad,"""mangeshikar A""[AU] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_082,title,"""approach excision superficial endometriosis using avascular spaces""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_082,first_author,"""briggs M""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_082,last_author,"""beran B""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_082,title_fragment,"""approach excision superficial endometriosis""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_082,author_broad,"""briggs M""[AU] AND 2023/11/01:2026/04/01[PDAT]",33
+AAGL2023_083,title,"""complex case bilateral endometriomas and uterine fibroids patient""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_083,first_author,"""alzamora M""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_083,last_author,"""robinson J""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",49
+AAGL2023_083,title_fragment,"""complex case bilateral endometriomas""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_083,author_broad,"""alzamora M""[AU] AND 2023/11/01:2026/04/01[PDAT]",3
+AAGL2023_084,title,"""approach total laparoscopic hysterectomy and longitudinal vaginal septum""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_084,first_author,"""crihfield E""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_084,last_author,"""alviar D""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_084,title_fragment,"""approach total laparoscopic hysterectomy""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_084,author_broad,"""crihfield E""[AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_085,title,"""laparoscopic assisted pregnancy termination weeks patient with obstructing""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_085,first_author,"""zeccola A""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_085,last_author,"""uhm S""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_085,title_fragment,"""laparoscopic assisted pregnancy termination""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_085,author_broad,"""zeccola A""[AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_086,title,"""interstitial ectopic pregnancy laparoscopic cornuostomy""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_086,first_author,"""elsherbiny M""[1AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_086,last_author,"""lim E""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",40
+AAGL2023_086,title_fragment,"""interstitial ectopic pregnancy laparoscopic""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_086,author_broad,"""elsherbiny M""[AU] AND 2023/11/01:2026/04/01[PDAT]",12
+AAGL2023_087,title,"""advanced pelvic anatomy and dissection techniques""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_087,first_author,"""kwon C""[1AU] AND 2023/11/01:2026/04/01[PDAT]",9
+AAGL2023_087,last_author,"""mcclurg A""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_087,title_fragment,"""advanced pelvic anatomy and""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_087,author_broad,"""kwon C""[AU] AND 2023/11/01:2026/04/01[PDAT]",58
+AAGL2023_088,title,"""laparoscopic hysterectomy without uterine manipulator""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_088,first_author,"""trieu E""[1AU] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_088,last_author,"""brunn E""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_088,title_fragment,"""laparoscopic hysterectomy without uterine""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_088,author_broad,"""trieu E""[AU] AND 2023/11/01:2026/04/01[PDAT]",5
+AAGL2023_089,title,"""cesarean scar ectopic pregnancy resection""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_089,first_author,"""cardona M""[1AU] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_089,last_author,"""cardona J""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_089,title_fragment,"""cesarean scar ectopic pregnancy""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",48
+AAGL2023_089,author_broad,"""cardona M""[AU] AND 2023/11/01:2026/04/01[PDAT]",33
+AAGL2023_090,title,"""cesarean scar pregnancy concurrent laparoscopy with dilation and""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_090,first_author,"""leaf M""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_090,last_author,"""wu H""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",1583
+AAGL2023_090,title_fragment,"""cesarean scar pregnancy concurrent""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_090,author_broad,"""leaf M""[AU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_091,title,"""neuropelveology sciatic nerve decompression""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_091,first_author,"""sarofim M""[1AU] AND 2023/11/01:2026/04/01[PDAT]",29
+AAGL2023_091,last_author,"""sarofim M""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",13
+AAGL2023_091,title_fragment,"""neuropelveology sciatic nerve decompression""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_091,author_broad,"""sarofim M""[AU] AND 2023/11/01:2026/04/01[PDAT]",50
+AAGL2023_092,title,"""icg fluorescence technique for detection sentinel lymph nodes""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_092,first_author,"""alashqar A""[1AU] AND 2023/11/01:2026/04/01[PDAT]",4
+AAGL2023_092,last_author,"""harold J""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_092,title_fragment,"""icg fluorescence technique for""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_092,author_broad,"""alashqar A""[AU] AND 2023/11/01:2026/04/01[PDAT]",11
+AAGL2023_093,title,"""robotic assisted tumor debulking stage serous endometrial cancer""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_093,first_author,"""duarte M""[1AU] AND 2023/11/01:2026/04/01[PDAT]",11
+AAGL2023_093,last_author,"""ramirez L""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",5
+AAGL2023_093,title_fragment,"""robotic assisted tumor debulking""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_093,author_broad,"""duarte M""[AU] AND 2023/11/01:2026/04/01[PDAT]",63
+AAGL2023_094,title,"""enclosed colpotomy technique for minimally invasive approach radical""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_094,first_author,"""murphy C""[1AU] AND 2023/11/01:2026/04/01[PDAT]",45
+AAGL2023_094,last_author,"""kashani S""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",1
+AAGL2023_094,title_fragment,"""enclosed colpotomy technique for""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_094,author_broad,"""murphy C""[AU] AND 2023/11/01:2026/04/01[PDAT]",246
+AAGL2023_095,title,"""endometriosis the ileocecal valve tips for surgical approach""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_095,first_author,"""cuesta L""[1AU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_095,last_author,"""de los rios J""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_095,title_fragment,"""endometriosis the ileocecal valve""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_095,author_broad,"""cuesta L""[AU] AND 2023/11/01:2026/04/01[PDAT]",3
+AAGL2023_096,title,"""picture worth thousand cuts uncovering hidden surprises during""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_096,first_author,"""namazi G""[1AU] AND 2023/11/01:2026/04/01[PDAT]",3
+AAGL2023_096,last_author,"""behbehani S""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",4
+AAGL2023_096,title_fragment,"""picture worth thousand cuts""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_096,author_broad,"""namazi G""[AU] AND 2023/11/01:2026/04/01[PDAT]",10
+AAGL2023_097,title,"""trachelectomy with excision endometriosis for chronic pelvic pain""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_097,first_author,"""downing P""[1AU] AND 2023/11/01:2026/04/01[PDAT]",2
+AAGL2023_097,last_author,"""misal M""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_097,title_fragment,"""trachelectomy with excision endometriosis""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_097,author_broad,"""downing P""[AU] AND 2023/11/01:2026/04/01[PDAT]",5
+AAGL2023_098,title,"""clinical use mixed reality for laparoscopic myomectomy""[TI] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_098,first_author,"""ochi Y""[1AU] AND 2023/11/01:2026/04/01[PDAT]",10
+AAGL2023_098,last_author,"""kanno K""[LASTAU] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_098,title_fragment,"""clinical use mixed reality""[TIAB] AND 2023/11/01:2026/04/01[PDAT]",0
+AAGL2023_098,author_broad,"""ochi Y""[AU] AND 2023/11/01:2026/04/01[PDAT]",70
