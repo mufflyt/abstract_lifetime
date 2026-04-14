@@ -1,4 +1,4 @@
-# utils_crossref.R — CrossRef and Europe PMC search utilities
+# utils_crossref.R — CrossRef, Europe PMC, OpenAlex, and Semantic Scholar search utilities
 
 library(httr)
 library(jsonlite)
@@ -362,4 +362,129 @@ search_europmc <- function(title, first_author = NULL, max_results = 5,
                       epmc_year == "2023"))
 
   combined
+}
+
+#' Search Semantic Scholar using bulk search endpoint
+#' Uses keyword-based search with year filtering and extracts PMIDs
+#' Bulk endpoint is more generous with rate limits than relevance endpoint
+search_semantic_scholar <- function(title, first_author = NULL, max_results = 5,
+                                    year_start = 2023, year_end = 2026) {
+  if (is.na(title) || nchar(title) < 10) return(tibble())
+
+  base_url <- "https://api.semanticscholar.org/graph/v1/paper/search/bulk"
+  year_filter <- sprintf("%d-%d", year_start, year_end)
+  kw <- .title_keywords(title, n = 6)
+  lastname <- if (!is.null(first_author)) .author_lastname(first_author) else NULL
+
+  all_results <- list()
+
+  # Strategy 1: Title keywords (most distinctive terms)
+  if (length(kw) >= 3) {
+    search_term <- paste(head(kw, 6), collapse = " ")
+    r1 <- .s2_query(base_url, search_term, year_filter, max_results)
+    if (nrow(r1) > 0) {
+      r1$s2_strategy <- "keyword_search"
+      all_results <- c(all_results, list(r1))
+    }
+  }
+
+  # Strategy 2: Author + title keywords
+  if (!is.null(lastname) && length(kw) >= 2) {
+    search_term <- paste(c(lastname, head(kw, 4)), collapse = " ")
+    r2 <- .s2_query(base_url, search_term, year_filter, max_results)
+    if (nrow(r2) > 0) {
+      r2$s2_strategy <- "author_keyword_search"
+      all_results <- c(all_results, list(r2))
+    }
+  }
+
+  if (length(all_results) == 0) return(tibble())
+
+  combined <- dplyr::bind_rows(all_results) |>
+    dplyr::distinct(s2_id, .keep_all = TRUE) |>
+    dplyr::mutate(source = "semantic_scholar")
+
+  # Filter out JMIG supplement (2023)
+  combined <- combined |>
+    dplyr::filter(!(grepl("minim.*invasive.*gynecol", tolower(s2_journal), perl = TRUE) &
+                      s2_year == "2023"))
+
+  combined
+}
+
+#' Execute a single Semantic Scholar bulk search query
+.s2_query <- function(base_url, search_term, year_filter, max_results) {
+  tryCatch({
+    resp <- httr::GET(base_url, query = list(
+      query = search_term,
+      year = year_filter,
+      limit = max_results,
+      fields = "externalIds,title,authors,journal,publicationDate"
+    ), httr::timeout(15),
+    httr::user_agent("abstract_lifetime/1.0"))
+
+    sc <- httr::status_code(resp)
+    if (sc == 429) {
+      # Rate limited — back off and retry once
+      Sys.sleep(5)
+      resp <- httr::GET(base_url, query = list(
+        query = search_term,
+        year = year_filter,
+        limit = max_results,
+        fields = "externalIds,title,authors,journal,publicationDate"
+      ), httr::timeout(15),
+      httr::user_agent("abstract_lifetime/1.0"))
+      sc <- httr::status_code(resp)
+    }
+    if (sc != 200) return(tibble())
+
+    body <- jsonlite::fromJSON(httr::content(resp, "text", encoding = "UTF-8"),
+                               simplifyVector = FALSE)
+    results <- body$data
+    if (length(results) == 0) return(tibble())
+
+    purrr::map_dfr(results, function(r) {
+      # Extract PMID from externalIds
+      pmid <- NA_character_
+      doi <- NA_character_
+      if (!is.null(r$externalIds)) {
+        if (!is.null(r$externalIds$PubMed)) pmid <- as.character(r$externalIds$PubMed)
+        if (!is.null(r$externalIds$DOI)) doi <- r$externalIds$DOI
+      }
+
+      # Authors
+      authors <- character(0)
+      if (!is.null(r$authors) && length(r$authors) > 0) {
+        authors <- purrr::map_chr(r$authors, function(a) a$name %||% "")
+      }
+      first_author <- if (length(authors) > 0) authors[1] else NA_character_
+      last_author <- if (length(authors) > 1) authors[length(authors)] else first_author
+
+      # Journal
+      journal <- NA_character_
+      if (!is.null(r$journal) && !is.null(r$journal$name)) {
+        journal <- r$journal$name
+      }
+
+      # Year
+      pub_date <- r$publicationDate %||% NA_character_
+      pub_year <- if (!is.na(pub_date)) substr(pub_date, 1, 4) else NA_character_
+
+      tibble::tibble(
+        s2_id = r$paperId %||% NA_character_,
+        pmid = pmid,
+        doi = doi,
+        s2_title = str_squish(r$title %||% ""),
+        s2_first_author = str_squish(first_author %||% ""),
+        s2_last_author = str_squish(last_author %||% ""),
+        s2_all_authors = paste(authors, collapse = "; "),
+        s2_journal = journal,
+        s2_year = pub_year,
+        s2_pub_date = pub_date
+      )
+    })
+  }, error = function(e) {
+    cli_alert_warning("Semantic Scholar error: {e$message}")
+    tibble()
+  })
 }

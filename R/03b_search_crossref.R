@@ -12,7 +12,7 @@ source(here("R", "utils_text.R"))
 
 cfg <- config::get(file = here("config.yml"))
 
-cli_h2("Supplementary Search: CrossRef + Europe PMC + OpenAlex")
+cli_h2("Supplementary Search: CrossRef + Europe PMC + OpenAlex + Semantic Scholar")
 
 # Load abstracts and existing PubMed candidates
 abstracts <- read_csv(here("data", "processed", "abstracts_cleaned.csv"), show_col_types = FALSE)
@@ -195,6 +195,69 @@ if (nrow(oa_df) > 0) {
 }
 
 # ============================================================
+# Semantic Scholar: search ALL abstracts
+# ============================================================
+cli_h3("Semantic Scholar: keyword search for all {nrow(abstracts)} abstracts")
+
+s2_checkpoint_path <- here(cfg$pipeline$checkpoint_dir, "semantic_scholar_checkpoint.rds")
+if (file.exists(s2_checkpoint_path)) {
+  s2_checkpoint <- readRDS(s2_checkpoint_path)
+  s2_completed <- s2_checkpoint$completed_ids
+  all_s2_results <- s2_checkpoint$all_s2_results
+  cli_alert_info("Resuming from checkpoint ({length(s2_completed)} already done)")
+} else {
+  s2_completed <- character(0)
+  all_s2_results <- list()
+}
+
+s2_remaining <- abstracts |> filter(!abstract_id %in% s2_completed)
+cli_alert_info("{nrow(s2_remaining)} abstracts remaining for Semantic Scholar search")
+
+for (i in seq_len(nrow(s2_remaining))) {
+  row <- s2_remaining[i, ]
+  if (i %% 10 == 0 || i == 1) {
+    cli_alert_info("[{i}/{nrow(s2_remaining)}] {stringr::str_trunc(row$title, 60)}")
+  }
+
+  s2 <- search_semantic_scholar(
+    title = row$title,
+    first_author = row$first_author_normalized,
+    max_results = cfg$semantic_scholar$max_results,
+    year_start = year_start,
+    year_end = year_end
+  )
+
+  if (nrow(s2) > 0) {
+    s2$abstract_id <- row$abstract_id
+    all_s2_results <- c(all_s2_results, list(s2))
+    n_with_pmid <- sum(!is.na(s2$pmid) & s2$pmid != "")
+    cli_alert_success("  {nrow(s2)} Semantic Scholar results ({n_with_pmid} with PMIDs)")
+  }
+
+  s2_completed <- c(s2_completed, row$abstract_id)
+
+  if (i %% 20 == 0) {
+    saveRDS(list(completed_ids = s2_completed, all_s2_results = all_s2_results),
+            s2_checkpoint_path)
+  }
+
+  Sys.sleep(1)  # Semantic Scholar rate limits are stricter
+}
+
+saveRDS(list(completed_ids = s2_completed, all_s2_results = all_s2_results),
+        s2_checkpoint_path)
+
+s2_df <- bind_rows(all_s2_results)
+if (nrow(s2_df) > 0) {
+  write_csv(s2_df, here("data", "processed", "semantic_scholar_candidates.csv"))
+  n_with_pmid <- sum(!is.na(s2_df$pmid) & s2_df$pmid != "")
+  cli_alert_success("Semantic Scholar total: {nrow(s2_df)} candidates ({n_with_pmid} with PMIDs) across {n_distinct(s2_df$abstract_id)} abstracts")
+} else {
+  s2_df <- tibble()
+  cli_alert_warning("Semantic Scholar returned 0 results")
+}
+
+# ============================================================
 # Merge new PMIDs into the PubMed candidates pool
 # ============================================================
 cli_h3("Merging new candidates into PubMed pool")
@@ -243,6 +306,51 @@ if (nrow(oa_df) > 0) {
     }
   } else {
     cli_alert_info("No new PMIDs from OpenAlex (all already in pool)")
+  }
+}
+
+# From Semantic Scholar
+if (nrow(s2_df) > 0) {
+  s2_with_pmid <- s2_df |>
+    filter(!is.na(pmid) & pmid != "") |>
+    filter(!pmid %in% pubmed_candidates$pmid)
+
+  new_s2_pmids <- unique(s2_with_pmid$pmid)
+
+  if (length(new_s2_pmids) > 0) {
+    cli_alert_info("Fetching PubMed details for {length(new_s2_pmids)} new PMIDs from Semantic Scholar")
+    source(here("R", "utils_pubmed.R"))
+    s2_details <- fetch_pubmed_details(new_s2_pmids, cfg)
+
+    if (nrow(s2_details) > 0) {
+      s2_details <- s2_details |> mutate(across(everything(), as.character))
+      pmid_to_abstract <- s2_with_pmid |>
+        mutate(pmid = as.character(pmid)) |>
+        select(pmid, abstract_id) |>
+        distinct()
+      s2_details <- s2_details |>
+        inner_join(pmid_to_abstract, by = "pmid", relationship = "many-to-many") |>
+        mutate(strategies = "semantic_scholar", n_strategies = "1") |>
+        mutate(across(everything(), as.character))
+
+      # Filter out JMIG supplement
+      is_suppl <- vapply(seq_len(nrow(s2_details)), function(j) {
+        is_jmig <- grepl("j minim invasive gynecol", tolower(s2_details$pub_journal_abbrev[j]), fixed = TRUE)
+        is_vol <- !is.na(s2_details$pub_volume[j]) && s2_details$pub_volume[j] == as.character(cfg$pubmed$exclude_supplement_vol)
+        is_yr <- !is.na(s2_details$pub_year[j]) && s2_details$pub_year[j] == as.character(cfg$pubmed$exclude_supplement_year)
+        is_jmig && is_vol && is_yr
+      }, logical(1))
+      s2_details <- s2_details[!is_suppl, ]
+
+      if (nrow(s2_details) > 0) {
+        pubmed_candidates <- bind_rows(pubmed_candidates, s2_details) |>
+          distinct(abstract_id, pmid, .keep_all = TRUE)
+        new_pmid_count <- new_pmid_count + nrow(s2_details)
+        cli_alert_success("Added {nrow(s2_details)} new Semantic Scholar candidates to pool")
+      }
+    }
+  } else {
+    cli_alert_info("No new PMIDs from Semantic Scholar (all already in pool)")
   }
 }
 
