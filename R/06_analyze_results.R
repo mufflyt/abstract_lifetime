@@ -143,7 +143,7 @@ model_data <- results |>
     log_sample_size = log1p(coalesce(sample_size, 0))
   )
 
-if (nrow(model_data) >= 20) {
+if (nrow(model_data) >= 20 && length(unique(model_data$published_int)) >= 2) {
   # Logistic regression
   model <- glm(
     published_int ~ is_rct + log_sample_size + is_academic + is_us_based,
@@ -151,7 +151,13 @@ if (nrow(model_data) >= 20) {
     family = binomial(link = "logit")
   )
 
-  model_tidy <- tidy(model, exponentiate = TRUE, conf.int = TRUE)
+  model_tidy <- tryCatch(
+    tidy(model, exponentiate = TRUE, conf.int = TRUE),
+    error = function(e) {
+      cli_alert_warning("Confidence intervals failed ({conditionMessage(e)}); returning point estimates only")
+      tidy(model, exponentiate = TRUE, conf.int = FALSE)
+    }
+  )
   aim3 <- model_tidy |>
     mutate(across(where(is.numeric), ~ round(.x, 3)))
 
@@ -161,7 +167,7 @@ if (nrow(model_data) >= 20) {
   cli_alert_success("Logistic regression complete")
   print(aim3)
 } else {
-  cli_alert_warning("Insufficient data for logistic regression (n = {nrow(model_data)})")
+  cli_alert_warning("Insufficient data or no outcome variation for logistic regression (n = {nrow(model_data)}, unique outcomes = {length(unique(model_data$published_int))})")
   aim3 <- tibble::tibble(term = "insufficient_data", estimate = NA)
 }
 

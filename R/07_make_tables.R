@@ -114,7 +114,10 @@ cli_alert_info("Table 3: Predictors of Publication")
 
 model_path <- here("output", "aim3_logistic_regression.csv")
 if (file.exists(model_path)) {
-  table3 <- read_csv(model_path, show_col_types = FALSE) |>
+  aim3_raw <- read_csv(model_path, show_col_types = FALSE)
+}
+if (file.exists(model_path) && all(c("conf.low", "conf.high", "estimate", "p.value") %in% names(aim3_raw))) {
+  table3 <- aim3_raw |>
     mutate(
       or_ci = sprintf("%.2f (%.2f-%.2f)", estimate, conf.low, conf.high),
       significance = case_when(
@@ -128,6 +131,8 @@ if (file.exists(model_path)) {
 
   write_csv(table3, here("output", "tables", "table3_logistic_regression.csv"))
   cli_alert_success("Table 3 saved")
+} else if (file.exists(model_path)) {
+  cli_alert_warning("Table 3 skipped: aim3 regression had insufficient data")
 }
 
 # ============================================================

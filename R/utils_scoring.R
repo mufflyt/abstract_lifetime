@@ -256,7 +256,7 @@ score_abstract_candidates <- function(abstract_row, candidates_df, cfg = NULL) {
 
   tibble::tibble(
     abstract_id = abstract_row$abstract_id,
-    best_pmid = best$pmid,
+    best_pmid = as.character(best$pmid),
     best_score = best$total_score,
     classification = classification,
     has_tie = has_tie,
