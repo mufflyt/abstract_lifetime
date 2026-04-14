@@ -1,11 +1,11 @@
 metric,value
 n,20
 true_positives,9
-false_positives,1
+false_positives,0
 false_negatives,0
-true_negatives,10
+true_negatives,11
 sensitivity,1
-specificity,0.909
-ppv,0.9
+specificity,1
+ppv,1
 npv,1
-accuracy,0.95
+accuracy,1

@@ -269,6 +269,13 @@ score_abstract_candidates <- function(abstract_row, candidates_df, cfg = NULL) {
     classification <- "review"
   }
 
+  # Text evidence gate: author name + journal + date alone is never sufficient.
+  # Require at least title_pts >= 1 OR abstract_pts >= 1 to be accept/review.
+  has_text_evidence <- best$title_pts >= 1 || best$abstract_pts >= 1
+  if (!has_text_evidence && classification %in% c("accept", "review")) {
+    classification <- "reject"
+  }
+
   tibble::tibble(
     abstract_id = abstract_row$abstract_id,
     best_pmid = as.character(best$pmid),
