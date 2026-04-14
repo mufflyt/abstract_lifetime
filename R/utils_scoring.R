@@ -159,11 +159,23 @@ score_match <- function(abstract, candidate, cfg = NULL) {
     }
   }
 
+  # --- No-title-evidence penalty ---
+  # If there is zero title/abstract textual overlap, author + journal + date
+
+  # alone are not sufficient evidence — likely a coincidental name match.
+  scores$no_text_penalty <- 0
+  has_title_evidence <- scores$title_points >= 1 || scores$title_sim >= 0.20
+  has_abstract_evidence <- scores$abstract_points >= 1
+  if (!has_title_evidence && !has_abstract_evidence) {
+    scores$no_text_penalty <- -2
+  }
+
   # --- Total ---
   scores$total <- scores$title_points + scores$abstract_points +
     scores$first_author_points + scores$last_author_points +
     scores$coauthor_points + scores$author_team_bonus +
-    scores$journal_points + scores$keyword_points + scores$date_points
+    scores$journal_points + scores$keyword_points + scores$date_points +
+    scores$no_text_penalty
 
   scores
 }
@@ -237,7 +249,8 @@ score_abstract_candidates <- function(abstract_row, candidates_df, cfg = NULL) {
       team_bonus = sc$author_team_bonus,
       journal_pts = sc$journal_points,
       keyword_pts = sc$keyword_points,
-      date_pts = sc$date_points
+      date_pts = sc$date_points,
+      no_text_penalty = sc$no_text_penalty
     )
   })
 

@@ -48,7 +48,7 @@ default:
     abstract_semantic_high: 0.70
     abstract_semantic_mid: 0.50
     author_fuzzy_threshold: 0.88
-    auto_accept: 6
+    auto_accept: 7
     manual_review: 3
     auto_reject_below: 3
     pre_conference_penalty: -3
