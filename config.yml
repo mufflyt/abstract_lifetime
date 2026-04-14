@@ -36,15 +36,15 @@ default:
 
   # --- Scoring thresholds ---
   scoring:
-    title_jaccard_high: 0.80
-    title_jaccard_mid: 0.60
-    title_jaccard_low: 0.40
-    abstract_semantic_high: 0.85
-    abstract_semantic_mid: 0.70
-    author_fuzzy_threshold: 0.90
-    auto_accept: 7
-    manual_review: 4
-    auto_reject_below: 4
+    title_jaccard_high: 0.75
+    title_jaccard_mid: 0.55
+    title_jaccard_low: 0.35
+    abstract_semantic_high: 0.70
+    abstract_semantic_mid: 0.50
+    author_fuzzy_threshold: 0.88
+    auto_accept: 6
+    manual_review: 3
+    auto_reject_below: 3
     pre_conference_penalty: -3
     pub_date_early_months: 18
     pub_date_late_months: 30

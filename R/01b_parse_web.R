@@ -99,38 +99,119 @@ parse_sd_item <- function(element) {
   )
 }
 
+#' Extract ScienceDirect PII from article URL for cache keying
+sd_pii_from_url <- function(article_url) {
+  if (is.na(article_url)) return(NA_character_)
+  m <- stringr::str_match(article_url, "/pii/([A-Za-z0-9]+)")
+  if (is.na(m[1, 2])) return(NA_character_)
+  m[1, 2]
+}
+
+#' Fetch HTML with disk caching + retry/backoff. Returns HTML text or NA.
+fetch_sd_html_cached <- function(article_url, cache_dir, polite_sleep = 2,
+                                 max_retries = 3) {
+  pii <- sd_pii_from_url(article_url)
+  if (is.na(pii)) return(NA_character_)
+  cache_file <- file.path(cache_dir, paste0(pii, ".html"))
+
+  # Cache hit — no network call
+  if (file.exists(cache_file) && file.info(cache_file)$size > 5000) {
+    return(readr::read_file(cache_file))
+  }
+
+  ua_pool <- c(
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+  )
+
+  for (attempt in seq_len(max_retries)) {
+    Sys.sleep(polite_sleep + stats::runif(1, 0, 1.5))
+    resp <- tryCatch(
+      httr::GET(article_url, httr::timeout(30),
+                httr::user_agent(sample(ua_pool, 1)),
+                httr::add_headers(Accept = "text/html,application/xhtml+xml",
+                                  `Accept-Language` = "en-US,en;q=0.9",
+                                  Referer = "https://www.sciencedirect.com/")),
+      error = function(e) NULL
+    )
+    if (is.null(resp)) {
+      Sys.sleep(2^attempt)
+      next
+    }
+    sc <- httr::status_code(resp)
+    if (sc == 200) {
+      html_txt <- httr::content(resp, "text", encoding = "UTF-8")
+      # Guard against "Verify you are human" challenge pages
+      if (nchar(html_txt) < 5000 || stringr::str_detect(tolower(html_txt),
+          "verify you are human|just a moment|captcha")) {
+        Sys.sleep(2^attempt * 5)
+        next
+      }
+      dir.create(cache_dir, showWarnings = FALSE, recursive = TRUE)
+      readr::write_file(html_txt, cache_file)
+      return(html_txt)
+    }
+    # Rate-limited / blocked → exponential backoff
+    if (sc %in% c(403, 429, 503)) {
+      Sys.sleep(2^attempt * 10)
+      next
+    }
+    # Other non-200 — one more try
+    Sys.sleep(2^attempt)
+  }
+  NA_character_
+}
+
 #' Fetch structured abstract text from an individual article page
-fetch_article_abstract <- function(article_url) {
+fetch_article_abstract <- function(article_url, cache_dir = here::here("data", "cache", "sd_html")) {
   if (is.na(article_url)) return(list(sections = list(), abstract_full = NA_character_))
 
-  Sys.sleep(2)  # Polite crawling
-  tryCatch({
-    resp <- httr::GET(article_url, httr::timeout(30),
-                      httr::user_agent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"),
-                      httr::add_headers(Accept = "text/html,application/xhtml+xml",
-                                        `Accept-Language` = "en-US,en;q=0.9"))
-    if (httr::status_code(resp) != 200) {
-      return(list(sections = list(), abstract_full = NA_character_))
-    }
+  html_txt <- fetch_sd_html_cached(article_url, cache_dir)
+  if (is.na(html_txt)) return(list(sections = list(), abstract_full = NA_character_))
 
-    page <- rvest::read_html(httr::content(resp, "text", encoding = "UTF-8"))
+  tryCatch({
+    page <- rvest::read_html(html_txt)
 
     sections <- list()
 
-    # ScienceDirect structured abstracts use <h3> for section headings inside abstract
-    abstract_el <- page |> html_element("div.abstract.author div, div.abstract, section#abstracts, div#abstracts")
+    # Prefer the structured container. Candidates in priority order.
+    abstract_el <- NULL
+    for (sel in c("div.abstract.author", "section#abstracts", "div#abstracts", "div.abstract")) {
+      node <- html_element(page, sel)
+      if (!is.na(node) && length(html_elements(node, "h3, h4")) > 0) {
+        abstract_el <- node
+        break
+      }
+      if (is.null(abstract_el) && !is.na(node)) abstract_el <- node
+    }
 
-    if (!is.na(abstract_el)) {
-      # Try structured sections: <h3>Heading</h3><p>Text</p>
+    if (!is.null(abstract_el) && !is.na(abstract_el)) {
       headings <- abstract_el |> html_elements("h3, h4")
       if (length(headings) > 0) {
         for (h in headings) {
           heading_text <- html_text(h, trim = TRUE)
-          # Get following sibling text (p elements after this heading)
-          following <- html_elements(h, xpath = "following-sibling::p[1]")
-          if (length(following) > 0) {
-            sections[[heading_text]] <- str_squish(html_text(following[[1]], trim = TRUE))
+          # ScienceDirect wraps body in <div class="u-margin-s-bottom"> after <h3>,
+          # but fall back to <p> or any first non-heading sibling for other layouts.
+          body_text <- NA_character_
+          for (xp in c("following-sibling::div[1]", "following-sibling::p[1]",
+                       "following-sibling::*[not(self::h3) and not(self::h4)][1]")) {
+            sib <- html_elements(h, xpath = xp)
+            if (length(sib) > 0) {
+              txt <- str_squish(html_text(sib[[1]], trim = TRUE))
+              if (nchar(txt) > 10) { body_text <- txt; break }
+            }
           }
+          # Last resort: parent contains "Heading<body>" inline — strip heading from full text
+          if (is.na(body_text)) {
+            parent <- html_element(h, xpath = "..")
+            if (!is.na(parent)) {
+              parent_txt <- str_squish(html_text(parent, trim = TRUE))
+              stripped <- str_replace(parent_txt, fixed(heading_text), "")
+              if (nchar(stripped) > 10) body_text <- str_squish(stripped)
+            }
+          }
+          if (!is.na(body_text)) sections[[heading_text]] <- body_text
         }
       }
 
@@ -168,6 +249,31 @@ fetch_article_abstract <- function(article_url) {
 # ============================================================
 
 cli_h2("Web Scraping: JMIG 2023 Supplement")
+
+# ---- Short-circuit: skip scraping if we already have a complete parsed CSV ----
+# ScienceDirect hosts the AAGL 2023 meeting abstracts (fixed dataset, 686 items).
+# Once scraped successfully, this data never changes — don't re-hit the site.
+parsed_path <- here("data", "processed", "abstracts_parsed_web.csv")
+min_complete_n <- 680  # allow a few failures — 686 is the published count
+min_section_coverage <- 0.95  # require 95%+ of rows to have Objective + Conclusion
+skip_scrape <- FALSE
+if (file.exists(parsed_path)) {
+  existing <- tryCatch(readr::read_csv(parsed_path, show_col_types = FALSE), error = function(e) NULL)
+  if (!is.null(existing) && nrow(existing) >= min_complete_n &&
+      all(c("abstract_objective", "abstract_conclusion") %in% names(existing))) {
+    obj_cov <- mean(!is.na(existing$abstract_objective))
+    conc_cov <- mean(!is.na(existing$abstract_conclusion))
+    if (obj_cov >= min_section_coverage && conc_cov >= min_section_coverage) {
+      cli_alert_success("Existing parsed CSV is complete ({nrow(existing)} rows, Objective={round(obj_cov*100)}%, Conclusion={round(conc_cov*100)}%) — skipping scrape")
+      readr::write_csv(existing, here("data", "processed", "abstracts_parsed.csv"))
+      skip_scrape <- TRUE
+    } else {
+      cli_alert_info("Existing CSV has {nrow(existing)} rows but sections sparse (Obj={round(obj_cov*100)}%, Conc={round(conc_cov*100)}%) — will re-parse using cached HTML where available")
+    }
+  }
+}
+
+if (!skip_scrape) {
 
 # Scrape all listing pages (handle pagination via offset parameter)
 # ScienceDirect shows 100 items per page, uses ?offset=N for pagination
@@ -276,3 +382,4 @@ if (length(all_items) == 0) {
   write_csv(abstracts_df, here("data", "processed", "abstracts_parsed.csv"))
   cli_alert_info("Set as primary parsed file")
 }
+}  # end if (!skip_scrape)
