@@ -176,50 +176,89 @@ if (nrow(model_data) >= 20 && length(unique(model_data$published_int)) >= 2) {
 # ============================================================
 cli_h3("Aim 4: Search Strategy Performance")
 
+# For accepted matches, which strategies/sources found the winning PMID?
+accepted_pmids <- results |>
+  filter(final_published) |>
+  mutate(final_pmid = as.character(final_pmid)) |>
+  select(abstract_id, final_pmid)
+
+# --- PubMed strategy performance ---
 strategy_path <- here("data", "processed", "pubmed_strategy_results.csv")
-if (file.exists(strategy_path)) {
+candidates_path <- here("data", "processed", "pubmed_candidates.csv")
+
+aim4_pubmed <- NULL
+if (file.exists(strategy_path) && file.exists(candidates_path)) {
   strategy_results <- read_csv(strategy_path, show_col_types = FALSE)
+  candidates <- read_csv(candidates_path, show_col_types = FALSE)
 
-  # Which strategies found the correct match?
-  candidates_path <- here("data", "processed", "pubmed_candidates.csv")
-  if (file.exists(candidates_path)) {
-    candidates <- read_csv(candidates_path, show_col_types = FALSE)
+  strategy_contribution <- candidates |>
+    mutate(pmid = as.character(pmid)) |>
+    inner_join(accepted_pmids, by = c("abstract_id", "pmid" = "final_pmid")) |>
+    mutate(strategy_list = strsplit(strategies, ";\\s*")) |>
+    unnest(strategy_list) |>
+    count(strategy_list, name = "n_found_correct") |>
+    rename(strategy = strategy_list)
 
-    # For accepted matches, which strategies found the winning PMID?
-    accepted_pmids <- results |>
-      filter(final_published) |>
-      select(abstract_id, final_pmid)
-
-    strategy_contribution <- candidates |>
-      inner_join(accepted_pmids, by = c("abstract_id", "pmid" = "final_pmid")) |>
-      mutate(strategy_list = strsplit(strategies, ";\\s*")) |>
-      unnest(strategy_list) |>
-      count(strategy_list, name = "n_found_correct") |>
-      rename(strategy = strategy_list)
-
-    # Ablation: what if we removed each strategy?
-    ablation <- strategy_contribution |>
-      mutate(
-        total_accepted = nrow(accepted_pmids),
-        pct_found = round(n_found_correct / total_accepted * 100, 1)
-      )
-
-    aim4 <- strategy_results |>
-      group_by(strategy) |>
-      summarise(
-        n_searched = n(),
-        n_with_hits = sum(n_results > 0),
-        yield_pct = round(mean(n_results > 0) * 100, 1),
-        .groups = "drop"
-      ) |>
-      left_join(ablation |> select(strategy, n_found_correct, pct_found), by = "strategy")
-
-    write_csv(aim4, here("output", "aim4_strategy_performance.csv"))
-    cli_alert_success("Strategy ablation analysis complete")
-  }
-} else {
-  cli_alert_warning("No strategy results found")
+  aim4_pubmed <- strategy_results |>
+    group_by(strategy) |>
+    summarise(
+      n_searched = n(),
+      n_with_hits = sum(n_results > 0),
+      yield_pct = round(mean(n_results > 0) * 100, 1),
+      .groups = "drop"
+    ) |>
+    left_join(
+      strategy_contribution |>
+        mutate(pct_found = round(n_found_correct / nrow(accepted_pmids) * 100, 1)) |>
+        select(strategy, n_found_correct, pct_found),
+      by = "strategy"
+    ) |>
+    mutate(source = "PubMed")
 }
+
+# --- Supplementary API performance ---
+supp_apis <- list(
+  list(file = "crossref_candidates.csv", name = "CrossRef", pmid_col = NULL, doi_col = "doi"),
+  list(file = "europmc_candidates.csv", name = "Europe PMC", pmid_col = "pmid", doi_col = "doi"),
+  list(file = "openalex_candidates.csv", name = "OpenAlex", pmid_col = "pmid", doi_col = "doi"),
+  list(file = "semantic_scholar_candidates.csv", name = "Semantic Scholar", pmid_col = "pmid", doi_col = "doi")
+)
+
+aim4_supp <- purrr::map_dfr(supp_apis, function(api) {
+  fpath <- here("data", "processed", api$file)
+  if (!file.exists(fpath)) return(NULL)
+  cands <- read_csv(fpath, show_col_types = FALSE)
+
+  n_total <- 98L  # Total abstracts searched
+  n_abstracts_with_hits <- length(unique(cands$abstract_id))
+  n_candidates <- nrow(cands)
+
+  # Check if this source found the winning PMID for any accepted match
+  n_found <- 0L
+  if (!is.null(api$pmid_col) && api$pmid_col %in% names(cands)) {
+    cands_pmid <- cands[[api$pmid_col]]
+    if (!is.null(cands_pmid)) {
+      matched <- cands |>
+        mutate(.pmid = as.character(.data[[api$pmid_col]])) |>
+        inner_join(accepted_pmids, by = c("abstract_id", ".pmid" = "final_pmid"))
+      n_found <- nrow(matched)
+    }
+  }
+
+  tibble::tibble(
+    strategy = api$name,
+    n_searched = n_total,
+    n_with_hits = n_abstracts_with_hits,
+    yield_pct = round(n_abstracts_with_hits / n_total * 100, 1),
+    n_found_correct = if (n_found > 0) n_found else NA_integer_,
+    pct_found = if (n_found > 0) round(n_found / nrow(accepted_pmids) * 100, 1) else NA_real_,
+    source = "Supplementary"
+  )
+})
+
+aim4 <- bind_rows(aim4_pubmed, aim4_supp)
+write_csv(aim4, here("output", "aim4_strategy_performance.csv"))
+cli_alert_success("Strategy ablation analysis complete")
 
 # ============================================================
 # Save all aim summaries

@@ -3,6 +3,7 @@
 library(here)
 library(readr)
 library(dplyr)
+library(tidyr)
 library(purrr)
 library(cli)
 library(config)
@@ -68,8 +69,24 @@ cli_alert_info("Auto-reject (score < {cfg$scoring$manual_review}): {sum(results_
 cli_alert_info("No candidates: {sum(results_df$classification == 'no_candidates')}")
 cli_alert_info("Ties requiring review: {sum(results_df$has_tie)}")
 
-# Save results (without list column for CSV)
+# Extract best candidate's score components into flat columns
 results_save <- results_df |>
+  mutate(
+    best_details = map(score_details, function(sd) {
+      if (is.null(sd) || nrow(sd) == 0) {
+        return(tibble::tibble(
+          title_sim = NA_real_, title_pts = NA_real_, abstract_pts = NA_real_,
+          first_au_pts = NA_real_, last_au_pts = NA_real_, coauthor_pts = NA_real_,
+          team_bonus = NA_real_, journal_pts = NA_real_, keyword_pts = NA_real_,
+          date_pts = NA_real_, no_text_penalty = NA_real_
+        ))
+      }
+      sd[1, c("title_sim", "title_pts", "abstract_pts", "first_au_pts",
+              "last_au_pts", "coauthor_pts", "team_bonus", "journal_pts",
+              "keyword_pts", "date_pts", "no_text_penalty")]
+    })
+  ) |>
+  unnest(best_details) |>
   select(-score_details)
 write_csv(results_save, here("data", "processed", "match_scores.csv"))
 

@@ -110,15 +110,19 @@ abstracts <- abstracts |>
     # Sample size extraction from Patients field or full text
     sample_size = map_dbl(coalesce(abstract_patients_participants, search_text), function(text) {
       if (is.na(text) || text == "") return(NA_real_)
+      # Helper: filter out year-like numbers (1900-2099)
+      drop_years <- function(nums) nums[nums < 1900 | nums > 2099]
       # Look for numbers preceded by n=, N=, or common patterns
       nums <- str_extract_all(text, "(?:n\\s*=\\s*|N\\s*=\\s*|total of\\s+|included\\s+)(\\d[\\d,]*)")[[1]]
       if (length(nums) > 0) {
         num_str <- str_extract(nums[1], "\\d[\\d,]*")
-        return(as.numeric(str_remove_all(num_str, ",")))
+        val <- as.numeric(str_remove_all(num_str, ","))
+        if (length(drop_years(val)) > 0) return(val)
       }
-      # Fallback: largest number in text
+      # Fallback: largest number in text, excluding years
       all_nums <- as.numeric(str_extract_all(text, "\\d+")[[1]])
       all_nums <- all_nums[!is.na(all_nums) & all_nums > 1]
+      all_nums <- drop_years(all_nums)
       if (length(all_nums) > 0) return(max(all_nums))
       NA_real_
     }),

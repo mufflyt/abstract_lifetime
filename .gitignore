@@ -31,6 +31,9 @@ Thumbs.db
 output/tables/
 output/figures/
 
+# Google Sheets service account credentials
+google_credentials.json
+
 # Misc
 *.log
 .claude/

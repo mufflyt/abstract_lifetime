@@ -1,6 +1,10 @@
-strategy,n_searched,n_with_hits,yield_pct,n_found_correct,pct_found
-author_broad,98,88,89.8,8,44.4
-first_author,98,73,74.5,6,33.3
-last_author,98,63,64.3,4,22.2
-title,98,0,0,NA,NA
-title_fragment,98,5,5.1,2,11.1
+strategy,n_searched,n_with_hits,yield_pct,n_found_correct,pct_found,source
+author_broad,98,88,89.8,8,44.4,PubMed
+first_author,98,73,74.5,6,33.3,PubMed
+last_author,98,63,64.3,4,22.2,PubMed
+title,98,0,0,NA,NA,PubMed
+title_fragment,98,5,5.1,2,11.1,PubMed
+CrossRef,98,8,8.2,NA,NA,Supplementary
+Europe PMC,98,39,39.8,11,61.1,Supplementary
+OpenAlex,98,95,96.9,9,50,Supplementary
+Semantic Scholar,98,57,58.2,11,61.1,Supplementary

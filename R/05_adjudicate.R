@@ -45,12 +45,20 @@ results <- results |>
 
 # --- Output files ---
 
-# 1. Full results with matches
+# 1. Full results with matches (including score breakdown)
+score_component_cols <- c("title_sim", "title_pts", "abstract_pts",
+                          "first_au_pts", "last_au_pts", "coauthor_pts",
+                          "team_bonus", "journal_pts", "keyword_pts",
+                          "date_pts", "no_text_penalty")
+# Only include score columns that exist
+available_score_cols <- intersect(score_component_cols, names(results))
+
 results_out <- results |>
   select(
     abstract_id, title, first_author_normalized, last_author_normalized,
     author_count, is_rct, sample_size, is_academic, is_us_based,
     best_pmid, best_score, classification, has_tie, n_candidates,
+    all_of(available_score_cols),
     pub_title, pub_journal, pub_year, pub_doi, pub_first_author,
     months_to_pub
   )
@@ -65,6 +73,7 @@ review_queue <- results |>
     abstract_id, title, first_author_normalized,
     abstract_objective, abstract_conclusion,
     best_pmid, best_score, has_tie, n_candidates,
+    all_of(available_score_cols),
     pub_title, pub_journal, pub_doi
   )
 
