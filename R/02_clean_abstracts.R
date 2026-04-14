@@ -123,19 +123,25 @@ abstracts <- abstracts |>
       NA_real_
     }),
 
-    # Academic center detection from affiliation or authors
+    # Academic center detection from affiliation, authors, or abstract text
     is_academic = str_detect(
-      tolower(coalesce(affiliation_raw, authors_raw, "")),
+      tolower(coalesce(affiliation_raw, "", "")),
       "university|medical school|academic|teaching hospital|school of medicine"
+    ) | str_detect(
+      tolower(coalesce(search_text, "")),
+      "\\buniversity\\b|\\bacademic\\b|teaching hospital|school of medicine|tertiary.*center|residency|fellowship"
     ),
 
-    # US-based detection
+    # US-based detection from affiliation, authors, or abstract text
     is_us_based = str_detect(
-      tolower(coalesce(affiliation_raw, authors_raw, "")),
+      tolower(paste(coalesce(affiliation_raw, ""), coalesce(search_text, ""))),
       paste0("\\b(", paste(c(
-        state.name, state.abb, "united states", "usa",
-        "new york", "los angeles", "chicago", "houston",
-        "cleveland clinic", "mayo clinic", "johns hopkins"
+        tolower(state.name), tolower(state.abb), "united states", "usa",
+        "new york", "los angeles", "chicago", "houston", "boston",
+        "philadelphia", "san francisco", "seattle", "pittsburgh",
+        "cleveland clinic", "mayo clinic", "johns hopkins",
+        "columbia university", "stanford", "harvard", "yale",
+        "duke", "emory", "vanderbilt", "cedars-sinai"
       ), collapse = "|"), ")\\b")
     )
   )
