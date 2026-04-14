@@ -1,0 +1,6 @@
+term,estimate,std.error,statistic,p.value,conf.low,conf.high
+(Intercept),0.068,0.462,-5.825,0,0.024,0.152
+is_rctTRUE,0,1769.258,-0.008,0.993,NA,1870976443831928e56
+log_sample_size,1.204,0.111,1.666,0.096,0.949,1.492
+is_academicTRUE,NA,NA,NA,NA,NA,NA
+is_us_basedTRUE,NA,NA,NA,NA,NA,NA

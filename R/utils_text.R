@@ -35,10 +35,20 @@ normalize_author <- function(name) {
     first_is_initials <- nchar(tokens[1]) <= 3 &&
       str_detect(tokens[1], "^[A-Z]+$")
 
+    # Detect "LastName FI" format (e.g., "Johannesson U", "Smith AB")
+    # Last token is 1-3 uppercase chars = likely initials
+    last_is_initials <- nchar(tokens[length(tokens)]) <= 3 &&
+      str_detect(tokens[length(tokens)], "^[A-Z]+$")
+
     if (first_is_initials && length(tokens) == 2) {
       # "J Hayden" -> last = "hayden", initial = "J"
       last <- tokens[2]
       first_initial <- substr(tokens[1], 1, 1)
+    } else if (last_is_initials && length(tokens) >= 2) {
+      # "Johannesson U" -> last = "johannesson", initial = "U"
+      # Also handles "van der Berg AB" -> last = "van der Berg", initial = "A"
+      last <- paste(tokens[1:(length(tokens) - 1)], collapse = " ")
+      first_initial <- substr(tokens[length(tokens)], 1, 1)
     } else {
       # Handle particles: "van der Berg" -> last = "van der Berg"
       particles <- c("van", "de", "von", "del", "la", "le", "di", "el", "al")

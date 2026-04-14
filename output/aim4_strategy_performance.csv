@@ -1,0 +1,6 @@
+strategy,n_searched,n_with_hits,yield_pct,n_found_correct,pct_found
+author_broad,98,88,89.8,6,75
+first_author,98,73,74.5,6,75
+last_author,98,63,64.3,4,50
+title,98,0,0,NA,NA
+title_fragment,98,5,5.1,1,12.5

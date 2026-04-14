@@ -1,0 +1,8 @@
+metric,value
+total_abstracts,98
+published,8
+not_published,90
+pending_review,0
+publication_rate,8.2
+ci_lower,4.2
+ci_upper,15.3

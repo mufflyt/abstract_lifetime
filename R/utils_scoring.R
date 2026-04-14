@@ -141,7 +141,9 @@ score_match <- function(abstract, candidate, cfg = NULL) {
     month_num <- match(candidate$pub_month, month.abb)
     if (is.na(month_num)) month_num <- as.integer(candidate$pub_month)
     if (is.na(month_num)) month_num <- 1
-    as.Date(sprintf("%s-%02d-%s", candidate$pub_year, month_num, candidate$pub_day))
+    day <- candidate$pub_day
+    if (is.na(day) || day == "") day <- "01"
+    as.Date(sprintf("%s-%02d-%s", candidate$pub_year, month_num, day))
   }, error = function(e) NA)
 
   if (!is.na(pub_date)) {
