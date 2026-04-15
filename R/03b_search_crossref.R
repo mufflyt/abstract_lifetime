@@ -291,8 +291,8 @@ if (nrow(oa_df) > 0) {
       # Filter out JMIG supplement
       is_suppl <- vapply(seq_len(nrow(oa_details)), function(j) {
         is_jmig <- grepl("j minim invasive gynecol", tolower(oa_details$pub_journal_abbrev[j]), fixed = TRUE)
-        is_vol <- !is.na(oa_details$pub_volume[j]) && oa_details$pub_volume[j] == as.character(cfg$pubmed$exclude_supplement_vol)
-        is_yr <- !is.na(oa_details$pub_year[j]) && oa_details$pub_year[j] == as.character(cfg$pubmed$exclude_supplement_year)
+        is_vol <- !is.na(oa_details$pub_volume[j]) && oa_details$pub_volume[j] %in% as.character(cfg$pubmed$exclude_supplement_vol)
+        is_yr <- !is.na(oa_details$pub_year[j]) && oa_details$pub_year[j] %in% as.character(cfg$pubmed$exclude_supplement_year)
         is_jmig && is_vol && is_yr
       }, logical(1))
       oa_details <- oa_details[!is_suppl, ]
@@ -336,8 +336,8 @@ if (nrow(s2_df) > 0) {
       # Filter out JMIG supplement
       is_suppl <- vapply(seq_len(nrow(s2_details)), function(j) {
         is_jmig <- grepl("j minim invasive gynecol", tolower(s2_details$pub_journal_abbrev[j]), fixed = TRUE)
-        is_vol <- !is.na(s2_details$pub_volume[j]) && s2_details$pub_volume[j] == as.character(cfg$pubmed$exclude_supplement_vol)
-        is_yr <- !is.na(s2_details$pub_year[j]) && s2_details$pub_year[j] == as.character(cfg$pubmed$exclude_supplement_year)
+        is_vol <- !is.na(s2_details$pub_volume[j]) && s2_details$pub_volume[j] %in% as.character(cfg$pubmed$exclude_supplement_vol)
+        is_yr <- !is.na(s2_details$pub_year[j]) && s2_details$pub_year[j] %in% as.character(cfg$pubmed$exclude_supplement_year)
         is_jmig && is_vol && is_yr
       }, logical(1))
       s2_details <- s2_details[!is_suppl, ]
@@ -382,8 +382,8 @@ if (nrow(epmc_df) > 0) {
       # Filter out JMIG supplement
       is_suppl <- vapply(seq_len(nrow(new_details)), function(j) {
         is_jmig <- grepl("j minim invasive gynecol", tolower(new_details$pub_journal_abbrev[j]), fixed = TRUE)
-        is_vol <- !is.na(new_details$pub_volume[j]) && new_details$pub_volume[j] == as.character(cfg$pubmed$exclude_supplement_vol)
-        is_yr <- !is.na(new_details$pub_year[j]) && new_details$pub_year[j] == as.character(cfg$pubmed$exclude_supplement_year)
+        is_vol <- !is.na(new_details$pub_volume[j]) && new_details$pub_volume[j] %in% as.character(cfg$pubmed$exclude_supplement_vol)
+        is_yr <- !is.na(new_details$pub_year[j]) && new_details$pub_year[j] %in% as.character(cfg$pubmed$exclude_supplement_year)
         is_jmig && is_vol && is_yr
       }, logical(1))
       new_details <- new_details[!is_suppl, ]

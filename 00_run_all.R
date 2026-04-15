@@ -27,6 +27,10 @@ if (file.exists(here("data", "processed", "abstracts_parsed_web.csv")) &&
   source(here("R", "01c_compare_sources.R"))
 }
 
+# Step 1d: Tag session type (Oral vs Video) from JMIG TOC
+cli_h2("Step 1d: Session Type Tagging")
+source(here("R", "01d_tag_session_type.R"))
+
 # Step 2: Clean
 cli_h2("Step 2: Cleaning Abstracts")
 source(here("R", "02_clean_abstracts.R"))

@@ -248,86 +248,90 @@ fetch_article_abstract <- function(article_url, cache_dir = here::here("data", "
 # Main execution
 # ============================================================
 
-cli_h2("Web Scraping: JMIG 2023 Supplement")
+cli_h2("Web Scraping: JMIG AAGL Supplements")
 
 # ---- Short-circuit: skip scraping if we already have a complete parsed CSV ----
+# Threshold is per-congress × n_congresses so adding a new year re-runs the scrape.
 parsed_path <- here("data", "processed", "abstracts_parsed_web.csv")
-min_complete_n <- 80  # AAGL 2023 supplement has ~98 oral abstracts
-min_section_coverage <- 0.50  # sections may be sparse from JS rendering
+min_per_congress <- 80
+congresses_cfg <- cfg$congresses %||% list(list(
+  year = 2023,
+  sciencedirect_url = cfg$sources$sciencedirect_url
+))
+min_complete_n <- min_per_congress * length(congresses_cfg)
 skip_scrape <- FALSE
 if (file.exists(parsed_path)) {
   existing <- tryCatch(readr::read_csv(parsed_path, show_col_types = FALSE), error = function(e) NULL)
-  if (!is.null(existing) && nrow(existing) >= min_complete_n) {
-    cli_alert_success("Existing parsed CSV has {nrow(existing)} rows — skipping scrape")
+  if (!is.null(existing) && nrow(existing) >= min_complete_n &&
+      "congress_year" %in% names(existing) &&
+      length(setdiff(as.integer(sapply(congresses_cfg, function(c) c$year)),
+                     as.integer(existing$congress_year))) == 0) {
+    cli_alert_success("Existing parsed CSV has {nrow(existing)} rows covering all configured congresses — skipping scrape")
     readr::write_csv(existing, here("data", "processed", "abstracts_parsed.csv"))
     skip_scrape <- TRUE
   }
 }
 
+`%||%` <- function(a, b) if (is.null(a) || length(a) == 0) b else a
+
 if (!skip_scrape) {
 
-# Scrape listing page
-# Note: ScienceDirect supplement pages may return all items on first page;
-# offset parameter is tried but dedup guards against false pagination.
-all_items <- list()
-base_url <- cfg$sources$sciencedirect_url
+# Scrape each congress in turn. Pagination is rarely needed (issues return all
+# items on the first page) but offset fallback is kept for safety.
+scrape_one_congress <- function(base_url) {
+  all_items <- list()
+  result <- scrape_listing_page(base_url)
+  all_items <- result$items
+  cli_alert_info("  First page: {length(all_items)} items")
 
-result <- scrape_listing_page(base_url)
-all_items <- result$items
-cli_alert_info("First page: {length(all_items)} items")
-
-# Try offset pagination only if first page returned exactly 100 items
-if (length(all_items) == 100) {
-  for (offset in seq(100, 600, by = 100)) {
-    Sys.sleep(2)
-    url <- paste0(base_url, "?offset=", offset)
-    result <- scrape_listing_page(url)
-    if (length(result$items) == 0) break
-
-    # Check if this is genuinely new content by comparing first item
-    new_first_title <- result$items[[1]] |>
-      html_element("a.article-content-title") |>
-      html_text(trim = TRUE)
-    existing_first_title <- all_items[[1]] |>
-      html_element("a.article-content-title") |>
-      html_text(trim = TRUE)
-
-    if (!is.na(new_first_title) && new_first_title == existing_first_title) {
-      cli_alert_info("Offset={offset} returns same content — no true pagination")
-      break
+  if (length(all_items) == 100) {
+    for (offset in seq(100, 600, by = 100)) {
+      Sys.sleep(2)
+      url <- paste0(base_url, "?offset=", offset)
+      result <- scrape_listing_page(url)
+      if (length(result$items) == 0) break
+      new_first <- html_text(html_element(result$items[[1]], "a.article-content-title"), trim = TRUE)
+      existing_first <- html_text(html_element(all_items[[1]], "a.article-content-title"), trim = TRUE)
+      if (!is.na(new_first) && new_first == existing_first) break
+      all_items <- c(all_items, result$items)
+      if (length(result$items) < 100) break
     }
-
-    cli_alert_info("Offset={offset}: {length(result$items)} new items")
-    all_items <- c(all_items, result$items)
-    if (length(result$items) < 100) break
   }
+  all_items
 }
 
-cli_alert_success("Total items from listing: {length(all_items)}")
+all_congress_parsed <- list()
 
-if (length(all_items) == 0) {
-  cli_alert_danger("Could not scrape abstracts from ScienceDirect")
-  cli_alert_info("Falling back to PDF parsing")
-} else {
-  # Parse all items
-  cli_alert_info("Parsing listing items...")
-  all_parsed <- map_dfr(all_items, parse_sd_item)
+for (cc in congresses_cfg) {
+  cli_h3("Congress {cc$year}")
+  items <- scrape_one_congress(cc$sciencedirect_url)
+  cli_alert_success("  Total items: {length(items)}")
+  if (length(items) == 0) next
+  parsed <- map_dfr(items, parse_sd_item)
 
-  cli_alert_info("Item subtypes: {paste(unique(all_parsed$subtype), collapse=', ')}")
-  cli_alert_info("Total items: {nrow(all_parsed)}")
-
-  # Filter to conference abstracts only and dedup by DOI/title
-  abstracts_listing <- all_parsed |>
+  listing <- parsed |>
     filter(
       str_detect(tolower(subtype), "abstract|conference") | is.na(subtype),
       nchar(title) > 10,
-      !str_detect(tolower(title), "^toc$|^cover|^board|^editorial|^international societies")
+      !str_detect(tolower(title), "^toc$|^cover|^board|^editorial|^international societies|^officers|^committees")
     ) |>
-    distinct(doi, .keep_all = TRUE) |>  # Dedup by DOI
-    distinct(title, .keep_all = TRUE) |>  # Fallback dedup by title
-    mutate(abstract_id = sprintf("AAGL2023_%03d", row_number()))
+    distinct(doi, .keep_all = TRUE) |>
+    distinct(title, .keep_all = TRUE) |>
+    mutate(
+      congress_year = cc$year,
+      abstract_id = sprintf("AAGL%d_%03d", cc$year, row_number())
+    )
 
-  cli_alert_success("{nrow(abstracts_listing)} conference abstracts identified")
+  cli_alert_success("  {nrow(listing)} conference abstracts")
+  all_congress_parsed[[as.character(cc$year)]] <- listing
+}
+
+if (length(all_congress_parsed) == 0) {
+  cli_alert_danger("Could not scrape abstracts from ScienceDirect")
+  cli_alert_info("Falling back to PDF parsing")
+} else {
+  abstracts_listing <- bind_rows(all_congress_parsed)
+  cli_alert_success("Combined listing: {nrow(abstracts_listing)} abstracts across {length(all_congress_parsed)} congresses")
 
   # Fetch full abstract text for each article
   cli_alert_info("Fetching structured abstract text from individual pages...")

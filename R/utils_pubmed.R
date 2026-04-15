@@ -150,9 +150,9 @@ is_supplement_article <- function(details_row, cfg = NULL) {
 
   is_jmig <- str_detect(tolower(details_row$pub_journal_abbrev), "j minim invasive gynecol")
   is_supplement_vol <- !is.na(details_row$pub_volume) &&
-    details_row$pub_volume == as.character(cfg$pubmed$exclude_supplement_vol)
+    details_row$pub_volume %in% as.character(cfg$pubmed$exclude_supplement_vol)
   is_supplement_year <- !is.na(details_row$pub_year) &&
-    details_row$pub_year == as.character(cfg$pubmed$exclude_supplement_year)
+    details_row$pub_year %in% as.character(cfg$pubmed$exclude_supplement_year)
 
   is_jmig && is_supplement_vol && is_supplement_year
 }

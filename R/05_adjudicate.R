@@ -5,6 +5,7 @@ library(readr)
 library(dplyr)
 library(cli)
 library(config)
+source(here("R", "utils_congresses.R"))
 
 cfg <- config::get(file = here("config.yml"))
 
@@ -39,7 +40,7 @@ results <- results |>
       as.Date(sprintf("%s-%02d-01", pub_year, pub_month_num)),
       as.Date(NA)
     ),
-    conference_date = as.Date(cfg$conference$date),
+    conference_date = conference_date_for(congress_year, cfg),
     months_to_pub = as.numeric(difftime(pub_date, conference_date, units = "days")) / 30.44
   )
 
@@ -55,8 +56,10 @@ available_score_cols <- intersect(score_component_cols, names(results))
 
 results_out <- results |>
   select(
-    abstract_id, title, first_author_normalized, last_author_normalized,
+    abstract_id, any_of("congress_year"), title,
+    first_author_normalized, last_author_normalized,
     author_count, is_rct, sample_size, is_academic, is_us_based,
+    any_of("session_type"),
     best_pmid, best_score, classification, has_tie, n_candidates,
     all_of(available_score_cols),
     pub_title, pub_journal, pub_year, pub_doi, pub_first_author,

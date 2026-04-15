@@ -33,6 +33,13 @@ output/figures/
 
 # Google Sheets service account credentials
 google_credentials.json
+google_key/
+*.json.key
+*-service-account*.json
+
+# Deploy-time bundle for shinyapps.io (regenerated from data/processed & output)
+shiny/adjudication_app/bundle/
+shiny/adjudication_app/rsconnect/
 
 # Misc
 *.log

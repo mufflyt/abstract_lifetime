@@ -12,6 +12,19 @@ library(here)
 library(shinyjs)
 library(googlesheets4)
 
+# --- Path resolution (dev vs shinyapps.io deploy) ---
+# In dev, data/output live at the repo root. In a deployed bundle, only the
+# app directory is uploaded, so we copy a subset of files into ./bundle/ at
+# deploy time. app_path() looks in the app directory first, then falls back
+# to the repo-relative location that here::here() produces.
+APP_DIR <- tryCatch(normalizePath(".", mustWork = FALSE), error = function(e) ".")
+
+app_path <- function(...) {
+  local <- file.path(APP_DIR, "bundle", ...)
+  if (file.exists(local)) return(local)
+  here(...)
+}
+
 # --- Google Sheets helpers ---
 
 #' Get the Google Sheet ID from env or config
@@ -19,7 +32,7 @@ get_sheet_id <- function() {
 
   id <- Sys.getenv("GOOGLE_SHEETS_ID", "")
   if (nchar(id) == 0) {
-    cfg_path <- here("config.yml")
+    cfg_path <- app_path("config.yml")
     if (file.exists(cfg_path)) {
       cfg <- yaml::read_yaml(cfg_path)
       id <- cfg$default$google_sheet_id %||% ""
@@ -31,6 +44,7 @@ get_sheet_id <- function() {
 #' Attempt Google Sheets authentication via service account
 gs_auth_init <- function() {
   json_paths <- c(
+    file.path(APP_DIR, "google_credentials.json"),
     "google_credentials.json",
     here("shiny", "adjudication_app", "google_credentials.json")
   )
@@ -58,19 +72,33 @@ gs_available <- function() {
   }, error = function(e) FALSE)
 }
 
+# Canonical decision-row schema. Order preserved — new columns appended to the
+# right so previously written sheets stay valid (existing rows get NA for new
+# columns).
+DECISION_COLS <- c(
+  "abstract_id", "reviewer", "manual_decision", "manual_pmid",
+  "reviewer_notes", "review_timestamp",
+  "abstract_title", "abstract_first_author", "abstract_subtype", "session_type",
+  "congress_year", "sciencedirect_url",
+  "matched_pub_title", "matched_pub_journal", "matched_pub_year",
+  "matched_score", "matched_title_similarity"
+)
+
+empty_decisions <- function() {
+  out <- as_tibble(setNames(
+    replicate(length(DECISION_COLS), character(), simplify = FALSE),
+    DECISION_COLS
+  ))
+  out
+}
+
 #' Read decisions from Google Sheets
 gs_read_decisions <- function(sheet_id) {
   tryCatch({
-    d <- read_sheet(sheet_id, sheet = "decisions", col_types = "cccccc")
-    if (nrow(d) == 0) {
-      return(tibble(abstract_id = character(), reviewer = character(),
-                    manual_decision = character(), manual_pmid = character(),
-                    reviewer_notes = character(), review_timestamp = character()))
-    }
-    # Ensure all expected columns exist
-    expected <- c("abstract_id", "reviewer", "manual_decision",
-                  "manual_pmid", "reviewer_notes", "review_timestamp")
-    for (col in expected) {
+    col_types <- strrep("c", length(DECISION_COLS))
+    d <- read_sheet(sheet_id, sheet = "decisions", col_types = col_types)
+    if (nrow(d) == 0) return(empty_decisions())
+    for (col in DECISION_COLS) {
       if (!col %in% names(d)) d[[col]] <- NA_character_
     }
     d |> mutate(across(everything(), as.character),
@@ -80,9 +108,37 @@ gs_read_decisions <- function(sheet_id) {
   })
 }
 
-#' Append a single decision row to Google Sheet
+#' Ensure the sheet's header row contains all DECISION_COLS. Existing columns
+#' keep their position; missing columns are appended to the right.
+gs_ensure_headers <- function(sheet_id) {
+  tryCatch({
+    current <- tryCatch(
+      names(read_sheet(sheet_id, sheet = "decisions", n_max = 0)),
+      error = function(e) character()
+    )
+    missing <- setdiff(DECISION_COLS, current)
+    if (length(missing) == 0) return(TRUE)
+    new_header <- c(current, missing)
+    header_tbl <- as_tibble(setNames(
+      replicate(length(new_header), character(), simplify = FALSE),
+      new_header
+    ))
+    range_write(sheet_id, header_tbl, sheet = "decisions",
+                range = "A1", col_names = TRUE, reformat = FALSE)
+    TRUE
+  }, error = function(e) {
+    warning("Failed to extend headers: ", conditionMessage(e))
+    FALSE
+  })
+}
+
+#' Append a single decision row to Google Sheet. Reorders columns to match the
+#' sheet's header so values land in the correct cells.
 gs_append_decision <- function(sheet_id, new_row) {
   tryCatch({
+    header <- names(read_sheet(sheet_id, sheet = "decisions", n_max = 0))
+    for (col in setdiff(header, names(new_row))) new_row[[col]] <- NA_character_
+    new_row <- new_row[, header, drop = FALSE]
     sheet_append(sheet_id, new_row, sheet = "decisions")
     TRUE
   }, error = function(e) {
@@ -98,11 +154,14 @@ gs_all_decisions <- function(sheet_id) {
 
 # --- Data loading ---
 load_data <- function(use_gs = FALSE, sheet_id = NULL) {
-  review_path     <- here("output", "manual_review_queue.csv")
-  candidates_path <- here("data", "processed", "pubmed_candidates.csv")
-  scores_path     <- here("data", "processed", "match_scores_detailed.rds")
-  decisions_path  <- here("output", "manual_review_decisions.csv")
-  abstracts_path  <- here("data", "processed", "abstracts_cleaned.csv")
+  # Primary queue = full 98 abstracts with algorithm classification. This
+  # lets reviewers spot-check auto-accepts and auto-rejects, not just the
+  # algorithm's "review" cases.
+  review_path     <- app_path("output", "abstracts_with_matches.csv")
+  candidates_path <- app_path("data", "processed", "pubmed_candidates.csv")
+  scores_path     <- app_path("data", "processed", "match_scores_detailed.rds")
+  decisions_path  <- app_path("output", "manual_review_decisions.csv")
+  abstracts_path  <- app_path("data", "processed", "abstracts_cleaned.csv")
 
   review_queue  <- if (file.exists(review_path)) read_csv(review_path, show_col_types = FALSE) else tibble()
   candidates    <- if (file.exists(candidates_path)) read_csv(candidates_path, show_col_types = FALSE) else tibble()
@@ -110,7 +169,10 @@ load_data <- function(use_gs = FALSE, sheet_id = NULL) {
   abstracts     <- if (file.exists(abstracts_path)) {
     read_csv(abstracts_path, show_col_types = FALSE) |>
       select(any_of(c("abstract_id", "abstract_text", "authors_raw",
-                       "author_name_first", "author_name_last")))
+                       "author_name_first", "author_name_last",
+                       "title", "subtype", "session_type",
+                       "congress_year", "article_url", "doi",
+                       "first_author_normalized")))
   } else tibble(abstract_id = character(), abstract_text = character(),
                  authors_raw = character())
 
@@ -122,15 +184,13 @@ load_data <- function(use_gs = FALSE, sheet_id = NULL) {
   if (is.null(decisions)) {
     decisions <- if (file.exists(decisions_path)) {
       d <- read_csv(decisions_path, show_col_types = FALSE)
-      if (!"reviewer" %in% names(d))          d$reviewer          <- NA_character_
-      if (!"reviewer_notes" %in% names(d))   d$reviewer_notes   <- NA_character_
-      if (!"review_timestamp" %in% names(d)) d$review_timestamp <- NA_character_
+      for (col in DECISION_COLS) {
+        if (!col %in% names(d)) d[[col]] <- NA_character_
+      }
       d |> mutate(across(everything(), as.character),
                   reviewer = if_else(is.na(reviewer) | reviewer == "NA", "AUTO", reviewer))
     } else {
-      tibble(abstract_id = character(), reviewer = character(),
-             manual_decision = character(), manual_pmid = character(),
-             reviewer_notes = character(), review_timestamp = character())
+      empty_decisions()
     }
   }
 
@@ -188,6 +248,20 @@ $(document).on('keydown', function(e) {
 });
 "
 
+# --- UI helpers ---
+# Small "?" icon that shows a tooltip on hover. Place next to a label or
+# control when the meaning might not be obvious.
+help_icon <- function(text) {
+  bslib::tooltip(
+    tags$span(
+      icon("circle-question"),
+      style = "color: #6c757d; cursor: help; margin-left: 4px; font-size: 0.85em;"
+    ),
+    text,
+    placement = "top"
+  )
+}
+
 # --- UI ---
 ui <- page_sidebar(
   title = "AAGL 2023 Abstract-to-Publication Adjudication",
@@ -199,8 +273,49 @@ ui <- page_sidebar(
 
   sidebar = sidebar(
     width = 280,
-    selectInput("abstract_select", "Select Abstract:", choices = NULL, selected = NULL),
-    checkboxInput("filter_unreviewed", "Show unreviewed only", value = FALSE),
+    tooltip(
+      selectInput("abstract_select", "Select Abstract:", choices = NULL, selected = NULL),
+      "Pick any AAGL 2023 abstract. The left card shows the abstract; the right card shows PubMed candidates scored against it.",
+      placement = "right"
+    ),
+    tooltip(
+      checkboxInput("filter_unreviewed", "Show unreviewed only", value = FALSE),
+      "Hide abstracts that already have a decision saved (by any reviewer). Useful for dividing work.",
+      placement = "right"
+    ),
+    tooltip(
+      radioButtons(
+        "filter_year",
+        tagList("Congress year:",
+                help_icon("Narrow the list to a specific AAGL Global Congress year (2022 = 51st, 2023 = 52nd). 'All' shows both cohorts (198 abstracts).")),
+        choices = c("All" = "all", "2021" = "2021", "2022" = "2022", "2023" = "2023"),
+        selected = "all",
+        inline = TRUE
+      ),
+      "Filter the selector by AAGL year.",
+      placement = "right"
+    ),
+    tooltip(
+      radioButtons(
+        "filter_class",
+        tagList("Algorithm classification:",
+                help_icon(HTML(paste(
+                  "Filters the selector by what the matcher decided before any manual review:<br>",
+                  "• <b>All</b> — every AAGL 2023 abstract (98).<br>",
+                  "• <b>Review</b> — ambiguous cases the pipeline flagged for human judgement.<br>",
+                  "• <b>Accepted</b> — auto-accepted high-confidence matches (spot-check these).<br>",
+                  "• <b>Rejected</b> — auto-rejected (low score / no text evidence). Spot-check for missed matches.<br>",
+                  "• <b>No candidates</b> — PubMed returned nothing."
+                )))),
+        choices = c("All" = "all", "Review" = "review",
+                    "Accepted" = "accept", "Rejected" = "reject",
+                    "No candidates" = "no_candidates"),
+        selected = "all",
+        inline = FALSE
+      ),
+      "Narrow the abstract list to a specific pipeline decision category.",
+      placement = "right"
+    ),
     div(
       class = "d-flex gap-2 mb-3",
       actionButton("btn_prev", "Prev", icon = icon("arrow-left"), class = "btn-sm btn-outline-secondary flex-fill"),
@@ -216,8 +331,16 @@ ui <- page_sidebar(
     ),
     uiOutput("conflict_summary"),
     hr(),
-    downloadButton("download_decisions", "Export Decisions", class = "btn-success btn-sm w-100 mb-2"),
-    actionButton("btn_refresh", "Refresh Data", icon = icon("rotate"), class = "btn-info btn-sm w-100"),
+    tooltip(
+      downloadButton("download_decisions", "Export Decisions", class = "btn-success btn-sm w-100 mb-2"),
+      "Download all decisions (yours + everyone else's) as a CSV snapshot.",
+      placement = "right"
+    ),
+    tooltip(
+      actionButton("btn_refresh", "Refresh Data", icon = icon("rotate"), class = "btn-info btn-sm w-100"),
+      "Re-read decisions from Google Sheets to pull in other reviewers' recent saves.",
+      placement = "right"
+    ),
     hr(),
     uiOutput("backend_badge")
   ),
@@ -240,7 +363,27 @@ ui <- page_sidebar(
           tags$strong("Authors: "), uiOutput("abs_authors", inline = TRUE)
         ),
         tags$div(class = "mb-2",
-          tags$strong("Total Score: "), uiOutput("score_badge", inline = TRUE)
+          tags$strong("Session: "), uiOutput("abs_session", inline = TRUE),
+          help_icon("Which AAGL session the abstract was presented in — Oral Presentations or Video Presentations. (The JMIG supplement has no poster section.)")
+        ),
+        tags$div(class = "mb-2",
+          uiOutput("abs_sciencedirect_link"),
+          help_icon("Open the original abstract page on ScienceDirect in a new tab.")
+        ),
+        tags$div(class = "mb-2",
+          tags$strong("Total Score: "), uiOutput("score_badge", inline = TRUE),
+          help_icon(HTML(paste(
+            "Sum of matching-signal points for the top PubMed candidate.",
+            "Components: title similarity, abstract-text overlap, first/last/",
+            "coauthor matches, team bonus, journal, keywords, publication date,",
+            "minus a no-text-evidence penalty.<br><br>",
+            "Badge color: green &ge; 7 (auto-accept), yellow 4–6.9 (review),",
+            "red &lt; 4 (reject).<br><br>",
+            "<b>(TIE)</b> means two or more candidates share the top score — the",
+            "algorithm can't pick between them, so the abstract always goes to",
+            "manual review. <b>0.0 (TIE)</b> means every candidate scored zero",
+            "(no overlap at all) — usually this is a 'No Match'."
+          )))
         ),
         tags$div(class = "mb-2",
           uiOutput("pubmed_link")
@@ -257,7 +400,20 @@ ui <- page_sidebar(
 
     # --- Right card: Candidates table + decision ---
     card(
-      card_header("Candidate Publications"),
+      card_header(
+        class = "d-flex justify-content-between align-items-center",
+        span("Candidate Publications"),
+        help_icon(HTML(paste(
+          "PubMed papers that the search pipeline surfaced as possible",
+          "publications of this abstract, sorted by Score (highest first).<br><br>",
+          "<b>Columns:</b><br>",
+          "• <b>Score</b>: total matching points (same scale as Total Score).<br>",
+          "• <b>Title Sim</b>: cosine similarity of title bigrams (0–1).<br>",
+          "• <b>Pub Title / Journal / Year</b>: from PubMed.<br>",
+          "• <b>PMID</b>: click to open the record on PubMed.<br><br>",
+          "Click a row to expand that candidate's abstract for side-by-side reading."
+        )))
+      ),
       card_body(
         div(style = "max-height: 300px; overflow-y: auto;",
           DTOutput("candidates_table")
@@ -267,19 +423,41 @@ ui <- page_sidebar(
         h5("Decision"),
         div(class = "d-flex gap-3 align-items-end mb-2",
           div(style = "flex: 0 0 auto;",
-            textInput("reviewer_initials", "Reviewer Initials:", width = "100px")
+            tooltip(
+              textInput("reviewer_initials", tagList("Reviewer Initials:", help_icon("2–4 uppercase letters identifying you (e.g., TM, ABC). Required so multi-reviewer conflicts can be detected.")), width = "100px"),
+              "Your initials are stamped on every saved decision.",
+              placement = "top"
+            )
           ),
           div(style = "flex: 1;",
-            radioButtons("decision", "Match decision:",
+            radioButtons("decision",
+                         tagList("Match decision:",
+                                 help_icon(HTML(paste(
+                                   "<b>Confirmed match</b>: the PMID (best or overridden) is the published version of this abstract.<br>",
+                                   "<b>No match found</b>: you've reviewed the candidates and none correspond.<br>",
+                                   "<b>Skip / Unsure</b>: can't decide — come back later."
+                                 )))),
                          choices = c("Confirmed match" = "match",
                                      "No match found" = "no_match",
                                      "Skip / Unsure" = "skip"),
                          selected = "skip", inline = TRUE)
           )
         ),
-        textInput("manual_pmid", "Override PMID (if different from best):"),
-        textAreaInput("notes", "Reviewer notes:", rows = 2),
-        actionButton("btn_save", "Save Decision", class = "btn-primary", icon = icon("floppy-disk")),
+        tooltip(
+          textInput("manual_pmid", tagList("Override PMID (if different from best):", help_icon("Enter a 7-8 digit PubMed ID if the correct match isn't the top candidate. Leave blank to accept the 'best_pmid' on a match decision."))),
+          "Use when the right paper is lower in the candidate list or not listed at all.",
+          placement = "top"
+        ),
+        tooltip(
+          textAreaInput("notes", tagList("Reviewer notes:", help_icon("Optional free-text rationale. Helpful for edge cases and conflict resolution between reviewers.")), rows = 2),
+          "These notes ship to the Google Sheet alongside your decision.",
+          placement = "top"
+        ),
+        tooltip(
+          actionButton("btn_save", "Save Decision", class = "btn-primary", icon = icon("floppy-disk")),
+          "Writes your decision to Google Sheets (or local CSV fallback). Also confirms conflicts if another reviewer already decided.",
+          placement = "top"
+        ),
         tags$div(class = "text-muted small mt-2",
           tags$strong("Keyboard shortcuts: "),
           tags$span("m = match, n = no match, s = skip, Enter = save, "), tags$br(),
@@ -304,14 +482,11 @@ server <- function(input, output, session) {
         ok <- tryCatch({
           sheets <- sheet_names(sid)
           if (!"decisions" %in% sheets) {
-            # Create 'decisions' sheet with header
-            header <- tibble(
-              abstract_id = character(), reviewer = character(),
-              manual_decision = character(), manual_pmid = character(),
-              reviewer_notes = character(), review_timestamp = character()
-            )
             sheet_add(sid, sheet = "decisions")
-            range_write(sid, header, sheet = "decisions", col_names = TRUE)
+            range_write(sid, empty_decisions(), sheet = "decisions",
+                        col_names = TRUE)
+          } else {
+            gs_ensure_headers(sid)
           }
           TRUE
         }, error = function(e) FALSE)
@@ -358,7 +533,7 @@ server <- function(input, output, session) {
       tags$a(href = url, target = "_blank", class = "btn btn-sm btn-outline-success w-100 text-decoration-none",
              icon("cloud"), " Open Google Sheet ", icon("up-right-from-square"))
     } else {
-      csv_path <- here("output", "manual_review_decisions.csv")
+      csv_path <- app_path("output", "manual_review_decisions.csv")
       tags$div(
         span(class = "badge bg-secondary", icon("file"), " Local CSV"),
         tags$div(class = "small mt-1", style = "word-break: break-all;",
@@ -458,12 +633,21 @@ server <- function(input, output, session) {
     )
   })
 
-  # --- Visible IDs (respects filter) ---
+  # --- Visible IDs (respects filters) ---
   visible_ids <- reactive({
     d <- data()
     req(d)
     if (nrow(d$review_queue) == 0) return(character(0))
-    ids <- d$review_queue$abstract_id
+    rq <- d$review_queue
+    yr <- input$filter_year %||% "all"
+    if (yr != "all" && "congress_year" %in% names(rq)) {
+      rq <- rq[as.character(rq$congress_year) == yr, , drop = FALSE]
+    }
+    cls <- input$filter_class %||% "all"
+    if (cls != "all" && "classification" %in% names(rq)) {
+      rq <- rq[rq$classification %in% cls, , drop = FALSE]
+    }
+    ids <- rq$abstract_id
     if (isTRUE(input$filter_unreviewed)) {
       reviewed <- unique(d$decisions$abstract_id)
       ids <- ids[!ids %in% reviewed]
@@ -475,9 +659,10 @@ server <- function(input, output, session) {
   make_choices <- function(ids, d) {
     reviewed <- unique(d$decisions$abstract_id)
     cs <- conflict_status()
+    class_glyph <- c(accept = "[A]", review = "[R]", reject = "[x]",
+                     no_candidates = "[0]")
     labels <- vapply(ids, function(id) {
       row <- d$review_queue[d$review_queue$abstract_id == id, ]
-      # Status prefix
       conflict_row <- cs |> filter(abstract_id == id)
       prefix <- if (nrow(conflict_row) > 0 && conflict_row$status[1] == "Conflict") {
         "\U0001F534 "
@@ -486,7 +671,15 @@ server <- function(input, output, session) {
       } else {
         "\u2022 "
       }
-      paste0(prefix, id, ": ", str_trunc(row$title[1], 45))
+      cls_tag <- if ("classification" %in% names(row) && nrow(row) > 0 &&
+                     !is.na(row$classification[1])) {
+        paste0(class_glyph[row$classification[1]] %||% "", " ")
+      } else ""
+      yr_tag <- if ("congress_year" %in% names(row) && nrow(row) > 0 &&
+                    !is.na(row$congress_year[1])) {
+        paste0("'", substr(as.character(row$congress_year[1]), 3, 4), " ")
+      } else ""
+      paste0(prefix, cls_tag, yr_tag, id, ": ", str_trunc(row$title[1], 38))
     }, character(1))
     setNames(ids, labels)
   }
@@ -608,6 +801,38 @@ server <- function(input, output, session) {
       a <- current_abstract()
       if (nrow(a) > 0) span(a$first_author_normalized[1]) else span("")
     }
+  })
+
+  output$abs_sciencedirect_link <- renderUI({
+    d <- data()
+    req(d)
+    abs_id <- input$abstract_select
+    req(abs_id, abs_id != "")
+    row <- d$abstracts |> filter(abstract_id == abs_id)
+    url <- if (nrow(row) > 0 && "article_url" %in% names(row) &&
+               !is.na(row$article_url[1]) && nchar(row$article_url[1]) > 0) {
+      row$article_url[1]
+    } else NA_character_
+    if (is.na(url)) return(tags$em("No ScienceDirect link available."))
+    tags$a(href = url, target = "_blank", rel = "noopener",
+           icon("up-right-from-square"), " View on ScienceDirect")
+  })
+
+  output$abs_session <- renderUI({
+    d <- data()
+    req(d)
+    abs_id <- input$abstract_select
+    req(abs_id, abs_id != "")
+    row <- d$abstracts |> filter(abstract_id == abs_id)
+    st <- if (nrow(row) > 0 && "session_type" %in% names(row) &&
+              !is.na(row$session_type[1])) row$session_type[1] else NA_character_
+    if (is.na(st)) return(span(class = "badge bg-secondary", "Unknown"))
+    cls <- switch(st,
+                  "Oral"  = "bg-primary",
+                  "Video" = "bg-info",
+                  "Poster" = "bg-warning text-dark",
+                  "bg-secondary")
+    span(class = paste("badge", cls), st)
   })
 
   # Format abstract text with section headers as paragraphs
@@ -836,12 +1061,13 @@ server <- function(input, output, session) {
     dt
   })
 
-  # --- Progress ---
+  # --- Progress (scoped to the current classification filter) ---
   output$progress_count <- renderText({
     d <- data()
     req(d)
-    total <- nrow(d$review_queue)
-    reviewed <- sum(d$review_queue$abstract_id %in% unique(d$decisions$abstract_id))
+    ids <- visible_ids()
+    total <- length(ids)
+    reviewed <- sum(ids %in% unique(d$decisions$abstract_id))
     sprintf("%d / %d (%.0f%%)", reviewed, total,
             if (total > 0) reviewed / total * 100 else 0)
   })
@@ -928,20 +1154,85 @@ server <- function(input, output, session) {
   do_save <- function(abs_id, initials, pmid_input) {
     d <- data()
 
-    final_pmid <- if (nchar(pmid_input) > 0) {
+    # Only attach a PMID when the reviewer actually confirmed a match. For
+    # "no_match" / "skip" we must NOT backfill from best_pmid, or the saved
+    # row would look like the reviewer endorsed that candidate.
+    final_pmid <- if (!identical(input$decision, "match")) {
+      NA_character_
+    } else if (nchar(pmid_input) > 0) {
       pmid_input
     } else {
       bp <- d$review_queue$best_pmid[d$review_queue$abstract_id == abs_id]
       if (length(bp) > 0) as.character(bp[1]) else NA_character_
     }
 
+    # Abstract-level identifiers
+    abs_row <- if (nrow(d$abstracts) > 0) {
+      d$abstracts[d$abstracts$abstract_id == abs_id, , drop = FALSE]
+    } else tibble()
+    rq_row <- if (nrow(d$review_queue) > 0) {
+      d$review_queue[d$review_queue$abstract_id == abs_id, , drop = FALSE]
+    } else tibble()
+
+    pick <- function(df, col) {
+      if (nrow(df) == 0 || !col %in% names(df)) return(NA_character_)
+      v <- df[[col]][1]
+      if (is.null(v) || is.na(v)) NA_character_ else as.character(v)
+    }
+
+    abstract_title        <- pick(abs_row, "title")
+    abstract_first_author <- pick(abs_row, "first_author_normalized")
+    if (is.na(abstract_first_author)) {
+      abstract_first_author <- pick(abs_row, "author_name_first")
+    }
+    abstract_subtype      <- pick(abs_row, "subtype")
+    session_type          <- pick(abs_row, "session_type")
+    congress_year         <- pick(abs_row, "congress_year")
+    sciencedirect_url     <- pick(abs_row, "article_url")
+
+    # Matched publication details (looked up by the chosen PMID)
+    cand_row <- if (!is.na(final_pmid) && nchar(final_pmid) > 0 &&
+                    nrow(d$candidates) > 0 && "pmid" %in% names(d$candidates)) {
+      d$candidates[as.character(d$candidates$pmid) == final_pmid, , drop = FALSE]
+    } else tibble()
+
+    # Only populate matched-publication columns when the reviewer confirmed a
+    # match. For no_match/skip, leave them blank so the row can't be mistaken
+    # for an endorsement of the top candidate.
+    if (identical(input$decision, "match")) {
+      matched_pub_title   <- pick(cand_row, "pub_title")
+      matched_pub_journal <- pick(cand_row, "pub_journal")
+      matched_pub_year    <- pick(cand_row, "pub_year")
+      if (is.na(matched_pub_title))   matched_pub_title   <- pick(rq_row, "pub_title")
+      if (is.na(matched_pub_journal)) matched_pub_journal <- pick(rq_row, "pub_journal")
+      matched_score            <- pick(rq_row, "best_score")
+      matched_title_similarity <- pick(rq_row, "title_sim")
+    } else {
+      matched_pub_title        <- NA_character_
+      matched_pub_journal      <- NA_character_
+      matched_pub_year         <- NA_character_
+      matched_score            <- NA_character_
+      matched_title_similarity <- NA_character_
+    }
+
     new_decision <- tibble(
-      abstract_id      = abs_id,
-      reviewer         = initials,
-      manual_decision  = input$decision,
-      manual_pmid      = final_pmid,
-      reviewer_notes   = input$notes,
-      review_timestamp = as.character(Sys.time())
+      abstract_id              = abs_id,
+      reviewer                 = initials,
+      manual_decision          = input$decision,
+      manual_pmid              = final_pmid,
+      reviewer_notes           = input$notes,
+      review_timestamp         = as.character(Sys.time()),
+      abstract_title           = abstract_title,
+      abstract_first_author    = abstract_first_author,
+      abstract_subtype         = abstract_subtype,
+      session_type             = session_type,
+      congress_year            = congress_year,
+      sciencedirect_url        = sciencedirect_url,
+      matched_pub_title        = matched_pub_title,
+      matched_pub_journal      = matched_pub_journal,
+      matched_pub_year         = matched_pub_year,
+      matched_score            = matched_score,
+      matched_title_similarity = matched_title_similarity
     )
 
     saved_to_gs <- FALSE
@@ -958,7 +1249,7 @@ server <- function(input, output, session) {
     if (!saved_to_gs) {
       # Write to local CSV (replace old row for same abstract_id + reviewer)
       local_dedup <- dedup_decisions(updated_decisions)
-      write_csv(local_dedup, here("output", "manual_review_decisions.csv"))
+      write_csv(local_dedup, app_path("output", "manual_review_decisions.csv"))
     }
 
     d$decisions <- updated_decisions

@@ -136,7 +136,14 @@ score_match <- function(abstract, candidate, cfg = NULL) {
   }
 
   # --- Publication date ---
-  conference_date <- as.Date(cfg$conference$date)
+  # Prefer the per-abstract congress_year when scoring multi-cohort data.
+  conference_date <- if (!is.null(abstract$congress_year) &&
+                         !is.na(abstract$congress_year[1])) {
+    source(here::here("R", "utils_congresses.R"), local = TRUE)
+    conference_date_for(abstract$congress_year[1], cfg)
+  } else {
+    as.Date(cfg$conference$date)
+  }
   pub_date <- tryCatch({
     month_num <- match(candidate$pub_month, month.abb)
     if (is.na(month_num)) month_num <- as.integer(candidate$pub_month)

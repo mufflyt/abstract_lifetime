@@ -8,6 +8,7 @@ library(survival)
 library(broom)
 library(cli)
 library(config)
+source(here("R", "utils_congresses.R"))
 
 cfg <- config::get(file = here("config.yml"))
 
@@ -114,7 +115,7 @@ if (nrow(published) > 0 && "months_to_pub" %in% names(published)) {
       time = if_else(final_published & !is.na(months_to_pub),
                      months_to_pub,
                      as.numeric(difftime(as.Date(cfg$pubmed$date_end, "%Y/%m/%d"),
-                                         as.Date(cfg$conference$date),
+                                         conference_date_for(congress_year, cfg),
                                          units = "days")) / 30.44),
       event = as.integer(final_published)
     ) |>
