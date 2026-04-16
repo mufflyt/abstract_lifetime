@@ -288,7 +288,11 @@ ui <- page_sidebar(
         "filter_year",
         tagList("Congress year:",
                 help_icon("Narrow the list to a specific AAGL Global Congress year (2022 = 51st, 2023 = 52nd). 'All' shows both cohorts (198 abstracts).")),
-        choices = c("All" = "all", "2021" = "2021", "2022" = "2022", "2023" = "2023"),
+        choices = c("All" = "all",
+                    "2012" = "2012", "2013" = "2013", "2014" = "2014",
+                    "2015" = "2015", "2016" = "2016", "2018" = "2018",
+                    "2019" = "2019", "2020" = "2020", "2021" = "2021",
+                    "2022" = "2022", "2023" = "2023"),
         selected = "all",
         inline = TRUE
       ),
