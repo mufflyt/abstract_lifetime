@@ -1,6 +1,6 @@
 term,or_ci,p.value,significance
-(Intercept),0.35 (0.20-0.58),0,***
-is_rctTRUE,2.40 (0.59-8.91),0.193,
-log_sample_size,0.94 (0.82-1.07),0.376,
-is_academicTRUE,0.93 (0.43-1.89),0.834,
-is_us_basedTRUE,NA (NA-NA),NA,
+(Intercept),0.05 (0.03-0.09),0,***
+is_rctTRUE,2.00 (0.87-4.16),0.078,
+log_sample_size,1.01 (0.91-1.11),0.862,
+is_academicTRUE,1.40 (0.76-2.49),0.263,
+is_us_basedTRUE,2.67 (1.54-4.81),0.001,**

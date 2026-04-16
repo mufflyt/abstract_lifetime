@@ -44,3 +44,4 @@ shiny/adjudication_app/rsconnect/
 # Misc
 *.log
 .claude/
+data/processed/pubmed_candidates.csv

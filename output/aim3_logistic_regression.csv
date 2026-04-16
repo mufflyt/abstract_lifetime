@@ -1,6 +1,6 @@
 term,estimate,std.error,statistic,p.value,conf.low,conf.high
-(Intercept),0.348,0.265,-3.99,0,0.204,0.576
-is_rctTRUE,2.405,0.674,1.303,0.193,0.587,8.906
-log_sample_size,0.94,0.069,-0.885,0.376,0.818,1.075
-is_academicTRUE,0.925,0.373,-0.209,0.834,0.434,1.89
-is_us_basedTRUE,NA,NA,NA,NA,NA,NA
+(Intercept),0.054,0.249,-11.689,0,0.032,0.086
+is_rctTRUE,2,0.394,1.76,0.078,0.873,4.162
+log_sample_size,1.009,0.05,0.174,0.862,0.912,1.111
+is_academicTRUE,1.402,0.302,1.12,0.263,0.759,2.493
+is_us_basedTRUE,2.665,0.289,3.398,0.001,1.542,4.808

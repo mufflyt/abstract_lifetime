@@ -1,7 +1,7 @@
 step,n
-Total abstracts parsed,299
-After cleaning,299
-PubMed candidates found,299
-Auto-accepted,35
-Manual review,114
-Rejected / No match,150
+Total abstracts parsed,1060
+After cleaning,1060
+PubMed candidates found,1056
+Auto-accepted,77
+Manual review,252
+Rejected / No match,731

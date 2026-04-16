@@ -1,8 +1,8 @@
 metric,value
-n_with_dates,47
-median_months,10.8
-q1_months,4.2
-q3_months,17.3
-mean_months,12
+n_with_dates,89
+median_months,11.6
+q1_months,3.8
+q3_months,16.7
+mean_months,11.5
 min_months,-1.4
-max_months,32.8
+max_months,34.7

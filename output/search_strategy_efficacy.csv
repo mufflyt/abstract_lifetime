@@ -1,6 +1,6 @@
 strategy,n_abstracts_searched,n_with_results,pct_with_results,mean_results,median_results
-author_broad,884,794,89.8,643.6,11.5
-first_author,884,669,75.7,94.7,2
-last_author,884,578,65.4,89.4,2
-title,884,1,0.1,0,0
-title_fragment,884,55,6.2,63.3,0
+author_broad,1641,1526,93,2032,25
+first_author,1641,1311,79.9,321.1,4
+last_author,1641,1224,74.6,214.9,5
+title,1645,3,0.2,0.3,0
+title_fragment,1645,116,7.1,64.2,0
