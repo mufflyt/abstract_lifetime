@@ -118,6 +118,13 @@ parse_pubmed_xml <- function(xml_text) {
       collapse = "; "
     )
 
+    # Publication types — concatenate all. Used downstream to stratify by
+    # journal-article / review / case-report / trial.
+    pub_types <- paste(
+      xml_text(xml_find_all(art, ".//PublicationTypeList/PublicationType")),
+      collapse = "; "
+    )
+
     tibble::tibble(
       pmid = pmid,
       pub_title = str_squish(title),
@@ -132,7 +139,8 @@ parse_pubmed_xml <- function(xml_text) {
       pub_month = month,
       pub_day = day,
       pub_doi = doi,
-      pub_keywords = keywords
+      pub_keywords = keywords,
+      pub_types = pub_types
     )
   })
 }

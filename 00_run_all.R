@@ -51,6 +51,10 @@ source(here("R", "04_score_matches.R"))
 cli_h2("Step 5: Adjudication")
 source(here("R", "05_adjudicate.R"))
 
+# Step 5b: Publication-type enrichment for matched PMIDs
+cli_h2("Step 5b: Publication Type Enrichment")
+source(here("R", "09b_enrich_pub_types.R"))
+
 # Step 6: Analyze
 cli_h2("Step 6: Analysis")
 source(here("R", "06_analyze_results.R"))

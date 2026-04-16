@@ -81,7 +81,11 @@ DECISION_COLS <- c(
   "abstract_title", "abstract_first_author", "abstract_subtype", "session_type",
   "congress_year", "sciencedirect_url",
   "matched_pub_title", "matched_pub_journal", "matched_pub_year",
-  "matched_score", "matched_title_similarity"
+  "matched_score", "matched_title_similarity",
+  "matched_pub_type", "matched_pub_types_raw",
+  "n_authors", "n_unique_affiliations",
+  "first_author_state", "first_author_acog_district",
+  "first_author_gender"
 )
 
 empty_decisions <- function() {
@@ -373,6 +377,16 @@ ui <- page_sidebar(
         tags$div(class = "mb-2",
           uiOutput("abs_sciencedirect_link"),
           help_icon("Open the original abstract page on ScienceDirect in a new tab.")
+        ),
+        tags$div(class = "mb-2",
+          tags$strong("Pub type (top candidate): "),
+          uiOutput("abs_pub_type_badge", inline = TRUE),
+          help_icon("PubMed PublicationType for the highest-scored candidate: Journal Article / Review / RCT/Trial / Case Report / Editorial-Letter / Observational Study.")
+        ),
+        tags$div(class = "mb-2",
+          tags$strong("Author context: "),
+          uiOutput("abs_author_context", inline = TRUE),
+          help_icon("n authors / n unique affiliations (from PubMed author list). First-author state + ACOG district (parsed from affiliation) and gender (inferred from given name via Social Security data) apply only when we have a PubMed match for the abstract.")
         ),
         tags$div(class = "mb-2",
           tags$strong("Total Score: "), uiOutput("score_badge", inline = TRUE),
@@ -807,6 +821,51 @@ server <- function(input, output, session) {
     }
   })
 
+  output$abs_author_context <- renderUI({
+    d <- data()
+    req(d)
+    abs_id <- input$abstract_select
+    req(abs_id, abs_id != "")
+    row <- d$review_queue[d$review_queue$abstract_id == abs_id, , drop = FALSE]
+    if (nrow(row) == 0) return(tags$em("—"))
+    get <- function(c) if (c %in% names(row) && !is.na(row[[c]][1])) row[[c]][1] else NA
+
+    na <- get("n_authors"); nua <- get("n_unique_affiliations")
+    st <- get("first_author_state"); dist <- get("first_author_acog_district")
+    g  <- get("first_author_gender")
+
+    bits <- list()
+    if (!is.na(na))  bits[[length(bits)+1]] <- sprintf("%s authors", na)
+    if (!is.na(nua)) bits[[length(bits)+1]] <- sprintf("%s affiliation%s", nua, if (nua == 1) "" else "s")
+    if (!is.na(st) || !is.na(dist)) {
+      lbl <- paste0(na_if(st, ""), if (!is.na(dist)) sprintf(" (ACOG %s)", dist) else "")
+      bits[[length(bits)+1]] <- lbl
+    }
+    if (!is.na(g)) bits[[length(bits)+1]] <- sprintf("1st au: %s", g)
+    if (length(bits) == 0) return(tags$em("n/a"))
+    span(style = "font-size: 0.9em;", paste(unlist(bits), collapse = " • "))
+  })
+
+  output$abs_pub_type_badge <- renderUI({
+    d <- data()
+    req(d)
+    abs_id <- input$abstract_select
+    req(abs_id, abs_id != "")
+    row <- d$review_queue[d$review_queue$abstract_id == abs_id, , drop = FALSE]
+    pt <- if (nrow(row) > 0 && "pub_type_canonical" %in% names(row) &&
+              !is.na(row$pub_type_canonical[1])) row$pub_type_canonical[1] else NA_character_
+    if (is.na(pt)) return(span(class = "badge bg-secondary", "Unknown"))
+    cls <- switch(pt,
+      "Journal Article"     = "bg-primary",
+      "Review"              = "bg-info",
+      "RCT/Trial"           = "bg-success",
+      "Case Report"         = "bg-warning text-dark",
+      "Editorial/Letter"    = "bg-secondary",
+      "Observational Study" = "bg-primary",
+      "bg-secondary")
+    span(class = paste("badge", cls), pt)
+  })
+
   output$abs_sciencedirect_link <- renderUI({
     d <- data()
     req(d)
@@ -1211,12 +1270,16 @@ server <- function(input, output, session) {
       if (is.na(matched_pub_journal)) matched_pub_journal <- pick(rq_row, "pub_journal")
       matched_score            <- pick(rq_row, "best_score")
       matched_title_similarity <- pick(rq_row, "title_sim")
+      matched_pub_type         <- pick(rq_row, "pub_type_canonical")
+      matched_pub_types_raw    <- pick(rq_row, "pub_types")
     } else {
       matched_pub_title        <- NA_character_
       matched_pub_journal      <- NA_character_
       matched_pub_year         <- NA_character_
       matched_score            <- NA_character_
       matched_title_similarity <- NA_character_
+      matched_pub_type         <- NA_character_
+      matched_pub_types_raw    <- NA_character_
     }
 
     new_decision <- tibble(
@@ -1236,7 +1299,14 @@ server <- function(input, output, session) {
       matched_pub_journal      = matched_pub_journal,
       matched_pub_year         = matched_pub_year,
       matched_score            = matched_score,
-      matched_title_similarity = matched_title_similarity
+      matched_title_similarity = matched_title_similarity,
+      matched_pub_type         = matched_pub_type,
+      matched_pub_types_raw    = matched_pub_types_raw,
+      n_authors                = pick(rq_row, "n_authors"),
+      n_unique_affiliations    = pick(rq_row, "n_unique_affiliations"),
+      first_author_state       = pick(rq_row, "first_author_state"),
+      first_author_acog_district = pick(rq_row, "first_author_acog_district"),
+      first_author_gender      = pick(rq_row, "first_author_gender")
     )
 
     saved_to_gs <- FALSE

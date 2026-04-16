@@ -85,6 +85,33 @@ if ("category" %in% names(results)) {
   write_csv(aim1_by_cat, here("output", "aim1_by_category.csv"))
 }
 
+# Publication-type breakdown of published abstracts
+if ("pub_type_canonical" %in% names(results)) {
+  aim1_by_pub_type <- results |>
+    filter(isTRUE(final_published) | final_published == TRUE) |>
+    count(pub_type_canonical, name = "n") |>
+    arrange(desc(n))
+  write_csv(aim1_by_pub_type, here("output", "aim1_by_pub_type.csv"))
+  cli_alert_info("Publication-type breakdown of matched publications:")
+  print(aim1_by_pub_type)
+}
+
+# Publication rate by congress year
+if ("congress_year" %in% names(results)) {
+  aim1_by_year <- results |>
+    filter(!is.na(final_published)) |>
+    group_by(congress_year) |>
+    summarise(
+      n = n(),
+      n_published = sum(final_published),
+      rate = round(mean(final_published) * 100, 1),
+      .groups = "drop"
+    )
+  write_csv(aim1_by_year, here("output", "aim1_by_congress_year.csv"))
+  cli_alert_info("Publication rate by congress year:")
+  print(aim1_by_year)
+}
+
 # ============================================================
 # AIM 2: Time to publication
 # ============================================================
