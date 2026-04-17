@@ -72,7 +72,11 @@ INSTITUTION_STATE <- c(
 #' (4) institution lookup. Returns 2-letter state code or NA.
 parse_us_state <- function(aff) {
   if (is.na(aff) || nchar(aff) == 0) return(NA_character_)
-  lc <- tolower(aff)
+  # Strip email addresses, electronic address tags, and trailing periods
+  aff_clean <- str_replace_all(aff, "\\S+@\\S+", "")
+  aff_clean <- str_replace(aff_clean, "Electronic address:.*$", "")
+  aff_clean <- str_squish(aff_clean)
+  lc <- tolower(aff_clean)
 
   # Strategy 1: Spelled-out state names (longest-first to avoid "New" matching "Nevada")
   state_order <- names(STATE_NAMES)[order(-nchar(names(STATE_NAMES)))]
@@ -80,11 +84,11 @@ parse_us_state <- function(aff) {
     if (str_detect(lc, paste0("\\b", nm, "\\b"))) return(unname(STATE_NAMES[nm]))
   }
 
-  # Strategy 2: 2-letter uppercase code (possibly with ZIP)
-  # Look in comma-separated parts
-  parts <- str_trim(str_split(aff, ",")[[1]])
+  # Strategy 2: 2-letter uppercase code (possibly with ZIP or trailing period)
+  parts <- str_trim(str_split(aff_clean, ",")[[1]])
   for (p in parts) {
-    m <- str_match(p, "\\b([A-Z]{2})(?:\\s+\\d{5}(?:-\\d{4})?)?$")
+    # Match "NY", "NY 10001", "NY.", "NJ;" at end of part
+    m <- str_match(p, "\\b([A-Z]{2})(?:\\s+\\d{5}(?:-\\d{4})?)?[.;]?\\s*$")
     if (!is.na(m[1, 2]) && m[1, 2] %in% STATE_NAMES) return(m[1, 2])
   }
 
