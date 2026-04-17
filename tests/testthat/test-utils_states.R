@@ -47,6 +47,24 @@ test_that("is_us_affiliation works", {
   expect_true(is_us_affiliation("Cleveland Clinic Foundation"))
 })
 
+test_that("period-separated state codes resolved", {
+  expect_equal(parse_us_state("Winthrop University Hospital, Mineola, N.Y., USA"), "NY")
+  expect_equal(parse_us_state("Division of Nephrology, Mineola, N.Y."), "NY")
+})
+
+test_that("expanded institutions resolve", {
+  expect_equal(parse_us_state("Section on Intercellular Interactions, National Institutes of Health"), "MD")
+  expect_equal(parse_us_state("Tufts Medical Center"), "MA")
+  expect_equal(parse_us_state("Baylor College of Medicine"), "TX")
+  expect_equal(parse_us_state("MD Anderson Cancer Center"), "TX")
+  expect_equal(parse_us_state("Scripps Research Institute"), "CA")
+  expect_equal(parse_us_state("George Washington University Hospital"), "DC")
+  expect_equal(parse_us_state("Montefiore Medical Center, Einstein"), "NY")
+  expect_equal(parse_us_state("Penn Medicine Princeton Medical Center, Plainsboro"), "PA")
+  expect_equal(parse_us_state("University of Alabama at Birmingham"), "AL")
+  expect_equal(parse_us_state("Oregon Health and Science University"), "OR")
+})
+
 test_that("West Virginia distinguished from Virginia", {
   expect_equal(parse_us_state("WVU Medicine, Morgantown, West Virginia"), "WV")
   expect_equal(parse_us_state("University of Virginia, Charlottesville, Virginia"), "VA")

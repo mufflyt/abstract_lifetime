@@ -62,9 +62,52 @@ INSTITUTION_STATE <- c(
   "usc" = "CA", "uw madison" = "WI", "upenn" = "PA",
   "magee-womens" = "PA", "magee womens" = "PA", "magee-women" = "PA",
   "brigham and women" = "MA", "mass general" = "MA", "mgh" = "MA",
-  "beth israel" = "MA", "northwestern" = "IL", "rush" = "IL",
+  "beth israel" = "MA", "tufts" = "MA", "boston university" = "MA",
+  "northwestern" = "IL", "rush" = "IL", "loyola" = "IL",
+  "advocate aurora" = "IL", "northshore university" = "IL",
   "beaumont" = "MI", "henry ford" = "MI", "michigan medicine" = "MI",
-  "nih" = "MD", "walter reed" = "MD", "bethesda" = "MD"
+  "nih" = "MD", "national institutes of health" = "MD",
+  "walter reed" = "MD", "bethesda" = "MD",
+  "winthrop" = "NY", "lenox hill" = "NY", "montefiore" = "NY",
+  "northwell" = "NY", "long island jewish" = "NY",
+  "sloan kettering" = "NY", "memorial sloan" = "NY",
+  "nyu langone" = "NY", "new york presbyterian" = "NY",
+  "albert einstein" = "NY", "stony brook" = "NY",
+  "thomas jefferson" = "PA", "fox chase" = "PA",
+  "geisinger" = "PA", "lehigh valley" = "PA",
+  "scripps" = "CA", "kaiser" = "CA", "loma linda" = "CA",
+  "baylor" = "TX", "ut southwestern" = "TX", "md anderson" = "TX",
+  "methodist houston" = "TX", "parkland" = "TX",
+  "ochsner" = "LA", "tulane" = "LA",
+  "dartmouth" = "NH", "lahey" = "MA",
+  "st elizabeth" = "MA", "st. elizabeth" = "MA",
+  "penn medicine" = "PA", "university of pennsylvania" = "PA",
+  "drexel" = "PA", "temple university" = "PA",
+  "george washington" = "DC", "georgetown" = "DC", "medstar" = "DC",
+  "wake forest" = "NC", "carolinas medical" = "NC",
+  "university of florida" = "FL", "moffitt" = "FL",
+  "university of miami" = "FL", "jackson memorial" = "FL",
+  "ohio state" = "OH", "case western" = "OH",
+  "university of cincinnati" = "OH",
+  "indiana university" = "IN", "iu health" = "IN",
+  "university of iowa" = "IA",
+  "university of kansas" = "KS",
+  "university of nebraska" = "NE", "creighton" = "NE",
+  "university of colorado" = "CO",
+  "intermountain" = "UT", "university of utah" = "UT",
+  "university of washington" = "WA", "swedish" = "WA",
+  "ohsu" = "OR", "oregon health" = "OR",
+  "university of arizona" = "AZ", "banner" = "AZ",
+  "university of new mexico" = "NM",
+  "university of vermont" = "VT",
+  "university of connecticut" = "CT", "hartford" = "CT",
+  "university of alabama" = "AL", "uab" = "AL",
+  "university of mississippi" = "MS",
+  "university of arkansas" = "AR",
+  "university of oklahoma" = "OK",
+  "university of tennessee" = "TN",
+  "university of south carolina" = "SC", "musc" = "SC",
+  "university of virginia" = "VA", "virginia commonwealth" = "VA", "inova" = "VA"
 )
 
 #' Parse a US state from a PubMed affiliation string.
@@ -78,25 +121,30 @@ parse_us_state <- function(aff) {
   aff_clean <- str_squish(aff_clean)
   lc <- tolower(aff_clean)
 
-  # Strategy 1: Spelled-out state names (longest-first to avoid "New" matching "Nevada")
+  # Strategy 1: Institution name lookup (highest priority — "George Washington
+  # University" should resolve to DC, not state "Washington" = WA; "Mayo Clinic,
+  # Rochester" should resolve to MN, not city Rochester = NY)
+  inst_order <- names(INSTITUTION_STATE)[order(-nchar(names(INSTITUTION_STATE)))]
+  for (inst in inst_order) {
+    if (str_detect(lc, fixed(inst))) return(unname(INSTITUTION_STATE[inst]))
+  }
+
+  # Strategy 2: Spelled-out state names (longest-first to avoid partial matches)
   state_order <- names(STATE_NAMES)[order(-nchar(names(STATE_NAMES)))]
   for (nm in state_order) {
     if (str_detect(lc, paste0("\\b", nm, "\\b"))) return(unname(STATE_NAMES[nm]))
   }
 
-  # Strategy 2: 2-letter uppercase code (possibly with ZIP or trailing period)
+  # Strategy 3: 2-letter uppercase code (possibly with ZIP or trailing period)
   parts <- str_trim(str_split(aff_clean, ",")[[1]])
   for (p in parts) {
-    # Match "NY", "NY 10001", "NY.", "NJ;" at end of part
     m <- str_match(p, "\\b([A-Z]{2})(?:\\s+\\d{5}(?:-\\d{4})?)?[.;]?\\s*$")
     if (!is.na(m[1, 2]) && m[1, 2] %in% STATE_NAMES) return(m[1, 2])
-  }
-
-  # Strategy 3: Institution name lookup (before city — "Mayo Clinic, Rochester"
-  # should match institution MN, not city Rochester NY)
-  inst_order <- names(INSTITUTION_STATE)[order(-nchar(names(INSTITUTION_STATE)))]
-  for (inst in inst_order) {
-    if (str_detect(lc, fixed(inst))) return(unname(INSTITUTION_STATE[inst]))
+    m2 <- str_match(p, "\\b([A-Z])\\.([A-Z])\\.?\\s*$")
+    if (!is.na(m2[1, 2])) {
+      code <- paste0(m2[1, 2], m2[1, 3])
+      if (code %in% STATE_NAMES) return(code)
+    }
   }
 
   # Strategy 4: City name lookup
