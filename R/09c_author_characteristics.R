@@ -116,6 +116,7 @@ first_auth <- authors |>
     first_author_first = first_name,
     first_author_state_raw = affiliation_state,
     first_author_aff = affiliation,
+    first_author_all_aff = all_affiliations,
     first_author_country = affiliation_country
   ) |>
   # Re-parse state with the improved multi-strategy parser if raw is NA
@@ -129,11 +130,12 @@ first_auth <- authors |>
   left_join(gender_lkp, by = c("first_author_first" = "first_name")) |>
   mutate(
     first_author_acog_district = vapply(first_author_state, acog_district_for_state, character(1)),
-    practice_type = vapply(first_author_aff, classify_practice_type, character(1)),
+    practice_type = mapply(classify_practice_type, first_author_aff, first_author_all_aff,
+                           USE.NAMES = FALSE),
     subspecialty = vapply(first_author_aff, classify_subspecialty, character(1)),
     career_stage = vapply(first_author_aff, classify_career_stage, character(1))
   ) |>
-  select(-first_author_aff)
+  select(-first_author_aff, -first_author_all_aff)
 
 agg <- authors |>
   group_by(abstract_id) |>

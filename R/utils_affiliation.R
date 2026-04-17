@@ -1,11 +1,37 @@
 # utils_affiliation.R — Extract demographics from PubMed affiliation text.
+# Cross-references against 2754 ACGME-accredited teaching hospitals from the
+# isochrones project's validated hospital classifier.
 
 library(stringr)
 
+# Load teaching hospital names for cross-reference (generated from isochrones
+# teaching_hospitals.rds + ACGME residency/fellowship program data).
+.teaching_names_path <- file.path(here::here(), "data", "validation", "teaching_hospital_names.txt")
+TEACHING_HOSPITAL_NAMES <- if (file.exists(.teaching_names_path)) {
+  readLines(.teaching_names_path)
+} else character()
+
+#' Check if an affiliation matches any known teaching/academic hospital name.
+#' Uses substring matching against 2754 ACGME-accredited hospitals.
+is_teaching_hospital <- function(aff) {
+  if (is.na(aff) || nchar(aff) < 5 || length(TEACHING_HOSPITAL_NAMES) == 0)
+    return(FALSE)
+  aff_norm <- tolower(gsub("[^a-z0-9 ]", " ", tolower(aff)))
+  aff_norm <- gsub("\\s+", " ", trimws(aff_norm))
+  # Check if any teaching hospital name appears as a substring
+  any(vapply(TEACHING_HOSPITAL_NAMES, function(th) {
+    grepl(th, aff_norm, fixed = TRUE)
+  }, logical(1)))
+}
+
 #' Classify affiliation as academic, community, private_practice, research_institute, or military.
-classify_practice_type <- function(aff) {
+#' @param aff Primary affiliation string.
+#' @param all_aff Optional: all affiliations (pipe-separated). Checked for
+#'   university signals if primary affiliation looks community.
+classify_practice_type <- function(aff, all_aff = NA_character_) {
   if (is.na(aff) || nchar(aff) < 5) return(NA_character_)
   lc <- tolower(aff)
+  lc_all <- tolower(if (!is.na(all_aff) && nchar(all_aff) > 0) all_aff else aff)
 
   # Military / VA first (specific)
   if (str_detect(lc, "\\bva\\b|veterans affairs|military|army|navy|air force|walter reed|tricare|armed forces|madigan"))
@@ -16,7 +42,10 @@ classify_practice_type <- function(aff) {
       !str_detect(lc, "university|medical school|school of medicine"))
     return("research_institute")
 
-  # Academic signals
+  # ACGME cross-reference: check against 2754 known teaching hospitals
+  if (is_teaching_hospital(aff)) return("academic")
+
+  # Academic signals (regex fallback)
   academic_patterns <- paste0(
     "university|medical school|school of medicine|college of medicine|",
     "academic medical|teaching hospital|faculty of medicine|",
@@ -32,9 +61,10 @@ classify_practice_type <- function(aff) {
   if (str_detect(lc, "private practice|associates|\\bllc\\b|\\bpc\\b|\\bpllc\\b|group practice|medical group|physicians? group|solo practice"))
     return("private_practice")
 
-  # Community hospital / health system (no university affiliation)
+  # Community hospital / health system (no university affiliation in ANY affiliation)
   if (str_detect(lc, "hospital|medical center|health system|health sciences? cent|clinic") &&
-      !str_detect(lc, "university|medical school|school of medicine|college of medicine"))
+      !str_detect(lc_all, "university|medical school|school of medicine|college of medicine") &&
+      !is_teaching_hospital(all_aff))
     return("community")
 
   # If we detect a department but no institution type, assume academic (most PubMed authors)
