@@ -1,1155 +1,1107 @@
-abstract_id,n_authors,n_unique_affiliations,n_authors_aagl,first_author_last,first_author_first,first_author_state,first_author_country,first_author_gender,first_author_gender_p,first_author_acog_district
-AAGL2012_001,6,6,5,Galen,Donald I,CA,USA. drgalen@drgalen.com.,NA,NA,IX
-AAGL2012_002,6,1,5,Chudnoff,Scott G,NA,Pennsylvania.,NA,NA,NA
-AAGL2012_003,10,5,5,Garza-Cavazos,Arturo,NA,Illinois.,male,0.9955,NA
-AAGL2012_004,3,1,3,Adelowo,Amos,MA,MD.,male,0.9983,I
-AAGL2012_005,4,4,4,Dahiya,Mini,NA,India.,female,1,NA
-AAGL2012_006,7,2,3,van Weelden,W J,AD,The Netherlands.,NA,NA,NA
-AAGL2012_007,5,1,5,Lewis,Christa,NJ,GA.,female,0.9992,III
-AAGL2012_008,10,6,4,Missmer,Stacey A,NA,USA stacey.missmer@channing.harvard.edu.,NA,NA,NA
-AAGL2012_009,9,1,2,Sasada,Kazumi,NA,Japan.,male,0.694,NA
-AAGL2012_010,4,1,5,Pitter,Michael C,NJ,United States. mptmd@aol.com.,NA,NA,III
-AAGL2012_011,5,4,4,Gould,Cassandra,UK,UK.,female,0.9978,NA
-AAGL2012_012,11,4,3,Huang,Jia,NA,China.,female,0.8147,NA
-AAGL2012_013,8,3,5,Zhang,Jun,NA,China. Electronic address: j.zhang@seu.edu.cn.,male,0.9309,NA
-AAGL2012_014,4,1,5,Schiff,Lauren,NA,schiff.lauren@gmail.com.,female,0.9904,NA
-AAGL2012_015,3,1,3,Hashemi,Lida,NA,Islamic Republic of Iran. morsali_a@modares.ac.ir.,female,1,NA
-AAGL2012_016,11,1,5,Santulli,Pietro,II,France. pietro.santulli@inserm.fr,male,1,NA
-AAGL2012_017,9,2,5,Chapron,Charles,NA,France.,male,0.9949,NA
-AAGL2012_018,7,3,5,Borghese,Bruno,AP,France.,male,1,AFS
-AAGL2012_019,6,1,5,Wei,Jianling,NA,People's Republic of China.,NA,NA,NA
-AAGL2012_020,10,4,5,Chapron,Charles,AP,France.,male,0.9949,AFS
-AAGL2012_021,3,1,2,Benagiano,Giuseppe,NA,Italy.,male,1,NA
-AAGL2012_022,1,1,5,Marqui,Alessandra Bernadete Trovó de,MG,Brazil.,NA,NA,NA
-AAGL2012_023,7,4,4,Martin,Davis,LA,USA.,male,0.9748,X
-AAGL2012_024,2,2,2,van der Wat,Johan,NA,South Africa.,male,0.9839,NA
-AAGL2012_025,6,6,5,Koninckx,Philippe R,NA,United Arab Emirates - pkoninckx@gmail.com.,NA,NA,NA
-AAGL2012_026,9,4,4,Desai,Roopal,UK,UK.,female,1,NA
-AAGL2012_027,4,3,2,King,Carla,NY,NY.,female,0.9973,II
-AAGL2012_028,3,1,1,Orady,M,OB,USA - monaorady@hotmail.com.,NA,NA,NA
-AAGL2012_029,6,1,3,King,Cara R,NA,Pennsylvania.,NA,NA,NA
-AAGL2012_030,2,1,2,Chamsy,Dina,NA,Pennsylvania.,female,0.9975,NA
-AAGL2012_031,2,2,2,Rogers,Robert M,NA,Montana.,NA,NA,NA
-AAGL2012_032,12,1,4,Pons,Jaume,NA,Canada.,NA,NA,NA
-AAGL2012_033,7,1,5,Hong,Jin Hwa,NA,Republic of Korea.,NA,NA,NA
-AAGL2012_034,9,1,5,Holtzman,Sharonne,NA,USA.,female,1,NA
-AAGL2012_035,6,1,4,Finger,T,NA,tobias.finger@charite.de.,NA,NA,NA
-AAGL2012_036,8,4,5,Nezhat,Camran,NA,USA.,male,0.9334,NA
-AAGL2012_037,8,1,5,Bae,Jong Woon,NA,Republic of Korea.,NA,NA,NA
-AAGL2012_038,2,2,5,Singer,Tania,NA,Germany. Electronic address: singer@cbs.mpg.de.,female,0.9979,NA
-AAGL2012_039,3,1,3,Bodur,Serkan,NA,Ankara; Turkey.,male,1,NA
-AAGL2012_040,5,1,3,Hellman,Kristina,NA,Sweden. kristina.hellman@ki.se,female,0.9975,NA
-AAGL2012_041,2,1,3,Sgroi,Joseph,NA,Australia.,male,0.9958,NA
-AAGL2012_042,6,5,4,Hur,Hye-Chun,MA,USA.,NA,NA,I
-AAGL2012_043,9,7,5,Santulli,Pietro,II,France. Electronic address: pietro.santulli@inserm.fr.,male,1,NA
-AAGL2012_044,3,1,5,Walsh,Tanya,UK,M13 9PL.,female,0.9967,NA
-AAGL2012_045,3,3,5,Harris,Matthew,UK,UK. matt.harris11@doctors.net.uk.,male,0.9962,NA
-AAGL2012_046,11,2,5,Karadag,Serdar,NA,Turkey.,male,1,NA
-AAGL2012_047,6,2,3,Magson,Natasha R,NA,Australia. Natasha.Magson@mq.edu.au.,NA,NA,NA
-AAGL2012_048,6,1,5,Jost,S,NA,France. jost.stephanie@hotmail.fr,NA,NA,NA
-AAGL2012_049,15,14,5,Laberge,Philippe,NA,Canada. Electronic address: philippe.laberge@fmed.ulaval.ca.,male,1,NA
-AAGL2012_050,7,6,5,Berman,Jesse,NY,NY. Electronic address: jessemaxberman@gmail.com.,male,0.9692,II
-AAGL2012_051,12,6,1,Garcia,Ana,NA,Portugal.,female,0.9939,NA
-AAGL2012_052,4,4,5,Antoun,Lina,NA,United Kingdom.,female,0.9996,NA
-AAGL2012_053,5,1,2,Siponkoski,Sini-Tuuli,NA,Finland. stsipo@gmail.com,NA,NA,NA
-AAGL2012_054,2,1,5,Sanam,Moradan,NA,Iran E-mail : sm42595@yahoo.com.,NA,NA,NA
-AAGL2012_055,1,1,1,Gimpelson,Richard J,MO,USA.,NA,NA,VII
-AAGL2012_056,3,2,2,Adelman,Marisa R,NA,Salt Lake City. Electronic address: marisa.adelman@hsc.utah.edu.,NA,NA,NA
-AAGL2012_057,5,5,4,Fernandez,Hervé,AP,France. Electronic address: herve.fernandez@aphp.fr.,NA,NA,AFS
-AAGL2012_058,7,1,4,Zhang,Qi,NA,China.,male,1,NA
-AAGL2012_059,3,2,3,Sra,S K,NA,141 004 India.,NA,NA,NA
-AAGL2012_060,4,1,2,Kubo,Naoki,NA,Japan.,male,0.9555,NA
-AAGL2012_061,2,1,2,Isaacs,Samuel J,NA,South Africa.,NA,NA,NA
-AAGL2012_062,5,1,4,Salamon,Charbel G,NJ,USA. charbel.salamon@atlantichealth.org,NA,NA,III
-AAGL2012_063,3,3,1,Mosbrucker,Cindy,WA,USA. dr.mos@pacificendo.net.,female,0.9972,VIII
-AAGL2012_064,7,1,4,Mallikarjuna,Chiuruvella,NA,India.,NA,NA,NA
-AAGL2012_065,6,3,4,Hebson,Camden,AL,USA.,male,0.9123,XI
-AAGL2012_066,1,1,2,Gimpelson,Richard J,MO,USA.,NA,NA,VII
-AAGL2012_067,6,5,5,Penninx,Josien P M,NA,The Netherlands. Electronic address: josienp@hotmail.com.,NA,NA,NA
-AAGL2012_068,4,2,5,Figueres,Lucile,UK,UK.,female,0.9979,NA
-AAGL2012_069,6,6,5,Panel,P,NA,France.,NA,NA,NA
-AAGL2012_070,5,1,5,Ahlborg,Liv,NA,Sweden.,female,1,NA
-AAGL2012_071,2,1,3,Chavan,Nitika,NA,IND.,female,1,NA
-AAGL2012_072,8,2,2,Bansal,Virinder K,NA,India. Electronic address: drvkbansal@gmail.com.,NA,NA,NA
-AAGL2012_073,5,1,5,Tunitsky,Elena,OH,OH.,female,0.9984,V
-AAGL2012_074,23,14,4,Martinod,Emmanuel,AP,France.,male,0.9943,AFS
-AAGL2012_075,2,1,5,George,Elizabeth,CA,CA 94122.,female,0.9969,IX
-AAGL2012_076,5,3,5,Lokuge,Sandali,NA,Sri Lanka.,NA,NA,NA
-AAGL2012_077,2,2,5,Bixel,Kristin,OH,USA.,female,0.9915,V
-AAGL2012_078,7,5,5,Adashi,Eli Y,NA,Rhode Island. Electronic address: Eli_Adashi@brown.edu.,NA,NA,NA
-AAGL2012_079,5,3,3,Shepherd,Jessica A,NA,Illinois.,NA,NA,NA
-AAGL2012_080,6,2,2,Jung,Hungu,NA,Japan.,NA,NA,NA
-AAGL2012_081,3,1,4,Nezhat,Camran,NA,USA. cnezhat@stanford.edu,male,0.9334,NA
-AAGL2012_082,4,1,5,Pokkinen,Satu M,KN,Finland (KN).,NA,NA,NA
-AAGL2012_083,5,5,3,Fong,Alex,CA,CA. Electronic address: alexf@hs.uci.edu.,male,0.9659,IX
-AAGL2012_084,6,3,4,To,Justin,NA,New York. Electronic address: juto@montefiore.org.,male,0.9947,NA
+abstract_id,n_authors,n_unique_affiliations,n_authors_aagl,first_author_last,first_author_first,first_author_country,first_author_state,first_author_gender,first_author_gender_p,first_author_acog_district
+AAGL2012_001,6,6,5,Galen,Donald I,USA. drgalen@drgalen.com.,CA,NA,NA,IX
+AAGL2012_002,6,1,5,Banks,Erika,DC.,WA,female,0.9958,VIII
+AAGL2012_003,10,5,5,Garza-Cavazos,Arturo,Illinois.,IL,male,0.9955,VII
+AAGL2012_004,3,1,3,Adelowo,Amos,MD.,MA,male,0.9983,I
+AAGL2012_005,4,4,4,Dahiya,Mini,India.,NA,female,1,NA
+AAGL2012_006,5,1,3,Yim,Ga Won,Korea.,NA,NA,NA,NA
+AAGL2012_007,5,1,5,Lewis,Christa,GA.,NA,female,0.9992,NA
+AAGL2012_008,4,1,4,Lim,Courtney S,Michigan.,MI,NA,NA,V
+AAGL2012_009,9,1,2,Sasada,Kazumi,Japan.,NA,male,0.694,NA
+AAGL2012_010,3,2,5,Yoshiki,Naoyuki,Japan (all authors).. Electronic address: n.yoshiki.crm@tmd.ac.jp.,NA,NA,NA,NA
+AAGL2012_011,5,4,4,Gould,Cassandra,UK.,NA,female,0.9978,NA
+AAGL2012_012,11,1,3,Shapiro,Edan Y,New York.,NY,NA,NA,II
+AAGL2012_013,6,5,5,Hoffman,Mitchel,United States of America.,FL,male,0.998,XI
+AAGL2012_014,4,1,5,Schiff,Lauren,schiff.lauren@gmail.com.,MI,female,0.9904,V
+AAGL2012_015,3,1,3,Hashemi,Lida,Islamic Republic of Iran. morsali_a@modares.ac.ir.,NA,female,1,NA
+AAGL2012_016,11,1,5,Santulli,Pietro,France. pietro.santulli@inserm.fr,NA,male,1,NA
+AAGL2012_017,9,2,5,Chapron,Charles,France.,NA,male,0.9949,NA
+AAGL2012_018,7,3,5,Borghese,Bruno,France.,NA,male,1,NA
+AAGL2012_019,6,1,5,Wei,Jianling,People's Republic of China.,NA,NA,NA,NA
+AAGL2012_020,11,5,5,Chapron,Christopher,USA.,MA,male,0.995,I
+AAGL2012_021,3,1,2,Benagiano,Giuseppe,Italy.,NA,male,1,NA
+AAGL2012_022,4,3,5,Spinoni,Marta,Italy.,NA,female,0.9973,NA
+AAGL2012_023,3,3,4,Martin,Dan,UK. damartin@lincoln.ac.uk.,NA,male,0.9953,NA
+AAGL2012_024,2,2,2,van der Wat,Johan,South Africa.,NA,male,0.9839,NA
+AAGL2012_025,6,6,5,Koninckx,Philippe R,United Arab Emirates - pkoninckx@gmail.com.,NA,NA,NA,NA
+AAGL2012_026,9,4,4,Desai,Roopal,UK.,NA,female,1,NA
+AAGL2012_027,4,3,2,King,Carla,NY.,NY,female,0.9973,II
+AAGL2012_028,3,1,1,Orady,M,USA - monaorady@hotmail.com.,OH,NA,NA,V
+AAGL2012_029,6,1,3,King,Cara R,Pennsylvania.,PA,NA,NA,III
+AAGL2012_030,2,1,2,Chamsy,Dina,Pennsylvania.,PA,female,0.9975,III
+AAGL2012_031,2,2,2,Rogers,Robert M,Montana.,MT,NA,NA,VIII
+AAGL2012_032,12,1,4,Pons,Jaume,Canada.,NA,NA,NA,NA
+AAGL2012_033,8,8,5,Kim,Ju-Hyun,Korea.,NA,NA,NA,NA
+AAGL2012_034,6,0,5,Kanis,M J,NA,NA,NA,NA,NA
+AAGL2012_035,4,0,4,Crosbie,E J,NA,NA,NA,NA,NA
+AAGL2012_036,4,0,5,Crosbie,E J,NA,NA,NA,NA,NA
+AAGL2012_037,8,1,5,Bae,Jong Woon,Republic of Korea.,NA,NA,NA,NA
+AAGL2012_038,2,2,5,Singer,Tania,Germany. Electronic address: singer@cbs.mpg.de.,NA,female,0.9979,NA
+AAGL2012_039,3,1,3,Bodur,Serkan,Ankara; Turkey.,NA,male,1,NA
+AAGL2012_040,5,1,3,Hellman,Kristina,Sweden. kristina.hellman@ki.se,NA,female,0.9975,NA
+AAGL2012_041,2,1,3,Sgroi,Joseph,Australia.,NA,male,0.9958,NA
+AAGL2012_042,3,3,4,Daghash,Mohamed Hasan,Qatar.,NA,NA,NA,NA
+AAGL2012_043,9,7,5,Santulli,Pietro,France. Electronic address: pietro.santulli@inserm.fr.,NA,male,1,NA
+AAGL2012_044,3,1,5,Walsh,Tanya,M13 9PL.,NA,female,0.9967,NA
+AAGL2012_045,3,3,5,Harris,Matthew,UK. matt.harris11@doctors.net.uk.,NA,male,0.9962,NA
+AAGL2012_046,11,2,5,Karadag,Serdar,Turkey.,NA,male,1,NA
+AAGL2012_047,3,1,3,Stapleton,Susan Rutledge,USA. susanstapleton71@gmail.com,NA,NA,NA,NA
+AAGL2012_048,6,1,5,Jost,S,France. jost.stephanie@hotmail.fr,NA,NA,NA,NA
+AAGL2012_049,15,14,5,Laberge,Philippe,Canada. Electronic address: philippe.laberge@fmed.ulaval.ca.,NA,male,1,NA
+AAGL2012_050,5,4,5,Berman,J,Canada. Electronic address: julie.berman@umontreal.ca.,NA,NA,NA,NA
+AAGL2012_051,1,1,1,Garcia,Ashlee,Arizona.,AZ,female,0.9943,VIII
+AAGL2012_052,5,1,5,Rizk,Sviatlana,Switzerland.,NA,NA,NA,NA
+AAGL2012_053,3,1,2,Machamer,Joan,Washington.,WA,female,0.9891,VIII
+AAGL2012_054,2,1,5,Sanam,Moradan,Iran E-mail : sm42595@yahoo.com.,NA,NA,NA,NA
+AAGL2012_055,1,1,1,Gimpelson,Richard J,USA.,MO,NA,NA,VII
+AAGL2012_056,3,2,2,Adelman,Marisa R,Salt Lake City. Electronic address: marisa.adelman@hsc.utah.edu.,UT,NA,NA,VIII
+AAGL2012_057,5,5,4,Fernandez,Hervé,France. Electronic address: herve.fernandez@aphp.fr.,NA,NA,NA,NA
+AAGL2012_058,7,1,4,Zhang,Qi,China.,NA,male,1,NA
+AAGL2012_059,3,2,3,Sra,S K,141 004 India.,NA,NA,NA,NA
+AAGL2012_060,4,1,2,Kubo,Naoki,Japan.,NA,male,0.9555,NA
+AAGL2012_061,6,1,2,Rosenblatt,Paula,USA. aemadi@umm.edu.,MD,female,0.997,IV
+AAGL2012_062,5,1,4,Salamon,Charbel G,USA. charbel.salamon@atlantichealth.org,NJ,NA,NA,III
+AAGL2012_063,3,3,1,Mosbrucker,Cindy,USA. dr.mos@pacificendo.net.,WA,female,0.9972,VIII
+AAGL2012_064,7,1,4,Mallikarjuna,Chiuruvella,India.,NA,NA,NA,NA
+AAGL2012_065,6,3,4,Hebson,Camden,USA.,AL,male,0.9123,XI
+AAGL2012_066,6,4,2,Kohn,J R,USA.,TX,NA,NA,X
+AAGL2012_067,6,5,5,Penninx,Josien P M,The Netherlands. Electronic address: josienp@hotmail.com.,NA,NA,NA,NA
+AAGL2012_068,4,2,5,Figueres,Lucile,UK.,NA,female,0.9979,NA
+AAGL2012_069,6,4,5,Panel,Pierre,France. ppanel@ch-versailles.fr.,NA,male,0.995,NA
+AAGL2012_070,5,1,5,Ahlborg,Liv,Sweden.,NA,female,1,NA
+AAGL2012_071,7,1,3,Bonrath,Esther M,Germany. bonrathe@smh.ca,NA,NA,NA,NA
+AAGL2012_072,6,0,2,Kumar,Rajesh,NA,NA,male,1,NA
+AAGL2012_073,5,1,5,Tunitsky,Elena,OH.,OH,female,0.9984,V
+AAGL2012_074,8,1,4,Fazel,A,Iran.,NA,NA,NA,NA
+AAGL2012_075,2,1,5,George,Elizabeth,CA 94122.,CA,female,0.9969,IX
+AAGL2012_076,5,3,5,Lokuge,Sandali,Sri Lanka.,NA,NA,NA,NA
+AAGL2012_077,2,2,5,Bixel,Kristin,USA.,OH,female,0.9915,V
+AAGL2012_078,7,5,5,Adashi,Eli Y,Rhode Island. Electronic address: Eli_Adashi@brown.edu.,RI,NA,NA,I
+AAGL2012_079,5,3,3,Shepherd,Jessica A,Illinois.,IL,NA,NA,VII
+AAGL2012_080,6,2,2,Jung,Hungu,Japan.,NA,NA,NA,NA
+AAGL2012_081,3,1,4,Nezhat,Camran,USA. cnezhat@stanford.edu,CA,male,0.9334,IX
+AAGL2012_082,5,3,5,Nijjar,Jaspreet,Canada.,NA,female,0.6148,NA
+AAGL2012_083,5,5,3,Fong,Alex,CA. Electronic address: alexf@hs.uci.edu.,CA,male,0.9659,IX
+AAGL2012_084,6,3,4,To,Justin,New York. Electronic address: juto@montefiore.org.,NY,male,0.9947,II
 AAGL2012_085,4,0,3,Leong,Samuel C,NA,NA,NA,NA,NA
-AAGL2012_086,3,2,3,Adams,Robert,UK,UK.,male,0.9958,NA
-AAGL2012_087,4,1,3,Shroff,Rushad,NA,India.,male,1,NA
-AAGL2012_088,4,1,5,Ecker,Amanda M,PA,PA.,NA,NA,III
-AAGL2012_089,3,1,5,Gyang,Anthony,NA,Florida.,male,0.9946,NA
-AAGL2012_090,8,4,5,Long,Cheng-Yu,NA,Taiwan.,NA,NA,NA
-AAGL2012_091,7,1,5,Yurteri-Kaplan,Ladin A,DC,USA. ladin.yurteri-kaplan@medstar.net,NA,NA,IV
-AAGL2012_092,6,1,4,López-Leal,Gamaliel,NA,México. gamlopez@ccg.unam.mx.,male,1,NA
-AAGL2012_093,8,4,3,van Zanten,Femke,TZ,The Netherlands. f.van.zanten@meandermc.nl.,female,1,NA
-AAGL2012_094,5,2,2,Upadhyay,Smita,KY,USA.,female,1,V
-AAGL2012_095,7,4,3,Merali,Salim,NA,USA.,male,1,NA
-AAGL2013_001,4,1,3,Nezhat,Ceana H,NA,Georgia.,NA,NA,NA
-AAGL2013_002,3,1,5,Guido,Richard,NA,Missouri.,male,0.9963,NA
-AAGL2013_003,7,1,5,Kim,Jae Hun,NA,South Korea.,NA,NA,NA
-AAGL2013_004,4,2,4,Leone Roberti Maggiore,Umberto,NA,Italy. Electronic address: ulrm@me.com.,male,1,NA
-AAGL2013_005,7,1,5,McIlwaine,Kate,NA,Australia.,female,0.9988,NA
-AAGL2013_006,7,5,5,El Hachem,Lena,NY,NY.,female,0.9978,II
-AAGL2013_007,3,3,4,Raso,Rosanne,NA,USA.,female,0.9997,NA
-AAGL2013_008,7,5,2,Bourgin,C,NA,France.,NA,NA,NA
-AAGL2013_009,2,2,2,Akrivos,Nikolaos,UK,UK. nakrivos@hotmail.com.,male,1,NA
-AAGL2013_010,2,1,5,Kho,Kimberly,NA,Georgia.,female,0.9951,NA
-AAGL2013_011,7,1,5,Mitri,Michael,PA,USA.,male,0.9947,III
-AAGL2013_012,10,7,5,Yang,Jie,AZ,China. Electronic address: Yang.Jie@mayo.edu.,male,0.8187,VIII
-AAGL2013_013,7,2,4,Yang,Guang,NA,People's Republic of China.,NA,NA,NA
-AAGL2013_014,6,2,3,Zechmeister,Jenna R,NY,NY.,NA,NA,II
-AAGL2013_015,2,1,2,Nezhat,Farr R,NY,USA.,NA,NA,II
+AAGL2012_086,3,1,3,Adelowo,Amos,MD.,MA,male,0.9983,I
+AAGL2012_087,4,1,3,Shroff,Rushad,India.,NA,male,1,NA
+AAGL2012_088,4,1,5,Ecker,Amanda M,PA.,PA,NA,NA,III
+AAGL2012_089,3,1,5,Gyang,Anthony,Florida.,FL,male,0.9946,XI
+AAGL2012_090,8,4,5,Long,Cheng-Yu,Taiwan.,NA,NA,NA,NA
+AAGL2012_091,7,1,5,Yurteri-Kaplan,Ladin A,USA. ladin.yurteri-kaplan@medstar.net,WA,NA,NA,VIII
+AAGL2012_092,6,1,4,López-Leal,Gamaliel,México. gamlopez@ccg.unam.mx.,NA,male,1,NA
+AAGL2012_093,13,10,3,Hympánová,Lucie,Czech Republic.,NA,female,1,NA
+AAGL2012_094,4,0,2,Flora,Rupinder,NA,NA,female,1,NA
+AAGL2012_095,7,4,3,Merali,Salim,USA.,PA,male,1,III
+AAGL2013_001,4,1,3,Nezhat,Ceana H,Georgia.,NY,NA,NA,II
+AAGL2013_002,3,1,5,Guido,Richard,Missouri.,PA,male,0.9963,III
+AAGL2013_003,34,14,5,Brucker,Sara Yvonne,Germany.,NA,NA,NA,NA
+AAGL2013_004,4,2,4,Leone Roberti Maggiore,Umberto,Italy. Electronic address: ulrm@me.com.,NA,male,1,NA
+AAGL2013_005,7,1,5,McIlwaine,Kate,Australia.,NA,female,0.9988,NA
+AAGL2013_006,7,5,5,El Hachem,Lena,NY.,NY,female,0.9978,II
+AAGL2013_007,3,3,4,Raso,Rosanne,USA.,NY,female,0.9997,II
+AAGL2013_008,7,5,2,Bourgin,C,France.,NA,NA,NA,NA
+AAGL2013_009,2,2,2,Akrivos,Nikolaos,UK. nakrivos@hotmail.com.,NA,male,1,NA
+AAGL2013_010,2,1,5,Kho,Kimberly,Georgia.,GA,female,0.9951,XI
+AAGL2013_011,5,1,5,Chang,Stephen Kin Yong,cfscky@nus.edu.sg.,NA,NA,NA,NA
+AAGL2013_012,10,7,5,Yang,Jie,China. Electronic address: Yang.Jie@mayo.edu.,AZ,male,0.8187,VIII
+AAGL2013_013,4,3,4,Yang,Guangyuan,China.,NA,NA,NA,NA
+AAGL2013_014,6,2,3,Zechmeister,Jenna R,NY.,NY,NA,NA,II
+AAGL2013_015,2,1,2,Nezhat,Farr R,USA.,NY,NA,NA,II
 AAGL2013_016,4,0,5,Gomez,Nicole,NA,NA,female,0.9968,NA
-AAGL2013_017,8,3,5,Buchweitz,Olaf,NA,Germany. olafbuchweitz@aol.com.,male,1,NA
-AAGL2013_018,7,0,4,Fülöp,Ibolya,NA,NA,NA,NA,NA
-AAGL2013_019,9,5,5,Daraï,Camille,NA,France.,female,0.9873,NA
-AAGL2013_020,8,3,5,Muzii,Ludovico,NA,Italy. Electronic address: ludovico.muzii@uniroma1.it.,NA,NA,NA
-AAGL2013_021,3,2,3,Demir,Emine,NA,Turkey.,female,1,NA
-AAGL2013_022,6,1,5,Evangelista,Alessandra,NA,Brazil.,female,1,NA
-AAGL2013_023,6,5,5,Lyapis,Anna,NA,California.,female,0.9971,NA
-AAGL2013_024,8,8,5,Agarwal,Sanjay K,CA,CA.,NA,NA,IX
-AAGL2013_025,6,4,5,Tavares,João,NA,Portugal.,NA,NA,NA
-AAGL2013_026,2,1,5,Siddiqui,Daanyal,NA,Pakistan.,male,1,NA
-AAGL2013_027,4,3,5,Guirguis,Nancy,NA,Critical Care & Sleep Medicine and.,female,0.9972,NA
-AAGL2013_028,4,1,5,Lim,Courtney S,NA,Michigan.,NA,NA,NA
+AAGL2013_017,8,3,5,Buchweitz,Olaf,Germany. olafbuchweitz@aol.com.,NA,male,1,NA
+AAGL2013_018,8,1,4,Wu,Wenjing,China. shenzhong114@sina.com.,NA,NA,NA,NA
+AAGL2013_019,9,5,5,Daraï,Camille,France.,NA,female,0.9873,NA
+AAGL2013_020,8,3,5,Muzii,Ludovico,Italy. Electronic address: ludovico.muzii@uniroma1.it.,NA,NA,NA,NA
+AAGL2013_021,3,2,3,Demir,Emine,Turkey.,NA,female,1,NA
+AAGL2013_022,6,1,5,Evangelista,Alessandra,Brazil.,NA,female,1,NA
+AAGL2013_023,10,1,5,Luciano,Debora,France.,NA,female,0.9991,NA
+AAGL2013_024,6,4,5,Fernandes,Linford,UK. Electronic address: linford.fernandes@nhs.net.,NA,male,1,NA
+AAGL2013_025,6,4,5,Tavares,João,Portugal.,NA,NA,NA,NA
+AAGL2013_026,2,1,5,Siddiqui,Daanyal,Pakistan.,NA,male,1,NA
+AAGL2013_027,4,3,5,Guirguis,Nancy,Critical Care & Sleep Medicine and.,NA,female,0.9972,NA
+AAGL2013_028,4,1,5,Lim,Courtney S,Michigan.,MI,NA,NA,V
 AAGL2013_029,4,0,3,Sangha,Roopina,NA,NA,NA,NA,NA
-AAGL2013_030,6,5,2,Abad Torrent,A,NA,España. Electronic address: aat23865@yahoo.es.,NA,NA,NA
-AAGL2013_031,6,1,5,Siedhoff,Matthew T,NA,North Carolina.,NA,NA,NA
-AAGL2013_032,10,6,2,Xia,Leilei,PA,PA. Electronic address: leilei.xia@uphs.upenn.edu.,NA,NA,III
-AAGL2013_033,6,3,3,Harris,Jenny,UK,UK.,female,0.9937,NA
-AAGL2013_034,3,3,4,Sasaki,Kirsten,NA,Department of Obstetrics and Gynecology (Drs. Sasaki and Miller). Electronic address: Kirsten.Sasaki@aah.org.,female,0.9962,NA
-AAGL2013_035,3,1,5,Esteban,Andrés,NA,aesteban@ucigetafe.com.,NA,NA,NA
-AAGL2013_036,2,1,1,Steege,John F,NA,Massachusetts; e-mail: jeinarsson@partners.org.,NA,NA,NA
-AAGL2013_037,6,2,5,Puntambekar,Shailesh P,NA,India. shase63@gmail.com.,NA,NA,NA
-AAGL2013_038,9,4,2,Park,Soo-Hyun,NA,Republic of Korea.,NA,NA,NA
-AAGL2013_039,6,1,5,Puntambekar,Shailesh,NA,411004 India.,NA,NA,NA
-AAGL2013_040,7,4,5,Bae,Jaeman,NA,Republic of Korea.,NA,NA,NA
-AAGL2013_041,8,3,1,Lyngdoh,Bifica,NA,India.,NA,NA,NA
-AAGL2013_042,6,1,5,Cromi,Antonella,NA,Italy.,female,1,NA
-AAGL2013_043,8,1,5,Puntambekar,Shailesh P,NA,India.,NA,NA,NA
-AAGL2013_044,7,4,5,Lee,Minyoung,NA,Republic of Korea.,NA,NA,NA
-AAGL2013_045,10,10,5,Venturella,Roberta,NA,Italy. rovefa@libero.it.,female,0.9957,NA
-AAGL2013_046,9,4,5,Alabbasi,Areen Khateeb,NA,Israel.,NA,NA,NA
-AAGL2013_047,8,5,5,Pakish,Janelle,NH,USA.,female,0.9984,I
-AAGL2013_048,4,2,5,Gorchev,Grigor A,NA,Bulgaria. grigorgortchev@yahoo.com.,NA,NA,NA
-AAGL2013_049,7,4,5,Borghese,Bruno,AP,France.,male,1,AFS
-AAGL2013_050,7,7,5,Borahay,Mostafa A,TX,TX. Electronic address: maboraha@utmb.edu.,NA,NA,X
+AAGL2013_030,5,2,2,Lenihan,Jennifer,USA.,MA,female,0.9969,I
+AAGL2013_031,6,1,5,Siedhoff,Matthew T,North Carolina.,NC,NA,NA,XI
+AAGL2013_032,10,6,2,Xia,Leilei,PA. Electronic address: leilei.xia@uphs.upenn.edu.,PA,NA,NA,III
+AAGL2013_033,8,8,3,Harris,Jeduthun,USA. Electronic address: Jeduthun.harris@howard.edu.,WA,NA,NA,VIII
+AAGL2013_034,3,3,4,Sasaki,Kirsten,Department of Obstetrics and Gynecology (Drs. Sasaki and Miller). Electronic address: Kirsten.Sasaki@aah.org.,NA,female,0.9962,NA
+AAGL2013_035,3,1,5,Esteban,Andrés,aesteban@ucigetafe.com.,OH,NA,NA,V
+AAGL2013_036,2,1,1,Steege,John F,Massachusetts; e-mail: jeinarsson@partners.org.,NC,NA,NA,XI
+AAGL2013_037,6,2,5,Puntambekar,Shailesh P,India. shase63@gmail.com.,NA,NA,NA,NA
+AAGL2013_038,9,4,2,Park,Soo-Hyun,Republic of Korea.,NA,NA,NA,NA
+AAGL2013_039,2,2,5,Puntambekar,Shailesh,India.,NA,NA,NA,NA
+AAGL2013_040,7,4,5,Bae,Jaeman,Republic of Korea.,NA,NA,NA,NA
+AAGL2013_041,8,3,1,Lyngdoh,Bifica,India.,NA,NA,NA,NA
+AAGL2013_042,6,1,5,Cromi,Antonella,Italy.,NA,female,1,NA
+AAGL2013_043,8,1,5,Puntambekar,Shailesh P,India.,NA,NA,NA,NA
+AAGL2013_044,8,6,5,Gordts,Stephan,Belgium. Electronic address: stephan.gordts@lifeexpertcentre.be.,NA,male,0.9905,NA
+AAGL2013_045,4,1,5,Tanner,Edward J,Johns Hopkins Hospital.,MD,NA,NA,IV
+AAGL2013_046,6,6,5,Esselen,K,USA.,MA,NA,NA,I
+AAGL2013_047,8,5,5,Pakish,Janelle,USA.,NH,female,0.9984,I
+AAGL2013_048,3,1,5,Jiekang,Kegumei,China.,NA,NA,NA,NA
+AAGL2013_049,6,3,5,Borghese,B,France. Electronic address: bruno.borghese@cch.aphp.fr.,NA,NA,NA,NA
+AAGL2013_050,7,7,5,Borahay,Mostafa A,TX. Electronic address: maboraha@utmb.edu.,TX,NA,NA,X
 AAGL2013_051,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-AAGL2013_052,9,4,5,Bitonti,Giovanna,NA,Italy.,female,1,NA
-AAGL2013_053,6,1,5,Mashiach,Roy,NA,roy.mashiach@gmail.com.,male,0.9936,NA
-AAGL2013_054,2,2,5,Diamond,Milton,HI,USA. Electronic address: diamond@hawaii.edu.,male,0.9946,VIII
-AAGL2013_055,14,8,5,Rees,Connie Odette,NA,Belgium. Electronic address: connie.rees@catharinaziekenhuis.nl.,NA,NA,NA
-AAGL2013_056,2,2,5,Diamond,Milton,HI,USA. Electronic address: diamond@hawaii.edu.,male,0.9946,VIII
-AAGL2013_057,1,1,1,Vigliani,Marguerite B,RI,USA.,NA,NA,I
-AAGL2013_058,11,1,5,Banlunara,Wijit,NA,Thailand.,NA,NA,NA
-AAGL2013_059,12,3,5,Colombi,Irene,NA,Italy.,female,0.9959,NA
-AAGL2013_060,6,3,5,Phillips,Sharon J,MA,MA. Electronic address: sharonphillipsmd@gmail.com.,NA,NA,I
-AAGL2013_061,6,1,2,Rosenblatt,Peter,MA,MN.,male,0.9965,I
-AAGL2013_062,10,8,5,Azizoglu,Mustafa,NA,Turkey. Electronic address: mdmazizoglu@gmail.com.,male,1,NA
-AAGL2013_063,3,3,2,Sarlos,Dimitri,NA,Switzerland. Electronic address: dimitri.sarlos@ksa.ch.,male,0.9848,NA
-AAGL2013_064,6,2,5,Puntambekar,Shailesh,NA,India. Electronic address: shase63@gmail.com.,NA,NA,NA
-AAGL2013_065,6,3,4,Tunitsky-Bitton,Elena,OH,OH. Electronic address: lena0605@gmail.com.,female,0.9984,V
-AAGL2013_066,2,1,2,Wójcik,Ewa,NA,Poland.,female,1,NA
-AAGL2013_067,3,3,2,Siemons,Sara,NA,The Netherlands. Electronic address: s.e.siemons@gmail.com.,female,0.9971,NA
-AAGL2013_068,6,4,2,Adjei,Naomi N,CT,and Adeyemo). Electronic address: nadjei@mdanderson.org.,NA,NA,I
-AAGL2013_069,2,2,5,Sohn,Beomseok,NA,Korea.,NA,NA,NA
-AAGL2013_070,5,1,5,Oraif,Ayman,ON,London ON.,male,0.9818,II
-AAGL2013_071,3,2,4,Youssef,Youssef,NY,NY (all authors).,male,1,II
-AAGL2013_072,1,1,2,Gimpelson,Richard J,MO,USA.,NA,NA,VII
-AAGL2013_073,7,7,2,Morabito,Emily,NA,Canada.,female,0.9979,NA
-AAGL2013_074,6,5,5,Murji,Ally,ON,Canada. amurji@mtsinai.on.ca.,female,0.9987,II
-AAGL2013_075,5,5,4,Moawad,Gaby,NA,Maryland. Electronic address: gnmoawad@gmail.com.,female,0.9748,NA
-AAGL2013_076,2,2,3,Powers,Claire,NA,North Carolina USA.,female,0.9933,NA
-AAGL2013_077,1,1,1,Hanafi,Magdi,NA,United States.,NA,NA,NA
-AAGL2013_078,7,2,5,Ahlborg,Liv,NA,Sweden.,female,1,NA
-AAGL2013_079,5,1,5,Zandi,Roya,NA,Illinois.,female,1,NA
-AAGL2013_080,6,1,2,Twijnstra,Andries R,NA,the Netherlands. A.R.H.Twijnstra@lumc.nl,NA,NA,NA
-AAGL2013_081,2,2,5,Braun,Katrin,NA,Germany.,female,1,NA
-AAGL2013_082,3,2,5,Mooney,Samantha S,NA,Australia.,NA,NA,NA
-AAGL2013_083,1,1,1,Mun,Sungyong,NA,South Korea. Electronic address: munsy@hanyang.ac.kr.,NA,NA,NA
-AAGL2013_084,9,7,5,Santulli,Pietro,AP,France pietro.santulli@cch.aphp.fr.,male,1,AFS
-AAGL2013_085,1,1,5,Yeung,Patrick,MO,USA. Electronic address: pyeung1@slu.edu.,male,0.9955,VII
-AAGL2013_086,3,0,3,Chen,Shao-Hui,NA,NA,NA,NA,NA
-AAGL2013_087,1,1,5,Kojima,Jun,NA,Japan. jdw06164@nifty.com,male,0.9309,NA
-AAGL2013_088,10,4,5,Spagnolo,E,NA,Spain.,NA,NA,NA
-AAGL2013_089,3,3,5,Stathopoulos,Panagiotis,NA,Northampton General Hospital. Electronic address: pan_stath@yahoo.gr.,male,1,NA
-AAGL2013_090,6,6,4,Koninckx,Philippe R,NA,United Arab Emirates - pkoninckx@gmail.com.,NA,NA,NA
-AAGL2013_091,8,7,5,Zanatta,Alysson,NA,Brazil alysson.zanatta@gmail.com.,female,1,NA
-AAGL2013_092,7,3,5,Exacoustos,Caterina,NA,Italy. Electronic address: caterinaexacoustos@tiscali.it.,female,1,NA
-AAGL2013_093,3,2,3,Khan,Aamir T,UK,UK.,NA,NA,NA
-AAGL2013_094,4,1,4,Andou,Masaaki,NA,Japan.,male,1,NA
-AAGL2013_095,9,4,5,Takano,Megumi,NA,Japan.,female,1,NA
-AAGL2013_096,2,2,2,Navarro,Ester,NA,USA. navarre1@stjohns.edu.,female,0.9615,NA
-AAGL2014_001,1,1,5,Robbins,Anthony,NA,Co-Editor E-mail: anthony.robbins@tufts.edu.,male,0.9946,NA
-AAGL2014_002,9,3,2,Giampaolino,Pierluigi,II,Italy.,NA,NA,NA
-AAGL2014_003,5,1,4,Mahnert,Nichole,NA,Michigan.,female,0.9972,NA
-AAGL2014_004,2,2,1,Temkin,Sarah M,DC,DC.,NA,NA,IV
-AAGL2014_005,4,3,3,Hartzell,Kimberly,AL,USA. Electronic address: kimhartzell@yahoo.com.,female,0.9951,XI
-AAGL2014_006,4,1,3,Winner,Brooke,NA,Missouri.,female,0.9899,NA
-AAGL2014_007,2,1,5,Özbaşlı,Esra,NA,Turkey,female,1,NA
-AAGL2014_008,2,2,5,Khalil,Emced,NA,Turkey.,NA,NA,NA
-AAGL2014_009,8,4,3,Alkaf,Hussein,NA,Jordan.,male,1,NA
-AAGL2014_010,3,2,3,Baker,James M,AZ,United States.,NA,NA,VIII
-AAGL2014_011,12,1,2,Mamik,Mamta M,NA,Texas.,NA,NA,NA
-AAGL2014_012,12,4,4,Chen,Yuanyuan,NA,China.,NA,NA,NA
-AAGL2014_013,5,3,5,Gungor,Mete,NA,Turkey.,male,1,NA
-AAGL2014_014,5,4,3,Penner,Kristine R,CA,CA.,NA,NA,IX
-AAGL2014_015,1,1,1,Breen,Michael,NA,Zambia.,male,0.9947,NA
-AAGL2014_016,5,1,5,Akdemir,Ali,NA,Turkey.,male,0.6881,NA
-AAGL2014_017,3,1,4,Sinno,Abdulrahman K,MD,USA.,NA,NA,IV
-AAGL2014_018,6,1,5,Joshi,Shriya,GA,USA.,female,1,XI
-AAGL2014_019,8,1,2,Park,Ju Young,NA,Korea.,NA,NA,NA
-AAGL2014_020,8,3,2,Yi,Xiaofang,NA,China.,NA,NA,NA
-AAGL2014_021,10,3,4,Holloway,Robert W,FL,USA. Electronic address: robhollowaymd@gmail.com.,NA,NA,XI
-AAGL2014_022,2,2,4,Arendas,Kristina,ON,ON.,female,0.9975,II
-AAGL2014_023,8,5,5,Delgado-Floody,Pedro,NA,Chile.,male,0.9935,NA
-AAGL2014_024,2,2,1,Chua,Abigail L,PA,USA. Abigail.Chua@jefferson.edu.,NA,NA,III
-AAGL2014_025,4,3,3,Vanichtantikul,Asama,NA,Thailand.,NA,NA,NA
-AAGL2014_026,4,3,5,Moon,Hwa Sook,NA,Republic of Korea.,NA,NA,NA
-AAGL2014_027,6,1,3,Jairath,Ankush,NA,India.,male,1,NA
-AAGL2014_028,5,5,4,Williams,Kate,UK,UK. Electronic address: kate.williams2@southwales.ac.uk.,female,0.9988,NA
-AAGL2014_029,6,5,2,Sheyn,David,OH,OH. Electronic address: david.sheyn@uhhospitals.org.,male,0.9963,V
-AAGL2014_030,9,6,3,Carrillo,Jorge,NA,Spain.,male,0.994,NA
-AAGL2014_031,9,1,3,Gupta,Ankita,NA,Michigan.,female,1,NA
-AAGL2014_032,3,3,1,Mosbrucker,Cindy,WA,USA. dr.mos@pacificendo.net.,female,0.9972,VIII
-AAGL2014_033,5,1,5,Balica,Adrian,NJ,08901.,male,0.9269,III
-AAGL2014_034,4,3,1,Manodoro,Stefano,NA,Italy. stefano.manodoro@gmail.com.,male,1,NA
-AAGL2014_035,7,4,5,Hugues,Clara,NA,France.,female,0.9966,NA
-AAGL2014_036,18,1,3,Dalton,Jonathan,PA,PA.,male,0.9954,III
-AAGL2014_037,8,2,4,Ochi,Yoshifumi,NA,Japan. Electronic address: quattroporte.1012@gmail.com.,NA,NA,NA
-AAGL2014_038,4,4,5,Abuhammour,Adnan,NA,United Arab Emirates. Electronic address: aabuhammour@yahoo.com.,male,1,NA
-AAGL2014_039,6,1,4,Puntambekar,Shailesh,NA,411004 India.,NA,NA,NA
-AAGL2014_040,6,5,5,Kroft,Jamie,NA,Canada. Electronic address: Jamie.kroft@utoronto.ca.,female,0.7702,NA
-AAGL2014_041,1,1,5,Kent,Athol,NA,South Africa.,male,1,NA
+AAGL2013_052,7,3,5,Di Cello,Annalisa,Italy. Electronic address: annalisa_dicello84@yahoo.it.,NA,female,1,NA
+AAGL2013_053,6,1,5,Mashiach,Roy,roy.mashiach@gmail.com.,NA,male,0.9936,NA
+AAGL2013_054,2,2,5,Diamond,Milton,USA. Electronic address: diamond@hawaii.edu.,HI,male,0.9946,VIII
+AAGL2013_055,6,2,5,Kuijsters,N P M,The Netherlands. nienkekuijsters@live.nl.,NA,NA,NA,NA
+AAGL2013_056,2,2,5,Diamond,Milton,USA. Electronic address: diamond@hawaii.edu.,HI,male,0.9946,VIII
+AAGL2013_057,1,1,1,Vigliani,Marguerite B,USA.,RI,NA,NA,I
+AAGL2013_058,3,3,5,Iwanoff,Christopher,USA. chrisiwanoff@gmail.com.,NJ,male,0.995,III
+AAGL2013_059,3,1,5,Zupi,Errico,Italy.,NA,NA,NA,NA
+AAGL2013_060,6,3,5,Phillips,Sharon J,MA. Electronic address: sharonphillipsmd@gmail.com.,MA,NA,NA,I
+AAGL2013_061,6,1,2,Rosenblatt,Peter,MN.,MN,male,0.9965,VI
+AAGL2013_062,10,8,5,Azizoglu,Mustafa,Turkey. Electronic address: mdmazizoglu@gmail.com.,NY,male,1,II
+AAGL2013_063,3,3,2,Sarlos,Dimitri,Switzerland. Electronic address: dimitri.sarlos@ksa.ch.,NA,male,0.9848,NA
+AAGL2013_064,6,2,5,Puntambekar,Shailesh,India. Electronic address: shase63@gmail.com.,NA,NA,NA,NA
+AAGL2013_065,6,3,4,Tunitsky-Bitton,Elena,OH. Electronic address: lena0605@gmail.com.,OH,female,0.9984,V
+AAGL2013_066,5,3,2,Pata,Giacomo,Italy. Electronic address: patagiacomo@gmail.com.,NA,male,1,NA
+AAGL2013_067,5,3,2,Vleugels,Michel,The Netherlands. Electronic address: wings.michael@wxs.nl.,NA,male,0.7248,NA
+AAGL2013_068,6,4,2,Adjei,Naomi N,and Adeyemo). Electronic address: nadjei@mdanderson.org.,CT,NA,NA,I
+AAGL2013_069,2,2,5,Sohn,Beomseok,Korea.,NA,NA,NA,NA
+AAGL2013_070,5,1,5,Oraif,Ayman,London ON.,NA,male,0.9818,NA
+AAGL2013_071,3,2,4,Youssef,Youssef,NY (all authors).,NY,male,1,II
+AAGL2013_072,1,1,2,Gimpelson,Richard J,USA.,MO,NA,NA,VII
+AAGL2013_073,7,7,2,Morabito,Emily,Canada.,NA,female,0.9979,NA
+AAGL2013_074,6,5,5,Murji,Ally,Canada. amurji@mtsinai.on.ca.,NY,female,0.9987,II
+AAGL2013_075,9,6,4,Moawad,Gaby,USA.,WA,female,0.9748,VIII
+AAGL2013_076,2,2,3,Powers,Claire,North Carolina USA.,NC,female,0.9933,XI
+AAGL2013_077,1,1,1,Hanafi,Magdi,United States.,GA,NA,NA,XI
+AAGL2013_078,7,2,5,Ahlborg,Liv,Sweden.,NA,female,1,NA
+AAGL2013_079,5,2,5,Washburn,Erik,USA. Electronic address: ewashburn1@pennstatehealth.psu.edu.,PA,male,0.9952,III
+AAGL2013_080,6,1,2,Twijnstra,Andries R,the Netherlands. A.R.H.Twijnstra@lumc.nl,NA,NA,NA,NA
+AAGL2013_081,5,5,5,Farrell,R,Australia.,NA,NA,NA,NA
+AAGL2013_082,7,3,5,Ellett,Lenore,Australia lenore@crosbie.com.au.,NA,female,1,NA
+AAGL2013_083,1,1,1,Mun,Sungyong,South Korea. Electronic address: munsy@hanyang.ac.kr.,NA,NA,NA,NA
+AAGL2013_084,9,7,5,Santulli,Pietro,France pietro.santulli@cch.aphp.fr.,NA,male,1,NA
+AAGL2013_085,1,1,5,Yeung,Patrick,USA. Electronic address: pyeung1@slu.edu.,MO,male,0.9955,VII
+AAGL2013_086,7,4,3,Nezhat,Camran,USA.,CA,male,0.9334,IX
+AAGL2013_087,1,1,5,Kojima,Jun,Japan. jdw06164@nifty.com,MD,male,0.9309,IV
+AAGL2013_088,16,7,5,Spagnolo,Emanuela,Spain.,NA,female,1,NA
+AAGL2013_089,5,4,5,Ahmadi,Ehsan,Iran.,NA,male,1,NA
+AAGL2013_090,6,6,4,Koninckx,Philippe R,United Arab Emirates - pkoninckx@gmail.com.,NA,NA,NA,NA
+AAGL2013_091,8,7,5,Zanatta,Alysson,Brazil alysson.zanatta@gmail.com.,NA,female,1,NA
+AAGL2013_092,7,3,5,Exacoustos,Caterina,Italy. Electronic address: caterinaexacoustos@tiscali.it.,NA,female,1,NA
+AAGL2013_093,1,1,3,Taniguchi,Fumiaki,Japan.,NA,NA,NA,NA
+AAGL2013_094,11,3,4,Yamada,Kazutaka,Japan. k-yamada@magma.jp.,NA,NA,NA,NA
+AAGL2013_095,3,2,5,Takano,Mariko,Japan.,NA,female,0.9949,NA
+AAGL2013_096,2,2,2,Navarro,Ester,USA. navarre1@stjohns.edu.,NY,female,0.9615,II
+AAGL2014_001,1,1,5,Robbins,Anthony,Co-Editor E-mail: anthony.robbins@tufts.edu.,NA,male,0.9946,NA
+AAGL2014_002,9,3,2,Giampaolino,Pierluigi,Italy.,NA,NA,NA,NA
+AAGL2014_003,5,1,4,Mahnert,Nichole,Michigan.,MI,female,0.9972,V
+AAGL2014_004,2,2,1,Temkin,Sarah M,DC.,WA,NA,NA,VIII
+AAGL2014_005,4,3,3,Hartzell,Kimberly,USA. Electronic address: kimhartzell@yahoo.com.,AL,female,0.9951,XI
+AAGL2014_006,4,1,3,Winner,Brooke,Missouri.,WA,female,0.9899,VIII
+AAGL2014_007,4,3,5,Mathieu,Jordane A,France.,NA,NA,NA,NA
+AAGL2014_008,3,0,5,Khalil,Eyyaz,NA,NA,NA,NA,NA
+AAGL2014_009,5,1,3,Bina,Saiid,MD.,MD,male,1,IV
+AAGL2014_010,4,3,3,Levy,Jared,Israel. Electronic address: jaredlevy@mail.tau.ac.il.,NA,male,0.9959,NA
+AAGL2014_011,12,1,2,Mamik,Mamta M,Texas.,RI,NA,NA,I
+AAGL2014_012,6,2,4,Allemann,Pierre,Switzerland.,NA,male,0.995,NA
+AAGL2014_013,5,3,5,Gungor,Mete,Turkey.,NA,male,1,NA
+AAGL2014_014,5,4,3,Penner,Kristine R,CA.,CA,NA,NA,IX
+AAGL2014_015,1,1,1,Breen,Michael,Zambia.,NA,male,0.9947,NA
+AAGL2014_016,5,1,5,Akdemir,Ali,Turkey.,NA,male,0.6881,NA
+AAGL2014_017,3,1,4,Sinno,Abdulrahman K,USA.,MD,NA,NA,IV
+AAGL2014_018,6,1,5,Joshi,Shriya,USA.,GA,female,1,XI
+AAGL2014_019,8,1,2,Park,Ju Young,Korea.,NA,NA,NA,NA
+AAGL2014_020,8,3,2,Yi,Xiaofang,China.,NA,NA,NA,NA
+AAGL2014_021,10,3,4,Holloway,Robert W,USA. Electronic address: robhollowaymd@gmail.com.,FL,NA,NA,XI
+AAGL2014_022,2,2,4,Arendas,Kristina,ON.,NA,female,0.9975,NA
+AAGL2014_023,8,5,5,Delgado-Floody,Pedro,Chile.,NA,male,0.9935,NA
+AAGL2014_024,2,2,1,Chua,Abigail L,USA. Abigail.Chua@jefferson.edu.,PA,NA,NA,III
+AAGL2014_025,4,3,3,Vanichtantikul,Asama,Thailand.,NA,NA,NA,NA
+AAGL2014_026,4,3,5,Moon,Hwa Sook,Republic of Korea.,NA,NA,NA,NA
+AAGL2014_027,6,1,3,Jairath,Ankush,India.,NA,male,1,NA
+AAGL2014_028,5,5,4,Williams,Kate,UK. Electronic address: kate.williams2@southwales.ac.uk.,NA,female,0.9988,NA
+AAGL2014_029,6,5,2,Sheyn,David,OH. Electronic address: david.sheyn@uhhospitals.org.,OH,male,0.9963,V
+AAGL2014_030,9,6,3,Carrillo,Jorge,Spain.,NA,male,0.994,NA
+AAGL2014_031,9,1,3,Gupta,Ankita,Michigan.,NM,female,1,VIII
+AAGL2014_032,3,3,1,Mosbrucker,Cindy,USA. dr.mos@pacificendo.net.,WA,female,0.9972,VIII
+AAGL2014_033,5,1,5,Balica,Adrian,08901.,NJ,male,0.9269,III
+AAGL2014_034,4,3,1,Manodoro,Stefano,Italy. stefano.manodoro@gmail.com.,NA,male,1,NA
+AAGL2014_035,7,4,5,Hugues,Clara,France.,NA,female,0.9966,NA
+AAGL2014_036,3,2,3,Ebell,Mark H,MC). ebell@uga.edu.,GA,NA,NA,XI
+AAGL2014_037,8,5,4,Andou,Miya,Japan.,NA,female,1,NA
+AAGL2014_038,4,4,5,Abuhammour,Adnan,United Arab Emirates. Electronic address: aabuhammour@yahoo.com.,NA,male,1,NA
+AAGL2014_039,6,1,4,Puntambekar,Shailesh,411004 India.,NA,NA,NA,NA
+AAGL2014_040,6,5,5,Kroft,Jamie,Canada. Electronic address: Jamie.kroft@utoronto.ca.,NA,female,0.7702,NA
+AAGL2014_041,1,1,5,Kent,Athol,South Africa.,NA,male,1,NA
 AAGL2014_042,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2014_043,15,13,5,NA,NA,NA,NA,NA,NA,NA
-AAGL2014_044,5,3,4,Ghai,Vishalli,UK,UK.,NA,NA,NA
-AAGL2014_045,8,3,5,Uzunlar,Ozlem,NA,Turkey. Electronic address: ozlemuzunlars@hotmail.com.,female,1,NA
-AAGL2014_046,7,3,5,Di Cello,Annalisa,NA,Italy. Electronic address: annalisa_dicello84@yahoo.it.,female,1,NA
-AAGL2014_047,17,6,3,Rooney,Kathleen,ON,Canada.,female,0.9977,II
-AAGL2014_048,6,1,5,Huang,Jidong,GA,CA.,NA,NA,XI
-AAGL2014_049,5,3,5,Ferrero,Simone,NA,Italy.,female,0.9823,NA
-AAGL2014_050,15,5,4,Ramírez,Esther,NA,Spain.,female,0.9959,NA
-AAGL2014_051,2,2,5,Walker,Zachary,NA,Massachusetts. Electronic address: zwalker1@bwh.harvard.edu.,male,0.9969,NA
-AAGL2014_052,5,2,3,Mikhail,Emad,FL,USA.,male,1,XI
+AAGL2014_044,5,3,4,Ghai,Vishalli,UK.,NA,NA,NA,NA
+AAGL2014_045,8,3,5,Uzunlar,Ozlem,Turkey. Electronic address: ozlemuzunlars@hotmail.com.,NA,female,1,NA
+AAGL2014_046,7,3,5,Di Cello,Annalisa,Italy. Electronic address: annalisa_dicello84@yahoo.it.,NA,female,1,NA
+AAGL2014_047,8,2,3,Caskey,Rachel,California.. Electronic address: rachelinacaskey@gmail.com.,CA,female,0.997,IX
+AAGL2014_048,6,1,5,Huang,Jidong,CA.,IL,NA,NA,VII
+AAGL2014_049,6,5,5,Ferrero,Simone,Italy. Electronic address: simoneferrero@me.com.,NA,female,0.9823,NA
+AAGL2014_050,3,2,4,Ramirez,Ernesto,United States.,IN,male,0.9967,V
+AAGL2014_051,2,2,5,Walker,Zachary,Massachusetts. Electronic address: zwalker1@bwh.harvard.edu.,MA,male,0.9969,I
+AAGL2014_052,5,2,3,Mikhail,Emad,USA.,FL,male,1,XI
 AAGL2014_053,4,0,3,Sangha,Roopina,NA,NA,NA,NA,NA
-AAGL2014_054,16,10,5,Muzii,Ludovico,NA,Italy ludovico.muzii@uniroma1.it.,NA,NA,NA
-AAGL2014_055,7,2,5,Hahn,M,NA,Tübingen.,NA,NA,NA
-AAGL2014_056,6,1,3,Lu,Qi,NA,People's Republic of China.,male,1,NA
-AAGL2014_057,1,1,5,Hobbs,Katherine,NA,United Kingdom. Electronic address: katherinejhobbs@hotmail.co.uk.,female,0.9972,NA
-AAGL2014_058,6,5,2,Huang,Xuanwu,NA,China.,NA,NA,NA
-AAGL2014_059,7,6,5,Noel,Nicolas,NA,France.,male,0.9975,NA
-AAGL2014_060,5,4,5,Berman,J,QC,Canada. Electronic address: julie.berman@umontreal.ca.,NA,NA,II
-AAGL2014_061,5,3,5,Ribeiro,Diana,NA,Portugal.,female,0.9965,NA
-AAGL2014_062,3,3,2,Feuer,Gerald,NA,USA.,male,0.9946,NA
-AAGL2014_063,6,2,3,Warehime,Jenna,KY,USA. jenna.warehime@louisville.edu.,female,0.9983,V
-AAGL2014_064,4,1,3,Gentry,Michael,OH,OH.,male,0.9947,V
-AAGL2014_065,7,4,3,Ramos,Silvina,NA,Argentina.,female,1,NA
-AAGL2014_066,4,2,2,Boyle,Melanie Adams,NJ,USA. adamsm1@ihn.org.,NA,NA,III
-AAGL2014_067,4,1,4,Riley,Kristin,NA,Pennsylvania.,female,0.9915,NA
-AAGL2014_068,4,3,1,Yamamoto,Matsuo,NA,Japan.,NA,NA,NA
-AAGL2014_069,2,1,2,Diana,M,NA,France.,NA,NA,NA
-AAGL2014_070,6,1,3,Fornalik,Hubert,IN,IN.,male,0.9976,V
-AAGL2014_071,1,1,4,Einarsson,Jonas,NA,Sweden me@jonaseinarsson.se.,male,0.9984,NA
-AAGL2014_072,2,2,2,Truong,Mireille,NA,California. Electronic address: mireille.truong@gmail.com.,female,1,NA
-AAGL2014_073,2,1,1,Peters,Ann,NA,USA.,female,0.9972,NA
-AAGL2014_074,9,1,2,Chen,Chi Chung Grace,NA,all participating institutions were members of the American College of Obstetricians and Gynecologists Simulations Working Group.,NA,NA,NA
-AAGL2014_075,1,1,2,Mackenzie,Malcolm,MA,MA.,male,0.9981,I
-AAGL2014_076,3,3,3,Takmaz,Ozguc,NA,Turkey. Electronic address: ozguctakmaz@gmail.com.,NA,NA,NA
-AAGL2014_077,3,3,4,Murji,Ally,NA,Canada. Electronic address: amurji@mtsinai.on.ca.,female,0.9987,NA
-AAGL2014_078,4,3,1,Farnam,Richard W,NA,United States.,NA,NA,NA
-AAGL2014_079,1,1,1,Tandulwadkar,Sunita,NA,India.,female,1,NA
-AAGL2014_080,7,5,5,Di Spiezio Sardo,Attilio,II,Italy.,male,1,NA
-AAGL2014_081,9,1,3,Fridman,Dmitry,NA,USA.,male,1,NA
-AAGL2014_082,5,2,5,Bizzarri,Nicolò,NA,Italy.,NA,NA,NA
-AAGL2014_083,3,2,2,Georgiou,Dimitra,UK,UK.,female,1,NA
-AAGL2014_084,3,1,5,De Baets,Liesbet,NA,Belgium.,NA,NA,NA
-AAGL2014_085,5,0,5,Issat,T,NA,NA,NA,NA,NA
-AAGL2014_086,6,5,5,Billow,Megan,NA,Ohio. Electronic address: billowm3@ccf.org.,female,0.9976,NA
-AAGL2014_087,5,4,5,Louis,Sarah,NA,France.,female,0.9971,NA
-AAGL2014_088,12,3,3,Taylor,Charles,UK,UK. Charles.taylor@stgeorges.nhs.uk.,male,0.9949,NA
-AAGL2014_089,4,3,3,Dhanani,Maya,FL,USA.,female,0.9981,XI
-AAGL2014_090,8,7,5,Rees,Connie O,NA,The Netherlands. Electronic address: connie.rees@catharinaziekenhuis.nl.,NA,NA,NA
-AAGL2014_091,7,4,3,Coad,Jane,UK,UK. Electronic address: jane.coad@coventry.ac.uk.,female,0.9971,NA
-AAGL2014_092,7,7,5,Borahay,Mostafa A,TX,TX. Electronic address: maboraha@utmb.edu.,NA,NA,X
-AAGL2014_093,7,7,5,Brölmann,Hans,NA,Netherlands.,male,0.9996,NA
-AAGL2015_001,2,2,5,Carmona Mata,Vanesa,NA,Spain.,female,0.9992,NA
-AAGL2015_002,6,5,5,Lyapis,Anna,NA,California.,female,0.9971,NA
-AAGL2015_003,4,1,4,Barron,Kenneth I,NA,Florida.,NA,NA,NA
-AAGL2015_004,1,1,5,Allahbadia,Gautam N,NA,India.,NA,NA,NA
-AAGL2015_005,11,6,4,Puntambekar,Shailesh,NA,India. (Dr. Puntambekar).,NA,NA,NA
-AAGL2015_006,6,4,3,Jacob,Jack,NA,Alaska.,male,0.9967,NA
-AAGL2015_007,4,1,4,Kho,Kimberly A,NA,Texas.,NA,NA,NA
-AAGL2015_008,7,2,5,Martinelli,Fabio,NA,Italy Fabio.Martinelli@istitutotumori.mi.it.,male,1,NA
-AAGL2015_009,9,8,5,Fazel,A,NA,Iran.,NA,NA,NA
-AAGL2015_010,5,3,5,Wang,Yan-zhou,NA,People's Republic of China.,NA,NA,NA
-AAGL2015_011,2,2,1,Iavazzo,Christos,UK,UK. christosiavazzo@hotmail.com.,male,1,NA
-AAGL2015_012,8,5,5,Andou,Miya,NA,Japan.,female,1,NA
-AAGL2015_013,5,3,5,Vilos,Angelos G,ON,ON.,NA,NA,II
-AAGL2015_014,7,3,5,Lazzeri,Lucia,NA,Italy.,female,0.9973,NA
-AAGL2015_015,3,3,2,Santiago,Carlos,NA,Portugal. Electronic address: carlos.santiago@ist.utl.pt.,male,0.9922,NA
-AAGL2015_016,3,2,2,Shokeir,Tarek,NA,Egypt.,male,1,NA
-AAGL2015_017,3,2,3,Suen,Michael W H,NA,Canada.,NA,NA,NA
-AAGL2015_018,8,4,2,Rajakumar,C,NA,Canada.,NA,NA,NA
-AAGL2015_019,3,3,5,Sasaki,Kirsten,NA,Department of Obstetrics and Gynecology (Drs. Sasaki and Miller). Electronic address: Kirsten.Sasaki@aah.org.,female,0.9962,NA
-AAGL2015_020,5,2,5,Deimling,Timothy A,PA,USA.,NA,NA,III
-AAGL2015_021,11,2,5,Tsafrir,Ziv,NA,Michigan.,male,1,NA
-AAGL2015_022,3,1,5,Li,Xue-Lian,NA,China.,NA,NA,NA
-AAGL2015_023,7,3,5,Lee,Hyunkwang,MA,USA.,NA,NA,I
-AAGL2015_024,4,4,5,Simpson,Kara,NA,USA.,female,0.9973,NA
-AAGL2015_025,8,2,5,Vogt,Ivan,NA,Germany. ivan.vogt@ovgu.de.,male,0.9946,NA
-AAGL2015_026,12,7,5,Mathews,Shyama,NY,NY. Electronic address: Shyama.mathews@gmail.com.,NA,NA,II
-AAGL2015_027,5,1,5,Saito,Tsuyoshi,NA,Japan.,male,1,NA
-AAGL2015_028,7,6,3,Whitcomb,B,CT,USA. Electronic address: whitcomb@uchc.edu.,NA,NA,I
-AAGL2015_029,5,1,4,Wasson,Megan,NA,Arizona.,female,0.9976,NA
+AAGL2014_054,16,10,5,Muzii,Ludovico,Italy ludovico.muzii@uniroma1.it.,NA,NA,NA,NA
+AAGL2014_055,7,2,5,Hahn,M,Tübingen.,NA,NA,NA,NA
+AAGL2014_056,6,1,3,Lu,Qi,People's Republic of China.,NA,male,1,NA
+AAGL2014_057,1,1,5,Hobbs,Katherine,United Kingdom. Electronic address: katherinejhobbs@hotmail.co.uk.,NA,female,0.9972,NA
+AAGL2014_058,5,2,2,Alkatout,Ibrahim,Germany.,NA,male,1,NA
+AAGL2014_059,7,6,5,Noel,Nicolas,France.,NA,male,0.9975,NA
+AAGL2014_060,5,4,5,Berman,J,Canada. Electronic address: julie.berman@umontreal.ca.,NA,NA,NA,NA
+AAGL2014_061,5,3,5,Ribeiro,Diana,Portugal.,NA,female,0.9965,NA
+AAGL2014_062,3,3,2,Feuer,Gerald,USA.,GA,male,0.9946,XI
+AAGL2014_063,6,2,3,Warehime,Jenna,USA. jenna.warehime@louisville.edu.,KY,female,0.9983,V
+AAGL2014_064,4,1,3,Gentry,Michael,OH.,OH,male,0.9947,V
+AAGL2014_065,7,4,3,Ramos,Silvina,Argentina.,NA,female,1,NA
+AAGL2014_066,4,2,2,Boyle,Melanie Adams,USA. adamsm1@ihn.org.,NJ,NA,NA,III
+AAGL2014_067,4,1,4,Riley,Kristin,Pennsylvania.,PA,female,0.9915,III
+AAGL2014_068,4,3,1,Yamamoto,Matsuo,Japan.,NA,NA,NA,NA
+AAGL2014_069,4,4,2,Cheng,Connie,United States of America. Electronic address: connie.cheng@hmhn.org.,NJ,female,0.9816,III
+AAGL2014_070,6,1,3,Fornalik,Hubert,IN.,IN,male,0.9976,V
+AAGL2014_071,1,1,4,Einarsson,Jonas,Sweden me@jonaseinarsson.se.,NA,male,0.9984,NA
+AAGL2014_072,2,2,2,Truong,Mireille,California. Electronic address: mireille.truong@gmail.com.,CA,female,1,IX
+AAGL2014_073,2,1,1,Peters,Ann,USA.,PA,female,0.9972,III
+AAGL2014_074,9,1,2,Chen,Chi Chung Grace,all participating institutions were members of the American College of Obstetricians and Gynecologists Simulations Working Group.,NC,NA,NA,XI
+AAGL2014_075,1,1,2,Mackenzie,Malcolm,MA.,NA,male,0.9981,NA
+AAGL2014_076,3,3,3,Takmaz,Ozguc,Turkey. Electronic address: ozguctakmaz@gmail.com.,NA,NA,NA,NA
+AAGL2014_077,3,3,4,Murji,Ally,Canada. Electronic address: amurji@mtsinai.on.ca.,NY,female,0.9987,II
+AAGL2014_078,4,3,1,Farnam,Richard W,United States.,TX,NA,NA,X
+AAGL2014_079,1,1,1,Tandulwadkar,Sunita,India.,NA,female,1,NA
+AAGL2014_080,10,4,5,Di Spiezio Sardo,Attilio,Italy.,NA,male,1,NA
+AAGL2014_081,9,1,3,Fridman,Dmitry,USA.,NY,male,1,II
+AAGL2014_082,5,2,5,Bizzarri,Nicolò,Italy.,NA,NA,NA,NA
+AAGL2014_083,3,2,2,Georgiou,Dimitra,UK.,NA,female,1,NA
+AAGL2014_084,3,1,5,De Baets,Liesbet,Belgium.,NA,NA,NA,NA
+AAGL2014_085,3,0,5,Issat,Tadeusz,NA,NA,male,1,NA
+AAGL2014_086,6,5,5,Billow,Megan,Ohio. Electronic address: billowm3@ccf.org.,OH,female,0.9976,V
+AAGL2014_087,3,1,5,Vallabh-Patel,Vaneesha,NJ.,NA,NA,NA,NA
+AAGL2014_088,12,3,3,Taylor,Charles,UK. Charles.taylor@stgeorges.nhs.uk.,NA,male,0.9949,NA
+AAGL2014_089,4,3,3,Dhanani,Maya,USA.,FL,female,0.9981,XI
+AAGL2014_090,8,7,5,Rees,Connie O,The Netherlands. Electronic address: connie.rees@catharinaziekenhuis.nl.,NA,NA,NA,NA
+AAGL2014_091,7,4,3,Coad,Jane,UK. Electronic address: jane.coad@coventry.ac.uk.,NA,female,0.9971,NA
+AAGL2014_092,7,7,5,Borahay,Mostafa A,TX. Electronic address: maboraha@utmb.edu.,TX,NA,NA,X
+AAGL2014_093,7,7,5,Brölmann,Hans,Netherlands.,NA,male,0.9996,NA
+AAGL2015_001,3,3,5,Stanhiser,Jamie,OH. Electronic address: jamiestanhiser@gmail.com.,OH,female,0.7702,V
+AAGL2015_002,6,5,5,Lyapis,Anna,California.,CA,female,0.9971,IX
+AAGL2015_003,4,1,4,Barron,Kenneth I,Florida.,FL,NA,NA,XI
+AAGL2015_004,1,1,5,Allahbadia,Gautam N,India.,NA,NA,NA,NA
+AAGL2015_005,11,6,4,Puntambekar,Shailesh,India. (Dr. Puntambekar).,NA,NA,NA,NA
+AAGL2015_006,6,4,3,Jacob,Jack,Alaska.,AK,male,0.9967,VIII
+AAGL2015_007,4,1,4,Kho,Kimberly A,Texas.,TX,NA,NA,X
+AAGL2015_008,7,2,5,Martinelli,Fabio,Italy Fabio.Martinelli@istitutotumori.mi.it.,NA,male,1,NA
+AAGL2015_009,9,8,5,Fazel,A,Iran.,NA,NA,NA,NA
+AAGL2015_010,5,3,5,Wang,Yan-zhou,People's Republic of China.,NA,NA,NA,NA
+AAGL2015_011,2,2,1,Iavazzo,Christos,UK. christosiavazzo@hotmail.com.,NA,male,1,NA
+AAGL2015_012,8,5,5,Andou,Miya,Japan.,NA,female,1,NA
+AAGL2015_013,6,3,5,Ilnitsky,Sara,ON. Electronic address: sara.ilnitsky@gmail.com.,NA,female,0.9971,NA
+AAGL2015_014,10,4,5,Di Spiezio Sardo,Attilio,Italy.,NA,male,1,NA
+AAGL2015_015,8,3,2,Santiago,Calvin,Canada.,NA,male,0.9933,NA
+AAGL2015_016,3,2,2,Shokeir,Tarek,Egypt.,NA,male,1,NA
+AAGL2015_017,3,2,3,Suen,Michael W H,Canada.,NA,NA,NA,NA
+AAGL2015_018,8,4,2,Rajakumar,C,Canada.,NA,NA,NA,NA
+AAGL2015_019,3,3,5,Sasaki,Kirsten,Department of Obstetrics and Gynecology (Drs. Sasaki and Miller). Electronic address: Kirsten.Sasaki@aah.org.,NA,female,0.9962,NA
+AAGL2015_020,5,2,5,Deimling,Timothy A,USA.,PA,NA,NA,III
+AAGL2015_021,11,2,5,Tsafrir,Ziv,Michigan.,MI,male,1,V
+AAGL2015_022,6,2,5,Livinti,I,New York.,NY,NA,NA,II
+AAGL2015_023,3,3,5,Habte,Ruth,Canada.,MO,female,0.9962,VII
+AAGL2015_024,4,4,5,Simpson,Kara,USA.,DC,female,0.9973,IV
+AAGL2015_025,8,2,5,Crocco,Paolina,Italy.,NA,female,1,NA
+AAGL2015_026,12,7,5,Mathews,Shyama,NY. Electronic address: Shyama.mathews@gmail.com.,NY,NA,NA,II
+AAGL2015_027,5,1,5,Saito,Tsuyoshi,Japan.,NA,male,1,NA
+AAGL2015_028,7,6,3,Whitcomb,B,USA. Electronic address: whitcomb@uchc.edu.,CT,NA,NA,I
+AAGL2015_029,5,1,4,Wasson,Megan,Arizona.,AZ,female,0.9976,VIII
 AAGL2015_030,1,0,3,Guha,Paroma,NA,NA,NA,NA,NA
-AAGL2015_031,11,11,3,Ross,Douglas S,NA,Massachusetts.,NA,NA,NA
+AAGL2015_031,15,1,3,Gu,Zheng,People's Republic of China.,NA,male,1,NA
 AAGL2015_032,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-AAGL2015_033,4,2,3,Rosenblatt,Peter,MA,MA.,male,0.9965,I
-AAGL2015_034,1,1,1,Hanes,Charles R,NA,Alabama. Electronic address: hanes@urogynsa.com.,NA,NA,NA
-AAGL2015_035,6,2,5,Mikhail,Emad,NA,USA.,male,1,NA
-AAGL2015_036,4,3,2,Hanstede,Miriam M F,NA,The Netherlands. Electronic address: mhanstede@spaarnegasthuis.nl.,NA,NA,NA
-AAGL2015_037,1,1,1,A M,Luthra,NA,India.,NA,NA,NA
-AAGL2015_038,6,3,2,Xu,Bin,NA,People's Republic of China.,male,1,NA
-AAGL2015_039,7,4,4,Huy,Nguyen Vu Quoc,NA,Viet Nam.,NA,NA,NA
-AAGL2015_040,4,2,2,Shenoy,Chandrika,NA,Canada.,female,1,NA
-AAGL2015_041,2,1,3,Hong,Mun-Kun,NA,Taiwan.,NA,NA,NA
-AAGL2015_042,8,2,5,Caskey,Rachel,NA,California.. Electronic address: rachelinacaskey@gmail.com.,female,0.997,NA
-AAGL2015_043,7,2,4,Rosenbaum,Jonathan,NA,France.,male,0.9954,NA
-AAGL2015_044,3,1,3,Clancy,Aisling A,ON,Ottawa ON.,NA,NA,II
-AAGL2015_045,6,3,5,Lemos,Nucelio,SP,Brazil. nucelio@gmail.com.,NA,NA,NA
-AAGL2015_046,3,3,4,Pacis,Michelle,NA,Pennsylvania. Electronic address: mpacis@pennstatehealth.psu.edu.,female,0.9962,NA
-AAGL2015_047,6,4,5,Crochet,Patrice,NA,France. pcrochet.marseille@gmail.com.,female,0.9797,NA
+AAGL2015_033,4,2,3,Rosenblatt,Peter,MA.,MA,male,0.9965,I
+AAGL2015_034,1,1,1,Hanes,Charles R,Alabama. Electronic address: hanes@urogynsa.com.,AL,NA,NA,XI
+AAGL2015_035,6,2,5,Mikhail,Emad,USA.,FL,male,1,XI
+AAGL2015_036,2,1,2,Hanstede,M,Netherlands.,NA,NA,NA,NA
+AAGL2015_037,1,1,1,A M,Luthra,India.,NA,NA,NA,NA
+AAGL2015_038,5,1,2,Tjahyadi,Dian,Indonesia.,NA,female,0.9865,NA
+AAGL2015_039,7,4,4,Huy,Nguyen Vu Quoc,Viet Nam.,NA,NA,NA,NA
+AAGL2015_040,4,2,2,Shenoy,Chandrika,Canada.,NA,female,1,NA
+AAGL2015_041,3,3,3,Kapurubandara,Supuni,Australia.,NA,NA,NA,NA
+AAGL2015_042,8,2,5,Caskey,Rachel,California.. Electronic address: rachelinacaskey@gmail.com.,CA,female,0.997,IX
+AAGL2015_043,7,2,4,Rosenbaum,Jonathan,France.,NA,male,0.9954,NA
+AAGL2015_044,3,1,3,Clancy,Aisling A,Ottawa ON.,NA,NA,NA,NA
+AAGL2015_045,6,3,5,Lemos,Nucelio,CEP: 04026-090. nucelio@gmail.com.,NA,NA,NA,NA
+AAGL2015_046,3,3,4,Pacis,Michelle,Pennsylvania. Electronic address: mpacis@pennstatehealth.psu.edu.,PA,female,0.9962,III
+AAGL2015_047,6,4,5,Crochet,Patrice,France. pcrochet.marseille@gmail.com.,NA,female,0.9797,NA
 AAGL2015_048,7,0,5,Kroft,Jamie,NA,NA,female,0.7702,NA
-AAGL2015_049,5,4,2,Sanderson,Derrick J,NY,USA.,NA,NA,II
-AAGL2015_050,1,1,2,DePasquale,Seth,NA,Kentucky. seth.depasquale@mac.com.,male,0.9966,NA
-AAGL2015_051,3,2,3,Cooney,Eva,NA,Ireland.,female,0.9962,NA
-AAGL2015_052,7,6,5,Polin,Michael R,NC,NC. Electronic address: michael.polin@duke.edu.,NA,NA,XI
-AAGL2015_053,5,2,4,Thomaier,Lauren,MD,USA. lthomai1@jhmi.edu.,female,0.9904,IV
-AAGL2015_054,3,1,5,Lannen,Amy,NA,Tennessee (Dr Wilbeck).,female,0.9974,NA
-AAGL2015_055,4,2,4,Truong,M D,NA,New York.,NA,NA,NA
-AAGL2015_056,7,3,4,Chen,Xi,NA,China.,NA,NA,NA
-AAGL2015_057,2,2,3,Li,Zheng-Yi,NA,People's Republic of China.,NA,NA,NA
-AAGL2015_058,1,1,4,Woodall,John,NA,Brazil; jackwoodall13@gmail.com.,male,0.996,NA
-AAGL2015_059,7,5,4,Seifi,Farinaz,CT,CT.,NA,NA,I
-AAGL2015_060,5,3,4,Sharma,Sidhartha,NA,India. Electronic address: sid.aiims@gmail.com.,male,1,NA
-AAGL2015_061,11,3,3,Zheng,Lili,NA,China.,female,1,NA
-AAGL2015_062,4,1,5,Arian,Sara E,OH,sarian@bcm.edu.,NA,NA,V
-AAGL2015_063,7,2,5,Katebi Kashi,P,NA,Virginia.,NA,NA,NA
-AAGL2015_064,12,7,5,Mathews,Shyama,NY,NY. Electronic address: Shyama.mathews@gmail.com.,NA,NA,II
-AAGL2015_065,6,2,3,Yin,Huijiao,NA,China.,NA,NA,NA
-AAGL2015_066,6,4,5,Gerges,B,NA,Australia.,NA,NA,NA
-AAGL2015_067,2,2,5,Reid,Shannon,NA,Advanced Minimally Invasive Gynaecological Surgery Unit University of New South Wales Liverpool Hospital Elizabeth & Goulburn St Liverpool 2170 NSW Australia.,female,0.859,NA
-AAGL2015_068,1,1,5,Maher,Pamela,CA,United States. Electronic address: pmaher@salk.edu.,female,0.9978,IX
-AAGL2015_069,9,1,5,Racca,A,NA,Belgium.,NA,NA,NA
-AAGL2015_070,6,1,4,Yuk,Jin-Sung,SY,Korea.,NA,NA,NA
-AAGL2015_071,20,15,5,Uccella,Stefano,NA,Italy. Electronic address: stefucc@libero.it.,male,1,NA
-AAGL2015_072,6,5,4,Lyapis,Anna,NA,California.,female,0.9971,NA
-AAGL2015_073,5,3,5,Tovoli,Francesco,NA,Italy.,male,1,NA
-AAGL2015_074,8,2,5,Ribeiro,Diego,NA,Brazil.,male,0.9977,NA
-AAGL2015_075,4,1,4,Schmitt,Eric M,NA,Hawaii.,NA,NA,NA
-AAGL2015_076,3,2,5,Levin,Danielle,NJ,USA.,female,0.9951,III
-AAGL2015_077,6,5,5,Valentin,L,NA,France. Electronic address: lucvalentin2@gmail.com.,NA,NA,NA
-AAGL2015_078,5,5,5,Bongers,Pim J,NA,The Netherlands.,NA,NA,NA
-AAGL2015_079,5,2,5,Asoğlu,Mehmet Reşit,NA,USA.,NA,NA,NA
-AAGL2015_080,2,2,4,Braun,Katrin,NA,Germany.,female,1,NA
-AAGL2015_081,6,3,5,Opoku-Anane,Jessica,CA,CA. Electronic address: jopokua1@gmail.com.,female,0.9968,IX
-AAGL2015_082,10,5,3,Guo,Zheng,NA,People's Republic of China.,male,1,NA
-AAGL2015_083,6,3,5,Chen,Changmao,NA,cas.cn.,NA,NA,NA
-AAGL2015_084,3,2,5,Clark,Nisse V,NA,Massachusetts.,NA,NA,NA
-AAGL2015_085,4,3,5,Yuk,Jin-Sung,NA,Republic of Korea.,NA,NA,NA
-AAGL2015_086,3,2,1,Soygur,Bikem,NA,Turkey.,NA,NA,NA
-AAGL2015_087,5,4,4,Murji,Ally,NA,Canada. Electronic address: amurji@mtsinai.on.ca.,female,0.9987,NA
-AAGL2015_088,4,1,5,Damadi,Amir A,NA,Michigan.,NA,NA,NA
-AAGL2015_089,11,4,5,Ajao,Mobolaji O,MA,USA. majao@bwh.harvard.edu.,NA,NA,I
-AAGL2015_090,6,3,5,Mowers,Erika L,NA,USA.,NA,NA,NA
-AAGL2015_091,11,3,4,Cooke,Peter V,NY,NY. Electronic address: peter.cooke@icahn.mssm.edu.,NA,NA,II
-AAGL2015_092,3,2,5,Zeybek,Burak,TX,USA. buzeybek@utmb.edu.,male,1,X
-AAGL2015_093,3,1,3,Moiety,F,NA,Egypt.,NA,NA,NA
-AAGL2015_094,14,8,5,Fanfani,F,NA,Italy. Electronic address: francesco.fanfani@unich.it.,NA,NA,NA
-AAGL2015_095,4,2,5,Lianos,Georgios D,NA,Greece.,NA,NA,NA
-AAGL2016_001,5,5,5,Malekpour,Padideh,NA,Iran.,NA,NA,NA
-AAGL2016_002,5,4,5,Ma,Tianyi,SA,Australia. Electronic address: tianyi.ma@uq.edu.au.,male,1,NA
-AAGL2016_003,3,3,5,Barron,K,NA,Ayr.,NA,NA,NA
-AAGL2016_004,8,7,5,Luketic,Lea,NA,Canada.,female,0.9876,NA
-AAGL2016_005,16,4,3,Guan,Xuan,NA,China.,female,0.9311,NA
-AAGL2016_006,8,2,5,Ochi,Yoshifumi,NA,Japan. Electronic address: quattroporte.1012@gmail.com.,NA,NA,NA
-AAGL2016_007,7,4,3,Huy,Nguyen Vu Quoc,NA,Viet Nam.,NA,NA,NA
-AAGL2016_008,2,2,5,Li,Xin,NA,China.,female,0.8485,NA
-AAGL2016_009,2,NA,2,NA,NA,NA,NA,NA,NA,NA
-AAGL2016_010,4,4,5,Siedhoff,Matthew T,CA,CA. Electronic address: Matthew.Siedhoff@cshs.org.,NA,NA,IX
-AAGL2016_011,15,7,5,Ohtani,Yohei,NA,Japan.,male,1,NA
-AAGL2016_012,9,2,3,Du,Jiang,NA,P.R. China.,NA,NA,NA
-AAGL2016_013,8,5,4,Dreyer,K,VU,The Netherlands k.dreyer@vumc.nl.,NA,NA,NA
+AAGL2015_049,5,4,2,Sanderson,Derrick J,USA.,NY,NA,NA,II
+AAGL2015_050,1,1,2,DePasquale,Seth,Kentucky. seth.depasquale@mac.com.,KY,male,0.9966,V
+AAGL2015_051,5,3,3,Cooney,Erin,Texas.,TX,female,0.9732,X
+AAGL2015_052,7,6,5,Polin,Michael R,NC. Electronic address: michael.polin@duke.edu.,NC,NA,NA,XI
+AAGL2015_053,5,2,4,Thomaier,Lauren,USA. lthomai1@jhmi.edu.,MD,female,0.9904,IV
+AAGL2015_054,1,1,5,Dove,Jessica,The Ohio State University.,OH,female,0.9968,V
+AAGL2015_055,4,2,4,Truong,M D,New York.,NY,NA,NA,II
+AAGL2015_056,7,3,4,Chen,Xi,China.,NA,NA,NA,NA
+AAGL2015_057,12,2,3,Koie,Takuya,Aomori.,NA,male,1,NA
+AAGL2015_058,1,1,4,Woodall,John,Brazil; jackwoodall13@gmail.com.,NA,male,0.996,NA
+AAGL2015_059,4,2,4,Menderes,Gulden,USA. Electronic address: gulden.menderes@yale.edu.,CT,NA,NA,I
+AAGL2015_060,6,1,4,Shirazian,Shayan,USA.,NA,male,0.9556,NA
+AAGL2015_061,7,3,3,Liu,Jie,PR China.,NA,male,0.8187,NA
+AAGL2015_062,4,1,5,Arian,Sara E,sarian@bcm.edu.,OH,NA,NA,V
+AAGL2015_063,7,2,5,Katebi Kashi,P,Virginia.,VA,NA,NA,IV
+AAGL2015_064,12,7,5,Mathews,Shyama,NY. Electronic address: Shyama.mathews@gmail.com.,NY,NA,NA,II
+AAGL2015_065,6,2,3,Yin,Huijiao,China.,NA,NA,NA,NA
+AAGL2015_066,2,2,5,Gerges,Bassem,Australia. bgerges@gmail.com.,NA,male,1,NA
+AAGL2015_067,2,2,5,Reid,Shannon,Advanced Minimally Invasive Gynaecological Surgery Unit University of New South Wales Liverpool Hospital Elizabeth & Goulburn St Liverpool 2170 NSW Australia.,NA,female,0.859,NA
+AAGL2015_068,1,1,5,Maher,Pamela,United States. Electronic address: pmaher@salk.edu.,CA,female,0.9978,IX
+AAGL2015_069,9,1,5,Racca,A,Belgium.,NA,NA,NA,NA
+AAGL2015_070,6,1,4,Yuk,Jin-Sung,Korea.,NA,NA,NA,NA
+AAGL2015_071,3,3,5,Shakir,Fevzi,UK. fevzi@doctors.org.uk.,NA,NA,NA,NA
+AAGL2015_072,6,5,4,Lyapis,Anna,California.,CA,female,0.9971,IX
+AAGL2015_073,2,2,5,Marinho,Feliciana Lage,Brazil.,NA,NA,NA,NA
+AAGL2015_074,5,3,5,Ribeiro,Diana,Portugal.,NA,female,0.9965,NA
+AAGL2015_075,4,1,4,Schmitt,Eric M,Hawaii.,HI,NA,NA,VIII
+AAGL2015_076,3,2,5,Levin,Danielle,USA.,NA,female,0.9951,NA
+AAGL2015_077,6,5,5,Valentin,L,France. Electronic address: lucvalentin2@gmail.com.,NA,NA,NA,NA
+AAGL2015_078,5,5,5,Bongers,Pim J,The Netherlands.,NA,NA,NA,NA
+AAGL2015_079,5,2,5,Asoğlu,Mehmet Reşit,USA.,TX,NA,NA,X
+AAGL2015_080,2,2,4,Braun,Katrin,Germany.,NA,female,1,NA
+AAGL2015_081,6,3,5,Opoku-Anane,Jessica,CA. Electronic address: jopokua1@gmail.com.,CA,female,0.9968,IX
+AAGL2015_082,4,1,3,Senapati,Sangeeta,Kansas.,KS,female,1,VII
+AAGL2015_083,6,3,5,Chen,Changmao,cas.cn.,NA,NA,NA,NA
+AAGL2015_084,3,2,5,Clark,Nisse V,Massachusetts.,MA,NA,NA,I
+AAGL2015_085,4,3,5,Yuk,Jin-Sung,Republic of Korea.,NA,NA,NA,NA
+AAGL2015_086,3,2,1,Soygur,Bikem,Turkey.,NA,NA,NA,NA
+AAGL2015_087,5,4,4,Murji,Ally,Canada. Electronic address: amurji@mtsinai.on.ca.,NY,female,0.9987,II
+AAGL2015_088,6,1,5,Park,Soo Yeun,Korea.,NA,NA,NA,NA
+AAGL2015_089,11,4,5,Ajao,Mobolaji O,USA. majao@bwh.harvard.edu.,MA,NA,NA,I
+AAGL2015_090,6,3,5,Mowers,Erika L,USA.,MI,NA,NA,V
+AAGL2015_091,2,1,4,Chuang,Yaoyang,Taiwan.,NA,NA,NA,NA
+AAGL2015_092,3,2,5,Zeybek,Burak,USA. buzeybek@utmb.edu.,TX,male,1,X
+AAGL2015_093,3,1,3,Moiety,F,Egypt.,NA,NA,NA,NA
+AAGL2015_094,14,8,5,Fanfani,F,Italy. Electronic address: francesco.fanfani@unich.it.,NA,NA,NA,NA
+AAGL2015_095,4,2,5,Lianos,Georgios D,Greece.,NA,NA,NA,NA
+AAGL2016_001,1,1,5,Kamdar,Nirav,CA.,CA,male,1,IX
+AAGL2016_002,5,4,5,Ma,Tianyi,Australia. Electronic address: tianyi.ma@uq.edu.au.,NA,male,1,NA
+AAGL2016_003,3,3,5,Barron,K,Ayr.,NA,NA,NA,NA
+AAGL2016_004,8,7,5,Luketic,Lea,Canada.,NY,female,0.9876,II
+AAGL2016_005,16,4,3,Guan,Xuan,China.,NA,female,0.9311,NA
+AAGL2016_006,8,2,5,Ochi,Yoshifumi,Japan. Electronic address: quattroporte.1012@gmail.com.,NA,NA,NA,NA
+AAGL2016_007,7,4,3,Huy,Nguyen Vu Quoc,Viet Nam.,NA,NA,NA,NA
+AAGL2016_008,7,5,5,Yang,Fuheng,China.,NA,NA,NA,NA
+AAGL2016_009,5,2,2,Deshmukh,Uma,USA.,CT,female,1,I
+AAGL2016_010,4,4,5,Siedhoff,Matthew T,CA. Electronic address: Matthew.Siedhoff@cshs.org.,CA,NA,NA,IX
+AAGL2016_011,15,7,5,Ohtani,Yohei,Japan.,NA,male,1,NA
+AAGL2016_012,9,2,3,Du,Jiang,P.R. China.,NA,NA,NA,NA
+AAGL2016_013,8,5,4,Dreyer,K,The Netherlands k.dreyer@vumc.nl.,NA,NA,NA,NA
 AAGL2016_014,2,0,2,Blomkvist,Pär,NA,NA,NA,NA,NA
-AAGL2016_015,7,7,3,Fernandez,H,AP,France. Electronic address: herve.fernandez@aphp.fr.,NA,NA,AFS
-AAGL2016_016,7,4,5,Vinklerová,Petra,NA,Czech Republic.,female,0.9967,NA
-AAGL2016_017,6,3,5,Li,Junjie,NA,People's Republic of China.,NA,NA,NA
-AAGL2016_018,1,1,3,Bradley,Lucy,NA,Sheffield.,female,0.9974,NA
-AAGL2016_019,24,22,5,Sorce,Gabriele,NA,Italy. gab.sorce@gmail.com.,female,0.755,NA
-AAGL2016_020,4,2,2,Kim,Jeong Jin,NA,Republic of Korea.,NA,NA,NA
-AAGL2016_021,8,6,5,Moawad,Gaby N,NW,USA. GNMoawad@gmail.com.,NA,NA,NA
+AAGL2016_015,7,7,3,Fernandez,H,France. Electronic address: herve.fernandez@aphp.fr.,NA,NA,NA,NA
+AAGL2016_016,7,4,5,Vinklerová,Petra,Czech Republic.,NA,female,0.9967,NA
+AAGL2016_017,3,2,5,Lovell,Daniel Y,Texas (all authors).,TX,NA,NA,X
+AAGL2016_018,1,1,3,Bradley,Lucy,Sheffield.,NA,female,0.9974,NA
+AAGL2016_019,2,2,5,Vargas,Montserrat,Mexico. Electronic address: montsevarsa1@gmail.com.,NA,female,1,NA
+AAGL2016_020,5,2,2,Kim,Won Woong,South Korea.,NA,NA,NA,NA
+AAGL2016_021,4,2,5,Choussein,Souzana,Greece. schoussein@partners.org.,NA,NA,NA,NA
 AAGL2016_022,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-AAGL2016_023,6,2,4,Mourad,Sherif,NA,Egypt.,male,1,NA
-AAGL2016_024,3,3,3,Matern,Tyson,NV,United States of America.,male,0.9914,VIII
-AAGL2016_025,5,1,2,Shrivastava,Nitin,NA,India.,male,1,NA
-AAGL2016_026,5,2,3,Rompen,Ingmar F,NA,Switzerland.,NA,NA,NA
-AAGL2016_027,1,1,1,Lee,YooKyung,NA,Korea.,NA,NA,NA
-AAGL2016_028,6,3,5,To,Valérie,NA,Australia. Valerie.to@mail.mcgill.ca.,NA,NA,NA
-AAGL2016_029,4,1,5,Sun,Lei,NA,China.,female,0.9702,NA
-AAGL2016_030,6,6,5,Koops,Sanne,GA,the Netherlands. Electronic address: s.koops@umcutrecht.nl.,female,1,XI
-AAGL2016_031,4,2,3,Wasson,Megan,NA,Arizona. Electronic address: wasson.megan@mayo.edu.,female,0.9976,NA
-AAGL2016_032,9,9,4,Denys,Pierre,NA,France.,male,0.995,NA
-AAGL2016_033,5,2,3,Houlihan,Sara,NW,Canada. houlihan@ualberta.ca.,female,0.9971,NA
-AAGL2016_034,5,3,3,Petersen,Shariska S,MI,USA.,NA,NA,V
-AAGL2016_035,2,2,5,Şahin,Çiğdem,NA,Turkiye.,NA,NA,NA
-AAGL2016_036,6,1,4,Mára,M,NA,Czech Republic.,NA,NA,NA
-AAGL2016_037,6,4,5,Arakelyan,Anush,NA,National Institutes of Health.,male,1,NA
-AAGL2016_038,2,1,5,Martinez,Mikaela Erlinda Germar,NA,Philippines.,NA,NA,NA
-AAGL2016_039,1,1,4,Lavelanet,A,NA,Switzerland.,NA,NA,NA
-AAGL2016_040,9,6,3,Patanwala,Insiyyah Y,FL,FL. Electronic address: insiyyah.patanwala.md@flhosp.org.,NA,NA,XI
-AAGL2016_041,4,3,4,Aoun,Joe,NA,St. Elizabeth's Medical Center.,male,0.9741,NA
-AAGL2016_042,8,1,5,Mahnert,Nichole,NA,Michigan.,female,0.9972,NA
+AAGL2016_023,6,2,4,Mourad,Sherif,Egypt.,NA,male,1,NA
+AAGL2016_024,13,3,3,Lim,Prisca,USA.,NC,female,1,XI
+AAGL2016_025,5,1,2,Shrivastava,Nitin,India.,NA,male,1,NA
+AAGL2016_026,5,2,3,Rompen,Ingmar F,Switzerland.,NA,NA,NA,NA
+AAGL2016_027,1,1,1,Lee,YooKyung,Korea.,NA,NA,NA,NA
+AAGL2016_028,6,3,5,To,Valérie,Australia. Valerie.to@mail.mcgill.ca.,NA,NA,NA,NA
+AAGL2016_029,6,5,5,Liu,Zhengwei,China.,NA,NA,NA,NA
+AAGL2016_030,2,2,5,Koops,Sanne,The Netherlands. Electronic address: s.koops@umcutrecht.nl.,NA,female,1,NA
+AAGL2016_031,4,2,3,Wasson,Megan,Arizona. Electronic address: wasson.megan@mayo.edu.,AZ,female,0.9976,VIII
+AAGL2016_032,9,9,4,Denys,Pierre,France.,NA,male,0.995,NA
+AAGL2016_033,5,2,3,Houlihan,Sara,Canada. houlihan@ualberta.ca.,NA,female,0.9971,NA
+AAGL2016_034,5,3,3,Petersen,Shariska S,USA.,MI,NA,NA,V
+AAGL2016_035,7,2,5,Sahin,Cihangir,Turkey. drcihangir@hotmail.com.,NA,NA,NA,NA
+AAGL2016_036,6,2,4,Mara,Michal,Republic of Czech.,NA,female,0.5163,NA
+AAGL2016_037,6,4,5,Arakelyan,Anush,National Institutes of Health.,NA,male,1,NA
+AAGL2016_038,2,1,5,Martinez,Mikaela Erlinda Germar,Philippines.,NA,NA,NA,NA
+AAGL2016_039,1,1,4,Lavelanet,A,Switzerland.,NA,NA,NA,NA
+AAGL2016_040,9,6,3,Patanwala,Insiyyah Y,FL. Electronic address: insiyyah.patanwala.md@flhosp.org.,FL,NA,NA,XI
+AAGL2016_041,4,3,4,Aoun,Joe,St. Elizabeth's Medical Center.,NA,male,0.9741,NA
+AAGL2016_042,8,1,5,Mahnert,Nichole,Michigan.,MI,female,0.9972,V
 AAGL2016_043,6,0,5,Palma-Granados,P,NA,NA,NA,NA,NA
-AAGL2016_044,4,1,2,Molinos-Albert,Luis M,NA,Spain.,NA,NA,NA
-AAGL2016_045,6,6,2,Gutman,Robert E,DC,DC. Electronic address: Robert.e.gutman@medstar.net.,NA,NA,IV
-AAGL2016_046,1,1,5,Lichtman,Andrew,MA,USA. Email: alichtman@bwh.harvard.edu.,male,0.996,I
-AAGL2016_047,3,2,5,Alammari,Roa,NA,Massachusetts.,NA,NA,NA
-AAGL2016_048,5,4,3,Matthews,Lisa,NA,Australia.,female,0.9973,NA
-AAGL2016_049,7,7,2,Blanton,Emily,FL,FL. Electronic address: Emily.Blanton@gmail.com.,female,0.9979,XI
-AAGL2016_050,6,3,5,Julian,Danielle,NA,USA.,female,0.9951,NA
-AAGL2016_051,3,2,2,Dave,Ayush,NA,India.,male,1,NA
-AAGL2016_052,5,2,4,Gerges,B,NA,Australia.,NA,NA,NA
-AAGL2016_053,2,2,2,Truong,Mireille,NA,California. Electronic address: mireille.truong@gmail.com.,female,1,NA
-AAGL2016_054,3,2,3,Lerner,Vladimir,NA,Israel.,male,1,NA
-AAGL2016_055,1,1,2,Lee,YooKyung,NA,Korea.,NA,NA,NA
-AAGL2016_056,9,4,5,Vargas,Maria V,DC,DC. Electronic address: mvvargas@mfa.gwu.edu.,NA,NA,IV
-AAGL2016_057,13,2,5,Garg,Divyani,NA,India.,NA,NA,NA
-AAGL2016_058,6,3,4,Linares,C,NA,Spain.,NA,NA,NA
-AAGL2016_059,4,2,3,King,Lindy,SA,Australia.,female,0.8694,NA
-AAGL2016_060,4,3,4,Hinshaw,Shirley J,NA,Wisconsin.,NA,NA,NA
-AAGL2016_061,6,5,5,Ito,Hiroe,NA,Japan. hiroe@tokyo-med.ac.jp.,NA,NA,NA
-AAGL2016_062,9,1,3,Ruiz,Maria P,NA,New York.,NA,NA,NA
-AAGL2016_063,7,5,5,Adamyan,Leila,NA,Russia.,female,0.9998,NA
-AAGL2016_064,4,2,2,Boulus,Sari,NA,France. Electronic address: boulos_sari@hotmail.com.,female,0.9932,NA
-AAGL2016_065,6,6,5,Gomes,Helena Henriques,NA,Portugal. Electronic address: leninha_mhg@hotmail.com.,NA,NA,NA
-AAGL2016_066,8,3,5,Zhang,Ning,NA,China.,NA,NA,NA
-AAGL2016_067,6,2,5,Mabrouk,Mohamed,NA,Italy.,male,1,NA
-AAGL2016_068,2,2,3,Cáceres,Alejandro,NA,Spain. alejandro.caceres@isglobal.org.,male,0.9926,NA
-AAGL2016_069,4,2,5,Raiza,Luciana Cristina Pasquini,SP,Brazil.,NA,NA,NA
-AAGL2016_070,8,2,5,Martire,Francesco Giuseppe,NA,Italy.,NA,NA,NA
-AAGL2016_071,6,5,4,Cybulsky,Marta,NA,Canada.,female,0.9973,NA
-AAGL2016_072,6,6,5,Jørgensen,E,DK,Denmark. Electronic address: elinj@sund.ku.dk.,NA,NA,NA
-AAGL2016_073,5,3,4,Petersen,Shariska S,MI,USA.,NA,NA,V
-AAGL2016_074,7,2,2,Zhang,Xu-Hao,NA,China.,NA,NA,NA
-AAGL2016_075,7,3,5,Ogrin,Rajna,NA,Australia.,NA,NA,NA
-AAGL2016_076,5,4,3,Han,Changwoo,NA,Korea.,NA,NA,NA
-AAGL2016_077,6,1,2,Zhang,Ning,NA,China.,NA,NA,NA
-AAGL2016_078,1,1,1,Breen,Michael,NA,Zambia.,male,0.9947,NA
-AAGL2016_079,6,3,3,Rattray,Darrien D,SK,Canada.,NA,NA,VI
-AAGL2016_080,2,2,3,Stockwell,Erica,NA,Nevada.,female,0.9958,NA
-AAGL2016_081,3,2,4,Bends,Ralf,NA,ralf.bends@evk-koeln.de.,male,1,NA
-AAGL2016_082,10,5,1,Ben Hamou,Adrien,NA,France.,male,0.8173,NA
-AAGL2016_083,2,2,2,Huirne,Judith,VU,Netherlands. Electronic address: J.Huirne@vumc.nl.,female,0.9974,NA
-AAGL2016_084,4,4,5,Roy,Kanad,NA,Spain.,NA,NA,NA
-AAGL2016_085,8,5,5,Chauvet,Pauline,NA,France.,female,0.9961,NA
-AAGL2016_086,8,2,5,Usta,Tugay,NA,Türkiye.,NA,NA,NA
-AAGL2016_087,7,6,4,Vilos,George A,NA,Canada. Electronic address: george.vilos@lhsc.on.ca.,NA,NA,NA
-AAGL2016_088,4,4,5,Al,Salih,NA,Turkey. Electronic address: salih.al553@gmail.com.,male,1,NA
-AAGL2016_089,5,5,5,Moawad,Gaby,NA,Maryland. Electronic address: gnmoawad@gmail.com.,female,0.9748,NA
-AAGL2016_090,2,1,5,Ng,Karen Ka Man,NA,China.,NA,NA,NA
-AAGL2016_091,3,3,3,Harvey,Lara F B,NA,Tennessee. Electronic address: lara.harvey@vanderbilt.edu.,NA,NA,NA
-AAGL2016_092,4,3,5,Takechi,Kenichi,NA,Japan. ntakechi@me.com.,male,1,NA
-AAGL2016_093,4,4,4,Croft,Katherine,NA,North Carolina. Electronic address: katherine.croft@carolinashealthcare.org.,female,0.9972,NA
-AAGL2016_094,4,1,3,Casey,James,NA,USA.,male,0.9955,NA
-AAGL2016_095,8,1,5,O'Brien,M Shea,NA,Kentucky.,NA,NA,NA
-AAGL2016_096,1,1,5,Isaacson,Keith,NA,Massachusetts.,male,0.9948,NA
-AAGL2017_001,6,3,5,Li,Dongxu,NA,People's Republic of China.,NA,NA,NA
-AAGL2017_002,7,3,5,Vegas Carrillo de Albornoz,Ana,HM,Spain.,female,0.9939,NA
-AAGL2017_003,6,5,4,Brito,L,NA,Chile.,NA,NA,NA
-AAGL2017_004,3,2,3,Cramer,Michael,NA,Germany. michael.cramer@uni-rostock.de.,male,0.9947,NA
-AAGL2017_005,3,3,4,Nezhat,Ceana,NA,Georgia. Electronic address: ceana@nezhat.com.,female,1,NA
-AAGL2017_006,3,3,2,Wright,Kelly,CA,CA 90048. Electronic address: Kelly.wright@cshs.org.,female,0.8632,IX
-AAGL2017_007,14,14,5,Bogani,Giorgio,NA,Italy. Electronic address: giorgiobogani@yahoo.it.,male,1,NA
-AAGL2017_008,4,1,5,Varma,Shruti O,NA,India.,NA,NA,NA
-AAGL2017_009,5,1,5,Zhang,Menglei,NA,China.,NA,NA,NA
-AAGL2017_010,10,2,5,Fazel,Asita,NA,Germany.,NA,NA,NA
-AAGL2017_011,9,1,5,Curcio,Erin,NA,New Jersey.,female,0.9732,NA
-AAGL2017_012,4,1,3,Vargas,Rómulo,NA,Colombia.,NA,NA,NA
-AAGL2017_013,11,4,2,Han,Jongsuk,NA,Republic of Korea.,NA,NA,NA
-AAGL2017_014,6,2,5,Matanes,Emad,NA,Israel.,male,1,NA
-AAGL2017_015,4,4,1,Kaaki,Bilal,IA,USA. Bilal.Kaaki@unitypoint.org.,male,0.9986,VI
-AAGL2017_016,3,2,5,Espinal,Mariana,IL,USA.,female,0.9974,VII
-AAGL2017_017,7,2,5,Baker,B Wycke,TX,bwbaker@texaschildrens.org.,NA,NA,X
-AAGL2017_018,4,3,4,Menderes,Gulden,PO,USA. gulden.menderes@yale.edu.,NA,NA,NA
-AAGL2017_019,7,5,1,Steck-Bayat,Kayvahn P,AZ,USA. Kayvahn@gmail.com.,NA,NA,VIII
-AAGL2017_020,5,2,5,Aitchison,Lucy Ping,NA,Australia.,NA,NA,NA
-AAGL2017_021,5,2,4,Strug,Michael,CA,USA. mrstrug@gmail.com.,male,0.9947,IX
-AAGL2017_022,14,4,3,Pérez-Brangulí,Francesc,NA,Germany.,female,0.6679,NA
-AAGL2017_023,6,2,5,Daykan,Yair,NA,Israel.,male,1,NA
-AAGL2017_024,6,5,5,Sheyn,David,OH,OH. Electronic address: david.sheyn@uhhospitals.org.,male,0.9963,V
-AAGL2017_025,1,1,4,Noorchashm,Hooman,NA,Pennsylvania.,male,1,NA
-AAGL2017_026,7,5,2,Saber,Alan A,NJ,USA. Electronic address: Saber6231@gmail.com.,NA,NA,III
-AAGL2017_027,6,4,2,Siragusa,Melina Jazmin,NA,Argentina. Electronic address: melina.siragusa@hospitalitaliano.org.ar.,NA,NA,NA
-AAGL2017_028,5,2,4,Padilla,Pablo,NA,France.,male,0.9981,NA
-AAGL2017_029,12,7,2,Schivardi,Gabriella,MN,MN.,female,0.9994,VI
-AAGL2017_030,8,3,5,Gupta,Natasha,TN,USA. docnatasha3@gmail.com.,female,0.9971,X
-AAGL2017_031,3,2,5,Jansen,Sierra M,WI,USA. sjansen@uwhealth.org.,NA,NA,VI
-AAGL2017_032,8,4,4,Li,H-D,NA,China.,NA,NA,NA
-AAGL2017_033,7,6,2,Rowland,Ian,UK,UK. publications@ilsieurope.be.,male,0.9962,NA
-AAGL2017_034,5,3,5,Bretschneider,C Emi,OH,USA. bretscc@ccf.org.,NA,NA,V
-AAGL2017_035,2,2,5,Altshuler,Paulina C,NA,USA.,NA,NA,NA
-AAGL2017_036,4,2,3,Bastawros,Dina,NA,and.,female,0.9975,NA
-AAGL2017_037,9,4,5,Clarizia,Roberto,NA,Italy. Electronic address: roberto.clarizia@gmail.com.,male,0.9918,NA
-AAGL2017_038,8,6,5,Colón-Caraballo,Mariano,NA,USA.,male,1,NA
-AAGL2017_039,6,6,5,Barel,Ortal,NA,Israel. Electronic address: Ortal.Barel@sheba.health.gov.il.,NA,NA,NA
-AAGL2017_040,16,5,5,Elaïb,Ziane,NA,France.,female,1,NA
-AAGL2017_041,6,4,2,Jacob,Jack,NA,Alaska.,male,0.9967,NA
-AAGL2017_042,6,4,2,Jacob,Jack,NA,Alaska.,male,0.9967,NA
-AAGL2017_043,7,2,5,Hutchinson,Anne P,NY,USA.,NA,NA,II
-AAGL2017_044,3,3,5,Silva,Beatriz,NA,Portugal.,female,0.9968,NA
-AAGL2017_045,6,1,5,Smorgick,Noam,NA,Israel.,male,0.8846,NA
-AAGL2017_046,6,5,5,Liu,Zhengwei,NA,China.,NA,NA,NA
-AAGL2017_047,6,1,3,Hiremath,Akkamahadevi C,NA,Karnataka 560066 India.,NA,NA,NA
-AAGL2017_048,2,1,3,Falcone,Tommaso,NA,Ohio.,male,1,NA
-AAGL2017_049,6,1,5,DeMik,David E,NA,Iowa.,NA,NA,NA
-AAGL2017_050,5,2,3,Taheri,Melody,UK,UK.,female,0.9982,NA
-AAGL2017_051,6,4,5,Hammons,Lindsay,WI,USA.,female,0.9705,VI
-AAGL2017_052,5,3,5,Jørgensen,Elin,DK,Denmark.,female,0.9762,NA
-AAGL2017_053,6,2,4,Sangha,Roopina,MI,MI.,NA,NA,V
-AAGL2017_054,2,2,5,Young,Helen,NA,United States.,female,0.9963,NA
-AAGL2017_055,1,1,5,Till,Sara R,NA,Michigan. Electronic address: tillsa@med.umich.edu.,NA,NA,NA
-AAGL2017_056,10,1,5,Puntambekar,Shailesh,NA,India.,NA,NA,NA
-AAGL2017_057,4,4,3,Beran,Benjamin,NA,Wisconsin. Electronic address: bberan@mcw.edu.,male,0.9962,NA
-AAGL2017_058,2,2,3,Truong,Mireille,NA,California. Electronic address: mireille.truong@gmail.com.,female,1,NA
-AAGL2017_059,9,4,5,Clarizia,Roberto,NA,Italy. Electronic address: roberto.clarizia@gmail.com.,male,0.9918,NA
-AAGL2017_060,5,4,3,Fogelson,Noa,NA,Spain. Electronic address: nfogelson@gmail.com.,female,0.7299,NA
-AAGL2017_061,9,2,5,Arena,Alessandro,NA,Italy.,male,1,NA
-AAGL2017_062,1,1,5,Clark,Nancy,NA,Canada.,female,0.9972,NA
-AAGL2017_063,24,1,5,Surrey,Eric,BP,Illinois.,male,0.9947,NA
-AAGL2017_064,7,2,2,Qi,Hang,NA,China.,female,1,NA
-AAGL2017_065,1,1,3,Tam,Theresa,NA,Canada.,female,0.997,NA
-AAGL2017_066,3,3,5,Yeung,Patrick,NA,Missouri. Electronic address: ppyeungjr@gmail.com.,male,0.9955,NA
-AAGL2017_067,3,2,1,Hanafi,Mohamad,NA,Turkey.,male,1,NA
-AAGL2017_068,2,2,5,Nasioudis,Dimitrios,PA,USA. Electronic address: dimitrios.nasioudis@uphs.upenn.edu.,male,1,III
-AAGL2017_069,3,3,2,Paek,Jiheum,NA,South Korea.,NA,NA,NA
-AAGL2017_070,9,8,4,Tyan,Paul,NC,United States.,male,0.9959,XI
-AAGL2017_071,8,1,3,Yoo,Hae K,NA,South Korea.,NA,NA,NA
-AAGL2017_072,3,1,3,Nie,Ji-Chan,NA,China.,NA,NA,NA
-AAGL2017_073,4,2,2,Magee,Corey,UK,UK.,male,0.9502,NA
-AAGL2017_074,7,3,3,Liu,Jie,PR,PR China.,male,0.8187,XI
-AAGL2017_075,3,2,5,Davis,J L,VA,USA.,NA,NA,IV
-AAGL2017_076,5,3,2,Shin,In-Whoan,NA,Republic of Korea.,NA,NA,NA
-AAGL2017_077,7,5,5,Yang,Fuheng,NA,China.,NA,NA,NA
-AAGL2017_078,20,9,1,Song,Tingwei,NA,China.,NA,NA,NA
-AAGL2017_079,3,3,3,Bhagavath,Bala,NA,Wisconsin. Electronic address: bbhagavath@wisc.edu.,NA,NA,NA
-AAGL2017_080,5,1,5,Cohen,Stav,SC,CFW).,female,0.5391,XI
-AAGL2017_081,2,1,2,Rimbach,Stefan,NA,Germany.,male,0.9975,NA
-AAGL2017_082,8,8,2,van der Heijde,Désirée,NA,The Netherlands.,NA,NA,NA
-AAGL2017_083,7,4,4,Bougie,Olga,ON,ON. Electronic address: olga.bougie@kingstonhsc.ca.,female,0.9958,II
-AAGL2017_084,5,1,5,Benetti-Pinto,Cristina Laguna,SP,Brazil.,NA,NA,NA
-AAGL2017_085,16,5,5,Elaïb,Ziane,NA,France.,female,1,NA
-AAGL2017_086,5,4,1,Wu,Biying,NA,People's Republic of China.,NA,NA,NA
-AAGL2017_087,2,2,2,Borchgrevink,Petter C,NA,Norway.,NA,NA,NA
-AAGL2017_088,9,4,5,Candiani,M,NA,Italy.,NA,NA,NA
-AAGL2017_089,9,2,5,Ticconi,Carlo,NA,Italy.,male,0.9925,NA
-AAGL2017_090,16,5,5,Elaïb,Ziane,NA,France.,female,1,NA
-AAGL2017_091,8,3,5,Wang,Lijun,NA,China.,NA,NA,NA
-AAGL2017_092,10,5,5,Nguyen,Nam,NA,Canada.,male,1,NA
+AAGL2016_044,4,1,2,Molinos-Albert,Luis M,Spain.,NA,NA,NA,NA
+AAGL2016_045,6,6,2,Gutman,Robert E,DC. Electronic address: Robert.e.gutman@medstar.net.,WA,NA,NA,VIII
+AAGL2016_046,1,1,5,Lichtman,Andrew,USA. Email: alichtman@bwh.harvard.edu.,MA,male,0.996,I
+AAGL2016_047,3,2,5,Alammari,Roa,Massachusetts.,MA,NA,NA,I
+AAGL2016_048,5,2,3,Glaser,Laura M,USA. Electronic address: l-matthews@northwestern.edu.,IL,NA,NA,VII
+AAGL2016_049,7,7,2,Blanton,Emily,FL. Electronic address: Emily.Blanton@gmail.com.,FL,female,0.9979,XI
+AAGL2016_050,6,3,5,Julian,Danielle,USA.,FL,female,0.9951,XI
+AAGL2016_051,4,3,2,Watkins,Jeffrey R,USA.,TX,NA,NA,X
+AAGL2016_052,5,2,4,Gerges,B,Australia.,NA,NA,NA,NA
+AAGL2016_053,2,2,2,Truong,Mireille,California. Electronic address: mireille.truong@gmail.com.,CA,female,1,IX
+AAGL2016_054,3,2,3,Lerner,Vladimir,Israel.,NA,male,1,NA
+AAGL2016_055,1,1,2,Lee,YooKyung,Korea.,NA,NA,NA,NA
+AAGL2016_056,9,4,5,Vargas,Maria V,DC. Electronic address: mvvargas@mfa.gwu.edu.,WA,NA,NA,VIII
+AAGL2016_057,13,2,5,Garg,Divyani,India.,NA,NA,NA,NA
+AAGL2016_058,6,3,4,Linares,C,Spain.,NA,NA,NA,NA
+AAGL2016_059,4,2,3,King,Lindy,Australia.,NA,female,0.8694,NA
+AAGL2016_060,4,3,4,Hinshaw,Shirley J,Wisconsin.,WI,NA,NA,VI
+AAGL2016_061,13,12,5,Ito,Hiroe,Japan.,NA,NA,NA,NA
+AAGL2016_062,9,1,3,Ruiz,Maria P,New York.,NY,NA,NA,II
+AAGL2016_063,16,5,5,Elaïb,Ziane,France.,NA,female,1,NA
+AAGL2016_064,4,2,2,Boulus,Sari,France. Electronic address: boulos_sari@hotmail.com.,NA,female,0.9932,NA
+AAGL2016_065,6,6,5,Gomes,Helena Henriques,Portugal. Electronic address: leninha_mhg@hotmail.com.,NA,NA,NA,NA
+AAGL2016_066,8,3,5,Zhang,Ning,China.,NA,NA,NA,NA
+AAGL2016_067,6,2,5,Mabrouk,Mohamed,Italy.,NA,male,1,NA
+AAGL2016_068,2,2,3,Cáceres,Alejandro,Spain. alejandro.caceres@isglobal.org.,NA,male,0.9926,NA
+AAGL2016_069,4,2,5,Raiza,Luciana Cristina Pasquini,Brazil.,NA,NA,NA,NA
+AAGL2016_070,8,2,5,Martire,Francesco Giuseppe,Italy.,NA,NA,NA,NA
+AAGL2016_071,2,2,4,Galhotra,Sheena,AZ. Electronic address: sheenagalhotra@gmail.com.,AZ,female,0.9971,VIII
+AAGL2016_072,6,6,5,Jørgensen,E,Denmark. Electronic address: elinj@sund.ku.dk.,NA,NA,NA,NA
+AAGL2016_073,5,3,4,Petersen,Shariska S,USA.,MI,NA,NA,V
+AAGL2016_074,10,2,2,Li,Peiling,xxmu.edu.cn.,NA,NA,NA,NA
+AAGL2016_075,9,6,5,Robinson,Elena,Switzerland.,NA,female,0.9984,NA
+AAGL2016_076,6,3,3,Gannagé-Yared,Marie-Hélène,Lebanon.,NA,NA,NA,NA
+AAGL2016_077,10,8,2,Qiu,Jin,People's Republic of China.,NA,male,0.7084,NA
+AAGL2016_078,1,1,1,Breen,Michael,Zambia.,NA,male,0.9947,NA
+AAGL2016_079,6,3,3,Rattray,Darrien D,Canada.,NA,NA,NA,NA
+AAGL2016_080,2,2,3,Stockwell,Erica,Nevada.,NV,female,0.9958,VIII
+AAGL2016_081,3,2,4,Bends,Ralf,ralf.bends@evk-koeln.de.,NA,male,1,NA
+AAGL2016_082,10,5,1,Ben Hamou,Adrien,France.,NA,male,0.8173,NA
+AAGL2016_083,2,2,2,Huirne,Judith,Netherlands. Electronic address: J.Huirne@vumc.nl.,NA,female,0.9974,NA
+AAGL2016_084,9,6,5,McKenzie,Lara B,USA.,OH,NA,NA,V
+AAGL2016_085,8,5,5,Chauvet,Pauline,France.,NA,female,0.9961,NA
+AAGL2016_086,8,2,5,Usta,Tugay,Türkiye.,NA,NA,NA,NA
+AAGL2016_087,7,6,4,Vilos,George A,Canada. Electronic address: george.vilos@lhsc.on.ca.,NA,NA,NA,NA
+AAGL2016_088,4,4,5,Al,Serhat,Turkey. Electronic address: serhatal@erciyes.edu.tr.,NA,male,1,NA
+AAGL2016_089,5,5,5,Moawad,Gaby,Maryland. Electronic address: gnmoawad@gmail.com.,WA,female,0.9748,VIII
+AAGL2016_090,6,3,5,Shanmugam,Victoria K,USA.,WA,NA,NA,VIII
+AAGL2016_091,3,3,3,Harvey,Lara F B,Tennessee. Electronic address: lara.harvey@vanderbilt.edu.,TN,NA,NA,X
+AAGL2016_092,3,1,5,Hartley,Jennifer,UK.,NA,female,0.9969,NA
+AAGL2016_093,4,4,4,Croft,Katherine,North Carolina. Electronic address: katherine.croft@carolinashealthcare.org.,NC,female,0.9972,XI
+AAGL2016_094,4,1,3,Casey,James,USA.,TN,male,0.9955,X
+AAGL2016_095,8,1,5,O'Brien,M Shea,Kentucky.,KY,NA,NA,V
+AAGL2016_096,1,1,5,Isaacson,Keith,Massachusetts.,MA,male,0.9948,I
+AAGL2017_001,6,3,5,Li,Dongxu,People's Republic of China.,NA,NA,NA,NA
+AAGL2017_002,7,3,5,Vegas Carrillo de Albornoz,Ana,Spain.,NA,female,0.9939,NA
+AAGL2017_003,6,5,4,Brito,L,Chile.,NA,NA,NA,NA
+AAGL2017_004,3,2,3,Cramer,Michael,Germany. michael.cramer@uni-rostock.de.,NA,male,0.9947,NA
+AAGL2017_005,3,3,4,Nezhat,Ceana,Georgia. Electronic address: ceana@nezhat.com.,GA,female,1,XI
+AAGL2017_006,3,3,2,Wright,Kelly,CA 90048. Electronic address: Kelly.wright@cshs.org.,CA,female,0.8632,IX
+AAGL2017_007,14,14,5,Bogani,Giorgio,Italy. Electronic address: giorgiobogani@yahoo.it.,NA,male,1,NA
+AAGL2017_008,4,1,5,Varma,Shruti O,India.,NA,NA,NA,NA
+AAGL2017_009,5,1,5,Zhang,Menglei,China.,NA,NA,NA,NA
+AAGL2017_010,10,2,5,Fazel,Asita,Germany.,NA,NA,NA,NA
+AAGL2017_011,9,1,5,Curcio,Erin,New Jersey.,NJ,female,0.9732,III
+AAGL2017_012,4,1,3,Vargas,Rómulo,Colombia.,NA,NA,NA,NA
+AAGL2017_013,11,4,2,Han,Jongsuk,Republic of Korea.,NA,NA,NA,NA
+AAGL2017_014,6,2,5,Matanes,Emad,Israel.,NA,male,1,NA
+AAGL2017_015,4,4,1,Kaaki,Bilal,USA. Bilal.Kaaki@unitypoint.org.,IA,male,0.9986,VI
+AAGL2017_016,3,2,5,Espinal,Mariana,USA.,IL,female,0.9974,VII
+AAGL2017_017,7,2,5,Baker,B Wycke,bwbaker@texaschildrens.org.,TX,NA,NA,X
+AAGL2017_018,4,3,4,Menderes,Gulden,USA. gulden.menderes@yale.edu.,CT,NA,NA,I
+AAGL2017_019,7,5,1,Steck-Bayat,Kayvahn P,USA. Kayvahn@gmail.com.,AZ,NA,NA,VIII
+AAGL2017_020,5,2,5,Aitchison,Lucy Ping,Australia.,NA,NA,NA,NA
+AAGL2017_021,5,2,4,Strug,Michael,USA. mrstrug@gmail.com.,CA,male,0.9947,IX
+AAGL2017_022,14,4,3,Pérez-Brangulí,Francesc,Germany.,NA,female,0.6679,NA
+AAGL2017_023,6,2,5,Daykan,Yair,Israel.,NA,male,1,NA
+AAGL2017_024,6,5,5,Sheyn,David,OH. Electronic address: david.sheyn@uhhospitals.org.,OH,male,0.9963,V
+AAGL2017_025,1,1,4,Noorchashm,Hooman,Pennsylvania.,PA,male,1,III
+AAGL2017_026,7,5,2,Saber,Alan A,USA. Electronic address: Saber6231@gmail.com.,NJ,NA,NA,III
+AAGL2017_027,6,4,2,Siragusa,Melina Jazmin,Argentina. Electronic address: melina.siragusa@hospitalitaliano.org.ar.,NA,NA,NA,NA
+AAGL2017_028,5,2,4,Padilla,Pablo,France.,NA,male,0.9981,NA
+AAGL2017_029,12,7,2,Schivardi,Gabriella,MN.,MN,female,0.9994,VI
+AAGL2017_030,8,3,5,Gupta,Natasha,USA. docnatasha3@gmail.com.,TN,female,0.9971,X
+AAGL2017_031,3,2,5,Jansen,Sierra M,USA. sjansen@uwhealth.org.,WI,NA,NA,VI
+AAGL2017_032,8,4,4,Li,H-D,China.,NA,NA,NA,NA
+AAGL2017_033,7,6,2,Rowland,Ian,UK. publications@ilsieurope.be.,NA,male,0.9962,NA
+AAGL2017_034,5,3,5,Bretschneider,C Emi,USA. bretscc@ccf.org.,OH,NA,NA,V
+AAGL2017_035,2,2,5,Altshuler,Paulina C,USA.,CO,NA,NA,VIII
+AAGL2017_036,4,2,3,Bastawros,Dina,and.,NA,female,0.9975,NA
+AAGL2017_037,9,4,5,Clarizia,Roberto,Italy. Electronic address: roberto.clarizia@gmail.com.,NA,male,0.9918,NA
+AAGL2017_038,8,6,5,Colón-Caraballo,Mariano,USA.,PR,male,1,XI
+AAGL2017_039,6,6,5,Barel,Ortal,Israel. Electronic address: Ortal.Barel@sheba.health.gov.il.,NA,NA,NA,NA
+AAGL2017_040,16,5,5,Elaïb,Ziane,France.,NA,female,1,NA
+AAGL2017_041,6,4,2,Jacob,Jack,Alaska.,AK,male,0.9967,VIII
+AAGL2017_042,6,4,2,Jacob,Jack,Alaska.,AK,male,0.9967,VIII
+AAGL2017_043,7,2,5,Hutchinson,Anne P,USA.,NY,NA,NA,II
+AAGL2017_044,3,3,5,Silva,Beatriz,Portugal.,NA,female,0.9968,NA
+AAGL2017_045,6,1,5,Smorgick,Noam,Israel.,NA,male,0.8846,NA
+AAGL2017_046,6,5,5,Liu,Zhengwei,China.,NA,NA,NA,NA
+AAGL2017_047,6,1,3,Hiremath,Akkamahadevi C,Karnataka 560066 India.,NA,NA,NA,NA
+AAGL2017_048,2,1,3,Falcone,Tommaso,Ohio.,OH,male,1,V
+AAGL2017_049,6,1,5,DeMik,David E,Iowa.,IA,NA,NA,VI
+AAGL2017_050,5,2,3,Taheri,Melody,UK.,NA,female,0.9982,NA
+AAGL2017_051,6,4,5,Hammons,Lindsay,USA.,WI,female,0.9705,VI
+AAGL2017_052,5,3,5,Jørgensen,Elin,Denmark.,NA,female,0.9762,NA
+AAGL2017_053,6,2,4,Sangha,Roopina,MI.,MI,NA,NA,V
+AAGL2017_054,2,2,5,Young,Helen,United States.,NA,female,0.9963,NA
+AAGL2017_055,1,1,5,Till,Sara R,Michigan. Electronic address: tillsa@med.umich.edu.,MI,NA,NA,V
+AAGL2017_056,10,1,5,Puntambekar,Shailesh,India.,NA,NA,NA,NA
+AAGL2017_057,4,4,3,Beran,Benjamin,Wisconsin. Electronic address: bberan@mcw.edu.,WI,male,0.9962,VI
+AAGL2017_058,2,2,3,Truong,Mireille,California. Electronic address: mireille.truong@gmail.com.,CA,female,1,IX
+AAGL2017_059,9,4,5,Clarizia,Roberto,Italy. Electronic address: roberto.clarizia@gmail.com.,NA,male,0.9918,NA
+AAGL2017_060,5,4,3,Fogelson,Noa,Spain. Electronic address: nfogelson@gmail.com.,NA,female,0.7299,NA
+AAGL2017_061,9,2,5,Arena,Alessandro,Italy.,NA,male,1,NA
+AAGL2017_062,1,1,5,Clark,Nancy,Canada.,NA,female,0.9972,NA
+AAGL2017_063,24,1,5,Surrey,Eric,Illinois.,SC,male,0.9947,XI
+AAGL2017_064,7,2,2,Qi,Hang,China.,NA,female,1,NA
+AAGL2017_065,1,1,3,Tam,Theresa,Canada.,NA,female,0.997,NA
+AAGL2017_066,3,3,5,Yeung,Patrick,Missouri. Electronic address: ppyeungjr@gmail.com.,MO,male,0.9955,VII
+AAGL2017_067,3,2,1,Hanafi,Mohamad,Turkey.,NA,male,1,NA
+AAGL2017_068,2,2,5,Nasioudis,Dimitrios,USA. Electronic address: dimitrios.nasioudis@uphs.upenn.edu.,PA,male,1,III
+AAGL2017_069,3,3,2,Paek,Jiheum,South Korea.,NA,NA,NA,NA
+AAGL2017_070,9,8,4,Tyan,Paul,United States.,NC,male,0.9959,XI
+AAGL2017_071,8,1,3,Yoo,Hae K,South Korea.,NA,NA,NA,NA
+AAGL2017_072,3,1,3,Nie,Ji-Chan,China.,NA,NA,NA,NA
+AAGL2017_073,4,2,2,Magee,Corey,UK.,NA,male,0.9502,NA
+AAGL2017_074,7,3,3,Liu,Jie,PR China.,NA,male,0.8187,NA
+AAGL2017_075,3,2,5,Davis,J L,USA.,VA,NA,NA,IV
+AAGL2017_076,5,3,2,Shin,In-Whoan,Republic of Korea.,NA,NA,NA,NA
+AAGL2017_077,7,5,5,Yang,Fuheng,China.,NA,NA,NA,NA
+AAGL2017_078,20,9,1,Song,Tingwei,China.,NA,NA,NA,NA
+AAGL2017_079,3,3,3,Bhagavath,Bala,Wisconsin. Electronic address: bbhagavath@wisc.edu.,WI,NA,NA,VI
+AAGL2017_080,5,1,5,Cohen,Stav,CFW).,NA,female,0.5391,NA
+AAGL2017_081,2,1,2,Rimbach,Stefan,Germany.,NA,male,0.9975,NA
+AAGL2017_082,8,8,2,van der Heijde,Désirée,The Netherlands.,NA,NA,NA,NA
+AAGL2017_083,3,3,4,Bougie,Olga,Canada. Electronic address: bougieo@kgh.kari.net.,NA,female,0.9958,NA
+AAGL2017_084,5,1,5,Benetti-Pinto,Cristina Laguna,Brazil.,NA,NA,NA,NA
+AAGL2017_085,16,5,5,Elaïb,Ziane,France.,NA,female,1,NA
+AAGL2017_086,5,4,1,Wu,Biying,People's Republic of China.,NA,NA,NA,NA
+AAGL2017_087,2,2,2,Borchgrevink,Petter C,Norway.,NA,NA,NA,NA
+AAGL2017_088,9,4,5,Candiani,M,Italy.,NA,NA,NA,NA
+AAGL2017_089,9,2,5,Ticconi,Carlo,Italy.,NA,male,0.9925,NA
+AAGL2017_090,16,5,5,Elaïb,Ziane,France.,NA,female,1,NA
+AAGL2017_091,8,3,5,Wang,Lijun,China.,NA,NA,NA,NA
+AAGL2017_092,10,5,5,Nguyen,Nam,Canada.,NA,male,1,NA
 AAGL2017_093,3,0,5,Vollrath,Kristin,NA,NA,female,0.9915,NA
-AAGL2017_094,6,6,5,Savona-Ventura,Charles,NA,Malta. Electronic address: charles.savona-ventura@um.edu.mt.,male,0.9949,NA
-AAGL2017_095,2,2,4,Krispin,Eyal,MA,MA.,male,1,I
-AAGL2017_096,2,2,2,Downing,Janelle M,NA,South Carolina. Electronic address: jdown@mailbox.sc.edu.,NA,NA,NA
-AAGL2017_097,5,3,4,Arabkhazaeli,Moona,NY,NY.,female,1,II
-AAGL2018_001,3,2,5,Giuliani,Emma,MI,USA.,female,0.9978,V
-AAGL2018_002,5,3,5,Ratna,Sumanth,CT,United States.,male,1,I
-AAGL2018_003,7,1,5,Franchini,Michela,NA,Italy.,female,1,NA
-AAGL2018_004,4,3,2,Huizar,Grace D,TX,USA.,NA,NA,X
-AAGL2018_005,2,2,2,Sanders,Ari P,NA,Canada. Electronic address: arisanders@hotmail.com.,NA,NA,NA
-AAGL2018_006,2,2,3,Sanders,Ari P,NA,Canada.,NA,NA,NA
-AAGL2018_007,10,2,5,Fazel,Asita,NA,Germany.,NA,NA,NA
-AAGL2018_008,8,3,2,Tang,Xiaoyan,NA,People's Republic of China.,NA,NA,NA
-AAGL2018_009,7,3,5,Jørgensen,Siv Lykke,NA,Denmark.,NA,NA,NA
-AAGL2018_010,7,4,5,Carrubba,Aakriti R,FL,USA. Electronic address: carrubba.aakriti@mayo.edu.,NA,NA,XI
-AAGL2018_011,4,1,2,Li,Huang,NA,China.,NA,NA,NA
-AAGL2018_012,4,1,4,Andou,Masaaki,NA,Japan.,male,1,NA
-AAGL2018_013,9,4,2,Park,Bombi,NA,Korea.,NA,NA,NA
-AAGL2018_014,7,5,3,Chaves,Karina,NA,Australia.,female,0.9956,NA
-AAGL2018_015,6,3,3,Le Neveu,Margot,MD,21224. Electronic address: mleneve1@jhu.edu.,female,1,IV
+AAGL2017_094,6,6,5,Savona-Ventura,Charles,Malta. Electronic address: charles.savona-ventura@um.edu.mt.,NA,male,0.9949,NA
+AAGL2017_095,2,2,4,Krispin,Eyal,MA.,MA,male,1,I
+AAGL2017_096,2,2,2,Downing,Janelle M,South Carolina. Electronic address: jdown@mailbox.sc.edu.,SC,NA,NA,XI
+AAGL2017_097,5,3,4,Arabkhazaeli,Moona,NY.,NY,female,1,II
+AAGL2018_001,12,4,5,Brullet,Enric,Spain.,NA,NA,NA,NA
+AAGL2018_002,5,3,5,Ratna,Sumanth,United States.,CT,male,1,I
+AAGL2018_003,7,1,5,Franchini,Michela,Italy.,NA,female,1,NA
+AAGL2018_004,4,3,2,Huizar,Grace D,USA.,TX,NA,NA,X
+AAGL2018_005,2,2,2,Sanders,Ari P,Canada. Electronic address: arisanders@hotmail.com.,NY,NA,NA,II
+AAGL2018_006,2,2,3,Sanders,Ari P,Canada.,NY,NA,NA,II
+AAGL2018_007,10,2,5,Fazel,Asita,Germany.,NA,NA,NA,NA
+AAGL2018_008,8,3,2,Tang,Xiaoyan,People's Republic of China.,NA,NA,NA,NA
+AAGL2018_009,7,3,5,Jørgensen,Siv Lykke,Denmark.,NA,NA,NA,NA
+AAGL2018_010,7,4,5,Carrubba,Aakriti R,USA. Electronic address: carrubba.aakriti@mayo.edu.,FL,NA,NA,XI
+AAGL2018_011,4,1,2,Li,Huang,China.,NA,NA,NA,NA
+AAGL2018_012,4,1,4,Andou,Masaaki,Japan.,NA,male,1,NA
+AAGL2018_013,9,4,2,Park,Bombi,Korea.,NA,NA,NA,NA
+AAGL2018_014,7,5,3,Chaves,Karina,Australia.,NA,female,0.9956,NA
+AAGL2018_015,6,3,3,Le Neveu,Margot,21224. Electronic address: mleneve1@jhu.edu.,MD,female,1,IV
 AAGL2018_016,6,0,3,Coote,Susan,NA,NA,female,0.9978,NA
-AAGL2018_017,12,12,3,Royce,Celeste S,MA,MA. Electronic address: croyce@bidmc.harvard.edu.,NA,NA,I
-AAGL2018_018,6,2,5,Ribeiro,Diogo,NA,Portugal.,male,1,NA
-AAGL2018_019,7,2,5,Bensouda-Miguet,Chloe,NA,France.,female,0.9984,NA
-AAGL2018_020,13,9,4,Shen,Fang,PR,PR China.,NA,NA,XI
-AAGL2018_021,3,1,5,Padilla,Pablo,NA,France.,male,0.9981,NA
-AAGL2018_022,11,5,5,Soloff,Michelle A,NY,NY.,NA,NA,II
-AAGL2018_023,3,2,5,Foley,Christine E,NY,USA. christine.e.foley@gmail.com.,NA,NA,II
-AAGL2018_024,11,5,5,Ceccaroni,Marcello,NA,Italy.,male,0.9975,NA
-AAGL2018_025,4,2,5,Namkung,Jeong,NA,Republic of Korea.,male,1,NA
-AAGL2018_026,4,4,3,Jan,Hanif,NA,Pakistan.,male,1,NA
-AAGL2018_027,3,2,1,Ceccaroni,Marcello,NA,Italy (all authors).. Electronic address: issaschool@gmail.com.,male,0.9975,NA
-AAGL2018_028,2,1,2,Chao,Lisa,NA,Pennsylvania.,female,0.9973,NA
-AAGL2018_029,6,5,5,Bastawros,Dina,NC,NC.,female,0.9975,XI
-AAGL2018_030,6,4,5,Page,Ann-Sophie,KU,Belgium.,NA,NA,NA
-AAGL2018_031,6,2,4,Laufer,Joel,NA,Uruguay.,male,0.9899,NA
-AAGL2018_032,44,27,5,Matos,Marcela,NA,Portugal.,female,1,NA
-AAGL2018_033,6,4,2,Jacob,Jack,NA,Alaska.,male,0.9967,NA
+AAGL2018_017,12,12,3,Royce,Celeste S,MA. Electronic address: croyce@bidmc.harvard.edu.,MA,NA,NA,I
+AAGL2018_018,6,2,5,Ribeiro,Diogo,Portugal.,NA,male,1,NA
+AAGL2018_019,7,2,5,Bensouda-Miguet,Chloe,France.,NA,female,0.9984,NA
+AAGL2018_020,13,9,4,Shen,Fang,PR China.,NA,NA,NA,NA
+AAGL2018_021,3,1,5,Padilla,Pablo,France.,NA,male,0.9981,NA
+AAGL2018_022,11,5,5,Soloff,Michelle A,NY.,NY,NA,NA,II
+AAGL2018_023,3,2,5,Foley,Christine E,USA. christine.e.foley@gmail.com.,NY,NA,NA,II
+AAGL2018_024,11,5,5,Ceccaroni,Marcello,Italy.,NA,male,0.9975,NA
+AAGL2018_025,4,2,5,Namkung,Jeong,Republic of Korea.,NA,male,1,NA
+AAGL2018_026,4,4,3,Jan,Hanif,Pakistan.,NA,male,1,NA
+AAGL2018_027,3,2,1,Ceccaroni,Marcello,Italy (all authors).. Electronic address: issaschool@gmail.com.,NA,male,0.9975,NA
+AAGL2018_028,2,1,2,Chao,Lisa,Pennsylvania.,PA,female,0.9973,III
+AAGL2018_029,6,5,5,Bastawros,Dina,NC.,NC,female,0.9975,XI
+AAGL2018_030,6,4,5,Page,Ann-Sophie,Belgium.,NA,NA,NA,NA
+AAGL2018_031,6,2,4,Laufer,Joel,Uruguay.,NA,male,0.9899,NA
+AAGL2018_032,44,27,5,Matos,Marcela,Portugal.,NA,female,1,NA
+AAGL2018_033,6,4,2,Jacob,Jack,Alaska.,AK,male,0.9967,VIII
 AAGL2018_034,5,2,4,Dougher,Erin,NA,NA,female,0.9732,NA
-AAGL2018_035,6,4,5,Ovakimyan,Andrew,NA,California.,male,0.996,NA
-AAGL2018_036,10,2,5,Fazel,Asita,NA,Germany.,NA,NA,NA
-AAGL2018_037,16,5,4,Elaïb,Ziane,NA,France.,female,1,NA
-AAGL2018_038,5,4,5,Bougie,O,ON,Canada.,NA,NA,II
-AAGL2018_039,2,1,5,Nezhat,Ceana H,NA,Georgia.,NA,NA,NA
-AAGL2018_040,2,1,3,Clark,Nancy,NA,Canada.,female,0.9972,NA
-AAGL2018_041,1,1,1,Dave,Abhishek,NA,India.,male,1,NA
-AAGL2018_042,8,6,5,Hoyos,Luis R,CA,United States. Electronic address: lhoyosmartinez@mednet.ucla.edu.,NA,NA,IX
-AAGL2018_043,13,9,5,Quinn,Shauna,NA,Ireland. Electronic address: squinn8@tcd.ie.,female,0.9981,NA
-AAGL2018_044,7,5,5,Kim,Tana,NA,Minnesota. Electronic address: kim.tana@mayo.edu.,female,0.9994,NA
-AAGL2018_045,9,7,2,Nucifora,Gaetano,UK,UK. gaetano.nucifora@mft.nhs.uk.,male,1,NA
-AAGL2018_046,16,10,2,Zhao,Yibai,WA,United States.,NA,NA,VIII
-AAGL2018_047,6,3,5,Opoku-Anane,Jessica,CA,CA. Electronic address: jopokua1@gmail.com.,female,0.9968,IX
-AAGL2018_048,2,1,2,Chao,Lisa,NA,Pennsylvania.,female,0.9973,NA
+AAGL2018_035,6,4,5,Ovakimyan,Andrew,California.,CA,male,0.996,IX
+AAGL2018_036,10,2,5,Fazel,Asita,Germany.,NA,NA,NA,NA
+AAGL2018_037,16,5,4,Elaïb,Ziane,France.,NA,female,1,NA
+AAGL2018_038,5,4,5,Bougie,O,Canada.,NA,NA,NA,NA
+AAGL2018_039,2,1,5,Nezhat,Ceana H,Georgia.,GA,NA,NA,XI
+AAGL2018_040,2,1,3,Clark,Nancy,Canada.,MO,female,0.9972,VII
+AAGL2018_041,1,1,1,Dave,Abhishek,India.,NA,male,1,NA
+AAGL2018_042,8,6,5,Hoyos,Luis R,United States. Electronic address: lhoyosmartinez@mednet.ucla.edu.,CA,NA,NA,IX
+AAGL2018_043,13,9,5,Quinn,Shauna,Ireland. Electronic address: squinn8@tcd.ie.,NA,female,0.9981,NA
+AAGL2018_044,7,5,5,Kim,Tana,Minnesota. Electronic address: kim.tana@mayo.edu.,MN,female,0.9994,VI
+AAGL2018_045,9,7,2,Nucifora,Gaetano,UK. gaetano.nucifora@mft.nhs.uk.,NA,male,1,NA
+AAGL2018_046,16,10,2,Zhao,Yibai,United States.,WA,NA,NA,VIII
+AAGL2018_047,6,3,5,Opoku-Anane,Jessica,CA. Electronic address: jopokua1@gmail.com.,CA,female,0.9968,IX
+AAGL2018_048,2,1,2,Chao,Lisa,Pennsylvania.,PA,female,0.9973,III
 AAGL2018_049,9,4,5,Miller,Jackson,NA,NA,male,0.9969,NA
-AAGL2018_050,3,3,5,Kamath,Mohan S,NA,India.,NA,NA,NA
-AAGL2018_051,4,2,3,Adolfsson,Emma,NA,Sweden.,female,0.9978,NA
-AAGL2018_052,3,1,5,Hattiangadi,Rohan,NA,USA.,male,0.9978,NA
-AAGL2018_053,7,3,5,Belilovets,Anastasia,NA,USA.,female,0.9993,NA
-AAGL2018_054,8,6,3,Melnyk,Angela,BC,Canada.,female,0.997,VIII
-AAGL2018_055,1,1,1,Woo,Jean,NA,Hong Kong. jeanwoowong@cuhk.edu.hk.,female,0.9467,NA
-AAGL2018_056,4,2,5,Bradley,Susan,UK,UK. Susan.Bradley@city.ac.uk.,female,0.9978,NA
-AAGL2018_057,5,1,5,Ouchi,Nozomi,NA,Japan.,female,1,NA
-AAGL2018_058,7,4,5,Bourdel,Nicolas,NA,France.,male,0.9975,NA
-AAGL2018_059,8,4,5,Valerio,Francesca,NA,Italy.,female,0.9987,NA
-AAGL2018_060,6,3,5,Abuzeid,Omar M,OB,USA.,NA,NA,NA
-AAGL2018_061,9,6,5,Baù,Maria Grazia,NA,Italy.,NA,NA,NA
-AAGL2018_062,4,2,5,Fuentes,Francisco,NA,Chile. Electronic address: Franciscojfuentes88@gmail.com.,male,0.9921,NA
-AAGL2018_063,4,2,4,Moein,Anita,NA,Canada.,female,0.9968,NA
-AAGL2018_064,6,4,5,Jaramillo-Cardoso,Adrian,MA,USA. amarceljc@gmail.com.,male,0.9269,I
-AAGL2018_065,3,1,5,Jung,Yoon Bin,NA,Korea.,NA,NA,NA
-AAGL2018_066,4,3,3,Al Kibria,Gulam Muhammed,MD,MD 21201. Email: gkibria1@outlook.com.,NA,NA,IV
-AAGL2018_067,6,2,5,Lauterbach,Roy,NA,Israel.,male,0.9936,NA
-AAGL2018_068,6,3,5,Declas,Estelle,NA,France. Electronic address: estelle.declas@outlook.fr.,female,0.9985,NA
-AAGL2018_069,5,1,4,Shumate,Ashley M,NA,USA.,NA,NA,NA
-AAGL2018_070,10,1,2,Liu,Xue-Jun,NA,China.,NA,NA,NA
-AAGL2018_071,3,2,5,Haider,Noor-Ul-Eman,NA,Pakistan. noorulemanhaider@gmail.com.,NA,NA,NA
+AAGL2018_050,3,3,5,Kamath,Mohan S,India.,NA,NA,NA,NA
+AAGL2018_051,4,2,3,Adolfsson,Emma,Sweden.,NA,female,0.9978,NA
+AAGL2018_052,3,1,5,Hattiangadi,Rohan,USA.,WA,male,0.9978,VIII
+AAGL2018_053,7,3,5,Belilovets,Anastasia,USA.,NV,female,0.9993,VIII
+AAGL2018_054,8,6,3,Melnyk,Angela,Canada.,MO,female,0.997,VII
+AAGL2018_055,1,1,1,Woo,Jean,Hong Kong. jeanwoowong@cuhk.edu.hk.,NA,female,0.9467,NA
+AAGL2018_056,4,2,5,Bradley,Susan,UK. Susan.Bradley@city.ac.uk.,NA,female,0.9978,NA
+AAGL2018_057,5,1,5,Ouchi,Nozomi,Japan.,NA,female,1,NA
+AAGL2018_058,7,4,5,Bourdel,Nicolas,France.,NA,male,0.9975,NA
+AAGL2018_059,8,4,5,Valerio,Francesca,Italy.,NA,female,0.9987,NA
+AAGL2018_060,6,3,5,Abuzeid,Omar M,USA.,MI,NA,NA,V
+AAGL2018_061,9,6,5,Baù,Maria Grazia,Italy.,NA,NA,NA,NA
+AAGL2018_062,4,2,5,Fuentes,Francisco,Chile. Electronic address: Franciscojfuentes88@gmail.com.,NA,male,0.9921,NA
+AAGL2018_063,4,2,4,Moein,Anita,Canada.,MO,female,0.9968,VII
+AAGL2018_064,6,4,5,Jaramillo-Cardoso,Adrian,USA. amarceljc@gmail.com.,MA,male,0.9269,I
+AAGL2018_065,3,1,5,Jung,Yoon Bin,Korea.,NA,NA,NA,NA
+AAGL2018_066,4,3,3,Al Kibria,Gulam Muhammed,MD 21201. Email: gkibria1@outlook.com.,MD,NA,NA,IV
+AAGL2018_067,6,2,5,Lauterbach,Roy,Israel.,NA,male,0.9936,NA
+AAGL2018_068,6,3,5,Declas,Estelle,France. Electronic address: estelle.declas@outlook.fr.,NA,female,0.9985,NA
+AAGL2018_069,5,1,4,Shumate,Ashley M,USA.,FL,NA,NA,XI
+AAGL2018_070,10,1,2,Liu,Xue-Jun,China.,NA,NA,NA,NA
+AAGL2018_071,3,2,5,Haider,Noor-Ul-Eman,Pakistan. noorulemanhaider@gmail.com.,NA,NA,NA,NA
 AAGL2018_072,20,0,1,San,Sovannarith,NA,NA,NA,NA,NA
-AAGL2018_073,6,2,2,Lampinen,Maria,NA,Sweden.,female,0.9927,NA
-AAGL2018_074,11,11,2,Donaldson,James F,UK,UK. Electronic address: r.james.donaldson6@nhs.net.,NA,NA,NA
-AAGL2018_075,7,4,5,Koichopolos,Jennifer,ON,Canada.,female,0.9969,II
-AAGL2018_076,4,3,3,Opatovsky,Itai,NA,Israel.,male,1,NA
-AAGL2018_077,1,1,5,Truong,Matthew,NY,USA.,male,0.9962,II
+AAGL2018_073,6,2,2,Lampinen,Maria,Sweden.,NA,female,0.9927,NA
+AAGL2018_074,11,11,2,Donaldson,James F,UK. Electronic address: r.james.donaldson6@nhs.net.,NA,NA,NA,NA
+AAGL2018_075,7,4,5,Koichopolos,Jennifer,Canada.,NA,female,0.9969,NA
+AAGL2018_076,4,3,3,Opatovsky,Itai,Israel.,NA,male,1,NA
+AAGL2018_077,1,1,5,Truong,Matthew,USA.,NY,male,0.9962,II
 AAGL2018_078,5,0,3,Chow,Monica,NA,NA,female,0.9962,NA
 AAGL2018_079,1,0,1,Yazdani,Azam,NA,NA,male,1,NA
-AAGL2018_080,8,5,4,Hashimoto,Daniel A,NA,United States. Electronic address: dahashimoto@mgh.harvard.edu.,NA,NA,NA
-AAGL2018_081,8,6,3,Melnyk,Angela,BC,Canada.,female,0.997,VIII
-AAGL2018_082,7,1,3,Hirpara,Dhruvin H.,NA,Ont. (Le Souder).,NA,NA,NA
-AAGL2018_083,1,1,5,Surrey,E,UK,UK.,NA,NA,NA
-AAGL2018_084,6,2,4,Leborne,Perrine,NA,France. perrine.leborne@gmail.com.,female,1,NA
-AAGL2018_085,5,3,4,Ghai,Vishalli,UK,UK.,NA,NA,NA
-AAGL2018_086,4,3,5,Leyland,Nicholas,NA,Toronto (Ont.).,male,0.9963,NA
-AAGL2018_087,8,6,4,Andriani,Leslie,PA,United States of America.,female,0.7724,III
-AAGL2018_088,7,3,3,Dior,Uri P,NA,Australia.,NA,NA,NA
-AAGL2018_089,4,3,1,Ayik,Nizameddin,PD,Germany.,NA,NA,NA
-AAGL2018_090,6,3,5,Opoku-Anane,Jessica,CA,CA. Electronic address: jopokua1@gmail.com.,female,0.9968,IX
-AAGL2018_091,3,1,3,Kita,Shunbun,NA,Department of Metabolic Medicine.,NA,NA,NA
-AAGL2018_092,5,1,4,Jorgensen,Elisa M,NA,Massachusetts.,NA,NA,NA
-AAGL2018_093,10,7,5,Sedra,Silvana,ON,ON.,female,1,II
-AAGL2018_094,3,2,5,Tamhane,Nupur,FL,USA.,female,1,XI
-AAGL2018_095,5,1,3,Holtzman,Sharonne,NA,USA.,female,1,NA
-AAGL2019_001,2,2,3,Miller,Charles E,NA,Illinois.,NA,NA,NA
-AAGL2019_002,6,4,4,Kostov,Stoyan,NA,Bulgaria.,NA,NA,NA
-AAGL2019_003,9,2,3,Benabou,Kelly,NA,Yale University School of Medicine.,female,0.8632,NA
-AAGL2019_004,2,2,3,Zhao,Xinxin,NA,China.,NA,NA,NA
-AAGL2019_005,6,2,3,Merola,Raffaele,II,Italy.,male,1,NA
-AAGL2019_006,9,4,2,Su,Qingbo,NA,China.,NA,NA,NA
-AAGL2019_007,5,1,3,Wefers,Sarah,NA,United Kingdom.,female,0.9971,NA
-AAGL2019_008,7,4,5,Chen,Li,NA,China.,female,0.7245,NA
-AAGL2019_009,7,3,3,Smith,Rachael B,AZ,USA. Electronic address: rachaelsmith.DO@gmail.com.,NA,NA,VIII
-AAGL2019_010,3,1,3,Lee,Eunhye,NA,Republic of Korea.,NA,NA,NA
-AAGL2019_011,6,1,5,Fan,Xiaorong,NA,China.,NA,NA,NA
-AAGL2019_012,11,5,4,Slootbeek,Peter H J,NA,The Netherlands.,NA,NA,NA
-AAGL2019_013,11,8,5,Cusimano,Maria C,NA,Canada.,NA,NA,NA
-AAGL2019_014,3,3,5,Post,Rene,NA,Amsterdam.,male,0.6702,NA
-AAGL2019_015,14,5,5,Poddubskaya,Elena,NA,Russia.,female,0.9984,NA
-AAGL2019_016,4,4,4,Moulder,Janelle K,NC,NC. Electronic address: janelle.moulder@gmail.com.,NA,NA,XI
-AAGL2019_017,3,1,2,Allen,Sarah E,NA,USA.,NA,NA,NA
+AAGL2018_080,8,5,4,Hashimoto,Daniel A,United States. Electronic address: dahashimoto@mgh.harvard.edu.,MA,NA,NA,I
+AAGL2018_081,8,6,3,Melnyk,Angela,Canada.,MO,female,0.997,VII
+AAGL2018_082,7,1,3,Hirpara,Dhruvin H.,Ont. (Le Souder).,NA,NA,NA,NA
+AAGL2018_083,1,1,5,Surrey,E,UK.,NA,NA,NA,NA
+AAGL2018_084,6,2,4,Leborne,Perrine,France. perrine.leborne@gmail.com.,NA,female,1,NA
+AAGL2018_085,5,3,4,Ghai,Vishalli,UK.,NA,NA,NA,NA
+AAGL2018_086,4,3,5,Leyland,Nicholas,Toronto (Ont.).,NA,male,0.9963,NA
+AAGL2018_087,8,6,4,Andriani,Leslie,United States of America.,PA,female,0.7724,III
+AAGL2018_088,7,3,3,Dior,Uri P,Australia.,NA,NA,NA,NA
+AAGL2018_089,4,3,1,Ayik,Nizameddin,Germany.,NA,NA,NA,NA
+AAGL2018_090,6,3,5,Opoku-Anane,Jessica,CA. Electronic address: jopokua1@gmail.com.,CA,female,0.9968,IX
+AAGL2018_091,3,1,3,Kita,Shunbun,Department of Metabolic Medicine.,NA,NA,NA,NA
+AAGL2018_092,5,1,4,Jorgensen,Elisa M,Massachusetts.,MA,NA,NA,I
+AAGL2018_093,10,7,5,Sedra,Silvana,ON.,NA,female,1,NA
+AAGL2018_094,3,2,5,Tamhane,Nupur,USA.,FL,female,1,XI
+AAGL2018_095,5,1,3,Holtzman,Sharonne,USA.,NY,female,1,II
+AAGL2019_001,2,2,3,Miller,Charles E,Illinois.,IL,NA,NA,VII
+AAGL2019_002,6,4,4,Kostov,Stoyan,Bulgaria.,NA,NA,NA,NA
+AAGL2019_003,9,2,3,Benabou,Kelly,Yale University School of Medicine.,CT,female,0.8632,I
+AAGL2019_004,2,2,3,Zhao,Xinxin,China.,NA,NA,NA,NA
+AAGL2019_005,6,2,3,Merola,Raffaele,Italy.,NA,male,1,NA
+AAGL2019_006,9,4,2,Su,Qingbo,China.,NA,NA,NA,NA
+AAGL2019_007,5,1,3,Wefers,Sarah,United Kingdom.,NA,female,0.9971,NA
+AAGL2019_008,7,4,5,Chen,Li,China.,NA,female,0.7245,NA
+AAGL2019_009,7,3,3,Smith,Rachael B,USA. Electronic address: rachaelsmith.DO@gmail.com.,AZ,NA,NA,VIII
+AAGL2019_010,3,1,3,Lee,Eunhye,Republic of Korea.,NA,NA,NA,NA
+AAGL2019_011,6,1,5,Fan,Xiaorong,China.,NA,NA,NA,NA
+AAGL2019_012,11,5,4,Slootbeek,Peter H J,The Netherlands.,NA,NA,NA,NA
+AAGL2019_013,11,8,5,Cusimano,Maria C,Canada.,NA,NA,NA,NA
+AAGL2019_014,3,3,5,Post,Rene,Amsterdam.,NA,male,0.6702,NA
+AAGL2019_015,14,5,5,Poddubskaya,Elena,Russia.,NA,female,0.9984,NA
+AAGL2019_016,4,4,4,Moulder,Janelle K,NC. Electronic address: janelle.moulder@gmail.com.,NC,NA,NA,XI
+AAGL2019_017,3,1,2,Allen,Sarah E,USA.,PA,NA,NA,III
 AAGL2019_018,8,3,5,Vieira-Baptista,Pedro,NA,NA,male,0.9935,NA
-AAGL2019_019,3,1,2,Sert,Mediha,NA,Turkey.,NA,NA,NA
-AAGL2019_020,10,1,5,Sawada,Masanaru,NA,Department of Medicine Nihon University School of Medicine Tokyo Japan.,NA,NA,NA
-AAGL2019_021,5,1,1,Birge,Ozer,NA,Turkey.,NA,NA,NA
-AAGL2019_022,3,2,3,Souza,Cristiane,NA,Portugal.,NA,NA,NA
-AAGL2019_023,18,1,3,Munro,Malcolm G,DC,Utah.,NA,NA,IV
-AAGL2019_024,4,2,2,Jones,Carly,SA,61 83027733.,female,0.9974,NA
-AAGL2019_025,4,4,5,Coelho Neto,M A,NA,Brazil.,NA,NA,NA
-AAGL2019_026,4,2,5,Ozceltik,Gokay,NA,Turkey. Electronic address: gokayozceltik@hotmail.com.,NA,NA,NA
-AAGL2019_027,6,5,5,Harvey,Lara,TN,USA. lara.harvey@vumc.org.,female,0.9989,X
-AAGL2019_028,60,33,2,Dorschel,Boris,NA,Germany. Boris.Dorschel@awi.de.,male,1,NA
-AAGL2019_029,1,1,3,Rosenblatt,Paula,MD,MD 21201.,female,0.997,IV
-AAGL2019_030,5,3,3,Martínez-Gómez,Carlos,NA,France.,male,0.9922,NA
-AAGL2019_031,4,3,4,Acosta,Daisy,NA,Dominican Republic.,female,0.9953,NA
-AAGL2019_032,4,2,2,Plair,Andre,NC,USA.,male,0.9804,XI
-AAGL2019_033,6,2,5,Yarranton,Brianne,NA,CAN.,female,0.9985,NA
-AAGL2019_034,4,1,4,Hu,Jie,NA,China.,male,0.8187,NA
-AAGL2019_035,3,3,2,Dhariwal,Laura,NJ,USA. laura.dhariwal@atlantichealth.org.,female,0.9969,III
-AAGL2019_036,4,3,3,Davenport,Erica,NA,Las Vegas Minimally Invasive Surgery/University of Nevada Las Vegas.,female,0.9958,NA
-AAGL2019_037,2,2,2,Leach,D Allan,SW,USA. leach.douglas@mayo.edu.,NA,NA,NA
-AAGL2019_038,3,3,3,Boyd,Susan,BC,Canada. Electronic address: scboyd@uvic.ca.,female,0.9978,VIII
-AAGL2019_039,6,1,2,Qiu,Jun-Jun,NA,China.,NA,NA,NA
-AAGL2019_040,10,5,5,Bertocchi,Elisa,NA,and Ruffo). Electronic address: elisa.bertocchi@sacrocuore.it.,female,0.9969,NA
-AAGL2019_041,9,1,5,Lee,Chia-Yi,NA,Taiwan.,NA,NA,NA
-AAGL2019_042,8,3,4,Roman,Horace,NA,France.,male,0.9957,NA
-AAGL2019_043,3,2,5,Souza,Cristiane,NA,Portugal.,NA,NA,NA
-AAGL2019_044,6,4,5,Zakhari,Andrew,ON,Canada.,male,0.996,II
-AAGL2019_045,8,3,5,Lapointe,Mathilde,NA,France.,female,1,NA
-AAGL2019_046,6,3,4,Farra,Chantal,NA,Lebanon.,female,0.9992,NA
-AAGL2019_047,10,7,5,Sroussi,Jérémy,NA,France. Electronic address: jeremy.sroussi@gmail.com.,NA,NA,NA
-AAGL2019_048,5,2,3,Guo,Xiaoyue Mona,IL,USA.,NA,NA,VII
+AAGL2019_019,3,1,2,Sert,Mediha,Turkey.,NA,NA,NA,NA
+AAGL2019_020,10,1,5,Sawada,Masanaru,Department of Medicine Nihon University School of Medicine Tokyo Japan.,MD,NA,NA,IV
+AAGL2019_021,5,1,1,Birge,Ozer,Turkey.,NA,NA,NA,NA
+AAGL2019_022,3,2,3,Souza,Cristiane,Portugal.,NA,NA,NA,NA
+AAGL2019_023,18,1,3,Munro,Malcolm G,Utah.,MA,NA,NA,I
+AAGL2019_024,4,2,2,Jones,Carly,61 83027733.,NA,female,0.9974,NA
+AAGL2019_025,4,4,5,Coelho Neto,M A,Brazil.,NA,NA,NA,NA
+AAGL2019_026,4,2,5,Ozceltik,Gokay,Turkey. Electronic address: gokayozceltik@hotmail.com.,NA,NA,NA,NA
+AAGL2019_027,6,5,5,Harvey,Lara,USA. lara.harvey@vumc.org.,TN,female,0.9989,X
+AAGL2019_028,60,33,2,Dorschel,Boris,Germany. Boris.Dorschel@awi.de.,NA,male,1,NA
+AAGL2019_029,1,1,3,Rosenblatt,Paula,MD 21201.,MD,female,0.997,IV
+AAGL2019_030,5,3,3,Martínez-Gómez,Carlos,France.,NA,male,0.9922,NA
+AAGL2019_031,4,3,4,Acosta,Daisy,Dominican Republic.,NA,female,0.9953,NA
+AAGL2019_032,4,2,2,Plair,Andre,USA.,NC,male,0.9804,XI
+AAGL2019_033,6,2,5,Yarranton,Brianne,CAN.,NA,female,0.9985,NA
+AAGL2019_034,4,1,4,Hu,Jie,China.,NA,male,0.8187,NA
+AAGL2019_035,3,3,2,Dhariwal,Laura,USA. laura.dhariwal@atlantichealth.org.,NJ,female,0.9969,III
+AAGL2019_036,4,3,3,Davenport,Erica,Las Vegas Minimally Invasive Surgery/University of Nevada Las Vegas.,NV,female,0.9958,VIII
+AAGL2019_037,2,2,2,Leach,D Allan,USA. leach.douglas@mayo.edu.,MN,NA,NA,VI
+AAGL2019_038,3,3,3,Boyd,Susan,Canada. Electronic address: scboyd@uvic.ca.,NA,female,0.9978,NA
+AAGL2019_039,6,1,2,Qiu,Jun-Jun,China.,NA,NA,NA,NA
+AAGL2019_040,10,5,5,Bertocchi,Elisa,and Ruffo). Electronic address: elisa.bertocchi@sacrocuore.it.,NA,female,0.9969,NA
+AAGL2019_041,9,1,5,Lee,Chia-Yi,Taiwan.,NA,NA,NA,NA
+AAGL2019_042,8,3,4,Roman,Horace,France.,NA,male,0.9957,NA
+AAGL2019_043,3,2,5,Souza,Cristiane,Portugal.,NA,NA,NA,NA
+AAGL2019_044,6,4,5,Zakhari,Andrew,Canada.,NY,male,0.996,II
+AAGL2019_045,8,3,5,Lapointe,Mathilde,France.,NA,female,1,NA
+AAGL2019_046,6,3,4,Farra,Chantal,Lebanon.,NA,female,0.9992,NA
+AAGL2019_047,10,7,5,Sroussi,Jérémy,France. Electronic address: jeremy.sroussi@gmail.com.,NA,NA,NA,NA
+AAGL2019_048,5,2,3,Guo,Xiaoyue Mona,USA.,IL,NA,NA,VII
 AAGL2019_049,1,0,3,Wu,Chengyuan,NA,NA,NA,NA,NA
 AAGL2019_050,1,0,3,Wu,Chengyuan,NA,NA,NA,NA,NA
-AAGL2019_051,4,1,4,Womack,Ashley S,NA,USA.,NA,NA,NA
-AAGL2019_052,6,2,2,Liu,Yao Z,RI,USA.,NA,NA,I
-AAGL2019_053,4,2,4,Tymon-Rosario,Joan,CT,USA.,female,0.9891,I
-AAGL2019_054,4,1,4,Mutlu,Levent,CT,USA.,male,1,I
-AAGL2019_055,2,2,3,Seaman,Sierra,NA,New York (all authors).,female,0.9972,NA
-AAGL2019_056,5,4,5,Beletsky,Alexander,NA,USA.,male,0.9921,NA
-AAGL2019_057,3,1,1,Guan,Xiaoming,NA,Texas.,NA,NA,NA
-AAGL2019_058,10,10,3,Green,Isabel,NA,Minnesota. Electronic address: green.isabel@mayo.edu.,female,0.9851,NA
-AAGL2019_059,2,2,3,Baekelandt,J,NA,Belgium. Electronic address: jan.baekelandt@imelda.be.,NA,NA,NA
-AAGL2019_060,3,2,4,Jackson,Emma F,NA,Australia. emma.jackson3@hdr.mq.edu.au.,NA,NA,NA
-AAGL2019_061,3,3,4,Chao,Lisa,TX,USA. Electronic address: Lisa.Chao@utsouthwestern.edu.,female,0.9973,X
-AAGL2019_062,5,2,5,Kennedy,Uttara,UQ,Australia.,NA,NA,NA
-AAGL2019_063,8,5,5,Cooke,Christopher,PO,USA.,male,0.995,NA
-AAGL2019_064,3,1,2,Foley,Christine,NA,Pennsylvania.,female,0.9967,NA
-AAGL2019_065,5,4,5,Mui,Justin,BC,BC. Electronic address: jmui@alumni.ubc.ca.,male,0.9947,VIII
-AAGL2019_066,13,5,2,Tam,Johnny,UK,UK.,male,0.9892,NA
-AAGL2019_067,5,5,3,Kamel,Sarah I,NA,Pennsylvania. Electronic address: Sarah.kamel@jefferson.edu.,NA,NA,NA
-AAGL2019_068,2,1,4,Thiel,Peter,NA,Canada.,male,0.9965,NA
-AAGL2019_069,7,3,3,Smith,Rachael B,AZ,USA. Electronic address: rachaelsmith.DO@gmail.com.,NA,NA,VIII
-AAGL2019_070,8,6,2,Melnyk,Angela,BC,Canada.,female,0.997,VIII
-AAGL2019_071,3,1,5,Liu,Jian-Hong,NA,Sichuan University.,NA,NA,NA
-AAGL2019_072,8,4,2,Jan,Hasnain,NA,Quaid-i-Azam University Islamabad 45320 Pakistan hasnainjan@bs.qau.edu.pk.,male,1,NA
-AAGL2019_073,7,2,4,Solís-Miranda,Jorge,NA,Mexico.,male,0.994,NA
-AAGL2019_074,5,4,4,Hunkler,Kiley,NA,Maryland. Electronic address: kiley.hunkler@gmail.com.,female,0.942,NA
-AAGL2019_075,14,14,3,Lee,Ted,NA,New York.,male,0.9977,NA
-AAGL2019_076,5,2,3,Cullinane,Carolyn,NA,Ireland.,female,0.9972,NA
-AAGL2019_077,2,2,3,Ruhotina,Merima,RI,RI USA.,female,1,I
-AAGL2019_078,4,2,5,Smith,Kieran,FC,UK.,male,0.877,NA
-AAGL2019_079,16,2,1,Liang,Zelin,NA,China.,NA,NA,NA
-AAGL2019_080,5,2,4,Kontomanolis,Emmanuel,NA,GRC.,male,0.9943,NA
-AAGL2019_081,4,3,3,Davenport,Erica,NA,Las Vegas Minimally Invasive Surgery/University of Nevada Las Vegas.,female,0.9958,NA
-AAGL2019_082,10,2,3,Gill,Corey M,NY,USA.,NA,NA,II
-AAGL2019_083,7,3,5,Liu,Juan,NA,China.,male,0.9915,NA
-AAGL2019_084,3,1,1,Liu,Jian-Hong,NA,Sichuan University.,NA,NA,NA
-AAGL2019_085,7,4,5,Handelzalts,Jonathan E,MI,USA. Electronic address: jhandelzalts@gmail.com.,NA,NA,V
-AAGL2019_086,4,2,5,Elder,Simone,NY,USA.,female,0.9823,II
-AAGL2019_087,4,2,1,Yashadhana,Aryati,NA,NSW.,NA,NA,NA
-AAGL2019_088,7,4,5,Chill,Henry H,NA,Israel - henchill@gmail.com.,NA,NA,NA
-AAGL2019_089,6,2,5,Matanes,Emad,NA,Israel.,male,1,NA
-AAGL2019_090,8,3,5,Ceci,Oronzo,NA,Italy.,NA,NA,NA
-AAGL2019_091,13,2,2,Araya,Shambel,NA,Ethiopia.,NA,NA,NA
-AAGL2019_092,6,6,2,Decker,Kaethel,NA,Canada. Electronic address: Kaethel.decker@ahs.ca.,NA,NA,NA
-AAGL2019_093,13,7,2,Leal,Jenine,NA,Canada. Electronic address: Jenine.leal@ucalgary.ca.,female,1,NA
-AAGL2019_094,17,6,1,Krysko,Olga,NA,Belgium.,female,0.9958,NA
-AAGL2019_095,5,3,2,Hanstede,Miriam M F,NA,Spaarne Gasthuis Haarlem Haarlem The Netherlands.,NA,NA,NA
-AAGL2019_096,6,6,1,Ortiz Vazquez,Estephano Fabian,NA,MEX.,NA,NA,NA
-AAGL2020_001,4,2,4,Luchristt,Douglas,IL,IL. Electronic address: douglas.h.luchristt@gmail.com.,male,0.9965,VII
-AAGL2020_002,2,2,3,Ross,Wendy,UK,UK. w.ross@kingston.ac.uk.,female,0.9965,NA
-AAGL2020_003,2,1,3,Cruz,Janet,NA,California.,female,0.9973,NA
-AAGL2020_004,7,1,5,Puntambekar,Shailesh,NA,Maharashtra 411004 India.,NA,NA,NA
-AAGL2020_005,5,3,5,Bisch,Steven,NA,Canada.,male,0.9963,NA
-AAGL2020_006,5,2,2,Edwards,Darl,NA,Canada.,male,0.9641,NA
-AAGL2020_007,6,3,2,Khatib,Ghanim,NA,Turkey,NA,NA,NA
-AAGL2020_008,4,3,4,Cosgriff,Lauren,NA,Maryland. Electronic address: lauren.l.cosgriff@medstar.net.,female,0.9904,NA
-AAGL2020_009,7,3,4,Benabou,Kelly,CT,USA.,female,0.8632,I
-AAGL2020_010,8,4,4,Sermer,Corey,ON,Canada.,male,0.9502,II
-AAGL2020_011,3,2,5,Kolhe,Sunanda,NA,India.,NA,NA,NA
-AAGL2020_012,5,4,5,Pereira,Rita,NA,Portugal. id10080@uminho.pt.,female,0.9972,NA
-AAGL2020_013,18,11,5,Abu-Zaid,Ahmed,NA,Saudi Arabia.,male,1,NA
-AAGL2020_014,3,2,3,Simmonds,Christopher,WA,USA.,male,0.995,VIII
-AAGL2020_015,7,1,5,Kingery,Matthew T,NY,NY.,NA,NA,II
-AAGL2020_016,8,7,4,Piszczek,Carolyn C,OR,OR. Electronic address: carolynfortune@gmail.com.,NA,NA,VIII
-AAGL2020_017,4,2,5,Nam,Jaehyun,NA,South Korea.,NA,NA,NA
-AAGL2020_018,19,13,5,Wang,Qifeng,NA,China.,NA,NA,NA
-AAGL2020_019,6,5,5,Corinti,Mariana,NA,Brazil.,female,0.9974,NA
-AAGL2020_020,16,14,5,Al-Hendy,Ayman,IL,IL. Electronic address: aalhendy@uic.edu.,male,0.9818,VII
-AAGL2020_021,7,6,5,Stewart,Elizabeth A,MN,MN. Electronic address: stewart.elizabeth@mayo.edu.,NA,NA,VI
-AAGL2020_022,7,7,5,Kang,Juseong,NA,Republic of Korea.,NA,NA,NA
-AAGL2020_023,5,1,5,Urbina,Pietro,NA,Spain.,male,1,NA
-AAGL2020_024,2,2,2,Gundavda,Kaival,NA,India.,NA,NA,NA
-AAGL2020_025,6,2,5,Oderkerk,Tamara J,NA,the Netherlands.,NA,NA,NA
-AAGL2020_026,5,2,5,Mohr-Sasson,Aya,NA,Israel. Mohraya@gmail.com.,female,1,NA
-AAGL2020_027,7,2,3,Sayyah-Melli,M,NA,Iran. Electronic address: Manizheh.sayyahmelli@gmail.com.,NA,NA,NA
-AAGL2020_028,3,3,3,Kim,Chang Woo,NA,Korea.,NA,NA,NA
-AAGL2020_029,2,1,2,Michel,Lindsey,CT,CT. (all authors).,female,0.9632,I
-AAGL2020_030,5,4,3,Pickett,Charlotte M,IN,IN. Electronic address: cpicket@iu.edu.,NA,NA,V
-AAGL2020_031,2,2,1,Lawani,Osayi,NA,USA.,NA,NA,NA
-AAGL2020_032,2,2,3,Stanton,Adam,NA,School of Informatics and Digital Engineering. a.j.stanton@aston.ac.uk.,male,0.9959,NA
-AAGL2020_033,7,3,5,Förster,Christiane E,NA,Switzerland.,NA,NA,NA
-AAGL2020_034,2,2,4,Galhotra,Sheena,AZ,AZ. Electronic address: sheenagalhotra@gmail.com.,female,0.9971,VIII
-AAGL2020_035,3,1,1,Guan,Xiaoming,NA,Texas.,NA,NA,NA
-AAGL2020_036,4,3,3,Rupley,Devon M,NA,USA.,NA,NA,NA
-AAGL2020_037,10,5,5,Ruggieri,Serena,NA,Italy.,female,0.9996,NA
-AAGL2020_038,6,4,5,Bastawros,Dina,NA,Winston-Salem.,female,0.9975,NA
-AAGL2020_039,3,1,4,Marceddu,Roberto,NA,Italy.,male,0.9918,NA
-AAGL2020_040,8,4,4,Ji,Yijia,NA,Australia.,NA,NA,NA
-AAGL2020_041,16,8,2,Morais,Luana,SP,Brazil. lumoraiss@ymail.com.,female,1,NA
+AAGL2019_051,4,1,4,Womack,Ashley S,USA.,AZ,NA,NA,VIII
+AAGL2019_052,6,2,2,Liu,Yao Z,USA.,RI,NA,NA,I
+AAGL2019_053,4,2,4,Tymon-Rosario,Joan,USA.,CT,female,0.9891,I
+AAGL2019_054,4,1,4,Mutlu,Levent,USA.,CT,male,1,I
+AAGL2019_055,2,2,3,Seaman,Sierra,New York (all authors).,NY,female,0.9972,II
+AAGL2019_056,5,4,5,Beletsky,Alexander,USA.,CA,male,0.9921,IX
+AAGL2019_057,3,1,1,Guan,Xiaoming,Texas.,TX,NA,NA,X
+AAGL2019_058,10,10,3,Green,Isabel,Minnesota. Electronic address: green.isabel@mayo.edu.,MN,female,0.9851,VI
+AAGL2019_059,2,2,3,Baekelandt,J,Belgium. Electronic address: jan.baekelandt@imelda.be.,NA,NA,NA,NA
+AAGL2019_060,3,2,4,Jackson,Emma F,Australia. emma.jackson3@hdr.mq.edu.au.,NA,NA,NA,NA
+AAGL2019_061,3,3,4,Chao,Lisa,USA. Electronic address: Lisa.Chao@utsouthwestern.edu.,TX,female,0.9973,X
+AAGL2019_062,5,2,5,Kennedy,Uttara,Australia.,NA,NA,NA,NA
+AAGL2019_063,8,5,5,Cooke,Christopher,USA.,MI,male,0.995,V
+AAGL2019_064,3,1,2,Foley,Christine,Pennsylvania.,PA,female,0.9967,III
+AAGL2019_065,5,4,5,Mui,Justin,BC. Electronic address: jmui@alumni.ubc.ca.,MO,male,0.9947,VII
+AAGL2019_066,13,5,2,Tam,Johnny,UK.,NA,male,0.9892,NA
+AAGL2019_067,5,5,3,Kamel,Sarah I,Pennsylvania. Electronic address: Sarah.kamel@jefferson.edu.,PA,NA,NA,III
+AAGL2019_068,2,1,4,Thiel,Peter,Canada.,NA,male,0.9965,NA
+AAGL2019_069,7,3,3,Smith,Rachael B,USA. Electronic address: rachaelsmith.DO@gmail.com.,AZ,NA,NA,VIII
+AAGL2019_070,8,6,2,Melnyk,Angela,Canada.,MO,female,0.997,VII
+AAGL2019_071,3,1,5,Liu,Jian-Hong,Sichuan University.,NA,NA,NA,NA
+AAGL2019_072,8,4,2,Jan,Hasnain,Quaid-i-Azam University Islamabad 45320 Pakistan hasnainjan@bs.qau.edu.pk.,NA,male,1,NA
+AAGL2019_073,7,2,4,Solís-Miranda,Jorge,Mexico.,NA,male,0.994,NA
+AAGL2019_074,5,4,4,Hunkler,Kiley,Maryland. Electronic address: kiley.hunkler@gmail.com.,MD,female,0.942,IV
+AAGL2019_075,14,14,3,Lee,Ted,New York.,NY,male,0.9977,II
+AAGL2019_076,5,2,3,Cullinane,Carolyn,Ireland.,NA,female,0.9972,NA
+AAGL2019_077,2,2,3,Ruhotina,Merima,RI USA.,RI,female,1,I
+AAGL2019_078,4,2,5,Smith,Kieran,UK.,NA,male,0.877,NA
+AAGL2019_079,16,2,1,Liang,Zelin,China.,NA,NA,NA,NA
+AAGL2019_080,5,2,4,Kontomanolis,Emmanuel,GRC.,NA,male,0.9943,NA
+AAGL2019_081,4,3,3,Davenport,Erica,Las Vegas Minimally Invasive Surgery/University of Nevada Las Vegas.,NV,female,0.9958,VIII
+AAGL2019_082,10,2,3,Gill,Corey M,USA.,NY,NA,NA,II
+AAGL2019_083,7,3,5,Liu,Juan,China.,NA,male,0.9915,NA
+AAGL2019_084,3,1,1,Liu,Jian-Hong,Sichuan University.,NA,NA,NA,NA
+AAGL2019_085,7,4,5,Handelzalts,Jonathan E,USA. Electronic address: jhandelzalts@gmail.com.,MI,NA,NA,V
+AAGL2019_086,4,2,5,Elder,Simone,USA.,NY,female,0.9823,II
+AAGL2019_087,4,2,1,Yashadhana,Aryati,NSW.,NA,NA,NA,NA
+AAGL2019_088,7,4,5,Chill,Henry H,Israel - henchill@gmail.com.,NA,NA,NA,NA
+AAGL2019_089,6,2,5,Matanes,Emad,Israel.,NA,male,1,NA
+AAGL2019_090,8,3,5,Ceci,Oronzo,Italy.,NA,NA,NA,NA
+AAGL2019_091,13,2,2,Araya,Shambel,Ethiopia.,NA,NA,NA,NA
+AAGL2019_092,6,6,2,Decker,Kaethel,Canada. Electronic address: Kaethel.decker@ahs.ca.,NA,NA,NA,NA
+AAGL2019_093,13,7,2,Leal,Jenine,Canada. Electronic address: Jenine.leal@ucalgary.ca.,NA,female,1,NA
+AAGL2019_094,17,6,1,Krysko,Olga,Belgium.,NA,female,0.9958,NA
+AAGL2019_095,5,3,2,Hanstede,Miriam M F,Spaarne Gasthuis Haarlem Haarlem The Netherlands.,NA,NA,NA,NA
+AAGL2019_096,6,6,1,Ortiz Vazquez,Estephano Fabian,MEX.,NA,NA,NA,NA
+AAGL2020_001,4,2,4,Luchristt,Douglas,IL. Electronic address: douglas.h.luchristt@gmail.com.,IL,male,0.9965,VII
+AAGL2020_002,2,2,3,Ross,Wendy,UK. w.ross@kingston.ac.uk.,NA,female,0.9965,NA
+AAGL2020_003,2,1,3,Cruz,Janet,California.,CA,female,0.9973,IX
+AAGL2020_004,7,1,5,Puntambekar,Shailesh,Maharashtra 411004 India.,NA,NA,NA,NA
+AAGL2020_005,5,3,5,Bisch,Steven,Canada.,NA,male,0.9963,NA
+AAGL2020_006,5,2,2,Edwards,Darl,Canada.,NY,male,0.9641,II
+AAGL2020_007,6,3,2,Khatib,Ghanim,Turkey,NA,NA,NA,NA
+AAGL2020_008,4,3,4,Cosgriff,Lauren,Maryland. Electronic address: lauren.l.cosgriff@medstar.net.,MD,female,0.9904,IV
+AAGL2020_009,7,3,4,Benabou,Kelly,USA.,CT,female,0.8632,I
+AAGL2020_010,8,4,4,Sermer,Corey,Canada.,NY,male,0.9502,II
+AAGL2020_011,3,2,5,Kolhe,Sunanda,India.,NA,NA,NA,NA
+AAGL2020_012,5,4,5,Pereira,Rita,Portugal. id10080@uminho.pt.,NA,female,0.9972,NA
+AAGL2020_013,18,11,5,Abu-Zaid,Ahmed,Saudi Arabia.,NA,male,1,NA
+AAGL2020_014,3,2,3,Simmonds,Christopher,USA.,WA,male,0.995,VIII
+AAGL2020_015,7,1,5,Kingery,Matthew T,NY.,NY,NA,NA,II
+AAGL2020_016,8,7,4,Piszczek,Carolyn C,OR. Electronic address: carolynfortune@gmail.com.,OR,NA,NA,VIII
+AAGL2020_017,4,2,5,Nam,Jaehyun,South Korea.,NA,NA,NA,NA
+AAGL2020_018,19,13,5,Wang,Qifeng,China.,NA,NA,NA,NA
+AAGL2020_019,6,5,5,Corinti,Mariana,Brazil.,NA,female,0.9974,NA
+AAGL2020_020,16,14,5,Al-Hendy,Ayman,IL. Electronic address: aalhendy@uic.edu.,IL,male,0.9818,VII
+AAGL2020_021,7,6,5,Stewart,Elizabeth A,MN. Electronic address: stewart.elizabeth@mayo.edu.,MN,NA,NA,VI
+AAGL2020_022,7,7,5,Kang,Juseong,Republic of Korea.,NA,NA,NA,NA
+AAGL2020_023,5,1,5,Urbina,Pietro,Spain.,NA,male,1,NA
+AAGL2020_024,2,2,2,Gundavda,Kaival,India.,NA,NA,NA,NA
+AAGL2020_025,6,2,5,Oderkerk,Tamara J,the Netherlands.,NA,NA,NA,NA
+AAGL2020_026,5,2,5,Mohr-Sasson,Aya,Israel. Mohraya@gmail.com.,NA,female,1,NA
+AAGL2020_027,7,2,3,Sayyah-Melli,M,Iran. Electronic address: Manizheh.sayyahmelli@gmail.com.,NA,NA,NA,NA
+AAGL2020_028,3,3,3,Kim,Chang Woo,Korea.,NA,NA,NA,NA
+AAGL2020_029,2,1,2,Michel,Lindsey,CT. (all authors).,NA,female,0.9632,NA
+AAGL2020_030,5,4,3,Pickett,Charlotte M,IN. Electronic address: cpicket@iu.edu.,IN,NA,NA,V
+AAGL2020_031,2,2,1,Lawani,Osayi,USA.,TX,NA,NA,X
+AAGL2020_032,2,2,3,Stanton,Adam,School of Informatics and Digital Engineering. a.j.stanton@aston.ac.uk.,NA,male,0.9959,NA
+AAGL2020_033,7,3,5,Förster,Christiane E,Switzerland.,NA,NA,NA,NA
+AAGL2020_034,2,2,4,Galhotra,Sheena,AZ. Electronic address: sheenagalhotra@gmail.com.,AZ,female,0.9971,VIII
+AAGL2020_035,3,1,1,Guan,Xiaoming,Texas.,TX,NA,NA,X
+AAGL2020_036,4,3,3,Rupley,Devon M,USA.,NY,NA,NA,II
+AAGL2020_037,10,5,5,Ruggieri,Serena,Italy.,NA,female,0.9996,NA
+AAGL2020_038,6,4,5,Bastawros,Dina,Winston-Salem.,NC,female,0.9975,XI
+AAGL2020_039,3,1,4,Marceddu,Roberto,Italy.,NA,male,0.9918,NA
+AAGL2020_040,8,4,4,Ji,Yijia,Australia.,NA,NA,NA,NA
+AAGL2020_041,16,8,2,Morais,Luana,Brazil. lumoraiss@ymail.com.,NA,female,1,NA
 AAGL2020_042,7,0,5,Chapman,Graham C,NA,NA,NA,NA,NA
-AAGL2020_043,13,6,5,Kogan,Liron,NA,Canada.,male,0.6065,NA
-AAGL2020_044,11,6,3,Filippova,Olga T,NY,United States of America.,NA,NA,II
-AAGL2020_045,6,4,5,Mun,Jaehee,NA,Republic of Korea.,NA,NA,NA
-AAGL2020_046,29,12,5,Bogani,Giorgio,NA,Italy. Electronic address: Giorgio.bogani@istitutotumori.mi.it.,male,1,NA
-AAGL2020_047,8,5,5,Bogani,Giorgio,NA,Italy. Electronic address: giorgiobogani@yahoo.it.,male,1,NA
-AAGL2020_048,4,2,4,Tymon-Rosario,Joan,CT,USA.,female,0.9891,I
-AAGL2020_049,5,4,2,Pickett,Charlotte M,IN,IN. Electronic address: cpicket@iu.edu.,NA,NA,V
-AAGL2020_050,4,2,5,Pepin,Kristen,NA,New York. Electronic address: kjp9013@med.cornell.edu.,female,0.9911,NA
-AAGL2020_051,5,3,5,Celikgun,Beyza,NA,Turkey.,female,1,NA
-AAGL2020_052,6,1,2,Muir,Teale M,NA,California.,NA,NA,NA
-AAGL2020_053,10,9,5,Levin,Gabriel,NA,Canada. Electronic address: levin.gaby@gmail.com.,male,0.9766,NA
-AAGL2020_054,8,4,2,Yang,Wenming,NA,China.,NA,NA,NA
-AAGL2020_055,4,2,3,Orlando,Megan S,NA,Colorado. Electronic address: megan.orlando@cuanschutz.edu.,NA,NA,NA
-AAGL2020_056,5,2,5,Benlolo,Samantha,NA,Canada. Electronic address: samantha.benlolo@gmail.com.,female,0.998,NA
-AAGL2020_057,5,2,5,Hamouie,Angie,DC,DC.,female,0.9978,IV
-AAGL2020_058,5,2,1,GiglioAyers,Patricia,NA,USA.,female,0.997,NA
-AAGL2020_059,5,2,5,Willson,Stephanie F,NA,USA.,NA,NA,NA
-AAGL2020_060,10,5,4,Marcelin,Clément,NA,France. clement.marcelin@gmail.com.,NA,NA,NA
-AAGL2020_061,7,2,5,Nguyen,Damnhien,NA,USA.,NA,NA,NA
-AAGL2020_062,8,4,4,Sermer,Corey,ON,Canada.,male,0.9502,II
-AAGL2020_063,8,4,2,You,Fuming,NA,China.,NA,NA,NA
-AAGL2020_064,4,3,5,Laughman,Kimberly,NA,Illinois.,female,0.9951,NA
-AAGL2020_065,5,3,5,Haverland,Rachael,NA,Arizona.,female,0.9978,NA
-AAGL2020_066,6,6,5,Delara,Ritchie,NA,Arizona. ORCID: https://orcid.org/0000-0002-2770-2155.,male,0.9905,NA
-AAGL2020_067,22,10,5,Klotz,Rosa,NA,Germany rosa.klotz@med.uni-heidelberg.de.,female,0.9927,NA
-AAGL2020_068,12,5,2,Yu,Victor,NA,Australia.,male,0.9938,NA
-AAGL2020_069,5,5,2,Kamioka,Hiroharu,NA,Japan.,NA,NA,NA
-AAGL2020_070,2,2,3,Miles,Shana,MD,USA.,female,0.9964,IV
-AAGL2020_071,4,2,5,Souza,Carla,NA,Brazil.,female,0.9973,NA
-AAGL2020_072,11,8,5,Ji,Ellie Y,NA,USA.,NA,NA,NA
-AAGL2020_073,6,2,1,Mohara,Mizuki,NA,Japan.,female,0.9786,NA
-AAGL2020_074,3,2,4,Lovell,Daniel Y,NA,Texas (all authors).,NA,NA,NA
-AAGL2020_075,7,7,5,Venturella,Roberta,NA,Italy.,female,0.9957,NA
-AAGL2020_076,2,1,2,Michel,Lindsey,CT,CT. (all authors).,female,0.9632,I
-AAGL2020_077,5,3,4,Schmidt,Christina N,NA,USA. christina.schmidt@ucsf.edu.,NA,NA,NA
+AAGL2020_043,13,6,5,Kogan,Liron,Canada.,NA,male,0.6065,NA
+AAGL2020_044,11,6,3,Filippova,Olga T,United States of America.,NY,NA,NA,II
+AAGL2020_045,6,4,5,Mun,Jaehee,Republic of Korea.,NA,NA,NA,NA
+AAGL2020_046,29,12,5,Bogani,Giorgio,Italy. Electronic address: Giorgio.bogani@istitutotumori.mi.it.,NA,male,1,NA
+AAGL2020_047,8,5,5,Bogani,Giorgio,Italy. Electronic address: giorgiobogani@yahoo.it.,NA,male,1,NA
+AAGL2020_048,4,2,4,Tymon-Rosario,Joan,USA.,CT,female,0.9891,I
+AAGL2020_049,5,4,2,Pickett,Charlotte M,IN. Electronic address: cpicket@iu.edu.,IN,NA,NA,V
+AAGL2020_050,4,2,5,Pepin,Kristen,New York. Electronic address: kjp9013@med.cornell.edu.,NY,female,0.9911,II
+AAGL2020_051,5,3,5,Celikgun,Beyza,Turkey.,NA,female,1,NA
+AAGL2020_052,6,1,2,Muir,Teale M,California.,PA,NA,NA,III
+AAGL2020_053,10,9,5,Levin,Gabriel,Canada. Electronic address: levin.gaby@gmail.com.,NA,male,0.9766,NA
+AAGL2020_054,8,4,2,Yang,Wenming,China.,NA,NA,NA,NA
+AAGL2020_055,4,2,3,Orlando,Megan S,Colorado. Electronic address: megan.orlando@cuanschutz.edu.,CO,NA,NA,VIII
+AAGL2020_056,5,2,5,Benlolo,Samantha,Canada. Electronic address: samantha.benlolo@gmail.com.,NA,female,0.998,NA
+AAGL2020_057,5,2,5,Hamouie,Angie,DC.,WA,female,0.9978,VIII
+AAGL2020_058,5,2,1,GiglioAyers,Patricia,USA.,CT,female,0.997,I
+AAGL2020_059,5,2,5,Willson,Stephanie F,USA.,NY,NA,NA,II
+AAGL2020_060,10,5,4,Marcelin,Clément,France. clement.marcelin@gmail.com.,NA,NA,NA,NA
+AAGL2020_061,7,2,5,Nguyen,Damnhien,USA.,CA,NA,NA,IX
+AAGL2020_062,8,4,4,Sermer,Corey,Canada.,NY,male,0.9502,II
+AAGL2020_063,8,4,2,You,Fuming,China.,NA,NA,NA,NA
+AAGL2020_064,4,3,5,Laughman,Kimberly,Illinois.,IL,female,0.9951,VII
+AAGL2020_065,5,3,5,Haverland,Rachael,Arizona.,AZ,female,0.9978,VIII
+AAGL2020_066,6,6,5,Delara,Ritchie,Arizona. ORCID: https://orcid.org/0000-0002-2770-2155.,AZ,male,0.9905,VIII
+AAGL2020_067,22,10,5,Klotz,Rosa,Germany rosa.klotz@med.uni-heidelberg.de.,NA,female,0.9927,NA
+AAGL2020_068,12,5,2,Yu,Victor,Australia.,NA,male,0.9938,NA
+AAGL2020_069,5,5,2,Kamioka,Hiroharu,Japan.,NA,NA,NA,NA
+AAGL2020_070,2,2,3,Miles,Shana,USA.,MD,female,0.9964,IV
+AAGL2020_071,4,2,5,Souza,Carla,Brazil.,NA,female,0.9973,NA
+AAGL2020_072,11,8,5,Ji,Ellie Y,USA.,TX,NA,NA,X
+AAGL2020_073,6,2,1,Mohara,Mizuki,Japan.,NA,female,0.9786,NA
+AAGL2020_074,3,2,4,Lovell,Daniel Y,Texas (all authors).,TX,NA,NA,X
+AAGL2020_075,7,7,5,Venturella,Roberta,Italy.,NA,female,0.9957,NA
+AAGL2020_076,2,1,2,Michel,Lindsey,CT. (all authors).,NA,female,0.9632,NA
+AAGL2020_077,5,3,4,Schmidt,Christina N,USA. christina.schmidt@ucsf.edu.,CA,NA,NA,IX
 AAGL2020_078,9,0,3,Boyd,S,NA,NA,NA,NA,NA
-AAGL2020_079,14,14,2,Lee,Ted,NA,New York.,male,0.9977,NA
-AAGL2020_080,7,3,4,Zhao,Xingping,NA,China.,NA,NA,NA
-AAGL2020_081,4,4,5,Manirambona,Emery,NA,Rwanda. manemery1@gmail.com.,male,0.5473,NA
-AAGL2020_082,6,2,4,Kulkarni,Aditya,NA,India.,male,0.9986,NA
-AAGL2020_083,6,3,4,Magliano,Joseph P,GA,United States.,NA,NA,XI
-AAGL2020_084,10,10,5,Green,Isabel,NA,Minnesota. Electronic address: green.isabel@mayo.edu.,female,0.9851,NA
+AAGL2020_079,14,14,2,Lee,Ted,New York.,NY,male,0.9977,II
+AAGL2020_080,7,3,4,Zhao,Xingping,China.,NA,NA,NA,NA
+AAGL2020_081,4,4,5,Manirambona,Emery,Rwanda. manemery1@gmail.com.,NA,male,0.5473,NA
+AAGL2020_082,6,2,4,Kulkarni,Aditya,India.,NA,male,0.9986,NA
+AAGL2020_083,6,3,4,Magliano,Joseph P,United States.,GA,NA,NA,XI
+AAGL2020_084,10,10,5,Green,Isabel,Minnesota. Electronic address: green.isabel@mayo.edu.,MN,female,0.9851,VI
 AAGL2020_085,2,0,2,Benabou,Kelly,NA,NA,female,0.8632,NA
-AAGL2020_086,11,1,4,Movilla,Peter,MA,USA.,male,0.9965,I
-AAGL2020_087,5,1,4,Duncan,Jonathan,AZ,United States of America.,male,0.9954,VIII
-AAGL2020_088,2,1,4,Dou,Lei,NA,China.,female,0.9702,NA
-AAGL2020_089,3,3,1,da Costa,Adriano Carneiro,UK,UK. Adriano.Costa@ebserh.gov.br.,NA,NA,NA
-AAGL2020_090,3,3,3,Katebi Kashi,Payam,VA,VA. Electronic address: pkatebi1@gmail.com.,male,1,IV
-AAGL2020_091,4,1,2,Abouzeid,Bassel,IL,USA.,male,1,VII
-AAGL2020_092,5,3,3,Nassar,Daniel,NA,and Ms. Chen).,male,0.9954,NA
-AAGL2020_093,16,6,5,León,Maela,NA,Spain.,female,1,NA
-AAGL2020_094,9,5,3,Michail,Maria,UK,UK. m.michail@bham.ac.uk.,female,0.9927,NA
-AAGL2020_095,5,4,3,Tanvir,Tanvir,NA,India. Electronic address: tanvirsinghtan@gmail.com.,male,0.9681,NA
-AAGL2021_001,8,4,5,Goncharov,A L,NA,Russia.,NA,NA,NA
-AAGL2021_002,8,6,5,Matsuo,Koji,CA,USA. Electronic address: koji.matsuo@med.usc.edu.,male,1,IX
-AAGL2021_003,7,3,5,Tzur,Yossi,NA,Israel. Electronic address: yossitzur@gmail.com.,male,1,NA
-AAGL2021_004,5,2,1,Shapera,Emanuel,FL,USA.,male,0.9979,XI
-AAGL2021_005,6,4,3,Guraslan,Hakan,NA,Turkey. Electronic address: guraslanhakan@gmail.com.,male,1,NA
-AAGL2021_006,9,2,5,Chen,Zihao,NA,China.,male,1,NA
-AAGL2021_007,8,6,3,Lee,Elisabeth,NA,USA.,female,0.9993,NA
-AAGL2021_008,3,1,3,Ambacher,Kristin,AB,Canada.,female,0.9915,VIII
-AAGL2021_009,1,1,5,Allen,Leigh,WV,WV.,female,0.9054,IV
-AAGL2021_010,5,3,2,Liu,Ge,NA,People's Republic of China.,male,0.906,NA
-AAGL2021_011,4,2,5,Dumont,F,NA,France. frederic.dumont@ico.unicancer.fr.,NA,NA,NA
-AAGL2021_012,12,2,5,Bogani,Giorgio,NA,Italy. Electronic address: giorgiobogani@yahoo.it.,male,1,NA
-AAGL2021_013,14,13,5,Houri,Ohad,NA,Peta Tikva.,male,1,NA
-AAGL2021_014,3,3,3,Horton,Tammy,UK,UK.,female,0.996,NA
-AAGL2021_015,4,4,4,Cheng,Connie,NJ,United States of America. Electronic address: connie.cheng@hmhn.org.,female,0.9816,III
-AAGL2021_016,3,1,2,St Laurent,Jessica D,MA,USA.,NA,NA,I
-AAGL2021_017,20,9,2,Lim,Pascal,AP,France.,male,0.9961,AFS
-AAGL2021_018,20,9,2,Lim,Pascal,AP,France.,male,0.9961,AFS
-AAGL2021_019,5,2,3,Kobayashi,Hiroaki,NA,Japan.,male,1,NA
-AAGL2021_020,2,1,5,Vieira,Margarida,NA,Portugal.,female,1,NA
-AAGL2021_021,5,4,5,Thanasa,Anna,NA,Greece.,female,0.9971,NA
-AAGL2021_022,5,1,5,Pereira,Sergio,NA,PRT.,male,0.9946,NA
-AAGL2021_023,2,2,5,Mijatovic,Velja,NA,The Netherlands.,NA,NA,NA
-AAGL2021_024,5,4,4,Pereira,Rita,NA,Portugal. id10080@uminho.pt.,female,0.9972,NA
-AAGL2021_025,5,3,5,Bar-El,Liron,NA,New York. Electronic address: Lironbarel@gmail.com.,male,0.6065,NA
-AAGL2021_026,5,1,3,Mrugała,Maja,NA,Poland.,female,1,NA
-AAGL2021_027,3,3,4,Rao,Tanushree,NA,Australia.,NA,NA,NA
-AAGL2021_028,3,3,2,Hardman,Danielle,NA,Florida. Electronic address: dehardman@usf.edu.,female,0.9951,NA
-AAGL2021_029,4,2,4,Beroukhim,Gabriela,NA,Connecticut.,female,0.9951,NA
-AAGL2021_030,9,7,5,As-Sanie,Sawsan,NA,Michigan. Electronic address: sassanie@med.umich.edu.,female,1,NA
-AAGL2021_031,5,2,5,Becker,Christine,NA,Germany.,female,0.9967,NA
-AAGL2021_032,4,2,5,Sheladiya,Pooja,NA,California (all authors). Electronic address: pshel004@medsch.ucr.edu.,female,1,NA
-AAGL2021_033,6,2,5,Moore,Kenya,SC,USA.,female,0.9192,XI
-AAGL2021_034,1,1,1,Shimada,Kazuyuki,NA,Japan.,NA,NA,NA
-AAGL2021_035,2,2,5,Simko,Sarah,NA,California.,female,0.9971,NA
-AAGL2021_036,2,2,2,Roy,Kelly,NA,USA.,female,0.8632,NA
-AAGL2021_037,7,5,5,Kebreab,Ermias,NA,Davis 95616. Electronic address: ekebreab@ucdavis.edu.,male,1,NA
-AAGL2021_038,4,3,2,Chan,Clarice,UK,UK.,female,0.9976,NA
-AAGL2021_039,3,2,3,Romanski,Phillip A,NA,New York. Electronic address: par9114@med.cornell.edu.,NA,NA,NA
-AAGL2021_040,8,3,5,Di Spiezio Sardo,Attilio,NA,Departments of Public Health.,male,1,NA
-AAGL2021_041,3,2,2,Hincapie,Maria,NA,Georgia.,female,0.9927,NA
-AAGL2021_042,8,3,5,Di Spiezio Sardo,Attilio,NA,Departments of Public Health.,male,1,NA
-AAGL2021_043,4,2,4,Han,Ling,NA,China.,female,0.9091,NA
-AAGL2021_044,1,1,1,Dave,Abhishek,NA,India.,male,1,NA
-AAGL2021_045,3,2,5,Kim,Soo Jung,NA,Republic of Korea.,NA,NA,NA
-AAGL2021_046,5,2,3,Heraganahally,Subash S,NA,Australia.,NA,NA,NA
-AAGL2021_047,5,2,5,Braxton,Elizabeth Gw,NA,From the Department of Obstetrics and Gynecology.,NA,NA,NA
-AAGL2021_048,12,5,5,Loverro,Matteo,NA,IRCCS.,male,1,NA
-AAGL2021_049,5,3,5,Rosen,Adam,NA,Canada.,male,0.9959,NA
-AAGL2021_050,3,2,4,Souza,Claudineia,BA,Brazil.,NA,NA,NA
-AAGL2021_051,5,2,4,Kanno,Kiyoshi,NA,Japan. Electronic address: less_is_more71@yahoo.co.jp.,male,0.9732,NA
-AAGL2021_052,7,2,4,Braxton,Emily,NA,U.K.,female,0.9979,NA
-AAGL2021_053,22,9,5,Barber,Bridget E,NA,Australia.,NA,NA,NA
-AAGL2021_054,3,3,4,Radtke,Sarah,MD,USA.,female,0.9971,IV
-AAGL2021_055,5,2,5,Benlolo,Samantha,NA,Canada. Electronic address: samantha.benlolo@gmail.com.,female,0.998,NA
-AAGL2021_056,5,2,2,Haikal,Samantha,NA,United States.,female,0.998,NA
-AAGL2021_057,11,1,4,Aharon,Devora,NA,New York.,female,1,NA
-AAGL2021_058,4,2,4,Lovell,Daniel Y,NA,North Carolina. (Dr. Lovell).,NA,NA,NA
-AAGL2021_059,1,1,5,Chen,Ang,NA,USA.,male,1,NA
-AAGL2021_060,3,2,3,Ramirez-Caban,Laura,FL,USA. Lramirezcaban@gmail.com.,female,0.9969,XI
-AAGL2021_061,2,2,4,Sunkara,Sowmya,NA,Texas.,female,1,NA
-AAGL2021_062,16,10,3,Etrusco,Andrea,NA,Italy.,female,0.9875,NA
-AAGL2021_063,13,13,4,Rodolakis,Alexandros,NA,Greece.,male,1,NA
-AAGL2021_064,10,4,2,Ham,In-Hye,NA,Republic of Korea.,NA,NA,NA
-AAGL2021_065,5,1,5,Shu,Michael,NA,Williamsville.,male,0.9947,NA
-AAGL2021_066,9,2,3,Mihetiu,Alin,NA,Romania.,female,0.7561,NA
-AAGL2021_067,8,1,5,Kho,Katherine,NA,Indonesia.,female,0.9972,NA
-AAGL2021_068,5,4,5,Li,Yuan-Li,NA,China.,NA,NA,NA
-AAGL2021_069,9,4,5,Meyer,Raanan,NA,Israel. Electronic address: Raanan.Meyer@cshs.org.,male,1,NA
-AAGL2021_070,6,3,4,Chitkara,Aman,NA,India.,male,0.9147,NA
-AAGL2021_071,3,3,3,Christoffel,Ladina,NA,Switzerland.,female,1,NA
-AAGL2021_072,14,7,4,Ito,Tetsuro,NA,Japan. tito@u-gifu-ms.ac.jp.,NA,NA,NA
-AAGL2021_073,32,26,3,Cornejo,José,NA,Peru.,NA,NA,NA
-AAGL2021_074,4,1,3,Alani,Sanah,QC,Canada.,female,1,II
-AAGL2021_075,5,4,5,Adamyan,Leila,NA,Russia.,female,0.9998,NA
-AAGL2021_076,1,1,3,Chen,Ang,NA,USA.,male,1,NA
-AAGL2021_077,9,2,5,Young,Robert,NA,USA.,male,0.9958,NA
-AAGL2021_078,1,1,3,Carey,Eileen,NA,Ireland.,female,0.9976,NA
-AAGL2021_079,7,3,5,Tappy,Erryn,UT,Texas. Electronic address: Erryn.Tappy@UTSouthwestern.edu.,female,1,VIII
-AAGL2021_080,3,1,5,Mitchelson,Hayley,NA,Australia.,female,0.9991,NA
-AAGL2021_081,8,2,4,Das,Deepanjana,IL,IL.,NA,NA,VII
-AAGL2021_082,2,2,5,Westbrook,Katherine E,OH,OH westbrk@ccf.org.,NA,NA,V
-AAGL2021_083,2,2,3,Salazar-Villamizar,Mary Elízabeth,NA,Colombia. Electronic address: maryesv@gmail.com.,NA,NA,NA
-AAGL2021_084,5,2,4,Kanno,Kiyoshi,NA,Japan. Electronic address: less_is_more71@yahoo.co.jp.,male,0.9732,NA
-AAGL2021_085,3,3,5,Wondwosen,Mekete,NA,Ethiopia.,NA,NA,NA
-AAGL2021_086,3,3,2,Rao,Tanushree,NA,Australia.,NA,NA,NA
-AAGL2021_087,6,5,3,Cybulsky,Marta,NA,Canada.,female,0.9973,NA
-AAGL2021_088,10,4,5,Nishio,Naoki,NA,Department of Otorhinolaryngology Nagoya University Graduate School of Medicine Nagoya Aichi Japan.,male,0.9555,NA
-AAGL2021_089,2,1,5,Foley,Anne Marie,NA,financial or otherwise.,NA,NA,NA
-AAGL2021_090,8,7,2,Quevedo,Amira,FL,FL. Electronic address: amiraquevedo@ufl.edu.,female,1,XI
-AAGL2021_091,7,4,5,Dason,E Shirin,NA,Ontario. Electronic address: Shirin.dason@mail.utoronto.ca.,NA,NA,NA
-AAGL2021_092,3,2,4,Hincapie,Maria,NA,Georgia.,female,0.9927,NA
-AAGL2021_093,7,6,3,Ferrari,Filippo Alberto,NA,Italy.,NA,NA,NA
-AAGL2021_094,13,3,3,Elfeky,Adel,UK,UK.,male,0.5558,NA
-AAGL2021_095,15,7,5,Dubernard,G,NA,France.,NA,NA,NA
+AAGL2020_086,11,1,4,Movilla,Peter,USA.,MA,male,0.9965,I
+AAGL2020_087,5,1,4,Duncan,Jonathan,United States of America.,AZ,male,0.9954,VIII
+AAGL2020_088,2,1,4,Dou,Lei,China.,NA,female,0.9702,NA
+AAGL2020_089,3,3,1,da Costa,Adriano Carneiro,UK. Adriano.Costa@ebserh.gov.br.,NA,NA,NA,NA
+AAGL2020_090,3,3,3,Katebi Kashi,Payam,VA. Electronic address: pkatebi1@gmail.com.,NA,male,1,NA
+AAGL2020_091,4,1,2,Abouzeid,Bassel,USA.,IL,male,1,VII
+AAGL2020_092,5,3,3,Nassar,Daniel,and Ms. Chen).,NY,male,0.9954,II
+AAGL2020_093,16,6,5,León,Maela,Spain.,NA,female,1,NA
+AAGL2020_094,9,5,3,Michail,Maria,UK. m.michail@bham.ac.uk.,AL,female,0.9927,XI
+AAGL2020_095,5,4,3,Tanvir,Tanvir,India. Electronic address: tanvirsinghtan@gmail.com.,NA,male,0.9681,NA
+AAGL2021_001,8,4,5,Goncharov,A L,Russia.,NA,NA,NA,NA
+AAGL2021_002,8,6,5,Matsuo,Koji,USA. Electronic address: koji.matsuo@med.usc.edu.,CA,male,1,IX
+AAGL2021_003,7,3,5,Tzur,Yossi,Israel. Electronic address: yossitzur@gmail.com.,NA,male,1,NA
+AAGL2021_004,5,2,1,Shapera,Emanuel,USA.,FL,male,0.9979,XI
+AAGL2021_005,6,4,3,Guraslan,Hakan,Turkey. Electronic address: guraslanhakan@gmail.com.,NA,male,1,NA
+AAGL2021_006,9,2,5,Chen,Zihao,China.,NA,male,1,NA
+AAGL2021_007,8,6,3,Lee,Elisabeth,USA.,MD,female,0.9993,IV
+AAGL2021_008,3,1,3,Ambacher,Kristin,Canada.,NA,female,0.9915,NA
+AAGL2021_009,1,1,5,Allen,Leigh,WV.,NA,female,0.9054,NA
+AAGL2021_010,5,3,2,Liu,Ge,People's Republic of China.,NA,male,0.906,NA
+AAGL2021_011,4,2,5,Dumont,F,France. frederic.dumont@ico.unicancer.fr.,NA,NA,NA,NA
+AAGL2021_012,12,2,5,Bogani,Giorgio,Italy. Electronic address: giorgiobogani@yahoo.it.,NA,male,1,NA
+AAGL2021_013,14,13,5,Houri,Ohad,Peta Tikva.,NA,male,1,NA
+AAGL2021_014,3,3,3,Horton,Tammy,UK.,NA,female,0.996,NA
+AAGL2021_015,4,4,4,Cheng,Connie,United States of America. Electronic address: connie.cheng@hmhn.org.,NJ,female,0.9816,III
+AAGL2021_016,3,1,2,St Laurent,Jessica D,USA.,MA,NA,NA,I
+AAGL2021_017,20,9,2,Lim,Pascal,France.,NA,male,0.9961,NA
+AAGL2021_018,20,9,2,Lim,Pascal,France.,NA,male,0.9961,NA
+AAGL2021_019,5,2,3,Kobayashi,Hiroaki,Japan.,NA,male,1,NA
+AAGL2021_020,2,1,5,Vieira,Margarida,Portugal.,NA,female,1,NA
+AAGL2021_021,5,4,5,Thanasa,Anna,Greece.,NA,female,0.9971,NA
+AAGL2021_022,5,1,5,Pereira,Sergio,PRT.,NA,male,0.9946,NA
+AAGL2021_023,2,2,5,Mijatovic,Velja,The Netherlands.,NA,NA,NA,NA
+AAGL2021_024,5,4,4,Pereira,Rita,Portugal. id10080@uminho.pt.,NA,female,0.9972,NA
+AAGL2021_025,5,3,5,Bar-El,Liron,New York. Electronic address: Lironbarel@gmail.com.,NY,male,0.6065,II
+AAGL2021_026,5,1,3,Mrugała,Maja,Poland.,NA,female,1,NA
+AAGL2021_027,3,3,4,Rao,Tanushree,Australia.,NA,NA,NA,NA
+AAGL2021_028,3,3,2,Hardman,Danielle,Florida. Electronic address: dehardman@usf.edu.,FL,female,0.9951,XI
+AAGL2021_029,4,2,4,Beroukhim,Gabriela,Connecticut.,CT,female,0.9951,I
+AAGL2021_030,9,7,5,As-Sanie,Sawsan,Michigan. Electronic address: sassanie@med.umich.edu.,MI,female,1,V
+AAGL2021_031,5,2,5,Becker,Christine,Germany.,NA,female,0.9967,NA
+AAGL2021_032,4,2,5,Sheladiya,Pooja,California (all authors). Electronic address: pshel004@medsch.ucr.edu.,CA,female,1,IX
+AAGL2021_033,6,2,5,Moore,Kenya,USA.,SC,female,0.9192,XI
+AAGL2021_034,1,1,1,Shimada,Kazuyuki,Japan.,NA,NA,NA,NA
+AAGL2021_035,2,2,5,Simko,Sarah,California.,CA,female,0.9971,IX
+AAGL2021_036,2,2,2,Roy,Kelly,USA.,AZ,female,0.8632,VIII
+AAGL2021_037,7,5,5,Kebreab,Ermias,Davis 95616. Electronic address: ekebreab@ucdavis.edu.,CA,male,1,IX
+AAGL2021_038,4,3,2,Chan,Clarice,UK.,NA,female,0.9976,NA
+AAGL2021_039,3,2,3,Romanski,Phillip A,New York. Electronic address: par9114@med.cornell.edu.,NY,NA,NA,II
+AAGL2021_040,8,3,5,Di Spiezio Sardo,Attilio,Departments of Public Health.,NA,male,1,NA
+AAGL2021_041,3,2,2,Hincapie,Maria,Georgia.,GA,female,0.9927,XI
+AAGL2021_042,8,3,5,Di Spiezio Sardo,Attilio,Departments of Public Health.,NA,male,1,NA
+AAGL2021_043,4,2,4,Han,Ling,China.,NA,female,0.9091,NA
+AAGL2021_044,1,1,1,Dave,Abhishek,India.,NA,male,1,NA
+AAGL2021_045,3,2,5,Kim,Soo Jung,Republic of Korea.,NA,NA,NA,NA
+AAGL2021_046,5,2,3,Heraganahally,Subash S,Australia.,NA,NA,NA,NA
+AAGL2021_047,5,2,5,Braxton,Elizabeth Gw,From the Department of Obstetrics and Gynecology.,NA,NA,NA,NA
+AAGL2021_048,12,5,5,Loverro,Matteo,IRCCS.,NA,male,1,NA
+AAGL2021_049,5,3,5,Rosen,Adam,Canada.,NY,male,0.9959,II
+AAGL2021_050,3,2,4,Souza,Claudineia,Brazil.,NA,NA,NA,NA
+AAGL2021_051,5,2,4,Kanno,Kiyoshi,Japan. Electronic address: less_is_more71@yahoo.co.jp.,NA,male,0.9732,NA
+AAGL2021_052,7,2,4,Braxton,Emily,U.K.,NA,female,0.9979,NA
+AAGL2021_053,22,9,5,Barber,Bridget E,Australia.,NA,NA,NA,NA
+AAGL2021_054,3,3,4,Radtke,Sarah,USA.,MD,female,0.9971,IV
+AAGL2021_055,5,2,5,Benlolo,Samantha,Canada. Electronic address: samantha.benlolo@gmail.com.,NA,female,0.998,NA
+AAGL2021_056,5,2,2,Haikal,Samantha,United States.,IL,female,0.998,VII
+AAGL2021_057,11,1,4,Aharon,Devora,New York.,NY,female,1,II
+AAGL2021_058,4,2,4,Lovell,Daniel Y,North Carolina. (Dr. Lovell).,NC,NA,NA,XI
+AAGL2021_059,1,1,5,Chen,Ang,USA.,NC,male,1,XI
+AAGL2021_060,3,2,3,Ramirez-Caban,Laura,USA. Lramirezcaban@gmail.com.,FL,female,0.9969,XI
+AAGL2021_061,2,2,4,Sunkara,Sowmya,Texas.,TX,female,1,X
+AAGL2021_062,16,10,3,Etrusco,Andrea,Italy.,NA,female,0.9875,NA
+AAGL2021_063,13,13,4,Rodolakis,Alexandros,Greece.,NA,male,1,NA
+AAGL2021_064,10,4,2,Ham,In-Hye,Republic of Korea.,NA,NA,NA,NA
+AAGL2021_065,5,1,5,Shu,Michael,Williamsville.,NA,male,0.9947,NA
+AAGL2021_066,9,2,3,Mihetiu,Alin,Romania.,NA,female,0.7561,NA
+AAGL2021_067,8,1,5,Kho,Katherine,Indonesia.,NA,female,0.9972,NA
+AAGL2021_068,5,4,5,Li,Yuan-Li,China.,NA,NA,NA,NA
+AAGL2021_069,9,4,5,Meyer,Raanan,Israel. Electronic address: Raanan.Meyer@cshs.org.,CA,male,1,IX
+AAGL2021_070,6,3,4,Chitkara,Aman,India.,NA,male,0.9147,NA
+AAGL2021_071,3,3,3,Christoffel,Ladina,Switzerland.,NA,female,1,NA
+AAGL2021_072,14,7,4,Ito,Tetsuro,Japan. tito@u-gifu-ms.ac.jp.,NA,NA,NA,NA
+AAGL2021_073,32,26,3,Cornejo,José,Peru.,NA,NA,NA,NA
+AAGL2021_074,4,1,3,Alani,Sanah,Canada.,NA,female,1,NA
+AAGL2021_075,5,4,5,Adamyan,Leila,Russia.,NA,female,0.9998,NA
+AAGL2021_076,1,1,3,Chen,Ang,USA.,NC,male,1,XI
+AAGL2021_077,9,2,5,Young,Robert,USA.,OH,male,0.9958,V
+AAGL2021_078,1,1,3,Carey,Eileen,Ireland.,NA,female,0.9976,NA
+AAGL2021_079,7,3,5,Tappy,Erryn,Texas. Electronic address: Erryn.Tappy@UTSouthwestern.edu.,TX,female,1,X
+AAGL2021_080,3,1,5,Mitchelson,Hayley,Australia.,NA,female,0.9991,NA
+AAGL2021_081,8,2,4,Das,Deepanjana,IL.,IL,NA,NA,VII
+AAGL2021_082,2,2,5,Westbrook,Katherine E,OH westbrk@ccf.org.,OH,NA,NA,V
+AAGL2021_083,2,2,3,Salazar-Villamizar,Mary Elízabeth,Colombia. Electronic address: maryesv@gmail.com.,NA,NA,NA,NA
+AAGL2021_084,5,2,4,Kanno,Kiyoshi,Japan. Electronic address: less_is_more71@yahoo.co.jp.,NA,male,0.9732,NA
+AAGL2021_085,3,3,5,Wondwosen,Mekete,Ethiopia.,NA,NA,NA,NA
+AAGL2021_086,3,3,2,Rao,Tanushree,Australia.,NA,NA,NA,NA
+AAGL2021_087,6,5,3,Cybulsky,Marta,Canada.,NA,female,0.9973,NA
+AAGL2021_088,10,4,5,Nishio,Naoki,Department of Otorhinolaryngology Nagoya University Graduate School of Medicine Nagoya Aichi Japan.,NA,male,0.9555,NA
+AAGL2021_089,2,1,5,Foley,Anne Marie,financial or otherwise.,NY,NA,NA,II
+AAGL2021_090,8,7,2,Quevedo,Amira,FL. Electronic address: amiraquevedo@ufl.edu.,FL,female,1,XI
+AAGL2021_091,7,4,5,Dason,E Shirin,Ontario. Electronic address: Shirin.dason@mail.utoronto.ca.,NA,NA,NA,NA
+AAGL2021_092,3,2,4,Hincapie,Maria,Georgia.,GA,female,0.9927,XI
+AAGL2021_093,7,6,3,Ferrari,Filippo Alberto,Italy.,NA,NA,NA,NA
+AAGL2021_094,13,3,3,Elfeky,Adel,UK.,NA,male,0.5558,NA
+AAGL2021_095,15,7,5,Dubernard,G,France.,NA,NA,NA,NA
 AAGL2021_096,6,0,5,Ishiura,Yoshihisa,NA,NA,NA,NA,NA
-AAGL2021_097,4,2,3,Acosta,Daniel,FL,United States.,male,0.9954,XI
-AAGL2021_098,6,1,2,Vercellini,Paolo,NA,Italy.,male,1,NA
-AAGL2022_001,7,6,5,Stewart,Elizabeth A,MN,MN. Electronic address: stewart.elizabeth@mayo.edu.,NA,NA,VI
-AAGL2022_002,3,3,5,Katon,Jodie G,VA,California.,NA,NA,IV
-AAGL2022_003,5,5,5,Eisenstein,David,MI,USA.,male,0.9963,V
-AAGL2022_004,3,3,3,Kirschen,Gregory W,MD,USA. Gkirsch7@jh.edu.,NA,NA,IV
-AAGL2022_005,5,5,5,Sinha,Annika,NC,NC. Electronic address: annikasinha@gmail.com.,female,1,XI
-AAGL2022_006,9,3,4,Al Baalharith,Maha,NA,SAU.,female,1,NA
-AAGL2022_007,10,3,5,Richtarova,Adela,NA,Czech Republic adela.richtarova@vfn.cz.,female,1,NA
-AAGL2022_008,4,2,2,Duncan,Jordann-Mishael,AZ,USA.,NA,NA,VIII
-AAGL2022_009,10,3,5,Barra,Fabio,NA,Italy.,male,1,NA
-AAGL2022_010,3,3,1,Noar,Mark,MD,USA.,male,0.9966,IV
-AAGL2022_011,5,2,5,Zorzi,Chantal,UK,UK.,female,0.9992,NA
-AAGL2022_012,7,4,5,Mak,Justin,NA,USA.,male,0.9947,NA
-AAGL2022_013,12,8,5,Allen,Sophie,UK,UK. sophie.allen@icr.ac.uk.,female,0.9992,NA
-AAGL2022_014,3,3,2,Talbott,Jennifer,AZ,AZ. Electronic address: drjennifertalbott@gmail.com.,female,0.9969,VIII
-AAGL2022_015,46,42,5,Ledermann,J A,UK,UK. Electronic address: clinicalguidelines@esmo.org.,NA,NA,NA
-AAGL2022_016,7,3,5,Smith,Rachael B,AZ,USA. Electronic address: rachaelsmith.DO@gmail.com.,NA,NA,VIII
-AAGL2022_017,8,4,5,Cameo,Tamara,NA,and Huang).,female,0.997,NA
-AAGL2022_018,10,2,3,Cain,Abigail,NA,Texas (all authors).,female,0.9982,NA
-AAGL2022_019,8,4,5,Lenfant,Louis,NA,France.,male,0.9933,NA
-AAGL2022_020,5,2,5,Eoh,Kyung Jin,NA,Republic of Korea.,NA,NA,NA
-AAGL2022_021,6,3,5,Min,Caroline J,MO,MO. Electronic address: carolinemin@wustl.edu.,NA,NA,VII
-AAGL2022_022,15,8,5,Saka,Natsumi,NA,Japan.,female,1,NA
-AAGL2022_023,6,3,3,Till,Sara R,NA,Michigan.. Electronic address: tillsa@med.umich.edu.,NA,NA,NA
-AAGL2022_024,3,2,3,Charles,François,NA,Belgium.,NA,NA,NA
-AAGL2022_025,10,7,5,Cohen,Nave,NA,Israel.,female,1,NA
-AAGL2022_026,11,3,3,Hui,Mason,NA,Santos).,male,0.9866,NA
-AAGL2022_027,3,3,4,Batumalai,Vikneswary,NA,Australia.,NA,NA,NA
-AAGL2022_028,8,3,4,Greenberg,Anya L,CA,USA.,NA,NA,IX
-AAGL2022_029,6,3,1,Ramani,Sangeeta,CT,and Andikyan).,female,1,I
-AAGL2022_030,8,4,3,Ward,Catherine L,NA,South Africa.,NA,NA,NA
-AAGL2022_031,6,2,5,Levin,Ishai,NA,Israel.,NA,NA,NA
-AAGL2022_032,7,5,5,Adamyan,Leila,NA,Russia.,female,0.9998,NA
-AAGL2022_033,5,4,5,Yastı,Ahmet Ç,NA,Turkey.,NA,NA,NA
-AAGL2022_034,7,3,1,Li,Fiona G,NA,Australia. Electronic address: fiona.li@unsw.edu.au.,NA,NA,NA
-AAGL2022_035,5,4,5,Cooke,Carly M,NA,Canada.,NA,NA,NA
-AAGL2022_036,8,4,5,Musselman,Kelsey,NA,Maryland. Electronic address: kelsey.musselman@gmail.com.,female,0.9684,NA
-AAGL2022_037,5,1,5,Tran,Tam,NA,USA.,male,0.5089,NA
-AAGL2022_038,6,5,3,Miller,Stephania T,TN,USA. Electronic address: smiller@mmc.edu.,NA,NA,X
-AAGL2022_039,8,5,5,Rosen,Adam,NA,Canada. Electronic address: adam.rosen@mail.utoronto.ca.,male,0.9959,NA
-AAGL2022_040,8,6,4,Adamyan,Leila,NA,Russia.,female,0.9998,NA
-AAGL2022_041,5,2,5,McKenna,Megan,UK,UK.,female,0.9976,NA
-AAGL2022_042,11,1,4,Montauban,Pierre,UK,UK.,male,0.995,NA
-AAGL2022_043,5,3,4,Boyd,Sarah S,PA,USA. sboyd@pennstatehealth.psu.edu.,NA,NA,III
-AAGL2022_044,5,5,3,Malekzadeh,Maral,NA,USA.,female,1,NA
-AAGL2022_045,12,3,5,Mathewlynn,S,UK,UK.,NA,NA,NA
-AAGL2022_046,1,1,1,Saini,Sunil,NA,India.,male,1,NA
-AAGL2022_047,8,5,5,Bogani,Giorgio,NA,Italy. Electronic address: giorgiobogani@yahoo.it.,male,1,NA
-AAGL2022_048,17,2,1,Su,Hankun,NA,China.,NA,NA,NA
-AAGL2022_049,5,3,5,Adjei,Naomi N,MD,USA.,NA,NA,IV
-AAGL2022_050,5,1,5,Dai,Zhen,NA,China.,male,1,NA
-AAGL2022_051,6,4,4,Taiym,Deanna,IL,USA.,female,0.9981,VII
-AAGL2022_052,8,2,5,Zhang,Yuqi,GI,USA.,NA,NA,NA
-AAGL2022_053,29,17,5,Bogani,Giorgio,NA,Italy. Electronic address: giorgiobogani@yahoo.it.,male,1,NA
-AAGL2022_054,5,3,5,Shivji,Azra,ON,ON. Electronic address: azra.shivji@mail.utoronto.ca.,female,0.98,II
+AAGL2021_097,4,2,3,Acosta,Daniel,United States.,FL,male,0.9954,XI
+AAGL2021_098,6,1,2,Vercellini,Paolo,Italy.,NA,male,1,NA
+AAGL2022_001,7,6,5,Stewart,Elizabeth A,MN. Electronic address: stewart.elizabeth@mayo.edu.,MN,NA,NA,VI
+AAGL2022_002,3,3,5,Katon,Jodie G,California.,CA,NA,NA,IX
+AAGL2022_003,5,5,5,Eisenstein,David,USA.,MI,male,0.9963,V
+AAGL2022_004,3,3,3,Kirschen,Gregory W,USA. Gkirsch7@jh.edu.,MD,NA,NA,IV
+AAGL2022_005,5,5,5,Sinha,Annika,NC. Electronic address: annikasinha@gmail.com.,NC,female,1,XI
+AAGL2022_006,9,3,4,Al Baalharith,Maha,SAU.,NA,female,1,NA
+AAGL2022_007,10,3,5,Richtarova,Adela,Czech Republic adela.richtarova@vfn.cz.,NA,female,1,NA
+AAGL2022_008,4,2,2,Duncan,Jordann-Mishael,USA.,AZ,NA,NA,VIII
+AAGL2022_009,10,3,5,Barra,Fabio,Italy.,NA,male,1,NA
+AAGL2022_010,3,3,1,Noar,Mark,USA.,MD,male,0.9966,IV
+AAGL2022_011,5,2,5,Zorzi,Chantal,UK.,NA,female,0.9992,NA
+AAGL2022_012,7,4,5,Mak,Justin,USA.,CA,male,0.9947,IX
+AAGL2022_013,12,8,5,Allen,Sophie,UK. sophie.allen@icr.ac.uk.,NA,female,0.9992,NA
+AAGL2022_014,3,3,2,Talbott,Jennifer,AZ. Electronic address: drjennifertalbott@gmail.com.,MN,female,0.9969,VI
+AAGL2022_015,46,42,5,Ledermann,J A,UK. Electronic address: clinicalguidelines@esmo.org.,NA,NA,NA,NA
+AAGL2022_016,7,3,5,Smith,Rachael B,USA. Electronic address: rachaelsmith.DO@gmail.com.,AZ,NA,NA,VIII
+AAGL2022_017,8,4,5,Cameo,Tamara,and Huang).,NA,female,0.997,NA
+AAGL2022_018,10,2,3,Cain,Abigail,Texas (all authors).,TX,female,0.9982,X
+AAGL2022_019,8,4,5,Lenfant,Louis,France.,NA,male,0.9933,NA
+AAGL2022_020,5,2,5,Eoh,Kyung Jin,Republic of Korea.,NA,NA,NA,NA
+AAGL2022_021,6,3,5,Min,Caroline J,MO. Electronic address: carolinemin@wustl.edu.,WA,NA,NA,VIII
+AAGL2022_022,15,8,5,Saka,Natsumi,Japan.,NA,female,1,NA
+AAGL2022_023,6,3,3,Till,Sara R,Michigan.. Electronic address: tillsa@med.umich.edu.,MI,NA,NA,V
+AAGL2022_024,3,2,3,Charles,François,Belgium.,NA,NA,NA,NA
+AAGL2022_025,10,7,5,Cohen,Nave,Israel.,NA,female,1,NA
+AAGL2022_026,11,3,3,Hui,Mason,Santos).,TX,male,0.9866,X
+AAGL2022_027,3,3,4,Batumalai,Vikneswary,Australia.,NA,NA,NA,NA
+AAGL2022_028,8,3,4,Greenberg,Anya L,USA.,CA,NA,NA,IX
+AAGL2022_029,6,3,1,Ramani,Sangeeta,and Andikyan).,NA,female,1,NA
+AAGL2022_030,8,4,3,Ward,Catherine L,South Africa.,NA,NA,NA,NA
+AAGL2022_031,6,2,5,Levin,Ishai,Israel.,NA,NA,NA,NA
+AAGL2022_032,7,5,5,Adamyan,Leila,Russia.,NA,female,0.9998,NA
+AAGL2022_033,5,4,5,Yastı,Ahmet Ç,Turkey.,NA,NA,NA,NA
+AAGL2022_034,7,3,1,Li,Fiona G,Australia. Electronic address: fiona.li@unsw.edu.au.,NA,NA,NA,NA
+AAGL2022_035,5,4,5,Cooke,Carly M,Canada.,NA,NA,NA,NA
+AAGL2022_036,8,4,5,Musselman,Kelsey,Maryland. Electronic address: kelsey.musselman@gmail.com.,MD,female,0.9684,IV
+AAGL2022_037,5,1,5,Tran,Tam,USA.,NY,male,0.5089,II
+AAGL2022_038,6,5,3,Miller,Stephania T,USA. Electronic address: smiller@mmc.edu.,TN,NA,NA,X
+AAGL2022_039,8,5,5,Rosen,Adam,Canada. Electronic address: adam.rosen@mail.utoronto.ca.,NA,male,0.9959,NA
+AAGL2022_040,8,6,4,Adamyan,Leila,Russia.,NA,female,0.9998,NA
+AAGL2022_041,5,2,5,McKenna,Megan,UK.,NA,female,0.9976,NA
+AAGL2022_042,11,1,4,Montauban,Pierre,UK.,NA,male,0.995,NA
+AAGL2022_043,5,3,4,Boyd,Sarah S,USA. sboyd@pennstatehealth.psu.edu.,PA,NA,NA,III
+AAGL2022_044,5,5,3,Malekzadeh,Maral,USA.,MD,female,1,IV
+AAGL2022_045,12,3,5,Mathewlynn,S,UK.,NA,NA,NA,NA
+AAGL2022_046,1,1,1,Saini,Sunil,India.,NA,male,1,NA
+AAGL2022_047,8,5,5,Bogani,Giorgio,Italy. Electronic address: giorgiobogani@yahoo.it.,NA,male,1,NA
+AAGL2022_048,17,2,1,Su,Hankun,China.,NA,NA,NA,NA
+AAGL2022_049,5,3,5,Adjei,Naomi N,USA.,TX,NA,NA,X
+AAGL2022_050,5,1,5,Dai,Zhen,China.,NA,male,1,NA
+AAGL2022_051,6,4,4,Taiym,Deanna,USA.,IL,female,0.9981,VII
+AAGL2022_052,8,2,5,Zhang,Yuqi,USA.,TX,NA,NA,X
+AAGL2022_053,29,17,5,Bogani,Giorgio,Italy. Electronic address: giorgiobogani@yahoo.it.,NA,male,1,NA
+AAGL2022_054,5,3,5,Shivji,Azra,ON. Electronic address: azra.shivji@mail.utoronto.ca.,NA,female,0.98,NA
 AAGL2022_055,4,0,4,Gencer,Aylin,NA,NA,female,0.9993,NA
-AAGL2022_056,5,4,5,Horwood,Genevieve,ON,Canada. ghorwood@toh.ca.,female,0.9992,II
-AAGL2022_057,3,2,1,Marguerie,Monique,NA,Alta. monique.marguerie@albertahealthservices.ca.,female,0.9954,NA
-AAGL2022_058,3,2,5,Sancar,Serpil,NA,Turkey. Electronic address: serpil.sancar@sbu.edu.tr.,NA,NA,NA
-AAGL2022_059,6,3,5,Fan,Wei,NA,China.,male,0.7691,NA
-AAGL2022_060,20,12,3,Fu,Kai,NA,China kaifu@sjtu.edu.cn zhangcq@sjtu.edu.cn.,male,0.827,NA
-AAGL2022_061,4,4,4,Ryan,Emer,NA,New Zealand.,female,0.892,NA
-AAGL2022_062,7,5,5,Fajardo,Olga M,WI,USA.,NA,NA,VI
-AAGL2022_063,6,3,4,Ruhotina,Merima,VT,VT. Electronic address: Merima.ruhotina@uvmhealth.org.,female,1,I
-AAGL2022_064,3,3,5,Shu,Mincong,NA,China.,NA,NA,NA
-AAGL2022_065,12,1,2,Seltzer,Harrison,MI,USA.,male,0.9961,V
-AAGL2022_066,13,3,5,Marchand,Greg J,NA,USA.,NA,NA,NA
-AAGL2022_067,13,8,3,Bahadoer,Renu R,RC,the Netherlands.,NA,NA,NA
-AAGL2022_068,5,3,5,Maudot,Constance,AP,France.,female,0.9973,AFS
-AAGL2022_069,6,4,5,Lu,Keji,NA,China.,NA,NA,NA
-AAGL2022_070,8,5,3,Arruda,Jonas,NA,Germany.,male,0.9984,NA
-AAGL2022_071,6,2,2,Chan,I-San,NA,Taiwan.,NA,NA,NA
-AAGL2022_072,9,3,5,Dedes,Ioannis,NA,Switzerland.,male,1,NA
-AAGL2022_073,5,4,5,Yastı,Ahmet Ç,NA,Turkey.,NA,NA,NA
-AAGL2022_074,6,3,5,Mishra,I,UK,UK.,NA,NA,NA
-AAGL2022_075,5,3,5,Kobylianskii,Anna,NA,Canada.,female,0.9971,NA
-AAGL2022_076,9,4,5,Bruno,Matteo,NA,Italy.,male,1,NA
-AAGL2022_077,6,1,5,Mára,Michal,NA,Czech Republic.,female,0.5163,NA
-AAGL2022_078,6,3,2,Bar-El,Liron,NA,USA.,male,0.6065,NA
-AAGL2022_079,2,2,5,Frost,Allison,NC,NC.,female,0.9914,XI
-AAGL2022_080,9,5,4,Cao,Xianghua,NA,China.,NA,NA,NA
-AAGL2022_081,8,4,5,Barel,Oshri,NA,and Levy). Electronic address: Oshrib@assuta.co.il.,NA,NA,NA
-AAGL2022_082,7,4,5,Zizolfi,Brunella,II,Italy. Electronic address: brunelllazizolfi@hotmail.it.,female,1,NA
-AAGL2022_083,11,11,5,Allahqoli,Leila,NA,Iran.,female,0.9998,NA
-AAGL2022_084,4,4,4,Bahrami,Foruzan,QC,QC.,NA,NA,II
-AAGL2022_085,2,2,2,Udofa,Edidiong,IL,USA.,NA,NA,VII
-AAGL2022_086,11,8,5,Lou,Kai,NA,China.,male,0.827,NA
-AAGL2022_087,5,4,5,Miazga,Elizabeth,ON,ON. Electronic address: elizabeth.miazga@utoronto.ca.,female,0.9969,II
-AAGL2022_088,4,4,4,Shiplo,Samantha N,NA,Canada. Electronic address: sam_shiplo@hotmail.com.,NA,NA,NA
-AAGL2022_089,6,2,5,Wu,Ziang,NA,China.,NA,NA,NA
-AAGL2022_090,3,3,5,Pondugula,Nishita,NA,Yale School of Medicine.,female,1,NA
-AAGL2022_091,6,0,4,Ishiura,Yoshihisa,NA,NA,NA,NA,NA
-AAGL2022_092,6,1,2,Johansson,Cecilia,NA,Sweden.,female,0.9977,NA
-AAGL2022_093,7,5,4,Fox,Carolyn,NC,USA.,female,0.9972,XI
-AAGL2022_094,8,1,4,O'Brien,M Shea,NA,Kentucky.,NA,NA,NA
-AAGL2022_095,3,2,4,Lewis,Gabriella,UK,UK.,female,0.9994,NA
-AAGL2022_096,7,2,5,Kanno,Kiyoshi,NA,Japan. less_is_more71@yahoo.co.jp.,male,0.9732,NA
-AAGL2022_097,5,1,4,Isono,Wataru,NA,Japan.,male,1,NA
-AAGL2022_098,7,7,4,Pickett,Charlotte M,NA,USA.,NA,NA,NA
-AAGL2022_099,2,2,3,Fitzgerald,Ailene,NA,Australia.,female,1,NA
-AAGL2022_100,5,1,2,Fukuoka,Hinata,NA,JPN.,female,0.9261,NA
-AAGL2023_001,14,4,5,Takenaka,Shin,NA,Japan.,male,0.8535,NA
-AAGL2023_002,5,2,5,Velthuijs,Eva L M,VU,The Netherlands.,NA,NA,NA
-AAGL2023_003,6,3,5,Levin,Ishai,NA,Israel. Electronic address: ishail@tlvmc.gov.il.,NA,NA,NA
-AAGL2023_004,8,3,5,Umesh,Amith,CA,CA.,male,1,IX
-AAGL2023_005,4,3,5,Namboodiri,Surya L,NA,USA.,NA,NA,NA
-AAGL2023_006,2,2,2,Pfeuti,Courtney Kay,NA,Deleware (all authors). Electronic address: ckpfeuti@icloud.com.,NA,NA,NA
-AAGL2023_007,5,3,5,González Peña,Tavia,NA,and Fajardo). Electronic address: tavia.gonzalez.pena@vumc.org.,female,1,NA
-AAGL2023_008,3,1,3,Johannesson,Ulrika,NA,Sweden.,female,1,NA
-AAGL2023_009,7,4,5,Al-Hendy,Ayman,IL,IL. Electronic address: aalhendy@uchicago.edu.,male,0.9818,VII
-AAGL2023_010,4,3,5,Ziadi,Chiraz,NA,Spain.,NA,NA,NA
-AAGL2023_011,7,1,5,Mitro,Susanna D,NA,Massachusetts.,NA,NA,NA
-AAGL2023_012,9,7,2,Baldini,Giorgio Maria,NA,Italy.,NA,NA,NA
-AAGL2023_013,6,5,5,Slotman,Derk J,NA,the Netherlands. Electronic address: d.j.slotman@isala.nl.,NA,NA,NA
-AAGL2023_014,6,2,3,Sasse,Simone A,NY,USA.,NA,NA,II
-AAGL2023_015,8,8,5,Kajal,D,ON,Canada. Electronic address: dilkash.kajal@uhn.ca.,NA,NA,II
-AAGL2023_016,12,9,5,Istrate-Ofiţeru,Anca-Maria,NA,Romania.,NA,NA,NA
-AAGL2023_017,44,39,5,Arias,Alfonso Martinez,NA,Spain.,NA,NA,NA
-AAGL2023_018,6,1,5,Zaritsky,Eve F,NA,California.,NA,NA,NA
-AAGL2023_019,6,3,5,Stamatopoulos,Nicole,NA,Australia.,female,0.9968,NA
-AAGL2023_020,4,3,5,Mikhail,Emad,NA,VanDeman and Malcom). Electronic address: emikhail@usf.edu.,male,1,NA
-AAGL2023_021,6,5,5,Kanti,Fleur Serge,NA,Canada.,NA,NA,NA
-AAGL2023_022,16,5,5,Ahmad,Gulzar,IT,Pakistan.,NA,NA,NA
-AAGL2023_023,9,7,5,As-Sanie,Sawsan,NA,Michigan. Electronic address: sassanie@med.umich.edu.,female,1,NA
-AAGL2023_024,4,4,2,Lunardhi,Alicia,NA,California.,female,0.997,NA
-AAGL2023_025,1,1,1,Fisher,Jane,UK,UK.,female,0.9971,NA
-AAGL2023_026,8,1,5,Zhou,Ruiqiong,NA,China.,NA,NA,NA
-AAGL2023_027,8,4,5,Barel,Oshri,NA,and Levy). Electronic address: Oshrib@assuta.co.il.,NA,NA,NA
-AAGL2023_028,5,3,5,Twidale,Emily K,NA,New Zealand.,NA,NA,NA
-AAGL2023_029,4,4,4,Zelivianskaia,Anna,NA,Pennsylvania (Dr. Zelivianskaia). Electronic address: anna.zelivianskaia@tuhs.temple.edu.,female,0.9971,NA
-AAGL2023_030,6,3,5,Fenske,Brooke M,NA,Minnesota.,NA,NA,NA
-AAGL2023_031,8,2,5,Jian,Minyu,NA,China.,NA,NA,NA
-AAGL2023_032,1,1,5,Hollis,Aidan,NA,Canada. ahollis@ucalgary.ca.,male,0.9734,NA
-AAGL2023_033,1,1,4,Orsi,Franco,NA,Italy.,male,1,NA
-AAGL2023_034,2,1,5,Ayodele,Aderonke,NC,USA.,female,1,XI
-AAGL2023_035,16,4,5,Saeed,Anum,PA,USA.,female,1,III
-AAGL2023_036,4,3,5,Malkan,Nur Derya,NA,TUR.,NA,NA,NA
-AAGL2023_037,15,6,5,Abu Halimah,Jalal,NA,SAU.,male,1,NA
-AAGL2023_038,5,2,4,Chen,Ximing,NA,China.,NA,NA,NA
-AAGL2023_039,2,1,5,Rees,Coral,NA,Wales.,female,0.9856,NA
-AAGL2023_040,5,2,5,Nakagawa,Masataka,NA,Japan.,male,1,NA
-AAGL2023_041,4,2,4,GiglioAyers,Patricia,NA,Rhode Island (all authors).. Electronic address: pgiglioayers@wihri.org.,female,0.997,NA
-AAGL2023_042,14,1,5,McCormack,Lalla,NA,Australia.,female,1,NA
-AAGL2023_043,3,2,5,Yang,Qiannan,TX,USA.,NA,NA,X
-AAGL2023_044,3,3,5,Anderson,Michaela R,PA,USA.,NA,NA,III
-AAGL2023_045,2,2,5,Rees,Colin,UK,UK.,male,0.996,NA
-AAGL2023_046,9,4,5,Matot,Ran,NA,Israel. Electronic address: ran.matoth@gmail.com.,male,1,NA
-AAGL2023_047,9,8,1,Ferreira,Nestor Lemos,NA,Brazil.,NA,NA,NA
-AAGL2023_048,5,2,5,Wu,Jenny,NA,USA.,female,0.9937,NA
-AAGL2023_049,5,2,4,Isaac,Amital,MA,(all authors).,NA,NA,I
+AAGL2022_056,5,4,5,Horwood,Genevieve,Canada. ghorwood@toh.ca.,NA,female,0.9992,NA
+AAGL2022_057,3,2,1,Marguerie,Monique,Alta. monique.marguerie@albertahealthservices.ca.,NA,female,0.9954,NA
+AAGL2022_058,3,2,5,Sancar,Serpil,Turkey. Electronic address: serpil.sancar@sbu.edu.tr.,NA,NA,NA,NA
+AAGL2022_059,6,3,5,Fan,Wei,China.,NA,male,0.7691,NA
+AAGL2022_060,20,12,3,Fu,Kai,China kaifu@sjtu.edu.cn zhangcq@sjtu.edu.cn.,NA,male,0.827,NA
+AAGL2022_061,4,4,4,Ryan,Emer,New Zealand.,NA,female,0.892,NA
+AAGL2022_062,7,5,5,Fajardo,Olga M,USA.,WI,NA,NA,VI
+AAGL2022_063,6,3,4,Ruhotina,Merima,VT. Electronic address: Merima.ruhotina@uvmhealth.org.,VT,female,1,I
+AAGL2022_064,3,3,5,Shu,Mincong,China.,NA,NA,NA,NA
+AAGL2022_065,12,1,2,Seltzer,Harrison,USA.,MI,male,0.9961,V
+AAGL2022_066,13,3,5,Marchand,Greg J,USA.,AZ,NA,NA,VIII
+AAGL2022_067,13,8,3,Bahadoer,Renu R,the Netherlands.,NA,NA,NA,NA
+AAGL2022_068,5,3,5,Maudot,Constance,France.,NA,female,0.9973,NA
+AAGL2022_069,6,4,5,Lu,Keji,China.,NA,NA,NA,NA
+AAGL2022_070,8,5,3,Arruda,Jonas,Germany.,NA,male,0.9984,NA
+AAGL2022_071,6,2,2,Chan,I-San,Taiwan.,NA,NA,NA,NA
+AAGL2022_072,9,3,5,Dedes,Ioannis,Switzerland.,NA,male,1,NA
+AAGL2022_073,5,4,5,Yastı,Ahmet Ç,Turkey.,NA,NA,NA,NA
+AAGL2022_074,6,3,5,Mishra,I,UK.,AL,NA,NA,XI
+AAGL2022_075,5,3,5,Kobylianskii,Anna,Canada.,NY,female,0.9971,II
+AAGL2022_076,9,4,5,Bruno,Matteo,Italy.,NA,male,1,NA
+AAGL2022_077,6,1,5,Mára,Michal,Czech Republic.,NA,female,0.5163,NA
+AAGL2022_078,6,3,2,Bar-El,Liron,USA.,CA,male,0.6065,IX
+AAGL2022_079,2,2,5,Frost,Allison,NC.,NC,female,0.9914,XI
+AAGL2022_080,9,5,4,Cao,Xianghua,China.,NA,NA,NA,NA
+AAGL2022_081,8,4,5,Barel,Oshri,and Levy). Electronic address: Oshrib@assuta.co.il.,NA,NA,NA,NA
+AAGL2022_082,7,4,5,Zizolfi,Brunella,Italy. Electronic address: brunelllazizolfi@hotmail.it.,NA,female,1,NA
+AAGL2022_083,11,11,5,Allahqoli,Leila,Iran.,NA,female,0.9998,NA
+AAGL2022_084,4,4,4,Bahrami,Foruzan,QC.,NA,NA,NA,NA
+AAGL2022_085,2,2,2,Udofa,Edidiong,USA.,IL,NA,NA,VII
+AAGL2022_086,11,8,5,Lou,Kai,China.,NA,male,0.827,NA
+AAGL2022_087,5,4,5,Miazga,Elizabeth,ON. Electronic address: elizabeth.miazga@utoronto.ca.,NA,female,0.9969,NA
+AAGL2022_088,4,4,4,Shiplo,Samantha N,Canada. Electronic address: sam_shiplo@hotmail.com.,NA,NA,NA,NA
+AAGL2022_089,6,2,5,Wu,Ziang,China.,NA,NA,NA,NA
+AAGL2022_090,3,3,5,Pondugula,Nishita,Yale School of Medicine.,CT,female,1,I
+AAGL2023_001,14,4,5,Takenaka,Shin,Japan.,NA,male,0.8535,NA
+AAGL2023_002,5,2,5,Velthuijs,Eva L M,The Netherlands.,NA,NA,NA,NA
+AAGL2023_003,6,3,5,Levin,Ishai,Israel. Electronic address: ishail@tlvmc.gov.il.,NA,NA,NA,NA
+AAGL2023_004,8,3,5,Umesh,Amith,CA.,CA,male,1,IX
+AAGL2023_005,4,3,5,Namboodiri,Surya L,USA.,TX,NA,NA,X
+AAGL2023_006,2,2,2,Pfeuti,Courtney Kay,Deleware (all authors). Electronic address: ckpfeuti@icloud.com.,NJ,NA,NA,III
+AAGL2023_007,5,3,5,González Peña,Tavia,and Fajardo). Electronic address: tavia.gonzalez.pena@vumc.org.,TN,female,1,X
+AAGL2023_008,3,1,3,Johannesson,Ulrika,Sweden.,NA,female,1,NA
+AAGL2023_009,7,4,5,Al-Hendy,Ayman,IL. Electronic address: aalhendy@uchicago.edu.,IL,male,0.9818,VII
+AAGL2023_010,4,3,5,Ziadi,Chiraz,Spain.,NA,NA,NA,NA
+AAGL2023_011,7,1,5,Mitro,Susanna D,Massachusetts.,MA,NA,NA,I
+AAGL2023_012,9,7,2,Baldini,Giorgio Maria,Italy.,NA,NA,NA,NA
+AAGL2023_013,6,5,5,Slotman,Derk J,the Netherlands. Electronic address: d.j.slotman@isala.nl.,NA,NA,NA,NA
+AAGL2023_014,6,2,3,Sasse,Simone A,USA.,NY,NA,NA,II
+AAGL2023_015,8,8,5,Kajal,D,Canada. Electronic address: dilkash.kajal@uhn.ca.,NA,NA,NA,NA
+AAGL2023_016,12,9,5,Istrate-Ofiţeru,Anca-Maria,Romania.,NA,NA,NA,NA
+AAGL2023_017,44,39,5,Arias,Alfonso Martinez,Spain.,NA,NA,NA,NA
+AAGL2023_018,6,1,5,Zaritsky,Eve F,California.,CA,NA,NA,IX
+AAGL2023_019,6,3,5,Stamatopoulos,Nicole,Australia.,NA,female,0.9968,NA
+AAGL2023_020,4,3,5,Mikhail,Emad,VanDeman and Malcom). Electronic address: emikhail@usf.edu.,FL,male,1,XI
+AAGL2023_021,6,5,5,Kanti,Fleur Serge,Canada.,NA,NA,NA,NA
+AAGL2023_022,16,5,5,Ahmad,Gulzar,Pakistan.,NA,NA,NA,NA
+AAGL2023_023,9,7,5,As-Sanie,Sawsan,Michigan. Electronic address: sassanie@med.umich.edu.,MI,female,1,V
+AAGL2023_024,4,4,2,Lunardhi,Alicia,California.,CA,female,0.997,IX
+AAGL2023_025,1,1,1,Fisher,Jane,UK.,NA,female,0.9971,NA
+AAGL2023_026,8,1,5,Zhou,Ruiqiong,China.,NA,NA,NA,NA
+AAGL2023_027,8,4,5,Barel,Oshri,and Levy). Electronic address: Oshrib@assuta.co.il.,NA,NA,NA,NA
+AAGL2023_028,5,3,5,Twidale,Emily K,New Zealand.,NA,NA,NA,NA
+AAGL2023_029,4,4,4,Zelivianskaia,Anna,Pennsylvania (Dr. Zelivianskaia). Electronic address: anna.zelivianskaia@tuhs.temple.edu.,PA,female,0.9971,III
+AAGL2023_030,6,3,5,Fenske,Brooke M,Minnesota.,MN,NA,NA,VI
+AAGL2023_031,8,2,5,Jian,Minyu,China.,NA,NA,NA,NA
+AAGL2023_032,1,1,5,Hollis,Aidan,Canada. ahollis@ucalgary.ca.,NA,male,0.9734,NA
+AAGL2023_033,1,1,4,Orsi,Franco,Italy.,NA,male,1,NA
+AAGL2023_034,2,1,5,Ayodele,Aderonke,USA.,NC,female,1,XI
+AAGL2023_035,16,4,5,Saeed,Anum,USA.,PA,female,1,III
+AAGL2023_036,4,3,5,Malkan,Nur Derya,TUR.,NA,NA,NA,NA
+AAGL2023_037,15,6,5,Abu Halimah,Jalal,SAU.,NA,male,1,NA
+AAGL2023_038,5,2,4,Chen,Ximing,China.,NA,NA,NA,NA
+AAGL2023_039,2,1,5,Rees,Coral,Wales.,NA,female,0.9856,NA
+AAGL2023_040,5,2,5,Nakagawa,Masataka,Japan.,NA,male,1,NA
+AAGL2023_041,4,2,4,GiglioAyers,Patricia,Rhode Island (all authors).. Electronic address: pgiglioayers@wihri.org.,RI,female,0.997,I
+AAGL2023_042,14,1,5,McCormack,Lalla,Australia.,NA,female,1,NA
+AAGL2023_043,3,2,5,Yang,Qiannan,USA.,TX,NA,NA,X
+AAGL2023_044,3,3,5,Anderson,Michaela R,USA.,PA,NA,NA,III
+AAGL2023_045,2,2,5,Rees,Colin,UK.,NA,male,0.996,NA
+AAGL2023_046,9,4,5,Matot,Ran,Israel. Electronic address: ran.matoth@gmail.com.,NA,male,1,NA
+AAGL2023_047,9,8,1,Ferreira,Nestor Lemos,Brazil.,NA,NA,NA,NA
+AAGL2023_048,5,2,5,Wu,Jenny,USA.,NC,female,0.9937,XI
+AAGL2023_049,5,2,4,Isaac,Amital,(all authors).,MA,NA,NA,I
 AAGL2023_050,2,0,4,An,Eunmi,NA,NA,NA,NA,NA
-AAGL2023_051,10,5,5,Xiao,Lekui,MN,USA. xiao.lekui@mayo.edu.,NA,NA,VI
-AAGL2023_052,4,2,5,Bak,B M,MN,USA.,NA,NA,VI
-AAGL2023_053,7,2,5,Garrett,Celine,NA,Australia. celinegarrett@gmail.com.,female,1,NA
-AAGL2023_054,7,2,5,Kavoussi,Arman,NA,Texas.,male,1,NA
-AAGL2023_055,4,2,5,Marwah,Vikas,NA,India.,male,1,NA
-AAGL2023_056,6,4,4,Sadowski,Karol,NA,Poland.,female,0.8965,NA
-AAGL2023_057,9,9,5,Chen,Innie,ON,Canada. Electronic address: ichen@toh.ca.,NA,NA,II
-AAGL2023_058,9,5,5,Swift,Brenna E,NA,Ontario. Electronic address: brenna.swift@mail.utoronto.ca.,NA,NA,NA
-AAGL2023_059,9,1,5,Gabra,Martina,NA,Arizona.,female,0.9974,NA
-AAGL2023_060,2,2,3,Edelson,Mia,VA,VA (Ms. Edelson and Dr. Casey). Electronic address: miape@vt.edu.,female,0.9987,IV
-AAGL2023_061,7,4,3,Pando,Cleiton,NA,Brazil.,NA,NA,NA
-AAGL2023_062,2,2,3,Namazi,Golnaz,NA,California. Electronic address: golnaz.namazi@medsch.ucr.edu.,female,1,NA
-AAGL2023_063,3,2,4,Russo,Miguel Luna,NA,Ohio.,NA,NA,NA
-AAGL2023_064,11,6,4,Puntambekar,Shailesh,NA,India. (Dr. Puntambekar).,NA,NA,NA
-AAGL2023_065,8,6,2,Andhare,Mangesh G,NA,India.,NA,NA,NA
-AAGL2023_066,5,3,3,Bogani,Giorgio,NA,Italy.,male,1,NA
-AAGL2023_067,6,3,2,Krug,Isabel,NA,Australia.,female,0.9851,NA
-AAGL2023_068,8,1,5,Berkowitz,Loni,NA,Chile.,female,0.9724,NA
-AAGL2023_069,8,8,5,Harvey,Luke,NA,France. Electronic address: luke.harvey.etu@univ-lemans.fr.,male,0.9976,NA
-AAGL2023_070,8,4,5,Jones,Georgina L,UK,UK.,NA,NA,NA
-AAGL2023_071,5,3,5,La Via,Luigi,NA,Italy.,male,1,NA
-AAGL2023_072,6,4,3,Ortiz,Bryan,NA,Honduras.,male,0.9951,NA
-AAGL2023_073,7,6,3,Fransvea,Pietro,NA,Italy.,male,1,NA
-AAGL2023_074,2,1,2,Rook,Charlotte,NA,Australia.,female,0.9978,NA
-AAGL2023_075,6,3,3,Chen,Yishan,NA,China.,NA,NA,NA
-AAGL2023_076,11,7,5,Alameddine,Sara,NA,Italy.,female,0.9971,NA
-AAGL2023_077,3,1,2,Lee,Eunhye,NA,Republic of Korea.,NA,NA,NA
-AAGL2023_078,4,4,4,Warshafsky,Chelsie,NA,Department of Obstetrics and Gynecology (Drs. Warshafsky and Singh). Electronic address: cwarshafsky@gmail.com.,female,1,NA
-AAGL2023_079,5,2,3,Kanno,Kiyoshi,NA,Japan. Electronic address: less_is_more71@yahoo.co.jp.,male,0.9732,NA
-AAGL2023_080,2,1,4,Nguyen,Andrew,NA,Virginia (Dr Craig).,male,0.996,NA
-AAGL2023_081,5,4,5,Mangeshikar,Abhishek,NA,India.,male,1,NA
-AAGL2023_082,3,3,2,Oliveira,Inês Jerónimo,NA,Portugal. Electronic address: inesjeronimo.oliveira@gmail.com.,NA,NA,NA
-AAGL2023_083,4,4,3,Alzamora,Maria,NA,Ohio. Electronic address: Alzamom3@ccf.org.,female,0.9927,NA
-AAGL2023_084,4,1,2,Moharana,Bishnupriya,NA,IND.,NA,NA,NA
-AAGL2023_085,10,1,5,Allen,Antoinette,NA,Texas.,female,0.999,NA
-AAGL2023_086,8,4,3,Elsherbiny,Mohamed,NA,SAU.,male,1,NA
-AAGL2023_087,43,0,5,Wanhainen,Anders,NA,NA,male,1,NA
-AAGL2023_088,6,6,3,Karacan,Erdener,NA,Turkey.,NA,NA,NA
-AAGL2023_089,6,6,3,Amuzegar,Hoora,NA,Iran.,NA,NA,NA
-AAGL2023_090,7,2,4,Wang,Xinzhou,NA,People's Republic of China.,NA,NA,NA
-AAGL2023_091,1,1,1,Sarofim,Mina,NA,Australia. Electronic address: mina.sarofim@sydney.edu.au.,female,0.9515,NA
-AAGL2023_092,12,10,5,Guijarro-Campillo,Alberto Rafael,NA,Spain. Electronic address: alguicam@alumni.uv.es.,NA,NA,NA
-AAGL2023_093,4,3,5,Duarte,Mafalda,NA,PRT.,female,1,NA
-AAGL2023_094,3,3,3,Vo,Thanh Nhan,NA,Vietnam.,NA,NA,NA
-AAGL2023_095,4,3,4,Lin,Frank,PA,PA.,male,0.9952,III
-AAGL2023_096,2,2,5,Namazi,Golnaz,NA,California. Electronic address: golnaz.namazi@medsch.ucr.edu.,female,1,NA
-AAGL2023_097,9,2,4,Downing,Poppy,NA,Australia.,female,1,NA
-AAGL2023_098,8,2,5,Ochi,Yoshifumi,NA,Japan. Electronic address: quattroporte.1012@gmail.com.,NA,NA,NA
+AAGL2023_051,10,5,5,Xiao,Lekui,USA. xiao.lekui@mayo.edu.,MN,NA,NA,VI
+AAGL2023_052,4,2,5,Bak,B M,USA.,MN,NA,NA,VI
+AAGL2023_053,7,2,5,Garrett,Celine,Australia. celinegarrett@gmail.com.,NA,female,1,NA
+AAGL2023_054,7,2,5,Kavoussi,Arman,Texas.,TX,male,1,X
+AAGL2023_055,4,2,5,Marwah,Vikas,India.,NA,male,1,NA
+AAGL2023_056,6,4,4,Sadowski,Karol,Poland.,NA,female,0.8965,NA
+AAGL2023_057,9,9,5,Chen,Innie,Canada. Electronic address: ichen@toh.ca.,NA,NA,NA,NA
+AAGL2023_058,9,5,5,Swift,Brenna E,Ontario. Electronic address: brenna.swift@mail.utoronto.ca.,NA,NA,NA,NA
+AAGL2023_059,9,1,5,Gabra,Martina,Arizona.,AZ,female,0.9974,VIII
+AAGL2023_060,2,2,3,Edelson,Mia,VA (Ms. Edelson and Dr. Casey). Electronic address: miape@vt.edu.,VA,female,0.9987,IV
