@@ -19,15 +19,15 @@ if (file.exists(here("output", "manual_review_decisions.csv"))) {
   results <- results |>
     left_join(decisions |> select(abstract_id, manual_decision), by = "abstract_id") |>
     mutate(final_published = case_when(
-      classification == "accept" ~ TRUE,
+      classification == "definite" ~ TRUE,
       manual_decision == "match" ~ TRUE,
       manual_decision == "no_match" ~ FALSE,
-      classification %in% c("reject", "no_candidates") ~ FALSE,
+      classification %in% c("no_match", "no_candidates", "excluded") ~ FALSE,
       TRUE ~ NA
     ))
 } else {
   results <- results |>
-    mutate(final_published = classification == "accept")
+    mutate(final_published = classification == "definite")
 }
 
 # ============================================================

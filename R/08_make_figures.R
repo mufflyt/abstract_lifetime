@@ -19,15 +19,15 @@ if (file.exists(here("output", "manual_review_decisions.csv"))) {
   results <- results |>
     left_join(decisions |> select(abstract_id, manual_decision), by = "abstract_id") |>
     mutate(final_published = case_when(
-      classification == "accept" ~ TRUE,
+      classification == "definite" ~ TRUE,
       manual_decision == "match" ~ TRUE,
       manual_decision == "no_match" ~ FALSE,
-      classification %in% c("reject", "no_candidates") ~ FALSE,
+      classification %in% c("no_match", "no_candidates", "excluded") ~ FALSE,
       TRUE ~ NA
     ))
 } else {
   results <- results |>
-    mutate(final_published = classification == "accept")
+    mutate(final_published = classification == "definite")
 }
 
 theme_pub <- theme_minimal(base_size = 12) +
@@ -46,16 +46,20 @@ flow <- tibble::tibble(
   step = c("Total abstracts parsed",
            "After cleaning",
            "PubMed candidates found",
-           "Auto-accepted",
-           "Manual review",
-           "Rejected / No match"),
+           "Definite matches",
+           "Probable (review needed)",
+           "Possible (weak evidence)",
+           "No match",
+           "Excluded (pre-conference)"),
   n = c(
     nrow(results),
     sum(!is.na(results$title)),
     sum(results$n_candidates > 0, na.rm = TRUE),
-    sum(results$classification == "accept", na.rm = TRUE),
-    sum(results$classification == "review", na.rm = TRUE),
-    sum(results$classification %in% c("reject", "no_candidates"), na.rm = TRUE)
+    sum(results$classification == "definite", na.rm = TRUE),
+    sum(results$classification == "probable", na.rm = TRUE),
+    sum(results$classification == "possible", na.rm = TRUE),
+    sum(results$classification %in% c("no_match", "no_candidates"), na.rm = TRUE),
+    sum(results$classification == "excluded", na.rm = TRUE)
   )
 )
 write_csv(flow, here("output", "figures", "figure1_flow_data.csv"))
@@ -169,13 +173,14 @@ if (nrow(scores) > 0) {
   fig5 <- ggplot(scores, aes(x = best_score, fill = classification)) +
     geom_histogram(binwidth = 0.5, color = "white", alpha = 0.8) +
     scale_fill_manual(values = c(
-      "accept" = "#1B9E77", "review" = "#D95F02", "reject" = "#7570B3"
+      "definite" = "#1B9E77", "probable" = "#D95F02", "possible" = "#E7298A",
+      "no_match" = "#7570B3", "excluded" = "#666666", "no_candidates" = "#999999"
     )) +
     geom_vline(xintercept = cfg$scoring$auto_accept, linetype = "dashed", color = "#1B9E77") +
     geom_vline(xintercept = cfg$scoring$manual_review, linetype = "dashed", color = "#D95F02") +
     labs(
       title = "Distribution of Best Match Scores",
-      subtitle = "Dashed lines show auto-accept and manual review thresholds",
+      subtitle = "Dashed lines show definite and probable thresholds",
       x = "Match Score",
       y = "Count",
       fill = "Classification"
