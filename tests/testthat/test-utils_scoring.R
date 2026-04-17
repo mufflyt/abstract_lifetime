@@ -22,13 +22,24 @@ mock_cfg <- list(
   )
 )
 
-test_that("classify_match returns correct categories", {
-  expect_equal(classify_match(8, mock_cfg), "accept")
-  expect_equal(classify_match(7, mock_cfg), "accept")
-  expect_equal(classify_match(5, mock_cfg), "review")
-  expect_equal(classify_match(4, mock_cfg), "review")
-  expect_equal(classify_match(3, mock_cfg), "reject")
-  expect_equal(classify_match(0, mock_cfg), "reject")
+test_that("classify_match returns Cochrane-aligned categories", {
+  expect_equal(classify_match(8, mock_cfg), "definite")
+  expect_equal(classify_match(7, mock_cfg), "definite")
+  expect_equal(classify_match(5, mock_cfg), "probable")
+  expect_equal(classify_match(4, mock_cfg), "probable")
+  expect_equal(classify_match(3, mock_cfg), "no_match")
+  expect_equal(classify_match(0, mock_cfg), "no_match")
+})
+
+test_that("classify_match handles text evidence gate", {
+  expect_equal(classify_match(5, mock_cfg, has_text_evidence = TRUE), "probable")
+  expect_equal(classify_match(5, mock_cfg, has_text_evidence = FALSE), "possible")
+  expect_equal(classify_match(8, mock_cfg, has_text_evidence = FALSE), "possible")
+})
+
+test_that("classify_match marks pre-conference as excluded", {
+  expect_equal(classify_match(9, mock_cfg, pre_conference = TRUE), "excluded")
+  expect_equal(classify_match(2, mock_cfg, pre_conference = TRUE), "excluded")
 })
 
 test_that("compute_text_similarity returns valid range", {
