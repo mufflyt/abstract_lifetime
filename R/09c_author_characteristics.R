@@ -34,40 +34,74 @@ abstracts <- read_csv(abstracts_path, show_col_types = FALSE)
 
 cli_h1("Author characteristics")
 
-# --- Gender inference (SSA data via `gender` package) ---
-# We use the ssa method over the period 1930-2012 to cover most first authors.
+# --- Gender inference: two-pass strategy ---
+# Pass 1: SSA (US names, high accuracy)
+# Pass 2: genderize.io (international names, broader coverage)
+# Name cleaning: strip middle initials ("Donald I" → "Donald"),
+# take first word of compound names ("Jong Woon" → "Jong").
+
+clean_first_name <- function(n) {
+  if (is.na(n) || nchar(n) < 2) return(NA_character_)
+  n <- trimws(n)
+  n <- sub("\\s+[A-Z]$", "", n)        # trailing single initial
+  n <- sub("\\s+[A-Z]\\.$", "", n)     # trailing initial with period
+  parts <- strsplit(n, "\\s+")[[1]]
+  n <- parts[1]
+  if (is.na(n) || nchar(n) < 2) return(NA_character_)
+  paste0(toupper(substr(n, 1, 1)), tolower(substr(n, 2, nchar(n))))
+}
+
 first_names <- authors |>
   filter(position == 1, !is.na(first_name), nchar(first_name) >= 2) |>
   distinct(first_name) |>
-  mutate(name_key = str_to_title(first_name))
+  mutate(name_clean = vapply(first_name, clean_first_name, character(1))) |>
+  filter(!is.na(name_clean))
 
-gender_result <- tryCatch({
-  if (requireNamespace("gender", quietly = TRUE)) {
-    gender::gender(first_names$name_key,
-                   years = c(1930, 2012),
-                   method = "ssa") |>
-      select(name_key = name, gender, proportion_male, proportion_female)
-  } else tibble()
+# Pass 1: SSA (US Social Security data, 1930-2012)
+ssa_result <- tryCatch({
+  gender::gender(unique(first_names$name_clean),
+                 years = c(1930, 2012), method = "ssa") |>
+    select(name_clean = name, gender, proportion_male, proportion_female)
 }, error = function(e) {
-  cli_alert_warning("gender::gender failed: {e$message}")
+  cli_alert_warning("SSA gender failed: {e$message}")
   tibble()
 })
+cli_alert_info("SSA resolved: {nrow(ssa_result)} / {length(unique(first_names$name_clean))}")
 
-if (nrow(gender_result) > 0) {
-  gender_lkp <- first_names |>
-    left_join(gender_result, by = "name_key") |>
-    mutate(
-      first_author_gender = gender,
-      first_author_gender_p = pmax(proportion_male, proportion_female, na.rm = TRUE)
-    ) |>
-    select(first_name, first_author_gender, first_author_gender_p)
-} else {
-  gender_lkp <- tibble(first_name = character(),
-                       first_author_gender = character(),
-                       first_author_gender_p = numeric())
+# Pass 2: genderize.io for names SSA missed
+ssa_names <- if (nrow(ssa_result) > 0) tolower(ssa_result$name_clean) else character()
+unresolved <- unique(first_names$name_clean[!tolower(first_names$name_clean) %in% ssa_names])
+unresolved <- unresolved[!is.na(unresolved) & nchar(unresolved) >= 2]
+
+genderize_result <- tibble()
+if (length(unresolved) > 0) {
+  cli_alert_info("Querying genderize.io for {length(unresolved)} remaining names...")
+  genderize_result <- tryCatch({
+    # genderize method in gender package handles the API call
+    gender::gender(unresolved, method = "genderize") |>
+      select(name_clean = name, gender, proportion_male, proportion_female)
+  }, error = function(e) {
+    cli_alert_warning("genderize.io failed: {e$message}")
+    tibble()
+  })
+  cli_alert_info("genderize.io resolved: {nrow(genderize_result)} / {length(unresolved)}")
 }
 
-cli_alert_info("Gender calls: {sum(!is.na(gender_lkp$first_author_gender))} / {nrow(gender_lkp)}")
+# Combine both passes (SSA takes priority where both resolve)
+gender_combined <- bind_rows(ssa_result, genderize_result) |>
+  group_by(name_clean) |>
+  slice(1) |>
+  ungroup()
+
+gender_lkp <- first_names |>
+  left_join(gender_combined, by = "name_clean") |>
+  mutate(
+    first_author_gender = gender,
+    first_author_gender_p = pmax(proportion_male, proportion_female, na.rm = TRUE)
+  ) |>
+  select(first_name, first_author_gender, first_author_gender_p)
+
+cli_alert_info("Total gender coverage: {sum(!is.na(gender_lkp$first_author_gender))} / {nrow(gender_lkp)} ({round(mean(!is.na(gender_lkp$first_author_gender))*100,1)}%)")
 
 # --- Per-abstract aggregation ---
 first_auth <- authors |>
