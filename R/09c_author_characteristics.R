@@ -23,6 +23,7 @@ suppressPackageStartupMessages({
 
 source(here("R", "utils_acog.R"))
 source(here("R", "utils_states.R"))
+source(here("R", "utils_affiliation.R"))
 
 authors_path <- here("data", "processed", "authors_pubmed.csv")
 matches_path <- here("output", "abstracts_with_matches.csv")
@@ -124,10 +125,15 @@ first_auth <- authors |>
       vapply(first_author_aff, parse_us_state, character(1))
     )
   ) |>
-  select(-first_author_state_raw, -first_author_aff) |>
+  select(-first_author_state_raw) |>
   left_join(gender_lkp, by = c("first_author_first" = "first_name")) |>
-  mutate(first_author_acog_district =
-           vapply(first_author_state, acog_district_for_state, character(1)))
+  mutate(
+    first_author_acog_district = vapply(first_author_state, acog_district_for_state, character(1)),
+    practice_type = vapply(first_author_aff, classify_practice_type, character(1)),
+    subspecialty = vapply(first_author_aff, classify_subspecialty, character(1)),
+    career_stage = vapply(first_author_aff, classify_career_stage, character(1))
+  ) |>
+  select(-first_author_aff)
 
 agg <- authors |>
   group_by(abstract_id) |>
@@ -165,13 +171,23 @@ print(table(char_tbl$first_author_acog_district, useNA = "ifany"))
 cli_alert_info("Gender distribution:")
 print(table(char_tbl$first_author_gender, useNA = "ifany"))
 
+cli_alert_info("Practice type:")
+print(table(char_tbl$practice_type, useNA = "ifany"))
+
+cli_alert_info("Subspecialty:")
+print(table(char_tbl$subspecialty, useNA = "ifany"))
+
+cli_alert_info("Career stage:")
+print(table(char_tbl$career_stage, useNA = "ifany"))
+
 # --- Merge into abstracts_with_matches.csv ---
 stale_cols <- intersect(names(matches),
                         c("n_authors", "n_authors_aagl", "n_unique_affiliations",
                           "first_author_last", "first_author_first",
                           "first_author_state", "first_author_country",
                           "first_author_acog_district",
-                          "first_author_gender", "first_author_gender_p"))
+                          "first_author_gender", "first_author_gender_p",
+                          "practice_type", "subspecialty", "career_stage"))
 for (c in stale_cols) matches[[c]] <- NULL
 matches <- matches |> left_join(char_tbl, by = "abstract_id")
 write_csv(matches, matches_path)
