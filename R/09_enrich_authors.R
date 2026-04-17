@@ -95,18 +95,18 @@ fetch_xml <- function(pmid) {
 
 # ---- Parse one PubmedArticle XML into author rows ------------------------
 
+source(here("R", "utils_states.R"))
+
 parse_affiliation <- function(aff) {
   if (is.na(aff) || nchar(aff) == 0) {
     return(list(city = NA_character_, state = NA_character_, country = NA_character_))
   }
   parts <- str_split(aff, ",\\s*")[[1]] |> str_squish()
   country <- if (length(parts) >= 1) tail(parts, 1) else NA_character_
-  # US state: 2-letter uppercase possibly followed by 5-digit ZIP
-  state <- NA_character_
-  for (p in parts) {
-    m <- str_match(p, "\\b([A-Z]{2})(?:\\s+\\d{5}(?:-\\d{4})?)?\\b")
-    if (!is.na(m[1, 2])) { state <- m[1, 2]; break }
-  }
+
+  # Use the improved multi-strategy state parser
+  state <- parse_us_state(aff)
+
   city <- if (length(parts) >= 2) parts[max(1, length(parts) - 2)] else NA_character_
   list(city = city, state = state, country = country)
 }

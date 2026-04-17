@@ -22,6 +22,18 @@ if (!file.exists(parsed_path)) {
 abstracts <- read_csv(parsed_path, show_col_types = FALSE)
 cli_alert_info("Loaded {nrow(abstracts)} abstracts")
 
+# --- Filter out video presentations ---
+# Study focuses on oral presentations only. Video abstracts (2022: 10, 2023: 38)
+# are a different presentation format and excluded per study protocol.
+# NAs (e.g., 2018 where tagger failed) are assumed Oral since pre-2022
+# congresses had no video section.
+if ("session_type" %in% names(abstracts)) {
+  abstracts <- abstracts |>
+    mutate(session_type = if_else(is.na(session_type), "Oral", session_type)) |>
+    filter(session_type != "Video")
+  cli_alert_info("After excluding video presentations: {nrow(abstracts)} abstracts")
+}
+
 # --- Normalize titles ---
 cli_alert_info("Normalizing titles...")
 abstracts <- abstracts |>

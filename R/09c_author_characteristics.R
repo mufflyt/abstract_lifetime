@@ -22,6 +22,7 @@ suppressPackageStartupMessages({
 })
 
 source(here("R", "utils_acog.R"))
+source(here("R", "utils_states.R"))
 
 authors_path <- here("data", "processed", "authors_pubmed.csv")
 matches_path <- here("output", "abstracts_with_matches.csv")
@@ -78,9 +79,18 @@ first_auth <- authors |>
     abstract_id,
     first_author_last  = last_name,
     first_author_first = first_name,
-    first_author_state = affiliation_state,
+    first_author_state_raw = affiliation_state,
+    first_author_aff = affiliation,
     first_author_country = affiliation_country
   ) |>
+  # Re-parse state with the improved multi-strategy parser if raw is NA
+  mutate(
+    first_author_state = if_else(
+      !is.na(first_author_state_raw), first_author_state_raw,
+      vapply(first_author_aff, parse_us_state, character(1))
+    )
+  ) |>
+  select(-first_author_state_raw, -first_author_aff) |>
   left_join(gender_lkp, by = c("first_author_first" = "first_name")) |>
   mutate(first_author_acog_district =
            vapply(first_author_state, acog_district_for_state, character(1)))
