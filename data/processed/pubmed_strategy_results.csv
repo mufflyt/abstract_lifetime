@@ -8212,3 +8212,488 @@ AAGL2016_096,first_author,"""isaacson K""[1AU] AND 2012/11/01:2026/04/01[PDAT]",
 AAGL2016_096,last_author,"""kraemer D""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",1
 AAGL2016_096,title_fragment,"""laparoscopic radiofrequency volumetric thermal""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",7
 AAGL2016_096,author_broad,"""isaacson K""[AU] AND 2012/11/01:2026/04/01[PDAT]",43
+AAGL2017_001,title,"""final results randomized controlled trial the cardea gea""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_001,first_author,"""feng L""[1AU] AND 2012/11/01:2026/04/01[PDAT]",1508
+AAGL2017_001,last_author,"""chen Q""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",4697
+AAGL2017_001,title_fragment,"""final results randomized controlled""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_001,author_broad,"""feng L""[AU] AND 2012/11/01:2026/04/01[PDAT]",10971
+AAGL2017_002,title,"""results hysteroscopic treatment symptomatic isthmoceles patients with abnormal""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_002,first_author,"""vegas A""[1AU] AND 2012/11/01:2026/04/01[PDAT]",14
+AAGL2017_002,last_author,"""moratalla E""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_002,title_fragment,"""results hysteroscopic treatment symptomatic""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_002,author_broad,"""vegas A""[AU] AND 2012/11/01:2026/04/01[PDAT]",40
+AAGL2017_003,title,"""comparison between transvaginal ultrasound and hysteroscopy for endometrial""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_003,first_author,"""brito L""[1AU] AND 2012/11/01:2026/04/01[PDAT]",8
+AAGL2017_003,last_author,"""yela D""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_003,title_fragment,"""between transvaginal ultrasound and""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_003,author_broad,"""brito L""[AU] AND 2012/11/01:2026/04/01[PDAT]",192
+AAGL2017_004,title,"""pain independent risk factor for failed second generation""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_004,first_author,"""cramer M""[1AU] AND 2012/11/01:2026/04/01[PDAT]",10
+AAGL2017_004,last_author,"""hoffman M""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",58
+AAGL2017_004,title_fragment,"""pain independent risk factor""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_004,author_broad,"""cramer M""[AU] AND 2012/11/01:2026/04/01[PDAT]",53
+AAGL2017_005,title,"""laparoscopic assisted hysteroscopic resection interstitial ectopic pregnancy""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_005,first_author,"""vilkins A""[1AU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_005,last_author,"""noel N""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",20
+AAGL2017_005,title_fragment,"""laparoscopic assisted hysteroscopic resection""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_005,author_broad,"""vilkins A""[AU] AND 2012/11/01:2026/04/01[PDAT]",7
+AAGL2017_006,title,"""operative hysteroscopy with iud place""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_006,first_author,"""wright K""[1AU] AND 2012/11/01:2026/04/01[PDAT]",103
+AAGL2017_006,last_author,"""vogell A""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_006,title_fragment,"""operative hysteroscopy with iud""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_006,author_broad,"""wright K""[AU] AND 2012/11/01:2026/04/01[PDAT]",685
+AAGL2017_007,title,"""prospective study the risk occult malignancies and day""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_007,first_author,"""bogani G""[1AU] AND 2012/11/01:2026/04/01[PDAT]",176
+AAGL2017_007,last_author,"""signorelli M""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",6
+AAGL2017_007,title_fragment,"""study the risk occult""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_007,author_broad,"""bogani G""[AU] AND 2012/11/01:2026/04/01[PDAT]",427
+AAGL2017_008,title,"""fibroids reduce the likelihood unanticipated malignancy""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_008,first_author,"""alvi F""[1AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_008,last_author,"""chaudhari A""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",55
+AAGL2017_008,title_fragment,"""fibroids reduce the likelihood""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_008,author_broad,"""alvi F""[AU] AND 2012/11/01:2026/04/01[PDAT]",14
+AAGL2017_009,title,"""comparative study video endoscopic inguinal lymphadenectomy and conventional""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_009,first_author,"""zhang M""[1AU] AND 2012/11/01:2026/04/01[PDAT]",9377
+AAGL2017_009,last_author,"""hua K""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",165
+AAGL2017_009,title_fragment,"""comparative study video endoscopic""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_009,author_broad,"""zhang M""[AU] AND 2012/11/01:2026/04/01[PDAT]",58240
+AAGL2017_010,title,"""avoiding occult uterine sarcoma morcellation yes can""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_010,first_author,"""fazel A""[1AU] AND 2012/11/01:2026/04/01[PDAT]",11
+AAGL2017_010,last_author,"""sroussi J""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_010,title_fragment,"""avoiding occult uterine sarcoma""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_010,author_broad,"""fazel A""[AU] AND 2012/11/01:2026/04/01[PDAT]",117
+AAGL2017_011,title,"""para aortic sentinel lymph nodes endometrial cancer""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_011,first_author,"""el-neemany D""[1AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_011,last_author,"""elsahwi K""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",9
+AAGL2017_011,title_fragment,"""para aortic sentinel lymph""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",6
+AAGL2017_011,author_broad,"""el-neemany D""[AU] AND 2012/11/01:2026/04/01[PDAT]",2
+AAGL2017_012,title,"""robotic assisted laparoscopic upper vaginectomy and rectosigmoid resection""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_012,first_author,"""vargas R""[1AU] AND 2012/11/01:2026/04/01[PDAT]",42
+AAGL2017_012,last_author,"""mahdi H""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",12
+AAGL2017_012,title_fragment,"""robotic assisted laparoscopic upper""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_012,author_broad,"""vargas R""[AU] AND 2012/11/01:2026/04/01[PDAT]",340
+AAGL2017_013,title,"""509 robotic assisted nerve uterine artery and fertility""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_013,first_author,"""lim P""[1AU] AND 2012/11/01:2026/04/01[PDAT]",29
+AAGL2017_013,last_author,"""kang E""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",61
+AAGL2017_013,title_fragment,"""509 robotic assisted nerve""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_013,author_broad,"""lim P""[AU] AND 2012/11/01:2026/04/01[PDAT]",329
+AAGL2017_014,title,"""the effects pneumoperitoneum and the steep trendelenburg position""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_014,first_author,"""matanes E""[1AU] AND 2012/11/01:2026/04/01[PDAT]",20
+AAGL2017_014,last_author,"""amit A""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",7
+AAGL2017_014,title_fragment,"""the effects pneumoperitoneum and""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_014,author_broad,"""matanes E""[AU] AND 2012/11/01:2026/04/01[PDAT]",73
+AAGL2017_015,title,"""direct cost hysterectomy when performed different routes""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_015,first_author,"""kaaki B""[1AU] AND 2012/11/01:2026/04/01[PDAT]",3
+AAGL2017_015,last_author,"""kaaki B""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_015,title_fragment,"""direct cost hysterectomy when""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_015,author_broad,"""kaaki B""[AU] AND 2012/11/01:2026/04/01[PDAT]",8
+AAGL2017_016,title,"""use administrative inpatient and outpatient databases determine routes""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_016,first_author,"""espinal M""[1AU] AND 2012/11/01:2026/04/01[PDAT]",6
+AAGL2017_016,last_author,"""robertson M""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",53
+AAGL2017_016,title_fragment,"""use administrative inpatient and""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_016,author_broad,"""espinal M""[AU] AND 2012/11/01:2026/04/01[PDAT]",38
+AAGL2017_017,title,"""transversus abdominis plane block using liposomal bupivacaine during""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_017,first_author,"""chen Y""[1AU] AND 2012/11/01:2026/04/01[PDAT]",20712
+AAGL2017_017,last_author,"""el-neemany D""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_017,title_fragment,"""transversus abdominis plane block""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",1223
+AAGL2017_017,author_broad,"""chen Y""[AU] AND 2012/11/01:2026/04/01[PDAT]",131570
+AAGL2017_018,title,"""robotic resection symptomatic parasitic leiomyoma from the obturator""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_018,first_author,"""menderes G""[1AU] AND 2012/11/01:2026/04/01[PDAT]",25
+AAGL2017_018,last_author,"""silasi D""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_018,title_fragment,"""robotic resection symptomatic parasitic""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_018,author_broad,"""menderes G""[AU] AND 2012/11/01:2026/04/01[PDAT]",90
+AAGL2017_019,title,"""robotic trans abdominal cerclage tips and tricks""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_019,first_author,"""mourad J""[1AU] AND 2012/11/01:2026/04/01[PDAT]",4
+AAGL2017_019,last_author,"""mourad J""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",7
+AAGL2017_019,title_fragment,"""robotic trans abdominal cerclage""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_019,author_broad,"""mourad J""[AU] AND 2012/11/01:2026/04/01[PDAT]",33
+AAGL2017_020,title,"""the ergonomics laparoscopic surgery quantitative study the time""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_020,first_author,"""aitchison L""[1AU] AND 2012/11/01:2026/04/01[PDAT]",5
+AAGL2017_020,last_author,"""abbott J""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",91
+AAGL2017_020,title_fragment,"""the ergonomics laparoscopic surgery""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_020,author_broad,"""aitchison L""[AU] AND 2012/11/01:2026/04/01[PDAT]",14
+AAGL2017_021,title,"""management interstitial ectopic pregnancy case series and guide""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_021,first_author,"""sample N""[1AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_021,last_author,"""ahn S""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",262
+AAGL2017_021,title_fragment,"""management interstitial ectopic pregnancy""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_021,author_broad,"""sample N""[AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_022,title,"""rate and factors predictive ureterolysis during laparoscopic surgery""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_022,first_author,"""liu L""[1AU] AND 2012/11/01:2026/04/01[PDAT]",9967
+AAGL2017_022,last_author,"""winner B""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",31
+AAGL2017_022,title_fragment,"""rate and factors predictive""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_022,author_broad,"""liu L""[AU] AND 2012/11/01:2026/04/01[PDAT]",66065
+AAGL2017_023,title,"""adnexal torsion during pregnancy perinatal and neonatal outcomes""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_023,first_author,"""daykan Y""[1AU] AND 2012/11/01:2026/04/01[PDAT]",17
+AAGL2017_023,last_author,"""josephy D""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_023,title_fragment,"""adnexal torsion during pregnancy""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_023,author_broad,"""daykan Y""[AU] AND 2012/11/01:2026/04/01[PDAT]",59
+AAGL2017_024,title,"""comparison day perioperative morbidity between same day discharges""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_024,first_author,"""sheyn D""[1AU] AND 2012/11/01:2026/04/01[PDAT]",34
+AAGL2017_024,last_author,"""billow M""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",3
+AAGL2017_024,title_fragment,"""day perioperative morbidity between""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_024,author_broad,"""sheyn D""[AU] AND 2012/11/01:2026/04/01[PDAT]",176
+AAGL2017_025,title,"""risk occult endometrial cancer during hysterectomy for benign""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_025,first_author,"""parsons L""[1AU] AND 2012/11/01:2026/04/01[PDAT]",20
+AAGL2017_025,last_author,"""kho K""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",4
+AAGL2017_025,title_fragment,"""risk occult endometrial cancer""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_025,author_broad,"""parsons L""[AU] AND 2012/11/01:2026/04/01[PDAT]",127
+AAGL2017_026,title,"""effectiveness the transversus abdominis plane tap block laparoscopic""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_026,first_author,"""wang A""[1AU] AND 2012/11/01:2026/04/01[PDAT]",1782
+AAGL2017_026,last_author,"""shin J""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",350
+AAGL2017_026,title_fragment,"""effectiveness the transversus abdominis""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_026,author_broad,"""wang A""[AU] AND 2012/11/01:2026/04/01[PDAT]",12058
+AAGL2017_027,title,"""laparoscopic resection rudimentary uterine horn identified after incomplete""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_027,first_author,"""wong M""[1AU] AND 2012/11/01:2026/04/01[PDAT]",195
+AAGL2017_027,last_author,"""morris S""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",162
+AAGL2017_027,title_fragment,"""laparoscopic resection rudimentary uterine""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_027,author_broad,"""wong M""[AU] AND 2012/11/01:2026/04/01[PDAT]",1434
+AAGL2017_028,title,"""management persistent products conception following cesarean scar pregnancy""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_028,first_author,"""padilla P""[1AU] AND 2012/11/01:2026/04/01[PDAT]",11
+AAGL2017_028,last_author,"""sprague M""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_028,title_fragment,"""management persistent products conception""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_028,author_broad,"""padilla P""[AU] AND 2012/11/01:2026/04/01[PDAT]",61
+AAGL2017_029,title,"""laparoscopic hysterectomy for cervical fibroid surgical tips""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_029,first_author,"""ramirez C""[1AU] AND 2012/11/01:2026/04/01[PDAT]",45
+AAGL2017_029,last_author,"""lee T""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",551
+AAGL2017_029,title_fragment,"""laparoscopic hysterectomy for cervical""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_029,author_broad,"""ramirez C""[AU] AND 2012/11/01:2026/04/01[PDAT]",464
+AAGL2017_030,title,"""outcomes for laparoscopic excision vaginal and mid urethral""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_030,first_author,"""elkattah R""[1AU] AND 2012/11/01:2026/04/01[PDAT]",8
+AAGL2017_030,last_author,"""furr R""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_030,title_fragment,"""for laparoscopic excision vaginal""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_030,author_broad,"""elkattah R""[AU] AND 2012/11/01:2026/04/01[PDAT]",20
+AAGL2017_031,title,"""assessing improved methods for clinic based sacral neuromodulation""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_031,first_author,"""eugenio-colon J""[1AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_031,last_author,"""groesch K""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_031,title_fragment,"""assessing improved methods for""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_031,author_broad,"""eugenio-colon J""[AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_032,title,"""comparative study sexual and functional outcomes vaginoplasty through""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_032,first_author,"""zhou Q""[1AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_032,last_author,"""hua K""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_032,title_fragment,"""comparative study sexual and""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_032,author_broad,"""zhou Q""[AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_033,title,"""clinical observation modified vaginal closure vaginal mucosa vaginal""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_033,first_author,"""jia N""[1AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_033,last_author,"""feng L""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_033,title_fragment,"""clinical observation modified vaginal""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_033,author_broad,"""jia N""[AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_034,title,"""entry into the peritoneal cavity post hysterectomy prolapse""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_034,first_author,"""bretschneider C""[1AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_034,last_author,"""walters M""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_034,title_fragment,"""entry into the peritoneal""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_034,author_broad,"""bretschneider C""[AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_035,title,"""laparoscopic management gynecologic benign bladder tumors leiomyoma and""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_035,first_author,"""andou M""[1AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_035,last_author,"""shirane A""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_035,title_fragment,"""laparoscopic management gynecologic benign""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_035,author_broad,"""andou M""[AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_036,title,"""607 persistent vaginal leakage the setting apical vaginal""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_036,first_author,"""bastawros D""[1AU] AND 2012/11/01:2026/04/01[PDAT]",3
+AAGL2017_036,last_author,"""stepp K""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_036,title_fragment,"""607 persistent vaginal leakage""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_036,author_broad,"""bastawros D""[AU] AND 2012/11/01:2026/04/01[PDAT]",7
+AAGL2017_037,title,"""conservative treatment for uterine adenomyosis radiofrequency thermal ablation""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_037,first_author,"""clarizia R""[1AU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_037,last_author,"""roviglione G""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",2
+AAGL2017_037,title_fragment,"""conservative treatment for uterine""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_037,author_broad,"""clarizia R""[AU] AND 2012/11/01:2026/04/01[PDAT]",30
+AAGL2017_038,title,"""long term effect elagolix the endometrium results from""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_038,first_author,"""lessey B""[1AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_038,last_author,"""dmowski P""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_038,title_fragment,"""long term effect elagolix""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_038,author_broad,"""lessey B""[AU] AND 2012/11/01:2026/04/01[PDAT]",6
+AAGL2017_039,title,"""endometriosis year retrospective analysis the surgical outcomes and""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_039,first_author,"""barel O""[1AU] AND 2012/11/01:2026/04/01[PDAT]",12
+AAGL2017_039,last_author,"""jim T""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_039,title_fragment,"""endometriosis year retrospective analysis""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_039,author_broad,"""barel O""[AU] AND 2012/11/01:2026/04/01[PDAT]",133
+AAGL2017_040,title,"""the similarity the eutopic and ectopic endometrium transcriptomic""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_040,first_author,"""aznaurova Y""[1AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_040,last_author,"""stepanian A""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",6
+AAGL2017_040,title_fragment,"""the similarity the eutopic""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_040,author_broad,"""aznaurova Y""[AU] AND 2012/11/01:2026/04/01[PDAT]",3
+AAGL2017_041,title,"""anterior discoid resection for rectosigmoid endometriosis""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_041,first_author,"""stuparich M""[1AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_041,last_author,"""lee T""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",551
+AAGL2017_041,title_fragment,"""anterior discoid resection for""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_041,author_broad,"""stuparich M""[AU] AND 2012/11/01:2026/04/01[PDAT]",12
+AAGL2017_042,title,"""partial vaginectomy for excision rectovaginal endometriosis""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_042,first_author,"""chao L""[1AU] AND 2012/11/01:2026/04/01[PDAT]",68
+AAGL2017_042,last_author,"""lee T""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",551
+AAGL2017_042,title_fragment,"""partial vaginectomy for excision""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_042,author_broad,"""chao L""[AU] AND 2012/11/01:2026/04/01[PDAT]",511
+AAGL2017_043,title,"""risk factors and human chorionic gonadotropin trends patients""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_043,first_author,"""hutchinson A""[1AU] AND 2012/11/01:2026/04/01[PDAT]",32
+AAGL2017_043,last_author,"""lekovich J""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_043,title_fragment,"""risk factors and human""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_043,author_broad,"""hutchinson A""[AU] AND 2012/11/01:2026/04/01[PDAT]",357
+AAGL2017_044,title,"""cesarean scar pregnancies systematic review treatment options""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_044,first_author,"""maheux-lacroix S""[1AU] AND 2012/11/01:2026/04/01[PDAT]",15
+AAGL2017_044,last_author,"""nesbitt-hawes E""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_044,title_fragment,"""cesarean scar pregnancies systematic""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_044,author_broad,"""maheux-lacroix S""[AU] AND 2012/11/01:2026/04/01[PDAT]",61
+AAGL2017_045,title,"""long term ultrasound follow pre and post menarchal""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_045,first_author,"""smorgick N""[1AU] AND 2012/11/01:2026/04/01[PDAT]",21
+AAGL2017_045,last_author,"""maymon S""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_045,title_fragment,"""long term ultrasound follow""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",12
+AAGL2017_045,author_broad,"""smorgick N""[AU] AND 2012/11/01:2026/04/01[PDAT]",75
+AAGL2017_046,title,"""successful twin pregnancy patient with hemi uterus corrected""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_046,first_author,"""yi X""[1AU] AND 2012/11/01:2026/04/01[PDAT]",755
+AAGL2017_046,last_author,"""hua K""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",165
+AAGL2017_046,title_fragment,"""successful twin pregnancy patient""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_046,author_broad,"""yi X""[AU] AND 2012/11/01:2026/04/01[PDAT]",4365
+AAGL2017_047,title,"""approach laparoscopic isthmocele repair with hysteroscopic guidance""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_047,first_author,"""krantz S""[1AU] AND 2012/11/01:2026/04/01[PDAT]",4
+AAGL2017_047,last_author,"""anderson T""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",85
+AAGL2017_047,title_fragment,"""approach laparoscopic isthmocele repair""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_047,author_broad,"""krantz S""[AU] AND 2012/11/01:2026/04/01[PDAT]",20
+AAGL2017_048,title,"""hysteroscopic removal cesarean section scar pregnancy""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_048,first_author,"""kotlyar A""[1AU] AND 2012/11/01:2026/04/01[PDAT]",10
+AAGL2017_048,last_author,"""flyckt R""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",21
+AAGL2017_048,title_fragment,"""hysteroscopic removal cesarean section""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_048,author_broad,"""kotlyar A""[AU] AND 2012/11/01:2026/04/01[PDAT]",51
+AAGL2017_049,title,"""are over prescribing opioid pain medications""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_049,first_author,"""patanwala I""[1AU] AND 2012/11/01:2026/04/01[PDAT]",4
+AAGL2017_049,last_author,"""fisk M""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",7
+AAGL2017_049,title_fragment,"""are over prescribing opioid""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_049,author_broad,"""patanwala I""[AU] AND 2012/11/01:2026/04/01[PDAT]",18
+AAGL2017_050,title,"""systematic review uterine fibroid volume reduction after uterine""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_050,first_author,"""taheri M""[1AU] AND 2012/11/01:2026/04/01[PDAT]",177
+AAGL2017_050,last_author,"""quinn S""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",14
+AAGL2017_050,title_fragment,"""systematic review uterine fibroid""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_050,author_broad,"""taheri M""[AU] AND 2012/11/01:2026/04/01[PDAT]",1366
+AAGL2017_051,title,"""implementation eras perioperative care protocols for gynecologic surgery""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_051,first_author,"""hammons L""[1AU] AND 2012/11/01:2026/04/01[PDAT]",5
+AAGL2017_051,last_author,"""silasi D""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_051,title_fragment,"""implementation eras perioperative care""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_051,author_broad,"""hammons L""[AU] AND 2012/11/01:2026/04/01[PDAT]",11
+AAGL2017_052,title,"""impact mode incision venous thromboembolic events after hysterectomy""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_052,first_author,"""jorgensen E""[1AU] AND 2012/11/01:2026/04/01[PDAT]",16
+AAGL2017_052,last_author,"""leung K""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",124
+AAGL2017_052,title_fragment,"""mode incision venous thromboembolic""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_052,author_broad,"""jorgensen E""[AU] AND 2012/11/01:2026/04/01[PDAT]",146
+AAGL2017_053,title,"""women express regret after hysterectomy""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_053,first_author,"""sangha R""[1AU] AND 2012/11/01:2026/04/01[PDAT]",10
+AAGL2017_053,last_author,"""wegeinka G""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_053,title_fragment,"""women express regret after""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_053,author_broad,"""sangha R""[AU] AND 2012/11/01:2026/04/01[PDAT]",74
+AAGL2017_054,title,"""predictors post operative admission for minimally invasive hysterectomies""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_054,first_author,"""young H""[1AU] AND 2012/11/01:2026/04/01[PDAT]",49
+AAGL2017_054,last_author,"""park D""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",423
+AAGL2017_054,title_fragment,"""predictors post operative admission""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_054,author_broad,"""young H""[AU] AND 2012/11/01:2026/04/01[PDAT]",332
+AAGL2017_055,title,"""sexual function according surgical indication for hysterectomy""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_055,first_author,"""till S""[1AU] AND 2012/11/01:2026/04/01[PDAT]",3
+AAGL2017_055,last_author,"""pierce J""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",50
+AAGL2017_055,title_fragment,"""sexual function according surgical""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_055,author_broad,"""till S""[AU] AND 2012/11/01:2026/04/01[PDAT]",32
+AAGL2017_056,title,"""vessel harvesting preparation for uterine transplant""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_056,first_author,"""puntambekar S""[1AU] AND 2012/11/01:2026/04/01[PDAT]",21
+AAGL2017_056,last_author,"""mehta M""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",134
+AAGL2017_056,title_fragment,"""vessel harvesting preparation for""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_056,author_broad,"""puntambekar S""[AU] AND 2012/11/01:2026/04/01[PDAT]",38
+AAGL2017_057,title,"""minimizing the iatrogenic footprint""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_057,first_author,"""beran B""[1AU] AND 2012/11/01:2026/04/01[PDAT]",2
+AAGL2017_057,last_author,"""sprague M""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_057,title_fragment,"""minimizing the iatrogenic footprint""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_057,author_broad,"""beran B""[AU] AND 2012/11/01:2026/04/01[PDAT]",7
+AAGL2017_058,title,"""surgical management adenomyoma with uterine wall dissection post""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_058,first_author,"""ely L""[1AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_058,last_author,"""advincula A""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",3
+AAGL2017_058,title_fragment,"""surgical management adenomyoma with""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_058,author_broad,"""ely L""[AU] AND 2012/11/01:2026/04/01[PDAT]",3
+AAGL2017_059,title,"""total laparoscopic ureteroneocystostomy for ureteral endometriosis single center""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_059,first_author,"""clarizia R""[1AU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_059,last_author,"""scarperi S""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_059,title_fragment,"""total laparoscopic ureteroneocystostomy for""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_059,author_broad,"""clarizia R""[AU] AND 2012/11/01:2026/04/01[PDAT]",30
+AAGL2017_060,title,"""dna testing predict endometriosis implications for referral for""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_060,first_author,"""fogelson N""[1AU] AND 2012/11/01:2026/04/01[PDAT]",10
+AAGL2017_060,last_author,"""ward K""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",82
+AAGL2017_060,title_fragment,"""dna testing predict endometriosis""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_060,author_broad,"""fogelson N""[AU] AND 2012/11/01:2026/04/01[PDAT]",22
+AAGL2017_061,title,"""anorectal angle transperineal ultrasound women with rectal endometriosis""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_061,first_author,"""arena A""[1AU] AND 2012/11/01:2026/04/01[PDAT]",52
+AAGL2017_061,last_author,"""benfenati A""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_061,title_fragment,"""anorectal angle transperineal ultrasound""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_061,author_broad,"""arena A""[AU] AND 2012/11/01:2026/04/01[PDAT]",267
+AAGL2017_062,title,"""perioperative outcomes and predictors complications for laparoscopic treatment""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_062,first_author,"""clark N""[1AU] AND 2012/11/01:2026/04/01[PDAT]",31
+AAGL2017_062,last_author,"""gu X""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",1193
+AAGL2017_062,title_fragment,"""perioperative outcomes and predictors""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_062,author_broad,"""clark N""[AU] AND 2012/11/01:2026/04/01[PDAT]",276
+AAGL2017_063,title,"""long term safety and efficacy elagolix treatment women""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_063,first_author,"""surrey E""[1AU] AND 2012/11/01:2026/04/01[PDAT]",4
+AAGL2017_063,last_author,"""singh S""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",3311
+AAGL2017_063,title_fragment,"""long term safety and""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",3891
+AAGL2017_063,author_broad,"""surrey E""[AU] AND 2012/11/01:2026/04/01[PDAT]",14
+AAGL2017_064,title,"""prevalence tubal endometriosis""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_064,first_author,"""zhang J""[1AU] AND 2012/11/01:2026/04/01[PDAT]",23875
+AAGL2017_064,last_author,"""zhang D""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",6100
+AAGL2017_064,title_fragment,"""prevalence tubal endometriosis""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_064,author_broad,"""zhang J""[AU] AND 2012/11/01:2026/04/01[PDAT]",158022
+AAGL2017_065,title,"""identifying clear lesions endometriosis using indocyanine green""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_065,first_author,"""hanna M""[1AU] AND 2012/11/01:2026/04/01[PDAT]",85
+AAGL2017_065,last_author,"""tam T""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",11
+AAGL2017_065,title_fragment,"""identifying clear lesions endometriosis""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_065,author_broad,"""hanna M""[AU] AND 2012/11/01:2026/04/01[PDAT]",675
+AAGL2017_066,title,"""endometriosis the appendix prevalence and correlation with gross""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_066,first_author,"""tenzel N""[1AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_066,last_author,"""orbuch I""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_066,title_fragment,"""endometriosis the appendix prevalence""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_066,author_broad,"""tenzel N""[AU] AND 2012/11/01:2026/04/01[PDAT]",2
+AAGL2017_067,title,"""hysterectomy vaginal abdominal and robotic laparoscopic study clinical""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_067,first_author,"""hanafi M""[1AU] AND 2012/11/01:2026/04/01[PDAT]",6
+AAGL2017_067,last_author,"""hanafi M""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",5
+AAGL2017_067,title_fragment,"""hysterectomy vaginal abdominal and""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_067,author_broad,"""hanafi M""[AU] AND 2012/11/01:2026/04/01[PDAT]",71
+AAGL2017_068,title,"""number lymph nodes removed early stage endometrial cancer""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_068,first_author,"""gungor M""[1AU] AND 2012/11/01:2026/04/01[PDAT]",21
+AAGL2017_068,last_author,"""gundogan S""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",7
+AAGL2017_068,title_fragment,"""number lymph nodes removed""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_068,author_broad,"""gungor M""[AU] AND 2012/11/01:2026/04/01[PDAT]",126
+AAGL2017_069,title,"""comparative analysis bladder function return between robotic nerve""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_069,first_author,"""lim P""[1AU] AND 2012/11/01:2026/04/01[PDAT]",29
+AAGL2017_069,last_author,"""kang E""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",61
+AAGL2017_069,title_fragment,"""comparative analysis bladder function""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_069,author_broad,"""lim P""[AU] AND 2012/11/01:2026/04/01[PDAT]",329
+AAGL2017_070,title,"""comparison between laparoscopic and robotic hysterectomy obese patients""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_070,first_author,"""ton J""[1AU] AND 2012/11/01:2026/04/01[PDAT]",8
+AAGL2017_070,last_author,"""moawad G""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",15
+AAGL2017_070,title_fragment,"""between laparoscopic and robotic""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_070,author_broad,"""ton J""[AU] AND 2012/11/01:2026/04/01[PDAT]",120
+AAGL2017_071,title,"""one institute experience robotic single site surgery 500""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_071,first_author,"""jeong K""[1AU] AND 2012/11/01:2026/04/01[PDAT]",111
+AAGL2017_071,last_author,"""moon H""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",55
+AAGL2017_071,title_fragment,"""one institute experience robotic""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_071,author_broad,"""jeong K""[AU] AND 2012/11/01:2026/04/01[PDAT]",597
+AAGL2017_072,title,"""robotic assisted radical hysterectomy results better surgical outcomes""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_072,first_author,"""nie J""[1AU] AND 2012/11/01:2026/04/01[PDAT]",445
+AAGL2017_072,last_author,"""liu X""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",15059
+AAGL2017_072,title_fragment,"""robotic assisted radical hysterectomy""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",26
+AAGL2017_072,author_broad,"""nie J""[AU] AND 2012/11/01:2026/04/01[PDAT]",2909
+AAGL2017_073,title,"""001 investigating novel compound for ureteral identification during""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_073,first_author,"""arms R""[1AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_073,last_author,"""farnam R""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_073,title_fragment,"""001 investigating novel compound""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_073,author_broad,"""arms R""[AU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_074,title,"""analysis the learning curve robotic surgical staging for""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_074,first_author,"""lu B""[1AU] AND 2012/11/01:2026/04/01[PDAT]",690
+AAGL2017_074,last_author,"""liu W""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",6902
+AAGL2017_074,title_fragment,"""analysis the learning curve""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_074,author_broad,"""lu B""[AU] AND 2012/11/01:2026/04/01[PDAT]",5594
+AAGL2017_075,title,"""longitudinal outcome study what are the factors that""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_075,first_author,"""cun H""[1AU] AND 2012/11/01:2026/04/01[PDAT]",7
+AAGL2017_075,last_author,"""medlin E""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",3
+AAGL2017_075,title_fragment,"""longitudinal outcome study what""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_075,author_broad,"""cun H""[AU] AND 2012/11/01:2026/04/01[PDAT]",24
+AAGL2017_076,title,"""modified single site laparoscopic surgery versus conventional laparoscopic""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_076,first_author,"""wang S""[1AU] AND 2012/11/01:2026/04/01[PDAT]",14758
+AAGL2017_076,last_author,"""yin L""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",990
+AAGL2017_076,title_fragment,"""modified single site laparoscopic""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_076,author_broad,"""wang S""[AU] AND 2012/11/01:2026/04/01[PDAT]",94439
+AAGL2017_077,title,"""single institutional experience laparoendoscopic single site radical hysterectomy""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_077,first_author,"""wang Y""[1AU] AND 2012/11/01:2026/04/01[PDAT]",43410
+AAGL2017_077,last_author,"""liang Z""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",1258
+AAGL2017_077,title_fragment,"""single institutional experience laparoendoscopic""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_077,author_broad,"""wang Y""[AU] AND 2012/11/01:2026/04/01[PDAT]",265369
+AAGL2017_078,title,"""the intensity post laparoscopic shoulder pain positively correlated""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_078,first_author,"""song T""[1AU] AND 2012/11/01:2026/04/01[PDAT]",630
+AAGL2017_078,last_author,"""song T""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",479
+AAGL2017_078,title_fragment,"""the intensity post laparoscopic""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_078,author_broad,"""song T""[AU] AND 2012/11/01:2026/04/01[PDAT]",3802
+AAGL2017_079,title,"""morcellation survey patients with uterine fibroids knowledge and""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_079,first_author,"""bortoletto P""[1AU] AND 2012/11/01:2026/04/01[PDAT]",34
+AAGL2017_079,last_author,"""petrozza J""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",2
+AAGL2017_079,title_fragment,"""morcellation survey patients with""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_079,author_broad,"""bortoletto P""[AU] AND 2012/11/01:2026/04/01[PDAT]",105
+AAGL2017_080,title,"""prospective comparison contained tissue extraction techniques time laparoscopic""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_080,first_author,"""cohen S""[1AU] AND 2012/11/01:2026/04/01[PDAT]",262
+AAGL2017_080,last_author,"""clark N""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",37
+AAGL2017_080,title_fragment,"""contained tissue extraction techniques""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_080,author_broad,"""cohen S""[AU] AND 2012/11/01:2026/04/01[PDAT]",1549
+AAGL2017_081,title,"""bag morcellation routine for laparoscopic hysterectomy""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_081,first_author,"""rimbach S""[1AU] AND 2012/11/01:2026/04/01[PDAT]",5
+AAGL2017_081,last_author,"""schempershofe M""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_081,title_fragment,"""bag morcellation routine for""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_081,author_broad,"""rimbach S""[AU] AND 2012/11/01:2026/04/01[PDAT]",17
+AAGL2017_082,title,"""comparison transvaginal and laparoscopic routes morcellation following total""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_082,first_author,"""mishra J""[1AU] AND 2012/11/01:2026/04/01[PDAT]",93
+AAGL2017_082,last_author,"""lakhanpal S""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",14
+AAGL2017_082,title_fragment,"""transvaginal and laparoscopic routes""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_082,author_broad,"""mishra J""[AU] AND 2012/11/01:2026/04/01[PDAT]",420
+AAGL2017_083,title,"""genitourinary involvement deep infiltrating endometriosis""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_083,first_author,"""bougie O""[1AU] AND 2012/11/01:2026/04/01[PDAT]",26
+AAGL2017_083,last_author,"""singh S""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",3311
+AAGL2017_083,title_fragment,"""genitourinary involvement deep infiltrating""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_083,author_broad,"""bougie O""[AU] AND 2012/11/01:2026/04/01[PDAT]",77
+AAGL2017_084,title,"""medical treatment for adenomyosis systematic review prospective clinical""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_084,first_author,"""brito L""[1AU] AND 2012/11/01:2026/04/01[PDAT]",8
+AAGL2017_084,last_author,"""benetti-pinto C""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_084,title_fragment,"""medical treatment for adenomyosis""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_084,author_broad,"""brito L""[AU] AND 2012/11/01:2026/04/01[PDAT]",192
+AAGL2017_085,title,"""comparative analysis lipid composition peritoneal fluid and blood""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_085,first_author,"""borisova A""[1AU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_085,last_author,"""stepanian A""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",6
+AAGL2017_085,title_fragment,"""comparative analysis lipid composition""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_085,author_broad,"""borisova A""[AU] AND 2012/11/01:2026/04/01[PDAT]",24
+AAGL2017_086,title,"""temporarily blocking the uterine artery dig out diffused""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_086,first_author,"""yong L""[1AU] AND 2012/11/01:2026/04/01[PDAT]",43
+AAGL2017_086,last_author,"""yong L""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",35
+AAGL2017_086,title_fragment,"""temporarily blocking the uterine""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_086,author_broad,"""yong L""[AU] AND 2012/11/01:2026/04/01[PDAT]",272
+AAGL2017_087,title,"""the impact concurrent chronic pain conditions the development""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_087,first_author,"""wagner C""[1AU] AND 2012/11/01:2026/04/01[PDAT]",106
+AAGL2017_087,last_author,"""jijon A""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_087,title_fragment,"""the impact concurrent chronic""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_087,author_broad,"""wagner C""[AU] AND 2012/11/01:2026/04/01[PDAT]",976
+AAGL2017_088,title,"""the impact ovarian reserve ovarian cystectomy versus laser""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_088,first_author,"""ottolina J""[1AU] AND 2012/11/01:2026/04/01[PDAT]",9
+AAGL2017_088,last_author,"""tandoi I""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_088,title_fragment,"""the impact ovarian reserve""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_088,author_broad,"""ottolina J""[AU] AND 2012/11/01:2026/04/01[PDAT]",44
+AAGL2017_089,title,"""and sonographic features deep endometriosis after laparoscopic bowel""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_089,first_author,"""zupi E""[1AU] AND 2012/11/01:2026/04/01[PDAT]",8
+AAGL2017_089,last_author,"""pietropolli A""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",10
+AAGL2017_089,title_fragment,"""and sonographic features deep""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_089,author_broad,"""zupi E""[AU] AND 2012/11/01:2026/04/01[PDAT]",121
+AAGL2017_090,title,"""immunohistochemical characteristic stem cells markers foci nodular and""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_090,first_author,"""dzhamaludinova K""[1AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_090,last_author,"""stepanian A""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",6
+AAGL2017_090,title_fragment,"""immunohistochemical characteristic stem cells""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_090,author_broad,"""dzhamaludinova K""[AU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_091,title,"""cxcr4 mediated epithelial mesenchymal transition and stemness epithelial""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_091,first_author,"""zi D""[1AU] AND 2012/11/01:2026/04/01[PDAT]",11
+AAGL2017_091,last_author,"""jin H""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",1368
+AAGL2017_091,title_fragment,"""cxcr4 mediated epithelial mesenchymal""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_091,author_broad,"""zi D""[AU] AND 2012/11/01:2026/04/01[PDAT]",65
+AAGL2017_092,title,"""there appropriate utilization alternative treatment before hysterectomy for""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_092,first_author,"""nguyen N""[1AU] AND 2012/11/01:2026/04/01[PDAT]",195
+AAGL2017_092,last_author,"""postlethwaite D""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_092,title_fragment,"""there appropriate utilization alternative""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_092,author_broad,"""nguyen N""[AU] AND 2012/11/01:2026/04/01[PDAT]",1280
+AAGL2017_093,title,"""vaginal extraction index predictive model for extraction hysterectomy""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_093,first_author,"""elkattah R""[1AU] AND 2012/11/01:2026/04/01[PDAT]",8
+AAGL2017_093,last_author,"""holcombe J""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",2
+AAGL2017_093,title_fragment,"""vaginal extraction index predictive""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_093,author_broad,"""elkattah R""[AU] AND 2012/11/01:2026/04/01[PDAT]",20
+AAGL2017_094,title,"""prospective controlled assessment stress hormones patients undergoing myomectomy""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_094,first_author,"""pados G""[1AU] AND 2012/11/01:2026/04/01[PDAT]",8
+AAGL2017_094,last_author,"""tarlatzis B""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",15
+AAGL2017_094,title_fragment,"""controlled assessment stress hormones""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_094,author_broad,"""pados G""[AU] AND 2012/11/01:2026/04/01[PDAT]",35
+AAGL2017_095,title,"""healthcare utilization patterns among women with newly diagnosed""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_095,first_author,"""vardy M""[1AU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_095,last_author,"""miller J""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",336
+AAGL2017_095,title_fragment,"""healthcare utilization patterns among""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_095,author_broad,"""vardy M""[AU] AND 2012/11/01:2026/04/01[PDAT]",6
+AAGL2017_096,title,"""quality life and health care access transgender population""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_096,first_author,"""motwani A""[1AU] AND 2012/11/01:2026/04/01[PDAT]",3
+AAGL2017_096,last_author,"""fatehchehr S""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_096,title_fragment,"""quality life and health""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_096,author_broad,"""motwani A""[AU] AND 2012/11/01:2026/04/01[PDAT]",8
+AAGL2017_097,title,"""five year retrospective study risk factors for small""[TI] AND 2012/11/01:2026/04/01[PDAT]",0
+AAGL2017_097,first_author,"""arabkhazaeli M""[1AU] AND 2012/11/01:2026/04/01[PDAT]",3
+AAGL2017_097,last_author,"""luts H""[LASTAU] AND 2012/11/01:2026/04/01[PDAT]",1
+AAGL2017_097,title_fragment,"""five year retrospective study""[TIAB] AND 2012/11/01:2026/04/01[PDAT]",272
+AAGL2017_097,author_broad,"""arabkhazaeli M""[AU] AND 2012/11/01:2026/04/01[PDAT]",7

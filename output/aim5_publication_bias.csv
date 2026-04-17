@@ -1,5 +1,5 @@
 result_positivity,n,n_published,rate
-negative,10,3,30
-neutral,44,9,20.5
-positive,60,12,20
-positive_vs_negative_OR,70,NA,0.583
+negative,11,3,27.3
+neutral,49,9,18.4
+positive,62,12,19.4
+positive_vs_negative_OR,73,NA,0.64

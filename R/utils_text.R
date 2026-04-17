@@ -94,7 +94,7 @@ extract_keywords <- function(texts, top_n = 10) {
 
   # Tokenize and compute TF-IDF
   lapply(texts, function(text) {
-    if (is.na(text) || text == "") return(character(0))
+    if (is.null(text) || is.na(text) || text == "") return(character(0))
     words <- text |>
       tolower() |>
       str_replace_all("[^a-z0-9\\s]", " ") |>

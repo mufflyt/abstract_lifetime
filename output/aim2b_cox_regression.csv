@@ -1,8 +1,10 @@
 term,estimate,std.error,statistic,p.value,conf.low,conf.high
-is_rctTRUE,1.617,0.362,1.325,0.185,0.795,3.289
-is_academicTRUE,1.239,0.281,0.763,0.445,0.715,2.149
-is_us_basedTRUE,2.208,0.292,2.715,0.007,1.247,3.912
-session_typeVideo,1.188,0.473,0.363,0.716,0.47,3.002
-result_positivityneutral,0.797,0.685,-0.331,0.741,0.208,3.054
-result_positivitypositive,0.73,0.655,-0.48,0.632,0.202,2.639
-result_positivityunclear,0.469,0.617,-1.228,0.219,0.14,1.57
+is_rctTRUE,1.489,0.502,0.792,0.428,0.556,3.984
+is_academicTRUE,1.066,0.345,0.186,0.853,0.542,2.098
+is_us_basedTRUE,1.703,0.323,1.65,0.099,0.905,3.207
+session_typeVideo,1.163,0.532,0.283,0.777,0.41,3.298
+n_authors,0.976,0.031,-0.776,0.438,0.918,1.038
+first_author_gendermale,0.65,0.261,-1.646,0.1,0.389,1.085
+result_positivityneutral,1.916,1.107,0.587,0.557,0.219,16.761
+result_positivitypositive,1.094,1.092,0.082,0.934,0.129,9.308
+result_positivityunclear,1.207,1.064,0.177,0.86,0.15,9.712

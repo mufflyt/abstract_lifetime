@@ -10,7 +10,7 @@ library(cli)
 cfg <- config::get(file = here("config.yml"))
 set.seed(cfg$pipeline$seed)
 
-cli_h1("AAGL 2023 Abstract-to-Publication Pipeline")
+cli_h1("AAGL Abstract-to-Publication Pipeline")
 
 # Step 1: Parse abstracts (web first, PDF fallback)
 cli_h2("Step 1: Data Ingestion")
@@ -58,6 +58,18 @@ source(here("R", "05_adjudicate.R"))
 # Step 5b: Publication-type enrichment for matched PMIDs
 cli_h2("Step 5b: Publication Type Enrichment")
 source(here("R", "09b_enrich_pub_types.R"))
+
+# Step 5c: Author enrichment (full names + affiliations from PubMed XML)
+cli_h2("Step 5c: Author Enrichment")
+source(here("R", "09_enrich_authors.R"))
+
+# Step 5d: Author characteristics (gender, ACOG district, counts)
+cli_h2("Step 5d: Author Characteristics")
+source(here("R", "09c_author_characteristics.R"))
+
+# Step 5e: Citation counts + journal impact from OpenAlex
+cli_h2("Step 5e: Citation Metrics")
+source(here("R", "09d_enrich_metrics.R"))
 
 # Step 6: Analyze
 cli_h2("Step 6: Analysis")

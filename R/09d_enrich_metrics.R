@@ -13,6 +13,8 @@ suppressPackageStartupMessages({
 cfg <- config::get(file = here("config.yml"))
 ua_email <- "tyler.muffly@dhha.org"
 
+`%||%` <- function(a, b) if (is.null(a) || length(a) == 0 || is.na(a)) b else a
+
 cli_h1("Citation + journal-impact enrichment via OpenAlex")
 
 matches <- read_csv(here("output", "abstracts_with_matches.csv"), show_col_types = FALSE)
@@ -72,8 +74,6 @@ for (i in seq_len(nrow(target_dois))) {
     journal_name_oa = journal_name
   )
 }
-
-`%||%` <- function(a, b) if (is.null(a) || length(a) == 0 || is.na(a)) b else a
 
 metrics <- bind_rows(results)
 write_csv(metrics, here("data", "processed", "publication_metrics.csv"))

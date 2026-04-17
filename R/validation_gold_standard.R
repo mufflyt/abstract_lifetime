@@ -51,12 +51,15 @@ if (nrow(validation) == 0) {
 validation <- validation |>
   mutate(
     truth = verified_published,
-    predicted = classification == "accept" |
-      (classification == "review" & !is.na(best_pmid)),
+    predicted = classification == "definite" |
+      (classification %in% c("probable", "possible") & !is.na(best_pmid)),
     # For PMID-level accuracy
     correct_pmid = case_when(
       !truth & !predicted ~ TRUE,  # True negative
-      truth & predicted & best_pmid == verified_pmid ~ TRUE,  # Correct match
+      # NA == NA returns NA in R, not TRUE — handle explicitly
+      truth & predicted & is.na(best_pmid) & is.na(verified_pmid) ~ FALSE,
+      truth & predicted & !is.na(best_pmid) & !is.na(verified_pmid) &
+        best_pmid == verified_pmid ~ TRUE,  # Correct match
       truth & predicted & is.na(verified_pmid) ~ NA,  # Can't verify
       TRUE ~ FALSE
     )

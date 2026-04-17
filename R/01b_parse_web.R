@@ -14,6 +14,8 @@ library(cli)
 
 cfg <- config::get(file = here("config.yml"))
 
+`%||%` <- function(a, b) if (is.null(a) || length(a) == 0) b else a
+
 #' Scrape one page of the supplement listing
 #' Returns a list: items (XML nodesets), has_next (logical), next_url (character)
 scrape_listing_page <- function(url) {
@@ -271,8 +273,6 @@ if (file.exists(parsed_path)) {
     skip_scrape <- TRUE
   }
 }
-
-`%||%` <- function(a, b) if (is.null(a) || length(a) == 0) b else a
 
 if (!skip_scrape) {
 

@@ -9,6 +9,7 @@ library(config)
 
 source(here("R", "utils_crossref.R"))
 source(here("R", "utils_text.R"))
+source(here("R", "utils_pubmed.R"))
 
 cfg <- config::get(file = here("config.yml"))
 
@@ -274,7 +275,6 @@ if (nrow(oa_df) > 0) {
 
   if (length(new_oa_pmids) > 0) {
     cli_alert_info("Fetching PubMed details for {length(new_oa_pmids)} new PMIDs from OpenAlex")
-    source(here("R", "utils_pubmed.R"))
     oa_details <- fetch_pubmed_details(new_oa_pmids, cfg)
 
     if (nrow(oa_details) > 0) {
@@ -319,7 +319,6 @@ if (nrow(s2_df) > 0) {
 
   if (length(new_s2_pmids) > 0) {
     cli_alert_info("Fetching PubMed details for {length(new_s2_pmids)} new PMIDs from Semantic Scholar")
-    source(here("R", "utils_pubmed.R"))
     s2_details <- fetch_pubmed_details(new_s2_pmids, cfg)
 
     if (nrow(s2_details) > 0) {
@@ -364,7 +363,6 @@ if (nrow(epmc_df) > 0) {
 
   if (length(new_epmc_pmids) > 0) {
     cli_alert_info("Fetching PubMed details for {length(new_epmc_pmids)} new PMIDs from Europe PMC")
-    source(here("R", "utils_pubmed.R"))
     new_details <- fetch_pubmed_details(new_epmc_pmids, cfg)
 
     if (nrow(new_details) > 0) {
@@ -428,7 +426,6 @@ if (nrow(cr_df) > 0) {
         mutate(pmid = as.character(pmid)) |>
         filter(!pmid %in% pubmed_candidates$pmid)
       if (nrow(truly_new) > 0) {
-        source(here("R", "utils_pubmed.R"))
         cr_details <- fetch_pubmed_details(unique(truly_new$pmid), cfg)
         if (nrow(cr_details) > 0) {
           cr_details <- cr_details |>

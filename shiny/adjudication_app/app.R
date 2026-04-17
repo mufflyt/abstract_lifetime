@@ -250,6 +250,31 @@ $(document).on('keydown', function(e) {
 
   if (handled) e.preventDefault();
 });
+
+// Bootstrap 5 tooltip init — re-run after each Shiny output update
+$(document).on('shiny:value', function() {
+  setTimeout(function() {
+    document.querySelectorAll('[data-bs-toggle=\"tooltip\"]').forEach(function(el) {
+      if (!bootstrap.Tooltip.getInstance(el)) {
+        new bootstrap.Tooltip(el, {trigger: 'hover'});
+      }
+    });
+  }, 50);
+});
+
+// localStorage persistence for reviewer initials
+$(document).ready(function() {
+  var saved = localStorage.getItem('adjudication_reviewer_initials');
+  if (saved && saved.length >= 2) {
+    setTimeout(function() {
+      Shiny.setInputValue('ls_reviewer_initials', saved, {priority: 'event'});
+    }, 800);
+  }
+  $(document).on('change blur', '#reviewer_initials', function() {
+    var val = $(this).val().trim().toUpperCase();
+    if (val.length >= 2) localStorage.setItem('adjudication_reviewer_initials', val);
+  });
+});
 "
 
 # --- UI helpers ---
@@ -268,18 +293,98 @@ help_icon <- function(text) {
 
 # --- UI ---
 ui <- page_sidebar(
-  title = "AAGL 2023 Abstract-to-Publication Adjudication",
+  title = "Abstract-to-Publication Adjudication",
   theme = bs_theme(version = 5, bootswatch = "flatly"),
 
   # shinyjs + keyboard handler
   useShinyjs(),
-  tags$head(tags$script(HTML(keyboard_js))),
+  tags$head(
+    tags$script(HTML(keyboard_js)),
+    tags$style(HTML("
+      .decision-panel {
+        margin: 1rem -1rem -1rem;
+        padding: 0.75rem 1rem 1rem;
+        background: var(--bs-body-bg);
+        border-top: 1px solid var(--bs-border-color);
+      }
+      .candidate-card {
+        min-height: 720px;
+      }
+      .candidate-card > .card-body {
+        display: flex;
+        flex-direction: column;
+      }
+      .candidate-workspace {
+        flex: 0 0 440px;
+        min-height: 440px;
+        overflow-y: auto;
+        padding-right: 0.25rem;
+      }
+      .candidate-table-wrap {
+        min-height: 260px;
+        overflow-x: auto;
+        overflow-y: auto;
+      }
+      .candidate-table-wrap table.dataTable td {
+        white-space: normal;
+      }
+      .candidate-table-wrap table.dataTable td.dt-top {
+        vertical-align: top;
+      }
+      .score-chip {
+        display: inline-block;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-size: 0.75em;
+        font-weight: 600;
+        margin: 0 2px 2px 0;
+        background: #e9ecef;
+        color: #495057;
+      }
+      .score-chip.positive { background: #d1e7dd; color: #0a3622; }
+      .score-chip.negative { background: #f8d7da; color: #58151c; }
+      .cand-summary-bar {
+        background: #f0f7ff;
+        border: 1px solid #b8daff;
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 0.82em;
+        margin-bottom: 6px;
+        line-height: 1.6;
+      }
+      .comparison-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 0.75rem;
+      }
+      .comparison-pane {
+        max-height: 240px;
+        overflow-y: auto;
+        padding: 0.75rem;
+        border: 1px solid var(--bs-border-color);
+        border-radius: 6px;
+        font-size: 0.85em;
+        line-height: 1.5;
+      }
+      .comparison-pane.abstract-source {
+        background: #f8f9fa;
+      }
+      .comparison-pane.candidate-source {
+        background: #f0f7ff;
+      }
+      @media (max-width: 900px) {
+        .comparison-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    "))
+  ),
 
   sidebar = sidebar(
     width = 280,
     tooltip(
       selectInput("abstract_select", "Select Abstract:", choices = NULL, selected = NULL),
-      "Pick any AAGL 2023 abstract. The left card shows the abstract; the right card shows PubMed candidates scored against it.",
+      "Pick any abstract. The left card shows the abstract; the right card shows PubMed candidates scored against it.",
       placement = "right"
     ),
     tooltip(
@@ -294,7 +399,7 @@ ui <- page_sidebar(
                 help_icon("Narrow the list to a specific AAGL Global Congress year (2022 = 51st, 2023 = 52nd). 'All' shows both cohorts (198 abstracts).")),
         choices = c("All" = "all",
                     "2012" = "2012", "2013" = "2013", "2014" = "2014",
-                    "2015" = "2015", "2016" = "2016", "2018" = "2018",
+                    "2015" = "2015", "2016" = "2016", "2017" = "2017", "2018" = "2018",
                     "2019" = "2019", "2020" = "2020", "2021" = "2021",
                     "2022" = "2022", "2023" = "2023"),
         selected = "all",
@@ -357,7 +462,7 @@ ui <- page_sidebar(
   ),
 
   layout_columns(
-    col_widths = c(5, 7),
+    col_widths = c(4, 8),
 
     # --- Left card: Abstract details + score breakdown ---
     card(
@@ -421,6 +526,7 @@ ui <- page_sidebar(
 
     # --- Right card: Candidates table + decision ---
     card(
+      class = "candidate-card",
       card_header(
         class = "d-flex justify-content-between align-items-center",
         span("Candidate Publications"),
@@ -436,53 +542,65 @@ ui <- page_sidebar(
         )))
       ),
       card_body(
-        div(style = "max-height: 300px; overflow-y: auto;",
-          DTOutput("candidates_table")
+        div(class = "candidate-workspace",
+          div(class = "candidate-table-wrap",
+            DTOutput("candidates_table")
+          )
         ),
         uiOutput("candidate_abstract_panel"),
-        hr(),
-        h5("Decision"),
-        div(class = "d-flex gap-3 align-items-end mb-2",
-          div(style = "flex: 0 0 auto;",
+        div(class = "decision-panel",
+          h5("Decision"),
+          div(class = "d-flex gap-3 align-items-end mb-2",
+            div(style = "flex: 0 0 auto;",
+              tooltip(
+                textInput("reviewer_initials", tagList("Reviewer Initials:", help_icon("2–4 uppercase letters identifying you (e.g., TM, ABC). Required so multi-reviewer conflicts can be detected.")), width = "100px"),
+                "Your initials are stamped on every saved decision.",
+                placement = "top"
+              )
+            ),
+            div(style = "flex: 1;",
+              radioButtons("decision",
+                           tagList("Match decision:",
+                                   help_icon(HTML(paste(
+                                     "<b>Confirmed match</b>: the PMID (best or overridden) is the published version of this abstract.<br>",
+                                     "<b>No match found</b>: you've reviewed the candidates and none correspond.<br>",
+                                     "<b>Skip / Unsure</b>: can't decide — come back later."
+                                   )))),
+                           choices = c("Confirmed match" = "match",
+                                       "No match found" = "no_match",
+                                       "Skip / Unsure" = "skip"),
+                           selected = "skip", inline = TRUE)
+            )
+          ),
+          div(class = "d-flex gap-2 align-items-end",
+            div(style = "flex: 1;",
+              tooltip(
+                textInput("manual_pmid", tagList("Override PMID (if different from best):", help_icon("Enter a 7-8 digit PubMed ID if the correct match isn't the top candidate. Leave blank to accept the 'best_pmid' on a match decision."))),
+                "Use when the right paper is lower in the candidate list or not listed at all.",
+                placement = "top"
+              )
+            ),
             tooltip(
-              textInput("reviewer_initials", tagList("Reviewer Initials:", help_icon("2–4 uppercase letters identifying you (e.g., TM, ABC). Required so multi-reviewer conflicts can be detected.")), width = "100px"),
-              "Your initials are stamped on every saved decision.",
+              actionButton("btn_use_selected_pmid", "Use selected PMID", icon = icon("arrow-down"), class = "btn-outline-primary mb-3"),
+              "Copy the selected candidate row's PMID into the override field and mark this as a confirmed match.",
               placement = "top"
             )
           ),
-          div(style = "flex: 1;",
-            radioButtons("decision",
-                         tagList("Match decision:",
-                                 help_icon(HTML(paste(
-                                   "<b>Confirmed match</b>: the PMID (best or overridden) is the published version of this abstract.<br>",
-                                   "<b>No match found</b>: you've reviewed the candidates and none correspond.<br>",
-                                   "<b>Skip / Unsure</b>: can't decide — come back later."
-                                 )))),
-                         choices = c("Confirmed match" = "match",
-                                     "No match found" = "no_match",
-                                     "Skip / Unsure" = "skip"),
-                         selected = "skip", inline = TRUE)
+          tooltip(
+            textAreaInput("notes", tagList("Reviewer notes:", help_icon("Optional free-text rationale. Helpful for edge cases and conflict resolution between reviewers.")), rows = 2),
+            "These notes ship to the Google Sheet alongside your decision.",
+            placement = "top"
+          ),
+          tooltip(
+            actionButton("btn_save", "Save Decision", class = "btn-primary", icon = icon("floppy-disk")),
+            "Writes your decision to Google Sheets (or local CSV fallback). Also confirms conflicts if another reviewer already decided.",
+            placement = "top"
+          ),
+          tags$div(class = "text-muted small mt-2",
+            tags$strong("Keyboard shortcuts: "),
+            tags$span("m = match, n = no match, s = skip, Enter = save, "), tags$br(),
+            tags$span("Arrow keys or [ ] = prev/next (when not in a text field)")
           )
-        ),
-        tooltip(
-          textInput("manual_pmid", tagList("Override PMID (if different from best):", help_icon("Enter a 7-8 digit PubMed ID if the correct match isn't the top candidate. Leave blank to accept the 'best_pmid' on a match decision."))),
-          "Use when the right paper is lower in the candidate list or not listed at all.",
-          placement = "top"
-        ),
-        tooltip(
-          textAreaInput("notes", tagList("Reviewer notes:", help_icon("Optional free-text rationale. Helpful for edge cases and conflict resolution between reviewers.")), rows = 2),
-          "These notes ship to the Google Sheet alongside your decision.",
-          placement = "top"
-        ),
-        tooltip(
-          actionButton("btn_save", "Save Decision", class = "btn-primary", icon = icon("floppy-disk")),
-          "Writes your decision to Google Sheets (or local CSV fallback). Also confirms conflicts if another reviewer already decided.",
-          placement = "top"
-        ),
-        tags$div(class = "text-muted small mt-2",
-          tags$strong("Keyboard shortcuts: "),
-          tags$span("m = match, n = no match, s = skip, Enter = save, "), tags$br(),
-          tags$span("Arrow keys or [ ] = prev/next (when not in a text field)")
         )
       )
     )
@@ -491,6 +609,16 @@ ui <- page_sidebar(
 
 # --- Server ---
 server <- function(input, output, session) {
+  # --- Restore reviewer initials from browser localStorage ---
+  observeEvent(input$ls_reviewer_initials, {
+    if (nchar(trimws(isolate(input$reviewer_initials))) == 0) {
+      updateTextInput(session, "reviewer_initials", value = input$ls_reviewer_initials)
+    }
+  }, once = TRUE)
+
+  # --- Candidate table proxy (used for auto-selection) ---
+  cands_proxy <- DT::dataTableProxy("candidates_table")
+
   # --- Google Sheets state ---
   use_gs <- reactiveVal(FALSE)
   sheet_id <- reactiveVal(NULL)
@@ -804,6 +932,12 @@ server <- function(input, output, session) {
     }
   }, ignoreInit = TRUE)
 
+  # Auto-select top-scored candidate row whenever the abstract changes
+  observeEvent(input$abstract_select, {
+    DT::selectRows(cands_proxy, NULL)
+    shinyjs::delay(200, DT::selectRows(cands_proxy, 1))
+  }, ignoreNULL = TRUE, ignoreInit = FALSE)
+
   # --- Outputs: abstract details ---
   output$abs_title <- renderText({
     a <- current_abstract()
@@ -1019,63 +1153,17 @@ server <- function(input, output, session) {
            icon("magnifying-glass"), " Search PubMed")
   })
 
-
-  # --- Candidate abstract comparison (shown on row click) ---
-  output$candidate_abstract_panel <- renderUI({
-    sel <- input$candidates_table_rows_selected
-    if (is.null(sel) || length(sel) == 0) {
-      return(div(class = "text-muted small mt-2", icon("hand-pointer"),
-                 " Click a candidate row above to compare abstracts"))
-    }
+  # --- Candidate rows with score details, ordered as shown in the table ---
+  candidate_rows <- reactive({
     d <- data()
     req(d)
     abs_id <- input$abstract_select
     req(abs_id, abs_id != "")
 
-    cands <- d$candidates |> filter(abstract_id == abs_id)
-    score_row <- d$scores_detail |> filter(abstract_id == abs_id)
-    if (nrow(score_row) > 0 && !is.null(score_row$score_details[[1]])) {
-      sd <- score_row$score_details[[1]] |> select(pmid, total_score)
-      cands <- cands |> left_join(sd, by = "pmid") |> arrange(desc(total_score))
-    }
-    if (sel > nrow(cands)) return(NULL)
-    selected_pmid <- cands$pmid[sel]
-
-    cand_row <- d$candidates |> filter(pmid == selected_pmid, abstract_id == abs_id)
-    if (nrow(cand_row) == 0) return(NULL)
-
-    pub_abs <- if ("pub_abstract" %in% names(cand_row) && !is.na(cand_row$pub_abstract[1])) {
-      cand_row$pub_abstract[1]
-    } else "No abstract available for this candidate."
-
-    pub_authors <- if ("pub_all_authors" %in% names(cand_row) && !is.na(cand_row$pub_all_authors[1])) {
-      cand_row$pub_all_authors[1]
-    } else ""
-
-    div(class = "mt-2",
-      tags$details(open = "open",
-        tags$summary(tags$strong(sprintf("Candidate PMID %s — Abstract", selected_pmid))),
-        if (nchar(pub_authors) > 0) div(class = "small text-muted mb-1", pub_authors),
-        div(style = "max-height: 180px; overflow-y: auto; background: #f0f7ff; padding: 8px; border-radius: 4px; font-size: 0.85em;",
-          pub_abs
-        )
-      )
-    )
-  })
-
-  # --- Candidates table with per-candidate scores ---
-  output$candidates_table <- renderDT({
-    d <- data()
-    req(d)
-    abs_id <- input$abstract_select
-    if (is.null(abs_id) || abs_id == "") return(datatable(tibble()))
-
     cands <- d$candidates |>
-      filter(abstract_id == abs_id) |>
-      select(any_of(c("pmid", "pub_title", "pub_first_author", "pub_last_author",
-                       "pub_journal", "pub_year", "pub_doi")))
+      filter(abstract_id == abs_id)
 
-    if (nrow(cands) == 0) return(datatable(tibble()))
+    if (nrow(cands) == 0) return(cands)
 
     score_row <- d$scores_detail |> filter(abstract_id == abs_id)
     if (nrow(score_row) > 0 && !is.null(score_row$score_details[[1]])) {
@@ -1087,6 +1175,156 @@ server <- function(input, output, session) {
         arrange(desc(total_score))
     }
 
+    cands
+  })
+
+  selected_candidate <- reactive({
+    sel <- input$candidates_table_rows_selected
+    if (is.null(sel) || length(sel) == 0) return(NULL)
+    cands <- candidate_rows()
+    if (nrow(cands) == 0 || sel[1] > nrow(cands)) return(NULL)
+    cands[sel[1], , drop = FALSE]
+  })
+
+  current_abstract_text <- reactive({
+    d <- data()
+    req(d)
+    abs_id <- input$abstract_select
+    req(abs_id, abs_id != "")
+    row <- d$abstracts |> filter(abstract_id == abs_id)
+    if (nrow(row) > 0 && "abstract_text" %in% names(row) && !is.na(row$abstract_text[1])) {
+      return(row$abstract_text[1])
+    }
+    a <- current_abstract()
+    if (nrow(a) == 0) return(NA_character_)
+    parts <- c(a$abstract_objective[1], a$abstract_conclusion[1])
+    parts <- parts[!is.na(parts) & parts != ""]
+    if (length(parts) == 0) NA_character_ else paste(parts, collapse = " ")
+  })
+
+  # Score-chip builder: renders one badge per scoring component
+  # Tooltip descriptions for each scoring component
+  CHIP_TIPS <- list(
+    title_pts      = "Title similarity: cosine similarity of title bigrams × weight. Max ~3 pts. Zero means the titles share no word-pairs.",
+    abstract_pts   = "Abstract text overlap: TF-IDF cosine similarity between conference abstract and candidate abstract. Max ~2 pts. Zero when either abstract is missing.",
+    first_au_pts   = "First-author match: fuzzy name comparison between abstract's first author and candidate's first author. Max ~1.5 pts.",
+    last_au_pts    = "Last-author match: fuzzy name comparison between abstract's last author and candidate's last author. Max ~2 pts.",
+    journal_pts    = "Journal match: bonus when the candidate is published in JMIG (the target journal). Max ~1 pt.",
+    date_pts       = "Publication date: bonus when candidate was published 6–36 months after the congress date — the expected window for a conference-to-journal pipeline. Max ~1 pt.",
+    no_text_penalty = "No-text-evidence penalty: negative adjustment applied when neither title similarity nor abstract overlap provides any signal. Penalises coincidental author/journal matches."
+  )
+
+  make_score_chips <- function(cand_row) {
+    chip <- function(label, col) {
+      val <- if (col %in% names(cand_row)) cand_row[[col]][1] else NA
+      if (is.na(val)) return(NULL)
+      v <- suppressWarnings(as.numeric(val))
+      if (is.na(v)) return(NULL)
+      cls  <- paste("score-chip", if (v > 0) "positive" else if (v < 0) "negative" else "neutral")
+      tip  <- CHIP_TIPS[[col]] %||% label
+      span(class = cls,
+           `data-bs-toggle` = "tooltip",
+           `data-bs-placement` = "top",
+           title = tip,
+           sprintf("%s %+.1f", label, v))
+    }
+    tagList(
+      chip("Title",    "title_pts"),
+      chip("Abstract", "abstract_pts"),
+      chip("1st Au",   "first_au_pts"),
+      chip("Last Au",  "last_au_pts"),
+      chip("Journal",  "journal_pts"),
+      chip("Date",     "date_pts"),
+      chip("Penalty",  "no_text_penalty")
+    )
+  }
+
+  # --- Candidate abstract comparison (shown on row click) ---
+  output$candidate_abstract_panel <- renderUI({
+    cand_row <- selected_candidate()
+    if (is.null(cand_row)) {
+      return(div(class = "text-muted small mt-2", icon("hand-pointer"),
+                 " Click a candidate row above to compare abstracts"))
+    }
+
+    pub_abs <- if ("pub_abstract" %in% names(cand_row) && !is.na(cand_row$pub_abstract[1])) {
+      cand_row$pub_abstract[1]
+    } else "No abstract available for this candidate."
+
+    pub_authors <- if ("pub_all_authors" %in% names(cand_row) && !is.na(cand_row$pub_all_authors[1])) {
+      cand_row$pub_all_authors[1]
+    } else ""
+
+    # Compact summary bar
+    score_val  <- if ("total_score" %in% names(cand_row)) cand_row$total_score[1] else NA
+    pub_year   <- if ("pub_year"    %in% names(cand_row)) cand_row$pub_year[1]    else NA
+    pub_jrnl   <- if ("pub_journal" %in% names(cand_row)) cand_row$pub_journal[1] else NA
+    first_au   <- if ("pub_first_author" %in% names(cand_row)) cand_row$pub_first_author[1] else NA
+    last_au    <- if ("pub_last_author"  %in% names(cand_row)) cand_row$pub_last_author[1]  else NA
+    pmid_link  <- tags$a(href = paste0("https://pubmed.ncbi.nlm.nih.gov/", cand_row$pmid[1], "/"),
+                         target = "_blank", paste0("PMID ", cand_row$pmid[1]))
+
+    summary_meta <- paste(
+      Filter(function(x) !is.na(x) && nchar(as.character(x)) > 0,
+             list(if (!is.na(score_val)) sprintf("Score %.2f", score_val),
+                  as.character(pub_year),
+                  pub_jrnl,
+                  if (!is.na(first_au) || !is.na(last_au))
+                    paste0(first_au %||% "?", " \u2192 ", last_au %||% "?")))
+    , collapse = " | ")
+
+    summary_bar <- div(class = "cand-summary-bar mt-2",
+      tags$div(pmid_link, span(class = "text-muted mx-1", "|"), summary_meta),
+      tags$div(class = "mt-1", make_score_chips(cand_row))
+    )
+
+    div(
+      summary_bar,
+      tags$details(open = "open",
+        tags$summary(tags$strong("Compare abstracts")),
+        div(class = "small text-muted mb-2",
+          if ("pub_title" %in% names(cand_row) && !is.na(cand_row$pub_title[1])) {
+            tags$span(cand_row$pub_title[1])
+          },
+          if (nchar(pub_authors) > 0) tags$div(pub_authors)
+        ),
+        div(class = "comparison-grid",
+          div(
+            tags$div(class = "fw-bold small mb-1", "Original abstract"),
+            div(class = "comparison-pane abstract-source",
+              format_abstract_html(current_abstract_text())
+            )
+          ),
+          div(
+            tags$div(class = "fw-bold small mb-1", "Candidate publication abstract"),
+            div(class = "comparison-pane candidate-source",
+              format_abstract_html(pub_abs)
+            )
+          )
+        )
+      )
+    )
+  })
+
+  observeEvent(input$btn_use_selected_pmid, {
+    cand_row <- selected_candidate()
+    if (is.null(cand_row)) {
+      showNotification("Select a candidate row first.", type = "warning")
+      return()
+    }
+    updateTextInput(session, "manual_pmid", value = as.character(cand_row$pmid[1]))
+    updateRadioButtons(session, "decision", selected = "match")
+    showNotification(paste("Using selected PMID", cand_row$pmid[1]), type = "message")
+  })
+
+  # --- Candidates table with per-candidate scores ---
+  output$candidates_table <- renderDT({
+    cands <- candidate_rows() |>
+      select(any_of(c("pmid", "pub_title", "pub_first_author", "pub_last_author",
+                       "pub_journal", "pub_year", "pub_doi", "total_score")))
+
+    if (nrow(cands) == 0) return(datatable(tibble()))
+
     cands <- cands |>
       mutate(
         Link = if_else(!is.na(pub_doi),
@@ -1097,23 +1335,30 @@ server <- function(input, output, session) {
 
     display <- cands |>
       rename(any_of(c(
-        PMID = "pmid", Title = "pub_title",
+        Score = "total_score", PMID = "pmid", Title = "pub_title",
         `1st Author` = "pub_first_author", `Last Author` = "pub_last_author",
-        Journal = "pub_journal", Year = "pub_year", Score = "total_score",
-        `Title Pts` = "title_pts", `Abstr` = "abstract_pts",
-        `1st Au Pts` = "first_au_pts", `Last Au Pts` = "last_au_pts",
-        `Jrnl Pts` = "journal_pts", `Date` = "date_pts",
-        Penalty = "no_text_penalty"
-      )))
+        Journal = "pub_journal", Year = "pub_year"
+      ))) |>
+      select(any_of(c("Score", "PMID", "Title", "1st Author",
+                      "Last Author", "Journal", "Year", "Link")))
 
-    dt_opts <- list(pageLength = 5, scrollX = TRUE)
+    dt_opts <- list(
+      pageLength = 5,
+      scrollX = FALSE,
+      scrollY = "230px",
+      scrollCollapse = FALSE,
+      autoWidth = FALSE
+    )
     score_idx <- match("Score", names(display))
     if (!is.na(score_idx)) {
       dt_opts$order <- list(list(score_idx - 1L, "desc"))
     }
     title_idx <- match("Title", names(display))
     if (!is.na(title_idx)) {
-      dt_opts$columnDefs <- list(list(targets = title_idx - 1L, width = "200px"))
+      dt_opts$columnDefs <- list(
+        list(targets = title_idx - 1L, width = "38%"),
+        list(targets = "_all", className = "dt-top")
+      )
     }
 
     dt <- datatable(display, escape = FALSE, selection = "single", rownames = FALSE, options = dt_opts)

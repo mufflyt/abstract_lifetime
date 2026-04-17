@@ -156,13 +156,24 @@ abstracts <- abstracts |>
     search_text_lc = tolower(coalesce(search_text, abstract_full_text, "")),
     study_design = case_when(
       is_rct ~ "rct",
-      str_detect(search_text_lc, "systematic review|meta-analysis|scoping review") ~ "systematic_review",
-      str_detect(search_text_lc, "prospective\\s+(cohort|observational|study|trial|longitudinal)") ~ "prospective_cohort",
-      str_detect(search_text_lc, "retrospective\\s+(cohort|review|chart|analysis|study)") ~ "retrospective_cohort",
+      str_detect(search_text_lc, "systematic review|meta-analysis|scoping review|narrative review|umbrella review") ~ "systematic_review",
+      str_detect(search_text_lc, "prospective\\s+(cohort|observational|study|trial|longitudinal|database|registry|analysis)") ~ "prospective_cohort",
+      str_detect(search_text_lc, paste0(
+        "retrospective\\s+(cohort|review|chart|analysis|study|database|case)",
+        "|chart review|database (study|analysis|review)|medical record review",
+        "|retrospective analysis|reviewed.*charts|reviewed.*records",
+        "|retrospective.*review of"
+      )) ~ "retrospective_cohort",
       str_detect(search_text_lc, "case-control|case control") ~ "case_control",
-      str_detect(search_text_lc, "case (series|report)") ~ "case_series",
-      str_detect(search_text_lc, "cross-sectional|cross sectional|survey") ~ "cross_sectional",
-      str_detect(search_text_lc, "quality improvement|qi project") ~ "quality_improvement",
+      str_detect(search_text_lc, "case (series|report)|single.?case|video (presentation|case|demonstration)") ~ "case_series",
+      str_detect(search_text_lc, "cross-sectional|cross sectional|survey|questionnaire") ~ "cross_sectional",
+      str_detect(search_text_lc, "quality improvement|qi project|pdsa cycle") ~ "quality_improvement",
+      str_detect(search_text_lc, "cost.?(effectiveness|analysis|benefit|utility)|economic (analysis|evaluation)") ~ "cost_analysis",
+      str_detect(search_text_lc, "simulation|cadaver|bench.?top|dry lab|wet lab|ex.?vivo|animal model|porcine") ~ "simulation_lab",
+      str_detect(search_text_lc, "validation (study|of)|validate[ds]?\\b|psychometric|reliability|accuracy") ~ "validation",
+      str_detect(search_text_lc, "\\b(nsqip|acs-nsqip|acsnsqip|hcup|nis|nrd|seer|ncdb|national.*database|nationwide.*database|sart|puf)\\b") ~ "retrospective_cohort",
+      str_detect(search_text_lc, "cohort study|cohort analysis|longitudinal study") ~ "prospective_cohort",
+      str_detect(search_text_lc, "descriptive study|descriptive analysis") ~ "cross_sectional",
       TRUE ~ "other"
     ),
     is_multicenter = str_detect(search_text_lc,
@@ -178,14 +189,26 @@ cli_alert_info("Study design: {paste(names(table(abstracts$study_design)), table
 cli_alert_info("Multicenter: {sum(abstracts$is_multicenter, na.rm=TRUE)} | Funded: {sum(abstracts$has_funding, na.rm=TRUE)} | Stat sig reported: {sum(abstracts$stat_sig_reported, na.rm=TRUE)}")
 
 # --- Result positivity classification (Cochrane MR000005) ---
+# Scan multiple text fields in priority order: conclusion > measurements/results
+# > full text. Many AAGL abstracts lack a structured conclusion but have
+# results in abstract_measurements or abstract_full_text.
 source(here("R", "utils_positivity.R"))
 abstracts <- abstracts |>
   mutate(
+    .positivity_text = coalesce(
+      if_else(nchar(coalesce(abstract_conclusion, "")) >= 20,
+              abstract_conclusion, NA_character_),
+      if_else(nchar(coalesce(abstract_measurements, "")) >= 20,
+              abstract_measurements, NA_character_),
+      if_else(nchar(coalesce(abstract_full_text, "")) >= 30,
+              abstract_full_text, NA_character_)
+    ),
     result_positivity = vapply(
-      coalesce(abstract_conclusion, abstract_full_text),
+      .positivity_text,
       classify_result_positivity, character(1)
     )
-  )
+  ) |>
+  select(-.positivity_text)
 cli_alert_info("Result positivity: {paste(names(table(abstracts$result_positivity)), table(abstracts$result_positivity), sep='=', collapse=', ')}")
 
 # --- Abstract hash for dedup ---

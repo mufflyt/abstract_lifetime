@@ -1,10 +1,10 @@
 strategy,n_searched,n_with_hits,yield_pct,n_found_correct,pct_found,source
-Europe PMC,98,563,574.5,62,70.5,Supplementary
-Semantic Scholar,98,904,922.4,59,67,Supplementary
-first_author,1641,1311,79.9,40,45.5,PubMed
-OpenAlex,98,790,806.1,38,43.2,Supplementary
-last_author,1641,1224,74.6,25,28.4,PubMed
-author_broad,1641,1526,93,24,27.3,PubMed
-title_fragment,1645,116,7.1,4,4.5,PubMed
-title,1645,3,0.2,NA,NA,PubMed
-CrossRef,98,72,73.5,NA,NA,Supplementary
+Europe PMC,98,619,631.6,80,68.4,Supplementary
+Semantic Scholar,98,1000,1020.4,75,64.1,Supplementary
+first_author,1738,1393,80.1,61,52.1,PubMed
+OpenAlex,98,887,905.1,46,39.3,Supplementary
+author_broad,1738,1616,93,36,30.8,PubMed
+last_author,1738,1299,74.7,30,25.6,PubMed
+title_fragment,1742,122,7,6,5.1,PubMed
+title,1742,3,0.2,NA,NA,PubMed
+CrossRef,98,78,79.6,NA,NA,Supplementary

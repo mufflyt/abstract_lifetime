@@ -5,6 +5,7 @@ library(dplyr)
 library(stringr)
 
 source(here::here("R", "utils_text.R"))
+source(here::here("R", "utils_congresses.R"))
 
 #' Score a candidate publication against an abstract
 #' Returns a named list with total score and component scores
@@ -139,7 +140,6 @@ score_match <- function(abstract, candidate, cfg = NULL) {
   # Prefer the per-abstract congress_year when scoring multi-cohort data.
   conference_date <- if (!is.null(abstract$congress_year) &&
                          !is.na(abstract$congress_year[1])) {
-    source(here::here("R", "utils_congresses.R"), local = TRUE)
     conference_date_for(abstract$congress_year[1], cfg)
   } else {
     as.Date(cfg$conference$date)

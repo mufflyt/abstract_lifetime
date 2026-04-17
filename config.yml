@@ -46,6 +46,15 @@ default:
       sciencedirect_url: "https://www.sciencedirect.com/journal/journal-of-minimally-invasive-gynecology/vol/23/issue/7/suppl/S"
       supplement_vol: 23
       supplement_year: 2016
+    - year: 2017
+      name: "46th AAGL Global Congress"
+      date: "2017-11-12"
+      volume: 24
+      issue: 7
+      doi_prefix: "10.1016/j.jmig.2017"
+      sciencedirect_url: "https://www.sciencedirect.com/journal/journal-of-minimally-invasive-gynecology/vol/24/issue/7/suppl/S"
+      supplement_vol: 24
+      supplement_year: 2017
     - year: 2018
       name: "47th AAGL Global Congress"
       date: "2018-11-11"
@@ -128,8 +137,8 @@ default:
     max_results_per_query: 20
     # Lists so we can exclude multiple supplement issues simultaneously
     # (one per congress year covered). 2017 is not included — no AAGL supplement.
-    exclude_supplement_vol: [19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30]
-    exclude_supplement_year: [2012, 2013, 2014, 2015, 2016, 2018, 2019, 2020, 2021, 2022, 2023]
+    exclude_supplement_vol: [19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+    exclude_supplement_year: [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023]
 
   # --- CrossRef / Europe PMC / OpenAlex ---
   crossref:

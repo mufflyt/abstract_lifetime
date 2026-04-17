@@ -188,7 +188,7 @@ if (nrow(decisions) > 0) {
 }
 
 authors <- authors |> mutate(
-  is_confirmed_match = (classification %in% "accept") |
+  is_confirmed_match = (classification %in% c("definite", "probable")) |
                        (manual_decision %in% "match")
 )
 
