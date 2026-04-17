@@ -1,6 +1,10 @@
 term,estimate,std.error,statistic,p.value,conf.low,conf.high
-(Intercept),0.054,0.249,-11.689,0,0.032,0.086
-is_rctTRUE,2,0.394,1.76,0.078,0.873,4.162
-log_sample_size,1.009,0.05,0.174,0.862,0.912,1.111
-is_academicTRUE,1.402,0.302,1.12,0.263,0.759,2.493
-is_us_basedTRUE,2.665,0.289,3.398,0.001,1.542,4.808
+(Intercept),0.148,0.776,-2.461,0.014,0.028,0.632
+is_rctTRUE,1.77,0.404,1.415,0.157,0.758,3.751
+log_sample_size,0.98,0.052,-0.383,0.702,0.882,1.083
+is_academicTRUE,1.279,0.311,0.789,0.43,0.679,2.315
+is_us_basedTRUE,2.296,0.302,2.753,0.006,1.289,4.235
+session_typeVideo,1.121,0.518,0.221,0.825,0.362,2.868
+result_positivityneutral,0.727,0.807,-0.396,0.692,0.157,4.032
+result_positivitypositive,0.655,0.779,-0.544,0.587,0.15,3.478
+result_positivityunclear,0.412,0.73,-1.213,0.225,0.106,2.042

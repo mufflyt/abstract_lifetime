@@ -216,15 +216,20 @@ compute_text_similarity <- function(text_a, text_b) {
   dot / (norm_a * norm_b)
 }
 
-#' Classify match based on score thresholds
-#' Returns "accept", "review", or "reject"
-classify_match <- function(score, cfg = NULL) {
+#' Classify match using Cochrane-aligned vocabulary
+#' Returns "definite", "probable", "possible", "no_match", or "excluded"
+#' @param has_text_evidence Logical — TRUE if title_pts >= 1 or abstract_pts >= 1
+#' @param pre_conference Logical — TRUE if best candidate published before conference
+classify_match <- function(score, cfg = NULL, has_text_evidence = TRUE,
+                           pre_conference = FALSE) {
   if (is.null(cfg)) cfg <- config::get(file = here::here("config.yml"))
   sc <- cfg$scoring
 
-  if (score >= sc$auto_accept) return("accept")
-  if (score >= sc$manual_review) return("review")
-  "reject"
+  if (pre_conference) return("excluded")
+  if (score >= sc$auto_accept && has_text_evidence) return("definite")
+  if (score >= sc$manual_review && has_text_evidence) return("probable")
+  if (score >= sc$manual_review) return("possible")
+  "no_match"
 }
 
 #' Score all candidates for one abstract and return best match + classification
@@ -269,18 +274,16 @@ score_abstract_candidates <- function(abstract_row, candidates_df, cfg = NULL) {
   # Check for ties
   has_tie <- nrow(all_scores) > 1 && all_scores$total_score[1] == all_scores$total_score[2]
 
-  classification <- classify_match(best$total_score, cfg)
-  # Ties always go to manual review
-
-  if (has_tie && classification == "accept") {
-    classification <- "review"
-  }
-
-  # Text evidence gate: author name + journal + date alone is never sufficient.
-  # Require at least title_pts >= 1 OR abstract_pts >= 1 to be accept/review.
   has_text_evidence <- best$title_pts >= 1 || best$abstract_pts >= 1
-  if (!has_text_evidence && classification %in% c("accept", "review")) {
-    classification <- "reject"
+  pre_conference <- !is.na(best$date_pts) && best$date_pts < 0
+
+  classification <- classify_match(best$total_score, cfg,
+                                    has_text_evidence = has_text_evidence,
+                                    pre_conference = pre_conference)
+
+  # Ties demote definite → probable (human must pick between candidates)
+  if (has_tie && classification == "definite") {
+    classification <- "probable"
   }
 
   tibble::tibble(

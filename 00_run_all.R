@@ -43,6 +43,10 @@ source(here("R", "03_search_pubmed.R"))
 cli_h2("Step 3b: Supplementary Search")
 source(here("R", "03b_search_crossref.R"))
 
+# Step 3c: DOI-chain search (reverse citations via OpenAlex)
+cli_h2("Step 3c: DOI-chain Search")
+source(here("R", "03c_doi_chain_search.R"))
+
 # Step 4: Score matches
 cli_h2("Step 4: Scoring Matches")
 source(here("R", "04_score_matches.R"))

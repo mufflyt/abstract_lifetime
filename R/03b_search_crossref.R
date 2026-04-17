@@ -447,6 +447,21 @@ if (nrow(cr_df) > 0) {
   }
 }
 
+# From DOI-chain search (03c) — merge if output file exists
+doi_chain_path <- here("data", "processed", "doi_chain_candidates.csv")
+if (file.exists(doi_chain_path)) {
+  doi_chain <- read_csv(doi_chain_path, show_col_types = FALSE) |>
+    mutate(across(everything(), as.character))
+  new_from_chain <- doi_chain |>
+    filter(!pmid %in% as.character(pubmed_candidates$pmid))
+  if (nrow(new_from_chain) > 0) {
+    pubmed_candidates <- bind_rows(pubmed_candidates, new_from_chain) |>
+      distinct(abstract_id, pmid, .keep_all = TRUE)
+    new_pmid_count <- new_pmid_count + nrow(new_from_chain)
+    cli_alert_success("Added {nrow(new_from_chain)} new DOI-chain candidates to pool")
+  }
+}
+
 # Save updated candidates
 write_csv(pubmed_candidates, here("data", "processed", "pubmed_candidates.csv"))
 cli_alert_success("Supplementary search complete — {new_pmid_count} new candidates added (total: {nrow(pubmed_candidates)})")

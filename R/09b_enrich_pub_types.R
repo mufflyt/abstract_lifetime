@@ -78,6 +78,8 @@ if (any(c("pub_types", "pub_type_canonical") %in% names(matches))) {
   matches$pub_type_canonical <- NULL
 }
 matches <- matches |>
-  left_join(type_tbl, by = c("best_pmid" = "pmid"))
+  mutate(best_pmid = as.character(best_pmid)) |>
+  left_join(type_tbl |> mutate(pmid = as.character(pmid)),
+            by = c("best_pmid" = "pmid"))
 write_csv(matches, matches_path)
 cli_alert_success("Merged pub types into {basename(matches_path)}")

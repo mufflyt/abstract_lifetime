@@ -63,9 +63,11 @@ results_df <- bind_rows(all_results)
 
 # Summary
 cli_h3("Scoring Summary")
-cli_alert_info("Auto-accept (score >= {cfg$scoring$auto_accept}): {sum(results_df$classification == 'accept')}")
-cli_alert_info("Manual review (score {cfg$scoring$manual_review}-{cfg$scoring$auto_accept - 0.1}): {sum(results_df$classification == 'review')}")
-cli_alert_info("Auto-reject (score < {cfg$scoring$manual_review}): {sum(results_df$classification == 'reject')}")
+cli_alert_info("Definite (score >= {cfg$scoring$auto_accept} + text evidence): {sum(results_df$classification == 'definite')}")
+cli_alert_info("Probable (score {cfg$scoring$manual_review}-{cfg$scoring$auto_accept} + text evidence): {sum(results_df$classification == 'probable')}")
+cli_alert_info("Possible (score >= {cfg$scoring$manual_review}, weak evidence): {sum(results_df$classification == 'possible')}")
+cli_alert_info("No match (score < {cfg$scoring$manual_review}): {sum(results_df$classification == 'no_match')}")
+cli_alert_info("Excluded (pre-conference pub): {sum(results_df$classification == 'excluded')}")
 cli_alert_info("No candidates: {sum(results_df$classification == 'no_candidates')}")
 cli_alert_info("Ties requiring review: {sum(results_df$has_tie)}")
 

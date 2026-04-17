@@ -1,0 +1,8 @@
+term,estimate,std.error,statistic,p.value,conf.low,conf.high
+is_rctTRUE,1.617,0.362,1.325,0.185,0.795,3.289
+is_academicTRUE,1.239,0.281,0.763,0.445,0.715,2.149
+is_us_basedTRUE,2.208,0.292,2.715,0.007,1.247,3.912
+session_typeVideo,1.188,0.473,0.363,0.716,0.47,3.002
+result_positivityneutral,0.797,0.685,-0.331,0.741,0.208,3.054
+result_positivitypositive,0.73,0.655,-0.48,0.632,0.202,2.639
+result_positivityunclear,0.469,0.617,-1.228,0.219,0.14,1.57

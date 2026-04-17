@@ -150,6 +150,44 @@ abstracts <- abstracts |>
     )
   )
 
+# --- Structured variable extraction (Cochrane MR000005) ---
+abstracts <- abstracts |>
+  mutate(
+    search_text_lc = tolower(coalesce(search_text, abstract_full_text, "")),
+    study_design = case_when(
+      is_rct ~ "rct",
+      str_detect(search_text_lc, "systematic review|meta-analysis|scoping review") ~ "systematic_review",
+      str_detect(search_text_lc, "prospective\\s+(cohort|observational|study|trial|longitudinal)") ~ "prospective_cohort",
+      str_detect(search_text_lc, "retrospective\\s+(cohort|review|chart|analysis|study)") ~ "retrospective_cohort",
+      str_detect(search_text_lc, "case-control|case control") ~ "case_control",
+      str_detect(search_text_lc, "case (series|report)") ~ "case_series",
+      str_detect(search_text_lc, "cross-sectional|cross sectional|survey") ~ "cross_sectional",
+      str_detect(search_text_lc, "quality improvement|qi project") ~ "quality_improvement",
+      TRUE ~ "other"
+    ),
+    is_multicenter = str_detect(search_text_lc,
+      "multi-?center|multi-?site|multi-?institutional|\\d+\\s+(center|site|institution|hospital)s?\\b"),
+    has_funding = str_detect(search_text_lc,
+      "funded by|grant|supported by|\\bnih\\b|\\bnichd\\b|foundation|sponsor|funding"),
+    stat_sig_reported = str_detect(search_text_lc,
+      "p\\s*[<=]\\s*0\\.|confidence interval|odds ratio|hazard ratio|relative risk|\\bci\\b.*\\d")
+  ) |>
+  select(-search_text_lc)
+
+cli_alert_info("Study design: {paste(names(table(abstracts$study_design)), table(abstracts$study_design), sep='=', collapse=', ')}")
+cli_alert_info("Multicenter: {sum(abstracts$is_multicenter, na.rm=TRUE)} | Funded: {sum(abstracts$has_funding, na.rm=TRUE)} | Stat sig reported: {sum(abstracts$stat_sig_reported, na.rm=TRUE)}")
+
+# --- Result positivity classification (Cochrane MR000005) ---
+source(here("R", "utils_positivity.R"))
+abstracts <- abstracts |>
+  mutate(
+    result_positivity = vapply(
+      coalesce(abstract_conclusion, abstract_full_text),
+      classify_result_positivity, character(1)
+    )
+  )
+cli_alert_info("Result positivity: {paste(names(table(abstracts$result_positivity)), table(abstracts$result_positivity), sep='=', collapse=', ')}")
+
 # --- Abstract hash for dedup ---
 abstracts <- abstracts |>
   mutate(

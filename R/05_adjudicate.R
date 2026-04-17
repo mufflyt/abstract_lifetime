@@ -59,7 +59,8 @@ results_out <- results |>
     abstract_id, any_of("congress_year"), title,
     first_author_normalized, last_author_normalized,
     author_count, is_rct, sample_size, is_academic, is_us_based,
-    any_of("session_type"),
+    any_of(c("session_type", "study_design", "is_multicenter",
+             "has_funding", "stat_sig_reported", "result_positivity")),
     best_pmid, best_score, classification, has_tie, n_candidates,
     all_of(available_score_cols),
     pub_title, pub_journal, pub_year, pub_doi, pub_first_author,
@@ -69,9 +70,9 @@ results_out <- results |>
 write_csv(results_out, here("output", "abstracts_with_matches.csv"))
 cli_alert_success("Full results: output/abstracts_with_matches.csv")
 
-# 2. Manual review queue
+# 2. Manual review queue (probable + possible + ties need human adjudication)
 review_queue <- results |>
-  filter(classification == "review" | has_tie) |>
+  filter(classification %in% c("probable", "possible") | has_tie) |>
   select(
     abstract_id, title, first_author_normalized,
     abstract_objective, abstract_conclusion,
@@ -86,11 +87,13 @@ cli_alert_success("Manual review queue ({nrow(review_queue)} abstracts): output/
 # 3. Summary
 cli_h3("Adjudication Summary")
 cli_alert_info("Total abstracts: {nrow(results)}")
-cli_alert_info("Auto-accepted matches: {sum(results$classification == 'accept', na.rm = TRUE)}")
-cli_alert_info("Pending manual review: {sum(results$classification == 'review', na.rm = TRUE)}")
-cli_alert_info("Rejected / no match: {sum(results$classification %in% c('reject', 'no_candidates'), na.rm = TRUE)}")
+cli_alert_info("Definite matches: {sum(results$classification == 'definite', na.rm = TRUE)}")
+cli_alert_info("Probable (review needed): {sum(results$classification == 'probable', na.rm = TRUE)}")
+cli_alert_info("Possible (weak evidence): {sum(results$classification == 'possible', na.rm = TRUE)}")
+cli_alert_info("No match: {sum(results$classification %in% c('no_match', 'no_candidates'), na.rm = TRUE)}")
+cli_alert_info("Excluded (pre-conference): {sum(results$classification == 'excluded', na.rm = TRUE)}")
 
-accepted <- results |> filter(classification == "accept")
+accepted <- results |> filter(classification == "definite")
 if (nrow(accepted) > 0) {
-  cli_alert_info("Median months to publication (accepted): {round(median(accepted$months_to_pub, na.rm = TRUE), 1)}")
+  cli_alert_info("Median months to publication (definite): {round(median(accepted$months_to_pub, na.rm = TRUE), 1)}")
 }

@@ -308,15 +308,18 @@ ui <- page_sidebar(
         "filter_class",
         tagList("Algorithm classification:",
                 help_icon(HTML(paste(
-                  "Filters the selector by what the matcher decided before any manual review:<br>",
-                  "• <b>All</b> — every AAGL 2023 abstract (98).<br>",
-                  "• <b>Review</b> — ambiguous cases the pipeline flagged for human judgement.<br>",
-                  "• <b>Accepted</b> — auto-accepted high-confidence matches (spot-check these).<br>",
-                  "• <b>Rejected</b> — auto-rejected (low score / no text evidence). Spot-check for missed matches.<br>",
-                  "• <b>No candidates</b> — PubMed returned nothing."
+                  "Filters by the pipeline's Cochrane-aligned match classification:<br>",
+                  "• <b>All</b> — every abstract.<br>",
+                  "• <b>Definite</b> — high-confidence auto-accepted matches (score &ge;7 + text evidence).<br>",
+                  "• <b>Probable</b> — likely matches needing human confirmation (score 3-7 + text evidence).<br>",
+                  "• <b>Possible</b> — weak-evidence matches (ties, no text overlap).<br>",
+                  "• <b>No match</b> — low-scoring, no viable candidates.<br>",
+                  "• <b>Excluded</b> — candidate published before the conference (pre-conference penalty).<br>",
+                  "• <b>No candidates</b> — no search results found."
                 )))),
-        choices = c("All" = "all", "Review" = "review",
-                    "Accepted" = "accept", "Rejected" = "reject",
+        choices = c("All" = "all", "Definite" = "definite",
+                    "Probable" = "probable", "Possible" = "possible",
+                    "No match" = "no_match", "Excluded" = "excluded",
                     "No candidates" = "no_candidates"),
         selected = "all",
         inline = FALSE
@@ -677,8 +680,8 @@ server <- function(input, output, session) {
   make_choices <- function(ids, d) {
     reviewed <- unique(d$decisions$abstract_id)
     cs <- conflict_status()
-    class_glyph <- c(accept = "[A]", review = "[R]", reject = "[x]",
-                     no_candidates = "[0]")
+    class_glyph <- c(definite = "[D]", probable = "[P]", possible = "[?]",
+                     no_match = "[x]", excluded = "[E]", no_candidates = "[0]")
     labels <- vapply(ids, function(id) {
       row <- d$review_queue[d$review_queue$abstract_id == id, ]
       conflict_row <- cs |> filter(abstract_id == id)

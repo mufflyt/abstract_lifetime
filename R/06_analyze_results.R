@@ -28,12 +28,11 @@ if (file.exists(manual_review_path)) {
               by = "abstract_id") |>
     mutate(
       final_published = case_when(
-        classification == "accept" ~ TRUE,
+        classification == "definite" ~ TRUE,
         manual_decision == "match" ~ TRUE,
         manual_decision == "no_match" ~ FALSE,
-        classification == "reject" ~ FALSE,
-        classification == "no_candidates" ~ FALSE,
-        TRUE ~ NA  # Still pending review
+        classification %in% c("no_match", "no_candidates", "excluded") ~ FALSE,
+        TRUE ~ NA  # Still pending review (probable/possible)
       ),
       final_pmid = coalesce(manual_pmid, best_pmid)
     )
@@ -41,7 +40,7 @@ if (file.exists(manual_review_path)) {
   cli_alert_warning("No manual review decisions found — using auto-classification only")
   results <- results |>
     mutate(
-      final_published = classification == "accept",
+      final_published = classification == "definite",
       final_pmid = best_pmid
     )
 }
@@ -153,6 +152,55 @@ if (nrow(published) > 0 && "months_to_pub" %in% names(published)) {
     km_summary <- summary(km_fit)
     saveRDS(km_fit, here("data", "processed", "km_fit.rds"))
     cli_alert_success("Kaplan-Meier model saved")
+
+    # Cox proportional hazards model (Cochrane MR000005 requirement)
+    cox_vars <- intersect(
+      c("is_rct", "log_sample_size", "is_academic", "is_us_based",
+        "session_type", "n_authors", "first_author_gender", "result_positivity"),
+      names(km_data)
+    )
+    # Only include variables with >=2 levels and <50% missing
+    cox_formula_parts <- character()
+    for (v in cox_vars) {
+      vals <- km_data[[v]]
+      if (is.null(vals)) next
+      pct_na <- mean(is.na(vals))
+      n_levels <- length(unique(vals[!is.na(vals)]))
+      if (pct_na < 0.5 && n_levels >= 2) cox_formula_parts <- c(cox_formula_parts, v)
+    }
+
+    if (length(cox_formula_parts) >= 2) {
+      cox_formula <- as.formula(paste("Surv(time, event) ~",
+                                       paste(cox_formula_parts, collapse = " + ")))
+      cox_data <- km_data |> tidyr::drop_na(all_of(cox_formula_parts))
+
+      if (nrow(cox_data) >= 30) {
+        cox_model <- tryCatch(
+          coxph(cox_formula, data = cox_data),
+          error = function(e) { cli_alert_warning("Cox PH failed: {e$message}"); NULL }
+        )
+        if (!is.null(cox_model)) {
+          cox_tidy <- tidy(cox_model, exponentiate = TRUE, conf.int = TRUE) |>
+            mutate(across(where(is.numeric), ~ round(.x, 3)))
+          write_csv(cox_tidy, here("output", "aim2b_cox_regression.csv"))
+          saveRDS(cox_model, here("data", "processed", "cox_model.rds"))
+          cli_alert_success("Cox PH model saved ({nrow(cox_tidy)} terms)")
+
+          # Test proportional hazards assumption
+          ph_test <- tryCatch(cox.zph(cox_model), error = function(e) NULL)
+          if (!is.null(ph_test)) {
+            ph_global_p <- ph_test$table["GLOBAL", "p"]
+            if (ph_global_p < 0.05) {
+              cli_alert_warning("PH assumption may be violated (global p = {round(ph_global_p, 3)})")
+            } else {
+              cli_alert_success("PH assumption holds (global p = {round(ph_global_p, 3)})")
+            }
+          }
+        }
+      } else {
+        cli_alert_warning("Too few complete cases ({nrow(cox_data)}) for Cox PH")
+      }
+    }
   }
 } else {
   cli_alert_warning("No published articles with dates to analyze")
@@ -172,10 +220,28 @@ model_data <- results |>
   )
 
 if (nrow(model_data) >= 20 && length(unique(model_data$published_int)) >= 2) {
-  # Logistic regression
+  # Expanded logistic regression (Cochrane MR000005: include presentation type,
+  # author demographics, result direction, and temporal effects)
+  extra_vars <- intersect(
+    c("session_type", "n_authors", "first_author_gender", "result_positivity"),
+    names(model_data)
+  )
+  # Filter to variables with enough variation
+  usable_extras <- character()
+  for (v in extra_vars) {
+    vals <- model_data[[v]]
+    if (!is.null(vals) && mean(is.na(vals)) < 0.5 &&
+        length(unique(vals[!is.na(vals)])) >= 2) usable_extras <- c(usable_extras, v)
+  }
+  logit_formula <- as.formula(paste(
+    "published_int ~ is_rct + log_sample_size + is_academic + is_us_based",
+    if (length(usable_extras) > 0) paste("+", paste(usable_extras, collapse = " + ")) else ""
+  ))
+  model_data_complete <- model_data |> tidyr::drop_na(all_of(c("is_rct", "is_academic", "is_us_based", usable_extras)))
+
   model <- glm(
-    published_int ~ is_rct + log_sample_size + is_academic + is_us_based,
-    data = model_data,
+    logit_formula,
+    data = model_data_complete,
     family = binomial(link = "logit")
   )
 
@@ -294,5 +360,104 @@ cli_alert_success("Strategy ablation analysis complete")
 write_csv(aim1, here("output", "aim1_publication_rate.csv"))
 write_csv(aim2, here("output", "aim2_time_to_pub.csv"))
 if (exists("aim3")) write_csv(aim3, here("output", "aim3_logistic_regression.csv"))
+
+# ============================================================
+# AIM 5: Publication bias by result direction (Cochrane MR000005)
+# ============================================================
+cli_h3("Aim 5: Publication Bias by Result Direction")
+
+if ("result_positivity" %in% names(results)) {
+  bias_data <- results |>
+    filter(!is.na(final_published), result_positivity %in% c("positive", "negative", "neutral")) |>
+    mutate(result_positivity = factor(result_positivity, levels = c("negative", "neutral", "positive")))
+
+  if (nrow(bias_data) >= 10 && length(unique(bias_data$result_positivity)) >= 2) {
+    bias_tab <- bias_data |>
+      group_by(result_positivity) |>
+      summarise(
+        n = n(),
+        n_published = sum(final_published),
+        rate = round(mean(final_published) * 100, 1),
+        .groups = "drop"
+      )
+
+    # Positive vs negative OR
+    pos_neg <- bias_data |> filter(result_positivity %in% c("positive", "negative"))
+    if (nrow(pos_neg) >= 5 && length(unique(pos_neg$result_positivity)) == 2) {
+      or_model <- tryCatch({
+        glm(final_published ~ result_positivity, data = pos_neg, family = binomial)
+      }, error = function(e) NULL)
+      if (!is.null(or_model)) {
+        or_tidy <- broom::tidy(or_model, exponentiate = TRUE, conf.int = TRUE) |>
+          filter(term != "(Intercept)") |>
+          mutate(across(where(is.numeric), ~ round(.x, 3)))
+        bias_tab <- bind_rows(bias_tab, tibble(
+          result_positivity = "positive_vs_negative_OR",
+          n = nrow(pos_neg),
+          n_published = NA_integer_,
+          rate = or_tidy$estimate[1]
+        ))
+      }
+    }
+
+    write_csv(bias_tab, here("output", "aim5_publication_bias.csv"))
+    cli_alert_success("Publication-bias analysis saved")
+    print(bias_tab)
+  } else {
+    cli_alert_warning("Not enough result-positivity data for bias analysis")
+  }
+} else {
+  cli_alert_warning("result_positivity column not found — run 02_clean_abstracts.R first")
+}
+
+# ============================================================
+# SENSITIVITY ANALYSES (Cochrane MR000005 requirement)
+# ============================================================
+cli_h3("Sensitivity Analyses")
+
+sens_rows <- list()
+
+# Definite-only publication rate
+n_def <- sum(results$classification == "definite", na.rm = TRUE)
+sens_rows[[1]] <- tibble(scenario = "Definite only",
+                         n = n_total, n_published = n_def,
+                         rate = round(n_def / n_total * 100, 1))
+
+# Definite + probable (treats all probable as published)
+n_prob <- sum(results$classification %in% c("definite", "probable"), na.rm = TRUE)
+sens_rows[[2]] <- tibble(scenario = "Definite + probable",
+                         n = n_total, n_published = n_prob,
+                         rate = round(n_prob / n_total * 100, 1))
+
+# Definite + reviewer-confirmed
+n_confirmed <- sum(results$final_published, na.rm = TRUE)
+sens_rows[[3]] <- tibble(scenario = "Definite + reviewer-confirmed",
+                         n = n_total - sum(is.na(results$final_published)),
+                         n_published = n_confirmed,
+                         rate = round(n_confirmed / (n_total - sum(is.na(results$final_published))) * 100, 1))
+
+# Follow-up window sensitivity (only for abstracts with enough follow-up)
+for (window_mo in c(12, 24, 36, 48)) {
+  sub <- results |>
+    filter(!is.na(final_published)) |>
+    mutate(
+      has_window = as.numeric(difftime(as.Date(cfg$pubmed$date_end, "%Y/%m/%d"),
+                                        conference_date_for(congress_year, cfg),
+                                        units = "days")) / 30.44 >= window_mo,
+      pub_in_window = final_published & !is.na(months_to_pub) & months_to_pub <= window_mo
+    ) |>
+    filter(has_window)
+  if (nrow(sub) > 0) {
+    sens_rows[[length(sens_rows) + 1]] <- tibble(
+      scenario = paste0("Published within ", window_mo, " months"),
+      n = nrow(sub), n_published = sum(sub$pub_in_window),
+      rate = round(mean(sub$pub_in_window) * 100, 1))
+  }
+}
+
+sensitivity <- bind_rows(sens_rows)
+write_csv(sensitivity, here("output", "sensitivity_analyses.csv"))
+cli_alert_success("Sensitivity analyses saved ({nrow(sensitivity)} scenarios)")
+print(sensitivity)
 
 cli_alert_success("Analysis complete — results in output/")
