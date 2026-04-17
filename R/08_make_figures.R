@@ -1,4 +1,4 @@
-# 08_make_figures.R — Generate publication-quality figures
+# 08_make_figures.R -Generate publication-quality figures
 
 library(here)
 library(readr)
@@ -6,6 +6,9 @@ library(dplyr)
 library(ggplot2)
 library(cli)
 library(config)
+library(survival)
+library(tidyr)
+source(here("R", "utils_congresses.R"))
 
 cfg <- config::get(file = here("config.yml"))
 
@@ -30,12 +33,24 @@ if (file.exists(here("output", "manual_review_decisions.csv"))) {
     mutate(final_published = classification == "definite")
 }
 
+n_congresses <- length(unique(results$congress_year))
+year_range <- paste0(min(results$congress_year, na.rm = TRUE), "-",
+                     max(results$congress_year, na.rm = TRUE))
+n_total <- nrow(results)
+
 theme_pub <- theme_minimal(base_size = 12) +
   theme(
     panel.grid.minor = element_blank(),
     plot.title = element_text(face = "bold", size = 14),
     legend.position = "bottom"
   )
+
+congress_colors <- c(
+  "2012" = "#E41A1C", "2013" = "#377EB8", "2014" = "#4DAF4A",
+  "2015" = "#984EA3", "2016" = "#FF7F00", "2018" = "#A65628",
+  "2019" = "#F781BF", "2020" = "#999999", "2021" = "#66C2A5",
+  "2022" = "#FC8D62", "2023" = "#8DA0CB"
+)
 
 # ============================================================
 # Figure 1: CONSORT-style flow diagram data (text-based)
@@ -52,7 +67,7 @@ flow <- tibble::tibble(
            "No match",
            "Excluded (pre-conference)"),
   n = c(
-    nrow(results),
+    n_total,
     sum(!is.na(results$title)),
     sum(results$n_candidates > 0, na.rm = TRUE),
     sum(results$classification == "definite", na.rm = TRUE),
@@ -65,7 +80,7 @@ flow <- tibble::tibble(
 write_csv(flow, here("output", "figures", "figure1_flow_data.csv"))
 
 # ============================================================
-# Figure 2: Time to publication histogram
+# Figure 2: Time to publication histogram (all years, faceted)
 # ============================================================
 cli_alert_info("Figure 2: Time to publication")
 
@@ -73,21 +88,24 @@ published <- results |>
   filter(final_published & !is.na(months_to_pub) & months_to_pub > 0)
 
 if (nrow(published) > 0) {
+  med_ttp <- median(published$months_to_pub)
+
   fig2 <- ggplot(published, aes(x = months_to_pub)) +
-    geom_histogram(binwidth = 2, fill = "#2166AC", color = "white", alpha = 0.8) +
-    geom_vline(aes(xintercept = median(months_to_pub)), linetype = "dashed",
+    geom_histogram(binwidth = 3, fill = "#2166AC", color = "white", alpha = 0.8) +
+    geom_vline(aes(xintercept = med_ttp), linetype = "dashed",
                color = "#B2182B", linewidth = 1) +
     labs(
       title = "Time from Conference Presentation to Full Publication",
-      subtitle = sprintf("AAGL 2023 Global Congress (n = %d published)", nrow(published)),
+      subtitle = sprintf("AAGL Global Congress %s (n = %d published across %d congresses)",
+                         year_range, nrow(published), n_congresses),
       x = "Months to Publication",
       y = "Number of Abstracts"
     ) +
     theme_pub +
     annotate("text",
-             x = median(published$months_to_pub) + 1,
+             x = med_ttp + 1,
              y = Inf, vjust = 2, hjust = 0,
-             label = sprintf("Median: %.1f mo", median(published$months_to_pub)),
+             label = sprintf("Median: %.1f mo", med_ttp),
              color = "#B2182B", fontface = "italic")
 
   ggsave(here("output", "figures", "figure2_time_to_pub.png"), fig2,
@@ -98,16 +116,27 @@ if (nrow(published) > 0) {
 }
 
 # ============================================================
-# Figure 3: Kaplan-Meier curve
+# Figure 3: Kaplan-Meier curve (pooled)
 # ============================================================
-cli_alert_info("Figure 3: Kaplan-Meier curve")
+cli_alert_info("Figure 3: Kaplan-Meier curve (pooled)")
 
-km_path <- here("data", "processed", "km_fit.rds")
-if (file.exists(km_path)) {
-  km_fit <- readRDS(km_path)
+km_data <- results |>
+  filter(!is.na(final_published)) |>
+  mutate(
+    time = if_else(final_published & !is.na(months_to_pub),
+                   months_to_pub,
+                   as.numeric(difftime(as.Date(cfg$pubmed$date_end, "%Y/%m/%d"),
+                                       conference_date_for(congress_year, cfg),
+                                       units = "days")) / 30.44),
+    event = as.integer(final_published)
+  ) |>
+  filter(time > 0)
+
+if (nrow(km_data) > 0) {
+  km_fit <- survfit(Surv(time, event) ~ 1, data = km_data)
   km_df <- tibble::tibble(
     time = km_fit$time,
-    surv = 1 - km_fit$surv,  # Convert to cumulative publication
+    surv = 1 - km_fit$surv,
     lower = 1 - km_fit$upper,
     upper = 1 - km_fit$lower
   )
@@ -118,7 +147,8 @@ if (file.exists(km_path)) {
     scale_y_continuous(labels = scales::percent_format(), limits = c(0, 1)) +
     labs(
       title = "Cumulative Publication Rate Over Time",
-      subtitle = "AAGL 2023 Global Congress Oral Presentations",
+      subtitle = sprintf("AAGL %s -%d abstracts across %d congresses",
+                         year_range, nrow(km_data), n_congresses),
       x = "Months Since Conference",
       y = "Cumulative Publication Rate"
     ) +
@@ -132,7 +162,7 @@ if (file.exists(km_path)) {
 }
 
 # ============================================================
-# Figure 4: Search strategy comparison (forest-plot style)
+# Figure 4: Search strategy comparison
 # ============================================================
 cli_alert_info("Figure 4: Search strategy performance")
 
@@ -149,7 +179,7 @@ if (file.exists(strat_path)) {
     coord_flip() +
     labs(
       title = "Search Strategy Contribution to Correct Matches",
-      subtitle = "Number of confirmed publications found by each strategy",
+      subtitle = sprintf("AAGL %s -%d abstracts", year_range, n_total),
       x = "Search Strategy",
       y = "Number of Correct Matches Found"
     ) +
@@ -164,7 +194,7 @@ if (file.exists(strat_path)) {
 }
 
 # ============================================================
-# Figure 5: Score distribution
+# Figure 5: Score distribution by classification
 # ============================================================
 cli_alert_info("Figure 5: Score distribution")
 
@@ -180,7 +210,8 @@ if (nrow(scores) > 0) {
     geom_vline(xintercept = cfg$scoring$manual_review, linetype = "dashed", color = "#D95F02") +
     labs(
       title = "Distribution of Best Match Scores",
-      subtitle = "Dashed lines show definite and probable thresholds",
+      subtitle = sprintf("AAGL %s -dashed lines show definite and probable thresholds",
+                         year_range),
       x = "Match Score",
       y = "Count",
       fill = "Classification"
@@ -192,6 +223,172 @@ if (nrow(scores) > 0) {
   ggsave(here("output", "figures", "figure5_score_dist.pdf"), fig5,
          width = 8, height = 5)
   cli_alert_success("Figure 5 saved")
+}
+
+# ============================================================
+# Figure 6: Publication rate by congress year (bar chart)
+# ============================================================
+cli_alert_info("Figure 6: Publication rate by congress year")
+
+if ("congress_year" %in% names(results)) {
+  year_rates <- results |>
+    filter(!is.na(final_published)) |>
+    group_by(congress_year) |>
+    summarise(
+      n = n(),
+      n_published = sum(final_published),
+      rate = mean(final_published) * 100,
+      .groups = "drop"
+    ) |>
+    mutate(congress_year = factor(congress_year))
+
+  fig6 <- ggplot(year_rates, aes(x = congress_year, y = rate,
+                                  fill = congress_year)) +
+    geom_col(alpha = 0.85, show.legend = FALSE) +
+    geom_text(aes(label = sprintf("%.0f%%\n(%d/%d)", rate, n_published, n)),
+              vjust = -0.3, size = 3) +
+    scale_fill_manual(values = congress_colors) +
+    scale_y_continuous(limits = c(0, max(year_rates$rate, na.rm = TRUE) * 1.3),
+                       labels = scales::percent_format(scale = 1)) +
+    labs(
+      title = "Publication Rate by AAGL Congress Year",
+      subtitle = sprintf("Definite + reviewer-confirmed matches (n = %d abstracts)", n_total),
+      x = "Congress Year",
+      y = "Publication Rate"
+    ) +
+    theme_pub
+
+  ggsave(here("output", "figures", "figure6_pub_rate_by_year.png"), fig6,
+         width = 10, height = 6, dpi = 300)
+  ggsave(here("output", "figures", "figure6_pub_rate_by_year.pdf"), fig6,
+         width = 10, height = 6)
+  cli_alert_success("Figure 6 saved")
+}
+
+# ============================================================
+# Figure 7: Kaplan-Meier curves stratified by congress year
+# ============================================================
+cli_alert_info("Figure 7: KM curves by congress year")
+
+if (nrow(km_data) > 0 && "congress_year" %in% names(km_data)) {
+  # Only include years with enough data
+  year_counts <- km_data |> count(congress_year)
+  viable_years <- year_counts$congress_year[year_counts$n >= 10]
+  km_strat <- km_data |> filter(congress_year %in% viable_years)
+
+  if (length(viable_years) >= 2) {
+    km_fit_strat <- survfit(Surv(time, event) ~ congress_year, data = km_strat)
+
+    # Extract per-stratum data
+    strata_names <- names(km_fit_strat$strata)
+    km_strat_df <- list()
+    idx <- 0
+    for (s in seq_along(strata_names)) {
+      n_s <- km_fit_strat$strata[s]
+      rows <- (idx + 1):(idx + n_s)
+      yr <- gsub("congress_year=", "", strata_names[s])
+      km_strat_df[[s]] <- tibble(
+        time = km_fit_strat$time[rows],
+        surv = 1 - km_fit_strat$surv[rows],
+        congress_year = yr
+      )
+      idx <- idx + n_s
+    }
+    km_strat_df <- bind_rows(km_strat_df)
+
+    fig7 <- ggplot(km_strat_df, aes(x = time, y = surv,
+                                     color = congress_year)) +
+      geom_step(linewidth = 0.8, alpha = 0.85) +
+      scale_y_continuous(labels = scales::percent_format(), limits = c(0, 1)) +
+      scale_color_manual(values = congress_colors) +
+      labs(
+        title = "Cumulative Publication Rate by Congress Year",
+        subtitle = sprintf("AAGL %s -%d abstracts across %d congresses",
+                           year_range, nrow(km_strat), length(viable_years)),
+        x = "Months Since Conference",
+        y = "Cumulative Publication Rate",
+        color = "Congress Year"
+      ) +
+      theme_pub +
+      theme(legend.position = "right")
+
+    ggsave(here("output", "figures", "figure7_km_by_year.png"), fig7,
+           width = 10, height = 6, dpi = 300)
+    ggsave(here("output", "figures", "figure7_km_by_year.pdf"), fig7,
+           width = 10, height = 6)
+    cli_alert_success("Figure 7 saved")
+  }
+}
+
+# ============================================================
+# Figure 8: Time to publication by congress year (box plot)
+# ============================================================
+cli_alert_info("Figure 8: Time to publication by year")
+
+if (nrow(published) > 0 && "congress_year" %in% names(published)) {
+  pub_by_year <- published |>
+    filter(!is.na(congress_year)) |>
+    mutate(congress_year = factor(congress_year))
+
+  if (nrow(pub_by_year) >= 5) {
+    fig8 <- ggplot(pub_by_year, aes(x = congress_year, y = months_to_pub,
+                                     fill = congress_year)) +
+      geom_boxplot(alpha = 0.7, outlier.shape = 21, show.legend = FALSE) +
+      geom_jitter(width = 0.15, alpha = 0.3, size = 1.2) +
+      scale_fill_manual(values = congress_colors) +
+      labs(
+        title = "Time to Publication by Congress Year",
+        subtitle = sprintf("AAGL %s -%d published abstracts", year_range, nrow(pub_by_year)),
+        x = "Congress Year",
+        y = "Months to Publication"
+      ) +
+      theme_pub
+
+    ggsave(here("output", "figures", "figure8_ttp_by_year.png"), fig8,
+           width = 10, height = 6, dpi = 300)
+    ggsave(here("output", "figures", "figure8_ttp_by_year.pdf"), fig8,
+           width = 10, height = 6)
+    cli_alert_success("Figure 8 saved")
+  }
+}
+
+# ============================================================
+# Figure 9: Classification breakdown by congress year (stacked bar)
+# ============================================================
+cli_alert_info("Figure 9: Classification by year")
+
+if ("congress_year" %in% names(results)) {
+  class_by_year <- results |>
+    filter(!is.na(congress_year), !is.na(classification)) |>
+    count(congress_year, classification) |>
+    mutate(
+      congress_year = factor(congress_year),
+      classification = factor(classification,
+        levels = c("definite", "probable", "possible", "no_match", "excluded", "no_candidates"))
+    )
+
+  fig9 <- ggplot(class_by_year, aes(x = congress_year, y = n,
+                                     fill = classification)) +
+    geom_col(position = "fill", alpha = 0.85) +
+    scale_fill_manual(values = c(
+      "definite" = "#1B9E77", "probable" = "#D95F02", "possible" = "#E7298A",
+      "no_match" = "#7570B3", "excluded" = "#666666", "no_candidates" = "#999999"
+    )) +
+    scale_y_continuous(labels = scales::percent_format()) +
+    labs(
+      title = "Match Classification Breakdown by Congress Year",
+      subtitle = sprintf("AAGL %s -%d abstracts", year_range, n_total),
+      x = "Congress Year",
+      y = "Proportion",
+      fill = "Classification"
+    ) +
+    theme_pub
+
+  ggsave(here("output", "figures", "figure9_class_by_year.png"), fig9,
+         width = 10, height = 6, dpi = 300)
+  ggsave(here("output", "figures", "figure9_class_by_year.pdf"), fig9,
+         width = 10, height = 6)
+  cli_alert_success("Figure 9 saved")
 }
 
 cli_alert_success("All figures generated in output/figures/")
