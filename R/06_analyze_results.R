@@ -95,6 +95,32 @@ if ("pub_type_canonical" %in% names(results)) {
   print(aim1_by_pub_type)
 }
 
+# Publication rate by practice type
+if ("practice_type" %in% names(results)) {
+  aim1_by_practice <- results |>
+    filter(!is.na(final_published), !is.na(practice_type)) |>
+    group_by(practice_type) |>
+    summarise(n = n(), n_published = sum(final_published),
+              rate = round(mean(final_published) * 100, 1), .groups = "drop") |>
+    arrange(desc(rate))
+  write_csv(aim1_by_practice, here("output", "aim1_by_practice_type.csv"))
+  cli_alert_info("Publication rate by practice type:")
+  print(aim1_by_practice)
+}
+
+# Publication rate by subspecialty
+if ("subspecialty" %in% names(results)) {
+  aim1_by_subspec <- results |>
+    filter(!is.na(final_published), !is.na(subspecialty)) |>
+    group_by(subspecialty) |>
+    summarise(n = n(), n_published = sum(final_published),
+              rate = round(mean(final_published) * 100, 1), .groups = "drop") |>
+    arrange(desc(rate))
+  write_csv(aim1_by_subspec, here("output", "aim1_by_subspecialty.csv"))
+  cli_alert_info("Publication rate by subspecialty:")
+  print(aim1_by_subspec)
+}
+
 # Publication rate by congress year
 if ("congress_year" %in% names(results)) {
   aim1_by_year <- results |>
@@ -156,7 +182,8 @@ if (nrow(published) > 0 && "months_to_pub" %in% names(published)) {
     # Cox proportional hazards model (Cochrane MR000005 requirement)
     cox_vars <- intersect(
       c("is_rct", "log_sample_size", "is_academic", "is_us_based",
-        "session_type", "n_authors", "first_author_gender", "result_positivity"),
+        "session_type", "n_authors", "first_author_gender", "result_positivity",
+        "practice_type", "is_multicenter", "has_funding"),
       names(km_data)
     )
     # Only include variables with >=2 levels and <50% missing
@@ -223,7 +250,8 @@ if (nrow(model_data) >= 20 && length(unique(model_data$published_int)) >= 2) {
   # Expanded logistic regression (Cochrane MR000005: include presentation type,
   # author demographics, result direction, and temporal effects)
   extra_vars <- intersect(
-    c("session_type", "n_authors", "first_author_gender", "result_positivity"),
+    c("session_type", "n_authors", "first_author_gender", "result_positivity",
+      "practice_type", "is_multicenter", "has_funding", "subspecialty"),
     names(model_data)
   )
   # Filter to variables with enough variation
