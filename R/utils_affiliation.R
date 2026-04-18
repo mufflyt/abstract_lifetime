@@ -11,17 +11,21 @@ TEACHING_HOSPITAL_NAMES <- if (file.exists(.teaching_names_path)) {
   readLines(.teaching_names_path)
 } else character()
 
+# Precompile a single alternation regex at load time so is_teaching_hospital()
+# makes one grepl() call instead of 2,754 per affiliation.
+.TEACHING_PATTERN <- if (length(TEACHING_HOSPITAL_NAMES) > 0) {
+  escaped <- gsub("([.^$|*+?()\\[\\]{\\\\])", "\\\\\\1", TEACHING_HOSPITAL_NAMES)
+  paste(escaped, collapse = "|")
+} else ""
+
 #' Check if an affiliation matches any known teaching/academic hospital name.
-#' Uses substring matching against 2754 ACGME-accredited hospitals.
+#' Uses a single precompiled alternation regex against 2754 ACGME hospitals.
 is_teaching_hospital <- function(aff) {
-  if (is.na(aff) || nchar(aff) < 5 || length(TEACHING_HOSPITAL_NAMES) == 0)
+  if (is.na(aff) || nchar(aff) < 5 || nchar(.TEACHING_PATTERN) == 0)
     return(FALSE)
   aff_norm <- tolower(gsub("[^a-z0-9 ]", " ", tolower(aff)))
   aff_norm <- gsub("\\s+", " ", trimws(aff_norm))
-  # Check if any teaching hospital name appears as a substring
-  any(vapply(TEACHING_HOSPITAL_NAMES, function(th) {
-    grepl(th, aff_norm, fixed = TRUE)
-  }, logical(1)))
+  grepl(.TEACHING_PATTERN, aff_norm, perl = TRUE)
 }
 
 #' Classify affiliation as academic, community, private_practice, research_institute, or military.

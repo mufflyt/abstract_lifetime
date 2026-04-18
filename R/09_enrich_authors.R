@@ -22,6 +22,7 @@ suppressPackageStartupMessages({
 })
 
 cfg <- config::get(file = here("config.yml"))
+`%||%` <- function(a, b) if (is.null(a) || length(a) == 0 || is.na(a)) b else a
 
 cache_dir <- here("data", "cache", "pubmed_xml")
 dir.create(cache_dir, showWarnings = FALSE, recursive = TRUE)
@@ -122,7 +123,7 @@ parse_authors <- function(xml_text, pmid, abstract_id) {
   nodes <- xml_find_all(art, ".//AuthorList/Author")
   if (length(nodes) == 0) return(tibble())
 
-  map_dfr(seq_along(nodes), function(i) {
+  purrr::map(seq_along(nodes), function(i) {
     a <- nodes[[i]]
     last <- xml_text(xml_find_first(a, "LastName"))
     fore <- xml_text(xml_find_first(a, "ForeName"))
@@ -147,10 +148,8 @@ parse_authors <- function(xml_text, pmid, abstract_id) {
       affiliation_state  = loc$state,
       affiliation_country = loc$country
     )
-  })
+  }) |> purrr::list_rbind()
 }
-
-`%||%` <- function(a, b) if (is.null(a) || length(a) == 0 || is.na(a)) b else a
 
 # ---- Main loop -----------------------------------------------------------
 

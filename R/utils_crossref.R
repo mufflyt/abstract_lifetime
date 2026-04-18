@@ -6,6 +6,8 @@ library(dplyr)
 library(stringr)
 library(cli)
 
+`%||%` <- function(a, b) if (is.null(a) || length(a) == 0 || is.na(a)) b else a
+
 #' Search CrossRef by title
 #' Returns a tibble of candidate matches with DOI and metadata
 search_crossref <- function(title, max_results = 5,
@@ -41,7 +43,7 @@ search_crossref <- function(title, max_results = 5,
     items <- body$message$items
     if (length(items) == 0) return(tibble())
 
-    purrr::map_dfr(items, function(item) {
+    purrr::map(items, function(item) {
       doi <- item$DOI %||% NA_character_
       cr_title <- if (length(item$title) > 0) item$title[[1]] else NA_character_
 
@@ -87,7 +89,7 @@ search_crossref <- function(title, max_results = 5,
         cr_month = pub_month,
         source = "crossref"
       )
-    })
+    }) |> purrr::list_rbind()
   }, error = function(e) {
     cli_alert_warning("CrossRef error: {e$message}")
     tibble()
@@ -114,7 +116,7 @@ search_crossref <- function(title, max_results = 5,
     results <- body$resultList$result
     if (length(results) == 0) return(tibble())
 
-    purrr::map_dfr(results, function(r) {
+    purrr::map(results, function(r) {
       tibble::tibble(
         pmid = r$pmid %||% NA_character_,
         doi = r$doi %||% NA_character_,
@@ -125,7 +127,7 @@ search_crossref <- function(title, max_results = 5,
         epmc_abstract = str_squish(r$abstractText %||% ""),
         source = "europmc"
       )
-    })
+    }) |> purrr::list_rbind()
   }, error = function(e) {
     tibble()
   })
@@ -203,10 +205,13 @@ search_openalex <- function(title, first_author = NULL, max_results = 5,
     dplyr::distinct(oa_id, .keep_all = TRUE) |>
     dplyr::mutate(source = "openalex")
 
-  # Filter out JMIG supplement (2023)
+  # Filter out JMIG supplement across all congress years in range
+  excl_years <- as.character(
+    seq(as.integer(substr(date_start, 1, 4)), as.integer(substr(date_end, 1, 4)))
+  )
   combined <- combined |>
     dplyr::filter(!(grepl("minim.*invasive.*gynecol", tolower(oa_journal), perl = TRUE) &
-                      oa_year == "2023"))
+                      oa_year %in% excl_years))
 
   combined
 }
@@ -232,7 +237,7 @@ search_openalex <- function(title, first_author = NULL, max_results = 5,
     results <- body$results
     if (length(results) == 0) return(tibble())
 
-    purrr::map_dfr(results, function(r) {
+    purrr::map(results, function(r) {
       # Extract PMID from ids object
       pmid <- NA_character_
       if (!is.null(r$ids$pmid)) {
@@ -297,7 +302,7 @@ search_openalex <- function(title, first_author = NULL, max_results = 5,
         oa_affiliation = affiliation,
         oa_country = country
       )
-    })
+    }) |> purrr::list_rbind()
   }, error = function(e) {
     cli_alert_warning("OpenAlex error: {e$message}")
     tibble()
@@ -356,10 +361,11 @@ search_europmc <- function(title, first_author = NULL, max_results = 5,
     dplyr::distinct(pmid, doi, .keep_all = TRUE) |>
     dplyr::mutate(source = "europmc")
 
-  # Filter out JMIG supplement (Vol 30, 2023)
+  # Filter out JMIG supplement across all congress years in range
+  excl_years_epmc <- as.character(seq(year_start, year_end))
   combined <- combined |>
     dplyr::filter(!(tolower(epmc_journal) %in% c("j minim invasive gynecol") &
-                      epmc_year == "2023"))
+                      epmc_year %in% excl_years_epmc))
 
   combined
 }
@@ -404,10 +410,11 @@ search_semantic_scholar <- function(title, first_author = NULL, max_results = 5,
     dplyr::distinct(s2_id, .keep_all = TRUE) |>
     dplyr::mutate(source = "semantic_scholar")
 
-  # Filter out JMIG supplement (2023)
+  # Filter out JMIG supplement across all congress years in range
+  excl_years_s2 <- as.character(seq(year_start, year_end))
   combined <- combined |>
     dplyr::filter(!(grepl("minim.*invasive.*gynecol", tolower(s2_journal), perl = TRUE) &
-                      s2_year == "2023"))
+                      s2_year %in% excl_years_s2))
 
   combined
 }
@@ -443,7 +450,7 @@ search_semantic_scholar <- function(title, first_author = NULL, max_results = 5,
     results <- body$data
     if (length(results) == 0) return(tibble())
 
-    purrr::map_dfr(results, function(r) {
+    purrr::map(results, function(r) {
       # Extract PMID from externalIds
       pmid <- NA_character_
       doi <- NA_character_
@@ -482,7 +489,7 @@ search_semantic_scholar <- function(title, first_author = NULL, max_results = 5,
         s2_year = pub_year,
         s2_pub_date = pub_date
       )
-    })
+    }) |> purrr::list_rbind()
   }, error = function(e) {
     cli_alert_warning("Semantic Scholar error: {e$message}")
     tibble()

@@ -23,8 +23,17 @@ if (file.exists(manual_review_path)) {
   decisions <- read_csv(manual_review_path, show_col_types = FALSE)
   cli_alert_info("Incorporating {nrow(decisions)} manual review decisions")
 
+  # Deduplicate to latest decision per abstract (multi-reviewer abstracts would
+  # otherwise duplicate rows in results, inflating all downstream counts).
+  decisions_deduped <- decisions |>
+    filter(!is.na(reviewer)) |>
+    group_by(abstract_id) |>
+    arrange(desc(review_timestamp)) |>
+    slice(1) |>
+    ungroup()
+
   results <- results |>
-    left_join(decisions |> select(abstract_id, manual_decision, manual_pmid),
+    left_join(decisions_deduped |> select(abstract_id, manual_decision, manual_pmid),
               by = "abstract_id") |>
     mutate(
       final_published = case_when(

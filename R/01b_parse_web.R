@@ -307,7 +307,7 @@ for (cc in congresses_cfg) {
   items <- scrape_one_congress(cc$sciencedirect_url)
   cli_alert_success("  Total items: {length(items)}")
   if (length(items) == 0) next
-  parsed <- map_dfr(items, parse_sd_item)
+  parsed <- purrr::map(items, parse_sd_item) |> purrr::list_rbind()
 
   listing <- parsed |>
     filter(
@@ -379,7 +379,7 @@ if (length(all_congress_parsed) == 0) {
   n_with_obj <- sum(!is.na(abstracts_df$abstract_objective))
   n_with_conc <- sum(!is.na(abstracts_df$abstract_conclusion))
   n_with_full <- sum(!is.na(abstracts_df$abstract_full_text) & nchar(abstracts_df$abstract_full_text) > 20)
-  n_with_auth <- sum(nchar(abstracts_df$authors_raw) > 2)
+  n_with_auth <- sum(nchar(abstracts_df$authors_raw) > 2, na.rm = TRUE)
 
   cli_h3("Data Quality")
   cli_alert_info("Abstracts with authors: {n_with_auth}/{nrow(abstracts_df)}")

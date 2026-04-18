@@ -60,7 +60,7 @@ parse_sd_item <- function(el) {
 
 `%||%` <- function(a, b) if (is.null(a) || length(a) == 0) b else a
 
-parsed <- map_dfr(items, parse_sd_item) |>
+parsed <- purrr::map(items, parse_sd_item) |> purrr::list_rbind() |>
   filter(
     str_detect(tolower(subtype), "abstract|conference") | is.na(subtype),
     nchar(title) > 10,

@@ -9,6 +9,8 @@ library(config)
 
 cfg <- config::get(file = here("config.yml"))
 
+dir.create(here("output", "tables"), showWarnings = FALSE, recursive = TRUE)
+
 cli_h2("Generating Tables")
 
 results <- read_csv(here("output", "abstracts_with_matches.csv"), show_col_types = FALSE)
@@ -16,6 +18,12 @@ results <- read_csv(here("output", "abstracts_with_matches.csv"), show_col_types
 # Determine final published status
 if (file.exists(here("output", "manual_review_decisions.csv"))) {
   decisions <- read_csv(here("output", "manual_review_decisions.csv"), show_col_types = FALSE)
+  decisions <- decisions |>
+    filter(!is.na(reviewer)) |>
+    group_by(abstract_id) |>
+    arrange(desc(review_timestamp)) |>
+    slice(1) |>
+    ungroup()
   results <- results |>
     left_join(decisions |> select(abstract_id, manual_decision), by = "abstract_id") |>
     mutate(final_published = case_when(

@@ -18,6 +18,7 @@ suppressPackageStartupMessages({
 })
 
 cfg <- config::get(file = here("config.yml"))
+`%||%` <- function(a, b) if (is.null(a) || length(a) == 0) b else a
 
 cli_h2("Tagging session type from JMIG supplement TOC(s)")
 
@@ -25,8 +26,6 @@ congresses <- cfg$congresses %||% list(list(
   year = 2023,
   sciencedirect_url = cfg$sources$sciencedirect_url
 ))
-
-`%||%` <- function(a, b) if (is.null(a) || length(a) == 0) b else a
 
 tag_one_congress <- function(toc_url, year) {
   cli_alert_info("Congress {year} -> {toc_url}")
@@ -59,7 +58,8 @@ tag_one_congress <- function(toc_url, year) {
   bind_rows(rows) |> distinct(pii, .keep_all = TRUE)
 }
 
-sessions <- map_dfr(congresses, ~ tag_one_congress(.x$sciencedirect_url, .x$year))
+sessions <- purrr::map(congresses, ~ tag_one_congress(.x$sciencedirect_url, .x$year)) |>
+  purrr::list_rbind()
 
 # "Oral Presentations" / "Video Presentations" (2023), "Oral Presentations" /
 # "Video Sessions" (2022) — collapse to canonical Oral / Video labels.

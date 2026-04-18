@@ -114,7 +114,7 @@ if (sensitivity < cfg$validation$target_sensitivity) {
   cli_h3("Threshold Tuning")
   # Test different thresholds
   thresholds <- seq(3, 10, by = 0.5)
-  tuning <- purrr::map_dfr(thresholds, function(thresh) {
+  tuning <- purrr::map(thresholds, function(thresh) {
     pred <- validation$best_score >= thresh
     tp_t <- sum(validation$truth & pred, na.rm = TRUE)
     fn_t <- sum(validation$truth & !pred, na.rm = TRUE)
@@ -126,7 +126,7 @@ if (sensitivity < cfg$validation$target_sensitivity) {
       specificity = tn_t / max(tn_t + fp_t, 1),
       f1 = 2 * tp_t / max(2 * tp_t + fp_t + fn_t, 1)
     )
-  })
+  }) |> purrr::list_rbind()
 
   best_threshold <- tuning |>
     filter(sensitivity >= cfg$validation$target_sensitivity) |>

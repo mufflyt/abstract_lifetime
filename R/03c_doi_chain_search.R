@@ -83,12 +83,37 @@ find_citing_papers <- function(doi_bare) {
     )
 }
 
-#' Resolve a DOI to a PMID via OpenAlex IDs field
+#' Resolve a single DOI to a PMID via OpenAlex IDs field (fallback)
 doi_to_pmid <- function(doi_bare) {
   d <- oa_get(paste0("https://api.openalex.org/works/doi:", doi_bare,
                       "?select=ids"))
   if (is.null(d) || is.null(d$ids$pmid)) return(NA_character_)
   gsub("https://pubmed.ncbi.nlm.nih.gov/", "", d$ids$pmid)
+}
+
+#' Batch-resolve a character vector of DOIs to PMIDs via a single OpenAlex
+#' filter query (up to 50 DOIs per request — OpenAlex pipe-filter limit).
+#' Returns a named character vector (DOI → PMID or NA).
+dois_to_pmids_batch <- function(dois) {
+  dois <- dois[!is.na(dois) & nchar(dois) > 0]
+  if (length(dois) == 0) return(setNames(character(0), character(0)))
+  result <- rep(NA_character_, length(dois))
+  names(result) <- dois
+  chunks <- split(dois, ceiling(seq_along(dois) / 50))
+  for (chunk in chunks) {
+    filter_str <- paste(paste0("doi:", chunk), collapse = "|")
+    url <- paste0("https://api.openalex.org/works?filter=", filter_str,
+                  "&select=doi,ids&per_page=50")
+    d <- oa_get(url)
+    if (is.null(d) || is.null(d$results)) next
+    for (rec in d$results) {
+      if (is.null(rec$doi) || is.null(rec$ids$pmid)) next
+      doi_clean <- gsub("https://doi.org/", "", rec$doi)
+      pmid_clean <- gsub("https://pubmed.ncbi.nlm.nih.gov/", "", rec$ids$pmid)
+      if (doi_clean %in% names(result)) result[[doi_clean]] <- pmid_clean
+    }
+  }
+  result
 }
 
 for (i in seq_len(nrow(remaining))) {
@@ -98,11 +123,11 @@ for (i in seq_len(nrow(remaining))) {
   citing <- find_citing_papers(row$doi_bare)
 
   if (nrow(citing) > 0) {
-    # Resolve DOIs to PMIDs
-    citing$pmid <- vapply(citing$pub_doi, function(d) {
-      if (is.na(d) || nchar(d) == 0) return(NA_character_)
-      doi_to_pmid(d)
-    }, character(1))
+    # Batch-resolve all citing DOIs to PMIDs in one OpenAlex request
+    # instead of one request per DOI.
+    valid_dois <- unique(citing$pub_doi[!is.na(citing$pub_doi) & nchar(citing$pub_doi) > 0])
+    pmid_map <- dois_to_pmids_batch(valid_dois)
+    citing$pmid <- pmid_map[citing$pub_doi]
 
     citing$abstract_id <- row$abstract_id
     all_results[[length(all_results) + 1]] <- citing

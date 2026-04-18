@@ -285,7 +285,7 @@ if (nrow(oa_df) > 0) {
         distinct()
       oa_details <- oa_details |>
         inner_join(pmid_to_abstract, by = "pmid", relationship = "many-to-many") |>
-        mutate(strategies = "openalex", n_strategies = "1") |>
+        mutate(strategies = "openalex", n_strategies = 1L) |>
         mutate(across(everything(), as.character))
 
       # Filter out JMIG supplement
@@ -329,7 +329,7 @@ if (nrow(s2_df) > 0) {
         distinct()
       s2_details <- s2_details |>
         inner_join(pmid_to_abstract, by = "pmid", relationship = "many-to-many") |>
-        mutate(strategies = "semantic_scholar", n_strategies = "1") |>
+        mutate(strategies = "semantic_scholar", n_strategies = 1L) |>
         mutate(across(everything(), as.character))
 
       # Filter out JMIG supplement
@@ -374,7 +374,7 @@ if (nrow(epmc_df) > 0) {
         distinct()
       new_details <- new_details |>
         inner_join(pmid_to_abstract, by = "pmid", relationship = "many-to-many") |>
-        mutate(strategies = "europmc", n_strategies = "1") |>
+        mutate(strategies = "europmc", n_strategies = 1L) |>
         mutate(across(everything(), as.character))
 
       # Filter out JMIG supplement
@@ -432,7 +432,7 @@ if (nrow(cr_df) > 0) {
             mutate(across(everything(), as.character)) |>
             inner_join(truly_new |> select(pmid, abstract_id) |> distinct(),
                        by = "pmid", relationship = "many-to-many") |>
-            mutate(strategies = "crossref_doi", n_strategies = "1") |>
+            mutate(strategies = "crossref_doi", n_strategies = 1L) |>
             mutate(across(everything(), as.character))
           pubmed_candidates <- bind_rows(pubmed_candidates, cr_details) |>
             distinct(abstract_id, pmid, .keep_all = TRUE)

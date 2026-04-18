@@ -267,17 +267,17 @@ $(document).on('shiny:value', function() {
 });
 
 // localStorage persistence for reviewer initials
-$(document).ready(function() {
+// Use shiny:connected (not a fixed timeout) so initials fire only after
+// the Shiny session is fully ready to accept setInputValue calls.
+$(document).on('shiny:connected', function() {
   var saved = localStorage.getItem('adjudication_reviewer_initials');
   if (saved && saved.length >= 2) {
-    setTimeout(function() {
-      Shiny.setInputValue('ls_reviewer_initials', saved, {priority: 'event'});
-    }, 800);
+    Shiny.setInputValue('ls_reviewer_initials', saved, {priority: 'event'});
   }
-  $(document).on('change blur', '#reviewer_initials', function() {
-    var val = $(this).val().trim().toUpperCase();
-    if (val.length >= 2) localStorage.setItem('adjudication_reviewer_initials', val);
-  });
+});
+$(document).on('change blur', '#reviewer_initials', function() {
+  var val = $(this).val().trim().toUpperCase();
+  if (val.length >= 2) localStorage.setItem('adjudication_reviewer_initials', val);
 });
 "
 
@@ -661,6 +661,16 @@ server <- function(input, output, session) {
 
   observe({
     data(load_data(use_gs(), sheet_id()))
+    # Derive year choices from loaded data so new congress years are picked up
+    # automatically without code changes.
+    d <- data()
+    if (!is.null(d) && "congress_year" %in% names(d$abstracts) &&
+        nrow(d$abstracts) > 0) {
+      yrs <- sort(unique(na.omit(as.character(d$abstracts$congress_year))))
+      yr_choices <- c("All" = "all", setNames(yrs, yrs))
+      updateRadioButtons(session, "filter_year", choices = yr_choices,
+                         selected = "all", inline = TRUE)
+    }
   }) |> bindEvent(TRUE, once = TRUE)
 
   # Also reload after gs state is set (runs once after auth)

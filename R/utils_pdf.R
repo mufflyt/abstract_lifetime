@@ -159,7 +159,7 @@ parse_pdf_abstracts <- function(pages_text) {
 
 #' Convert parsed abstract list to data frame
 abstracts_to_df <- function(abstracts_list) {
-  purrr::map_dfr(seq_along(abstracts_list), function(i) {
+  purrr::map(seq_along(abstracts_list), function(i) {
     a <- abstracts_list[[i]]
     tibble::tibble(
       abstract_id = sprintf("AAGL2023_%03d", i),
@@ -182,5 +182,5 @@ abstracts_to_df <- function(abstracts_list) {
       PDF_page = a$page,
       source = "pdf"
     )
-  })
+  }) |> purrr::list_rbind()
 }

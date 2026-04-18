@@ -90,8 +90,13 @@ score_match <- function(abstract, candidate, cfg = NULL) {
   }
 
   # --- Coauthor overlap ---
-  if (!is.null(abstract$all_authors_normalized) && !is.na(candidate$pub_all_authors)) {
-    abs_authors <- abstract$all_authors_normalized
+  # all_authors_normalized is a list column dropped at CSV save time;
+  # use all_authors_str (semicolon-separated) which is what the CSV retains.
+  abs_auth_str <- abstract$all_authors_str %||% NA_character_
+  if (!is.na(abs_auth_str) && nchar(abs_auth_str) > 0 &&
+      !is.na(candidate$pub_all_authors)) {
+    abs_authors <- str_split(abs_auth_str, ";\\s*")[[1]]
+    abs_authors <- abs_authors[nchar(abs_authors) > 0]
     cand_authors <- str_split(candidate$pub_all_authors, ";\\s*")[[1]]
     cand_authors_norm <- normalize_authors(cand_authors)
     cand_authors_norm <- cand_authors_norm[!is.na(cand_authors_norm)]
@@ -192,11 +197,23 @@ score_match <- function(abstract, candidate, cfg = NULL) {
 compute_text_similarity <- function(text_a, text_b) {
   if (is.na(text_a) || is.na(text_b)) return(0)
 
-  # Tokenize
+  .stop_words <- c(
+    "the", "and", "for", "are", "was", "were", "has", "had", "have",
+    "been", "with", "this", "that", "from", "not", "but", "its",
+    "they", "their", "our", "which", "who", "also", "more", "than",
+    "study", "patients", "results", "methods", "conclusion", "objective",
+    "background", "design", "setting", "intervention", "measurements",
+    "compared", "group", "groups", "using", "used", "total", "mean",
+    "median", "data", "analysis", "performed", "included", "significant",
+    "significantly", "associated", "respectively", "between", "after",
+    "before", "during", "about", "into", "through", "over", "under"
+  )
+
+  # Tokenize and strip stop words so common structural terms don't inflate scores
   words_a <- normalize_title(text_a) |> str_split("\\s+") |> unlist()
   words_b <- normalize_title(text_b) |> str_split("\\s+") |> unlist()
-  words_a <- words_a[nchar(words_a) >= 3]
-  words_b <- words_b[nchar(words_b) >= 3]
+  words_a <- words_a[nchar(words_a) >= 3 & !words_a %in% .stop_words]
+  words_b <- words_b[nchar(words_b) >= 3 & !words_b %in% .stop_words]
 
   if (length(words_a) == 0 || length(words_b) == 0) return(0)
 
@@ -246,7 +263,7 @@ score_abstract_candidates <- function(abstract_row, candidates_df, cfg = NULL) {
     ))
   }
 
-  all_scores <- purrr::map_dfr(seq_len(nrow(candidates_df)), function(i) {
+  all_scores <- purrr::map(seq_len(nrow(candidates_df)), function(i) {
     cand <- candidates_df[i, ]
     sc <- score_match(abstract_row, cand, cfg)
     tibble::tibble(
@@ -264,7 +281,7 @@ score_abstract_candidates <- function(abstract_row, candidates_df, cfg = NULL) {
       date_pts = sc$date_points,
       no_text_penalty = sc$no_text_penalty
     )
-  })
+  }) |> purrr::list_rbind()
 
   # Sort by score
 

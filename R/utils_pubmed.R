@@ -7,6 +7,8 @@ library(dplyr)
 library(stringr)
 library(cli)
 
+`%||%` <- function(a, b) if (is.null(a) || length(a) == 0 || is.na(a)) b else a
+
 # Rate limiting state
 .pubmed_env <- new.env(parent = emptyenv())
 .pubmed_env$last_request <- Sys.time() - 1
@@ -78,13 +80,13 @@ parse_pubmed_xml <- function(xml_text) {
   doc <- read_xml(xml_text)
   articles <- xml_find_all(doc, "//PubmedArticle")
 
-  purrr::map_dfr(articles, function(art) {
+  purrr::map(articles, function(art) {
     pmid <- xml_text(xml_find_first(art, ".//PMID"))
     title <- xml_text(xml_find_first(art, ".//ArticleTitle")) %||% NA_character_
-    abstract_text <- paste(
-      xml_text(xml_find_all(art, ".//AbstractText")),
-      collapse = " "
-    )
+    abstract_text <- {
+      parts <- xml_text(xml_find_all(art, ".//AbstractText"))
+      if (length(parts) > 0) paste(parts, collapse = " ") else NA_character_
+    }
 
     # Authors
     author_nodes <- xml_find_all(art, ".//Author")
@@ -96,7 +98,7 @@ parse_pubmed_xml <- function(xml_text) {
     })
     first_author <- if (length(authors) > 0) authors[1] else NA_character_
     last_author <- if (length(authors) > 1) authors[length(authors)] else first_author
-    all_authors <- paste(authors, collapse = "; ")
+    all_authors <- if (length(authors) > 0) paste(authors, collapse = "; ") else NA_character_
 
     # Journal
     journal <- xml_text(xml_find_first(art, ".//Journal/Title")) %||% NA_character_
@@ -113,17 +115,17 @@ parse_pubmed_xml <- function(xml_text) {
     doi <- if (!is.na(doi_node)) xml_text(doi_node) else NA_character_
 
     # Keywords / MeSH
-    keywords <- paste(
-      xml_text(xml_find_all(art, ".//Keyword")),
-      collapse = "; "
-    )
+    keywords <- {
+      kw <- xml_text(xml_find_all(art, ".//Keyword"))
+      if (length(kw) > 0) paste(kw, collapse = "; ") else NA_character_
+    }
 
     # Publication types — concatenate all. Used downstream to stratify by
     # journal-article / review / case-report / trial.
-    pub_types <- paste(
-      xml_text(xml_find_all(art, ".//PublicationTypeList/PublicationType")),
-      collapse = "; "
-    )
+    pub_types <- {
+      pt <- xml_text(xml_find_all(art, ".//PublicationTypeList/PublicationType"))
+      if (length(pt) > 0) paste(pt, collapse = "; ") else NA_character_
+    }
 
     tibble::tibble(
       pmid = pmid,
@@ -142,7 +144,7 @@ parse_pubmed_xml <- function(xml_text) {
       pub_keywords = keywords,
       pub_types = pub_types
     )
-  })
+  }) |> purrr::list_rbind()
 }
 
 #' Build PubMed date range filter
