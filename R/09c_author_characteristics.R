@@ -128,8 +128,31 @@ if (length(unresolved) > 0) {
     cli_alert_info("Tip: set GENDERIZE_API_KEY in .Renviron for higher rate limits")
 }
 
-# Combine both passes (SSA takes priority where both resolve)
-gender_combined <- bind_rows(ssa_result, genderize_result) |>
+# Pass 3: Static international name lookup (curated list of ~150 Chinese,
+# Korean, Japanese, Indian, European, Turkish, Arabic names common in
+# medical publishing). Covers names that SSA and genderize.io miss.
+intl_path <- here("data", "validation", "international_gender_lookup.csv")
+intl_result <- tibble()
+if (file.exists(intl_path)) {
+  intl_lkp <- read_csv(intl_path, show_col_types = FALSE) |>
+    mutate(name_clean = paste0(toupper(substr(name, 1, 1)),
+                               tolower(substr(name, 2, nchar(name))))) |>
+    transmute(name_clean, gender,
+              proportion_male = if_else(gender == "male", 0.95, 0.05),
+              proportion_female = if_else(gender == "female", 0.95, 0.05))
+
+  # Only use for names not already resolved by SSA or genderize
+  resolved_so_far <- c(
+    if (nrow(ssa_result) > 0) tolower(ssa_result$name_clean) else character(),
+    if (nrow(genderize_result) > 0) tolower(genderize_result$name_clean) else character()
+  )
+  intl_result <- intl_lkp |>
+    filter(!tolower(name_clean) %in% resolved_so_far)
+  cli_alert_info("International lookup resolved: {nrow(intl_result)} additional names")
+}
+
+# Combine all three passes (SSA > genderize > international static)
+gender_combined <- bind_rows(ssa_result, genderize_result, intl_result) |>
   group_by(name_clean) |>
   slice(1) |>
   ungroup()
