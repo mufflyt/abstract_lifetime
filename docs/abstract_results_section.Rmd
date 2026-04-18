@@ -66,6 +66,10 @@ med_cite <- median(d$cited_by_count[d$classification %in% c("definite", "probabl
 sensitivity <- val$value[val$metric == "sensitivity"]
 specificity <- val$value[val$metric == "specificity"]
 
+# Cox PH assumption global p-value
+ph_csv <- read_csv(here::here("output", "cox_ph_assumption.csv"), show_col_types = FALSE)
+ph_global_p <- ph_csv$p_value[1]
+
 title_changed_pct <- round(mean(fid$title_changed, na.rm = TRUE) * 100, 1)
 
 design_tbl <- table(d$study_design)
@@ -93,7 +97,7 @@ Among definite matches, the median time from conference presentation to full pub
 
 ### Predictors of Publication
 
-In multivariable Cox proportional hazards analysis (proportional hazards assumption met, global p=0.199), US-based affiliation was the only significant predictor of publication velocity (HR `r round(us_hr, 2)`, 95% CI `r round(us_ci_lo, 2)`-`r round(us_ci_hi, 2)`, p=`r round(us_p, 3)`). In logistic regression, US-based affiliation was similarly associated with higher odds of publication (OR `r round(us_or, 2)`, 95% CI `r round(us_or_lo, 2)`-`r round(us_or_hi, 2)`, p=`r round(us_or_p, 3)`). Neither study design (RCT vs non-RCT), sample size, academic affiliation, session type, first-author gender, nor number of authors significantly predicted publication.
+In multivariable Cox proportional hazards analysis (proportional hazards assumption met, global p=`r ph_global_p`), US-based affiliation was the only significant predictor of publication velocity (HR `r round(us_hr, 2)`, 95% CI `r round(us_ci_lo, 2)`-`r round(us_ci_hi, 2)`, p=`r round(us_p, 3)`). In logistic regression, US-based affiliation was similarly associated with higher odds of publication (OR `r round(us_or, 2)`, 95% CI `r round(us_or_lo, 2)`-`r round(us_or_hi, 2)`, p=`r round(us_or_p, 3)`). Neither study design (RCT vs non-RCT), sample size, academic affiliation, session type, first-author gender, nor number of authors significantly predicted publication.
 
 ### Publication Bias
 

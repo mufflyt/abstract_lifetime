@@ -222,6 +222,9 @@ if (nrow(published) > 0 && "months_to_pub" %in% names(published)) {
             } else {
               cli_alert_success("PH assumption holds (global p = {round(ph_global_p, 3)})")
             }
+            # Save PH test p-value for reproducible reporting
+            write_csv(tibble(test = "cox_zph_global", p_value = round(ph_global_p, 3)),
+                      here("output", "cox_ph_assumption.csv"))
           }
         }
       } else {
