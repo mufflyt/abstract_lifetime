@@ -15,7 +15,7 @@
 
 suppressPackageStartupMessages({
   library(here); library(config); library(cli); library(dplyr); library(readr)
-  library(stringr); library(tibble)
+  library(stringr); library(tibble); library(humaniformat)
 })
 
 source(here("R", "utils_text.R"))
@@ -81,11 +81,21 @@ lookup <- abstracts |>
   filter(is_us_based == TRUE) |>
   select(abstract_id, congress_year, author_name_first, primary_procedure) |>
   mutate(
+    # Use humaniformat for robust name parsing (handles "El Hachem", "Chapman-Davis", etc.)
+    parsed = humaniformat::parse_names(author_name_first),
+    last_name = trimws(parsed$last_name),
+    first_initial = toupper(substr(trimws(parsed$first_name), 1, 1)),
+    # Fallback to normalize_author for edge cases
     author_norm = vapply(author_name_first, normalize_author, character(1)),
-    last_name = trimws(str_extract(author_norm, "^[a-z][a-z '-]+")),
-    first_initial = toupper(str_extract(author_norm, "[A-Za-z]$"))
+    last_name = if_else(is.na(last_name) | nchar(last_name) == 0,
+                        trimws(str_extract(author_norm, "^[a-z][a-z '-]+")),
+                        last_name),
+    first_initial = if_else(is.na(first_initial) | nchar(first_initial) == 0,
+                            toupper(str_extract(author_norm, "[A-Za-z]$")),
+                            first_initial)
   ) |>
-  filter(!is.na(last_name), !is.na(first_initial)) |>
+  select(-parsed, -author_norm) |>
+  filter(!is.na(last_name), !is.na(first_initial), nchar(last_name) > 0) |>
   left_join(pubmed_fa, by = "abstract_id") |>
   mutate(
     pubmed_name_matches_aagl = !is.na(pubmed_last_name) &
@@ -140,16 +150,24 @@ score_author <- function(author_row) {
     npi_full_name = NA_character_
   )
 
-  # Find candidates in ABOG pool
+  # Find candidates in ABOG pool — exact last name first, fuzzy fallback
   if (has_full) {
     full_up <- toupper(trimws(author_row$full_first_name))
     my_cands <- pool |> filter(pool_last == last_up, pool_first == full_up)
     if (nrow(my_cands) == 0) {
-      # Fallback to initial match
       my_cands <- pool |> filter(pool_last == last_up, pool_first_initial == fi)
     }
   } else {
     my_cands <- pool |> filter(pool_last == last_up, pool_first_initial == fi)
+  }
+
+  # Fuzzy last-name fallback for hyphenated/compound names (Chapman-Davis, El Hachem)
+  if (nrow(my_cands) == 0 && nchar(last_up) >= 4) {
+    # Try removing hyphens and spaces
+    last_simplified <- gsub("[- ]", "", last_up)
+    fuzzy_cands <- pool |>
+      filter(gsub("[- ]", "", pool_last) == last_simplified, pool_first_initial == fi)
+    if (nrow(fuzzy_cands) > 0) my_cands <- fuzzy_cands
   }
 
   if (nrow(my_cands) == 0) return(empty_result)
@@ -215,8 +233,13 @@ score_author <- function(author_row) {
   second_score <- if (n_cands > 1) my_cands$total_score[2] else 0L
 
   # 3-tier classification
+  # Single-candidate relaxation: if there's exactly 1 OB/GYN in the entire
+  # ABOG pool with this last name + initial, the match is very likely correct
+  # even at lower scores. Accept at >= 35 for sole candidates.
+  is_sole_candidate <- n_cands == 1
   confidence <- case_when(
     best$total_score >= 50 & (best$total_score - second_score) >= 10 ~ "high",
+    is_sole_candidate & best$total_score >= 35 ~ "high",
     best$total_score >= 30 ~ "ambiguous",
     TRUE ~ "low"
   )
