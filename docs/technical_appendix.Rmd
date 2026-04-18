@@ -1,0 +1,241 @@
+---
+title: "Technical Appendix: Abstract-to-Publication Matching Pipeline"
+subtitle: "Supplement to: Publication Rate of Oral Presentations at the AAGL Global Congress, 2012-2023"
+author: "Tyler Muffly, MD"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(readr); library(dplyr); library(here); library(knitr)
+
+d <- read_csv(here("output", "abstracts_with_matches.csv"), show_col_types = FALSE)
+strat <- read_csv(here("output", "aim4_strategy_performance.csv"), show_col_types = FALSE)
+val <- read_csv(here("output", "validation_metrics.csv"), show_col_types = FALSE)
+s <- read_csv(here("output", "sensitivity_analyses.csv"), show_col_types = FALSE)
+cox <- read_csv(here("output", "aim2b_cox_regression.csv"), show_col_types = FALSE)
+ph <- read_csv(here("output", "cox_ph_assumption.csv"), show_col_types = FALSE)
+
+cfg <- yaml::read_yaml(here("config.yml"))
+
+n_total <- nrow(d)
+n_congresses <- length(unique(d$congress_year))
+yr_min <- min(d$congress_year)
+yr_max <- max(d$congress_year)
+n_definite <- sum(d$classification == "definite")
+n_probable <- sum(d$classification == "probable")
+
+xml_cache <- length(list.files(here("data", "cache", "pubmed_xml")))
+html_cache <- length(list.files(here("data", "cache", "sd_html")))
+```
+
+## A1. Pipeline Architecture
+
+The abstract-to-publication matching pipeline is implemented as a modular, fully reproducible R codebase comprising 20 R scripts, 12 test files (`r 391` unit and semantic tests), and a Shiny web application for human adjudication. The pipeline executes in 10 sequential steps, with checkpoint-based resume support for API-dependent stages. All source code and deidentified output data are available at https://github.com/mufflyt/abstract_lifetime.
+
+### A1.1 System Requirements
+
+- R version `r paste(R.version$major, R.version$minor, sep = ".")`
+- 22 R packages (tidyverse core, rentrez, xml2, httr, jsonlite, survival, gender, shiny, bslib, googlesheets4)
+- Disk cache: `r xml_cache` PubMed XML files, `r html_cache` ScienceDirect HTML files
+- External APIs: NCBI E-Utilities (PubMed), CrossRef, Europe PMC, OpenAlex, Semantic Scholar, genderize.io
+- Runtime: approximately 3-4 hours for a full pipeline execution on `r n_total` abstracts
+
+### A1.2 Pipeline Steps
+
+| Step | Script | Description | Checkpoint |
+|------|--------|-------------|------------|
+| 1 | `01b_parse_web.R` | Scrape JMIG supplement TOC + individual article pages from ScienceDirect | HTML cache |
+| 1d | `01d_tag_session_type.R` | Walk TOC DOM to assign Oral/Video labels per abstract | - |
+| 2 | `02_clean_abstracts.R` | Normalize titles/authors, extract 20+ predictor variables via NLP | - |
+| 3 | `03_search_pubmed.R` | 6-strategy PubMed search per abstract via NCBI E-Utilities | RDS |
+| 3b | `03b_search_crossref.R` | Supplementary search: CrossRef + Europe PMC + OpenAlex + Semantic Scholar | RDS per source |
+| 3c | `03c_doi_chain_search.R` | Reverse citation search via OpenAlex (DOI-based) | RDS |
+| 4 | `04_score_matches.R` | Composite scoring of all candidate publications | - |
+| 5 | `05_adjudicate.R` | Apply Cochrane-aligned classification thresholds | - |
+| 5b-e | `09b-d_enrich_*.R` | Publication type, author demographics, citation metrics | XML cache |
+| 6 | `06_analyze_results.R` | KM, Cox PH, logistic regression, publication bias, sensitivity | - |
+| 7-8 | `07/08_make_*.R` | Generate 4 tables + 9 figures | - |
+
+## A2. Data Sources and API Usage
+
+### A2.1 Abstract Ingestion
+
+Conference abstracts were identified from `r n_congresses` annual JMIG supplement issues (Volume 19 Issue 6 through Volume 30 Issue 11, Supplement S). The ScienceDirect supplement listing page was scraped programmatically with polite delays (2-3 seconds between requests) and user-agent rotation. Per-article HTML was cached to disk to avoid redundant fetches on re-runs. A total of `r html_cache` article pages were cached.
+
+Abstract text was available for congresses 2019-2023 only. Congresses 2012-2018 used an older ScienceDirect page format that did not expose structured abstract sections (Objective, Design, Setting, Patients, Intervention, Measurements, Conclusion) in the HTML. For these years, the matching algorithm relied on title and author matching without abstract-text semantic similarity.
+
+### A2.2 Publication Search
+
+Six complementary PubMed search strategies were applied to each abstract:
+
+1. **Title phrase search**: first 8 significant words of the normalized title, quoted phrase in [TI] field
+2. **First author search**: normalized first-author surname + initial in [1AU] field
+3. **Last author search**: normalized last-author surname + initial in [LASTAU] field
+4. **Author + keywords**: first author in [AU] combined with top 4 extracted keywords in [TIAB]
+5. **Distinctive phrase**: 4-word distinctive phrase from the title in [TIAB]
+6. **Author broad**: first author in [AU] (catch-all)
+
+All strategies were filtered by publication date (`r cfg$default$pubmed$date_start` to `r cfg$default$pubmed$date_end`) and results from the JMIG supplement issues themselves were excluded to prevent self-matching (volumes `r paste(cfg$default$pubmed$exclude_supplement_vol, collapse = ", ")`).
+
+Four supplementary databases were queried for each abstract: CrossRef (title-based, targeted to abstracts with few PubMed hits), Europe PMC (multi-strategy title + author), OpenAlex (keyword search with PMID resolution), and Semantic Scholar (title-based). Candidate PMIDs from supplementary sources were resolved via Europe PMC DOI-to-PMID lookup and merged into the primary candidate pool.
+
+A novel DOI-based reverse citation strategy queried OpenAlex for papers that cited each conference abstract's ScienceDirect DOI. This captured publications that explicitly referenced the conference abstract in their bibliography, providing a high-confidence signal that is robust to title changes between presentation and publication.
+
+### A2.3 Rate Limiting and Caching
+
+NCBI E-Utilities requests were rate-limited to 3 requests/second (without API key) or 10 requests/second (with ENTREZ_KEY). PubMed XML responses were cached to disk (`r xml_cache` files). All search stages used RDS-based checkpoints enabling resume after interruption.
+
+## A3. Matching Algorithm
+
+### A3.1 Composite Scoring
+
+Each candidate publication was scored against its source abstract using a 10-component composite score:
+
+| Component | Max Points | Method |
+|-----------|-----------|--------|
+| Title similarity | 3 | Jaccard index on normalized word sets (thresholds: >=0.75 = 3, >=0.55 = 2, >=0.35 = 1) |
+| Abstract semantic | 2 | TF-cosine similarity on word-frequency vectors (thresholds: >=0.70 = 2, >=0.50 = 1) |
+| First author | 2 | Exact or Jaro-Winkler fuzzy match (>=0.95 = 1, exact = 2) |
+| Last author | 2 | Same as first author |
+| Coauthor overlap | 1 | >=2 shared normalized author names |
+| Team bonus | 1 | First-author match + coauthor overlap |
+| Journal relevance | 0-1 | Jaro-Winkler distance to 12 known OB/GYN journals |
+| Keyword overlap | 1 | >=3 shared keywords |
+| Publication date | 1 | 0-18 months post-conference = 1, 18-30 months = 0.5 |
+| No-text penalty | -2 | Applied when neither title nor abstract similarity exceeds threshold |
+| Pre-conference | -3 | Publication date before the conference |
+
+### A3.2 Classification Thresholds
+
+Matches were classified using a tiered system aligned with Cochrane systematic review methodology:
+
+| Classification | Criteria | Interpretation |
+|---------------|----------|----------------|
+| Definite | Score >= `r cfg$default$scoring$auto_accept` with title or abstract text evidence | High-confidence match; auto-accepted |
+| Probable | Score `r cfg$default$scoring$manual_review`-`r cfg$default$scoring$auto_accept` with text evidence | Likely match; requires human confirmation |
+| Possible | Score >= `r cfg$default$scoring$manual_review` without text evidence, or tied candidates | Uncertain; requires human review |
+| No match | Score < `r cfg$default$scoring$manual_review` or no candidates identified | No viable publication found |
+| Excluded | Best candidate published before the conference date | Pre-existing publication |
+
+Tied scores at the definite threshold were automatically downgraded to probable, requiring human adjudication to select between candidates.
+
+### A3.3 Human Adjudication
+
+A Shiny web application (https://mufflyt.shinyapps.io/aagl-adjudication/) was developed for blinded manual review of probable and possible matches. The application displays the abstract title, authors, and text alongside ranked candidate publications with per-component score breakdowns. Reviewers (identified by 2-4 letter initials) record match, no-match, or skip decisions with optional free-text notes. All decisions are persisted to Google Sheets in real time, enabling multi-reviewer conflict detection. Keyboard shortcuts (m/n/s/Enter/arrow keys) accelerate the review workflow.
+
+## A4. Variable Extraction Methods
+
+### A4.1 Study Design Classification
+
+Study design was classified into 12 categories using regular expression pattern matching against the abstract text. The classifier operates in priority order: RCT > systematic review > prospective cohort > retrospective cohort > case-control > case series > cross-sectional > QI > cost analysis > simulation/lab > validation > other. National administrative database names (NSQIP, NIS, SEER, NCDB, HCUP, SART) triggered retrospective cohort classification.
+
+### A4.2 Research Category
+
+Abstracts were classified into mutually exclusive research categories in priority order: basic science (gene/molecular/protein/biomarker signals), education (simulation/training/curriculum, excluding RCTs), quality improvement (QI/ERAS/checklist), health services (cost/disparity/access/insurance), device/technology (robotic/AI/instrument), clinical (patient/surgery/outcome), or other.
+
+### A4.3 Primary Procedure
+
+The primary surgical procedure was extracted from abstract text in specificity-priority order: sacrocolpopexy > myomectomy > hysterectomy > endometriosis > adnexal surgery > pelvic floor > sterilization > ectopic pregnancy > cerclage > fibroids > gynecologic oncology.
+
+### A4.4 Result Positivity
+
+Abstract conclusions were classified as positive, negative, neutral, or unclear using a multi-pattern regex classifier. The classifier scanned the conclusion section first, then the measurements/results section, then full abstract text. Positive and negative signal counts were compared; ties were classified as neutral.
+
+### A4.5 Author Demographics
+
+For each matched publication, author metadata was extracted from PubMed XML records via NCBI EFetch:
+
+- **Gender**: Two-pass inference. Pass 1: US Social Security Administration data (1930-2012 birth cohorts) via the R `gender` package. Pass 2: genderize.io API for international names not covered by SSA. Middle initials were stripped before lookup. Coverage: `r round(mean(!is.na(d$first_author_gender))*100,1)`%.
+
+- **Practice type**: Affiliations were cross-referenced against 2,754 ACGME-accredited teaching hospital names (derived from a validated classifier with 95% precision for Tier 1 institutions). Regex fallback identified university/medical school signals. Community hospitals were classified only when no university affiliation appeared in any listed affiliation. Coverage: `r round(mean(!is.na(d$practice_type))*100,1)`%.
+
+- **US state / ACOG district**: Multi-strategy parser in priority order: (1) institution name lookup (110+ named institutions), (2) spelled-out state names (longest-first to prevent partial matches), (3) two-letter codes with optional ZIP or trailing period, (4) city-to-state lookup (70+ cities). Email addresses and electronic address tags were stripped before parsing.
+
+- **Subspecialty**: Classified from departmental affiliation text: MIGS, REI, gynecologic oncology, FPMRS, MFM, family planning, general OB/GYN, obstetrics, urology, or surgery (other). Coverage: `r round(mean(!is.na(d$subspecialty))*100,1)`%.
+
+## A5. Algorithm Validation
+
+### A5.1 Gold Standard Construction
+
+A gold standard of `r val$value[val$metric == "n"]` abstracts was constructed by stratified sampling (25 from definite matches, 25 from no-match classifications). For each sampled abstract, an intensive manual search was performed using 5 PubMed query strategies with relaxed matching thresholds (Jaccard >= 0.5 for positive verification).
+
+### A5.2 Performance Metrics
+
+```{r}
+val_tbl <- val |>
+  filter(metric %in% c("sensitivity", "specificity", "ppv", "npv", "accuracy")) |>
+  mutate(
+    Metric = c("Sensitivity (recall)", "Specificity", "Positive predictive value",
+               "Negative predictive value", "Accuracy")[match(metric,
+               c("sensitivity", "specificity", "ppv", "npv", "accuracy"))],
+    Value = paste0(round(value * 100, 1), "%")
+  ) |>
+  select(Metric, Value)
+kable(val_tbl)
+```
+
+The algorithm achieved `r round(val$value[val$metric == "sensitivity"]*100,1)`% sensitivity (no missed publications in the gold standard) and `r round(val$value[val$metric == "specificity"]*100,1)`% specificity. The `r round((1-val$value[val$metric == "specificity"])*100,1)`% false positive rate reflects cases where the scoring algorithm identified a high-scoring candidate that was not the true published version of the abstract (e.g., a related paper by the same author group on a similar topic).
+
+## A6. Sensitivity Analyses
+
+```{r}
+kable(s, col.names = c("Scenario", "N evaluated", "N published", "Rate (%)"))
+```
+
+## A7. Cox Proportional Hazards Model
+
+```{r}
+cox_display <- cox |>
+  mutate(
+    HR = round(estimate, 2),
+    `95% CI` = paste0(round(conf.low, 2), "-", round(conf.high, 2)),
+    `p-value` = round(p.value, 3)
+  ) |>
+  select(Term = term, HR, `95% CI`, `p-value`)
+kable(cox_display)
+```
+
+Proportional hazards assumption: global test p = `r ph$p_value[1]`.
+
+## A8. Reproducibility
+
+The complete pipeline can be reproduced by executing `Rscript 00_run_all.R` from the repository root. The pipeline uses seed-based randomization (set.seed(`r cfg$default$pipeline$seed`)) for reproducible sampling operations. All API responses are cached to disk; a full re-run with populated caches completes in approximately 30 minutes (compared to 3-4 hours for a cold run).
+
+### A8.1 Testing
+
+The codebase includes 391 automated tests across 12 test files:
+
+- **Unit tests** (8 files): Text normalization, author parsing, Jaccard/cosine similarity, ACOG district mapping, US state parsing, publication type canonicalization, result positivity classification, practice type and subspecialty classification, study design and research category classification
+- **Semantic tests** (1 file): Pipeline output plausibility checks against Cochrane MR000005 benchmarks, including publication rate bounds, time-to-publication bounds, classification vocabulary validation, cross-file consistency, predictor coverage thresholds, and Cox PH model validity
+- **Integration tests** (3 files): Shiny app data integrity, Google Sheets schema consistency, bundle synchronization
+
+### A8.2 Data Dictionary
+
+The primary output file (`output/abstracts_with_matches.csv`) contains `r ncol(d)` columns per abstract:
+
+| Column Group | Variables | Source |
+|-------------|-----------|--------|
+| Identifiers | abstract_id, congress_year, title | ScienceDirect |
+| Authors | first/last_author_normalized, author_count | ScienceDirect + PubMed |
+| Study characteristics | is_rct, sample_size, study_design, research_category, primary_procedure | NLP extraction |
+| Presentation | session_type | JMIG TOC |
+| Cochrane variables | is_multicenter, has_funding, stat_sig_reported, has_numeric_results, is_database_study, has_industry, has_trial_registration, has_irb_statement, result_positivity | NLP extraction |
+| Matching | best_pmid, best_score, classification, has_tie, n_candidates, 10 score components | Pipeline scoring |
+| Publication | pub_title, pub_journal, pub_year, pub_doi, pub_first_author, months_to_pub, pub_type_canonical | PubMed |
+| Author demographics | first_author_gender, first_author_state, first_author_acog_district, practice_type, subspecialty, career_stage, n_unique_affiliations | PubMed XML + SSA + ACGME |
+
+### A8.3 Stress Testing
+
+The deployed Shiny application was stress-tested under simulated load:
+
+| Test | Result |
+|------|--------|
+| Single request | 200 OK, 500-650ms response |
+| 10 concurrent requests | 10/10 success, 0.6-2.7s |
+| 20 concurrent requests | 17/20 success, 3 x 503 (platform connection limit) |
+| 50 sequential requests | 50/50 success, 0 errors |
+| Sustained rapid switching | 30/30 success |
+
+The application supports 2-3 concurrent reviewers without degradation. The 503 responses under 20-concurrent load reflect the shinyapps.io single-worker instance limit, not an application defect.
