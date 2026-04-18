@@ -8,24 +8,28 @@ library(stringr)
 # teaching_hospitals.rds + ACGME residency/fellowship program data).
 .teaching_names_path <- file.path(here::here(), "data", "validation", "teaching_hospital_names.txt")
 TEACHING_HOSPITAL_NAMES <- if (file.exists(.teaching_names_path)) {
-  readLines(.teaching_names_path)
+  nms <- readLines(.teaching_names_path)
+  # Filter out generic names too short to be meaningful (e.g., "hospital")
+  nms[nchar(nms) >= 10]
 } else character()
 
 # Precompile a single alternation regex at load time so is_teaching_hospital()
 # makes one grepl() call instead of 2,754 per affiliation.
-.TEACHING_PATTERN <- if (length(TEACHING_HOSPITAL_NAMES) > 0) {
-  escaped <- gsub("([.^$|*+?()\\[\\]{\\\\])", "\\\\\\1", TEACHING_HOSPITAL_NAMES)
-  paste(escaped, collapse = "|")
-} else ""
+.normalize_aff <- function(x) gsub("\\s+", " ", trimws(gsub("[^a-z0-9 ]", " ", tolower(x))))
+
+# Normalize hospital names at load time; stored as a plain character vector.
+.TEACHING_NAMES_NORM <- if (length(TEACHING_HOSPITAL_NAMES) > 0) {
+  norms <- unique(.normalize_aff(TEACHING_HOSPITAL_NAMES))
+  norms[nchar(norms) > 3]
+} else character()
 
 #' Check if an affiliation matches any known teaching/academic hospital name.
-#' Uses a single precompiled alternation regex against 2754 ACGME hospitals.
+#' Uses vectorized fixed-string search — avoids regex alternation length limits.
 is_teaching_hospital <- function(aff) {
-  if (is.na(aff) || nchar(aff) < 5 || nchar(.TEACHING_PATTERN) == 0)
+  if (is.na(aff) || nchar(aff) < 5 || length(.TEACHING_NAMES_NORM) == 0)
     return(FALSE)
-  aff_norm <- tolower(gsub("[^a-z0-9 ]", " ", tolower(aff)))
-  aff_norm <- gsub("\\s+", " ", trimws(aff_norm))
-  grepl(.TEACHING_PATTERN, aff_norm, perl = TRUE)
+  aff_norm <- .normalize_aff(aff)
+  any(stringr::str_detect(aff_norm, stringr::fixed(.TEACHING_NAMES_NORM)))
 }
 
 #' Classify affiliation as academic, community, private_practice, research_institute, or military.
@@ -120,10 +124,11 @@ classify_career_stage <- function(aff) {
     return("fellow")
   if (str_detect(lc, "\\bmedical student\\b|\\bstudent\\b"))
     return("student")
-  if (str_detect(lc, "\\bprofessor\\b|\\bchief\\b|\\bdirector\\b|\\bchair\\b|\\bhead\\b"))
-    return("faculty_senior")
+  # Junior faculty checked first — "assistant professor" contains "professor"
   if (str_detect(lc, "\\bassistant professor\\b|\\bassociate professor\\b|\\binstructor\\b|\\blecturer\\b"))
     return("faculty_junior")
+  if (str_detect(lc, "\\bprofessor\\b|\\bchief\\b|\\bdirector\\b|\\bchair\\b|\\bhead\\b"))
+    return("faculty_senior")
 
   # Can't determine from affiliation alone
   NA_character_
