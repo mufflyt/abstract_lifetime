@@ -306,6 +306,136 @@ if (nrow(dupes) > 0) {
   }
 }
 
+# ---- Fallback: Physician Compare + raw NPPES for unmatched ----
+cli_h2("Fallback: Physician Compare + NPPES for unmatched authors")
+
+db_path <- "/Volumes/MufflySamsung/DuckDB/nber_my_duckdb.duckdb"
+still_unmatched <- npi_matches |>
+  filter(npi_match_confidence != "high") |>
+  inner_join(lookup |> select(abstract_id, last_name_upper, full_first_name, has_full_name,
+                               state_hint, first_author_gender, first_initial),
+             by = "abstract_id") |>
+  filter(has_full_name)
+
+if (nrow(still_unmatched) > 0 && file.exists(db_path)) {
+  cli_alert_info("Searching Physician Compare + NPPES for {nrow(still_unmatched)} authors with full names...")
+  con <- DBI::dbConnect(duckdb::duckdb(), dbdir = db_path, read_only = TRUE)
+
+  fallback_results <- list()
+  for (i in seq_len(nrow(still_unmatched))) {
+    row <- still_unmatched[i, ]
+    first_up <- toupper(trimws(row$full_first_name))
+    last_up <- row$last_name_upper
+
+    # Try Physician Compare first (all Medicare-enrolled physicians)
+    q_pc <- sprintf(
+      "SELECT DISTINCT npi, first_name, last_name, gender, state, primary_specialty
+       FROM pc_all_years_mat
+       WHERE UPPER(TRIM(last_name)) = '%s' AND UPPER(TRIM(first_name)) = '%s'",
+      gsub("'", "''", last_up), gsub("'", "''", first_up)
+    )
+    cands <- tryCatch(dbGetQuery(con, q_pc) |> as_tibble(), error = function(e) tibble())
+
+    # If not in PC, try raw NPPES (broader)
+    if (nrow(cands) == 0) {
+      q_nppes <- sprintf(
+        "SELECT DISTINCT npi, first_name, last_name, gender,
+                practice_address_state as state, taxonomy_1 as primary_specialty
+         FROM temporal_all_years_fixed
+         WHERE UPPER(TRIM(last_name)) = '%s' AND UPPER(TRIM(first_name)) = '%s'",
+        gsub("'", "''", last_up), gsub("'", "''", first_up)
+      )
+      cands <- tryCatch(dbGetQuery(con, q_nppes) |> as_tibble(), error = function(e) tibble())
+    }
+
+    if (nrow(cands) == 0) next
+
+    # Deduplicate by NPI (temporal table returns same NPI across years)
+    cands <- cands |> distinct(npi, .keep_all = TRUE)
+
+    # Score: exact name = 50, state = 20, gender = 10
+    cands <- cands |>
+      mutate(
+        npi = as.character(npi),
+        pts_name = 50L,
+        pts_state = if_else(!is.na(row$state_hint) & !is.na(state) &
+                              toupper(row$state_hint) == toupper(state), 20L, 0L),
+        pts_gender = {
+          if (is.na(row$first_author_gender)) 0L
+          else {
+            gm <- c("female" = "F", "male" = "M")
+            expected <- unname(gm[row$first_author_gender])
+            if_else(!is.na(expected) & !is.na(gender) & gender == expected, 10L, 0L)
+          }
+        },
+        # Small bonus if specialty contains obgyn/gynecol
+        pts_spec = if_else(!is.na(primary_specialty) &
+                             grepl("obgyn|obstetric|gynecol", tolower(primary_specialty)), 5L, 0L),
+        total_score = pts_name + pts_state + pts_gender + pts_spec
+      ) |>
+      arrange(desc(total_score))
+
+    n_cands <- nrow(cands)
+    best <- cands[1, ]
+    second_score <- if (n_cands > 1) cands$total_score[2] else 0L
+    is_sole <- n_cands == 1
+
+    confidence <- case_when(
+      best$total_score >= 50 & (best$total_score - second_score) >= 10 ~ "high",
+      is_sole & best$total_score >= 35 ~ "high",
+      best$total_score >= 30 ~ "ambiguous",
+      TRUE ~ "low"
+    )
+
+    if (confidence == "high") {
+      # Update the main results
+      idx <- which(npi_matches$abstract_id == row$abstract_id)
+      npi_matches$npi_number[idx] <- best$npi
+      npi_matches$npi_match_score[idx] <- best$total_score
+      npi_matches$npi_n_candidates[idx] <- n_cands
+      npi_matches$npi_match_strategy[idx] <- "fallback_pc_nppes"
+      npi_matches$npi_match_confidence[idx] <- "high"
+      npi_matches$npi_gender[idx] <- best$gender
+      npi_matches$npi_state[idx] <- best$state
+      npi_matches$npi_subspecialty[idx] <- NA_character_  # not from ABOG
+      npi_matches$npi_full_name[idx] <- paste(best$first_name, best$last_name)
+
+      fallback_results[[length(fallback_results) + 1]] <- tibble(
+        abstract_id = row$abstract_id, npi = best$npi, source = "pc_nppes"
+      )
+    }
+
+    if (i %% 50 == 0) cli_alert_info("  {i}/{nrow(still_unmatched)}")
+  }
+
+  DBI::dbDisconnect(con, shutdown = TRUE)
+
+  n_fallback <- length(fallback_results)
+  cli_alert_success("Fallback matched: {n_fallback} additional physicians")
+} else {
+  cli_alert_info("No fallback candidates or DuckDB not mounted")
+}
+
+# Re-enforce one-to-one after fallback
+tier_a <- npi_matches |> filter(npi_match_confidence == "high", !is.na(npi_number))
+dupes <- tier_a |> count(npi_number) |> filter(n > 1)
+if (nrow(dupes) > 0) {
+  cli_alert_info("Resolving {nrow(dupes)} post-fallback NPI collisions...")
+  for (dup_npi in dupes$npi_number) {
+    conflict <- tier_a |> filter(npi_number == dup_npi) |> arrange(desc(npi_match_score))
+    losers <- conflict$abstract_id[-1]
+    npi_matches <- npi_matches |>
+      mutate(
+        npi_match_confidence = if_else(abstract_id %in% losers, "ambiguous", npi_match_confidence),
+        npi_number = if_else(abstract_id %in% losers, NA_character_, npi_number),
+        npi_gender = if_else(abstract_id %in% losers, NA_character_, npi_gender),
+        npi_state = if_else(abstract_id %in% losers, NA_character_, npi_state),
+        npi_subspecialty = if_else(abstract_id %in% losers, NA_character_, npi_subspecialty),
+        npi_full_name = if_else(abstract_id %in% losers, NA_character_, npi_full_name)
+      )
+  }
+}
+
 # Add ACOG district
 npi_matches <- npi_matches |>
   mutate(npi_acog_district = vapply(npi_state, acog_district_for_state, character(1)))
