@@ -1,30 +1,42 @@
 # Abstract Lifetime
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![R >= 4.4](https://img.shields.io/badge/R-%3E%3D%204.4-blue.svg)](https://www.r-project.org/)
+[![Tests: 391 passing](https://img.shields.io/badge/tests-391%20passing-brightgreen.svg)](tests/testthat/)
+[![Shiny App](https://img.shields.io/badge/Shiny-Live%20App-orange.svg)](https://mufflyt.shinyapps.io/aagl-adjudication/)
+
 **Publication Rate, Time to Publication, and Predictors of Full Publication Among Oral Presentations at the AAGL Global Congress, 2012-2023**
 
 A fully automated, reproducible pipeline that tracks whether conference abstracts presented at the AAGL Global Congress on Minimally Invasive Gynecology progress to full peer-reviewed publication. Designed to meet the methodological standards recommended by the [Cochrane review on full publication of results initially presented in abstracts](https://doi.org/10.1002/14651858.MR000005.pub4) (Scherer et al., 2018).
 
-## Pipeline Architecture
+**[Live Adjudication App](https://mufflyt.shinyapps.io/aagl-adjudication/)** | **[Technical Appendix](docs/technical_appendix.Rmd)** | **[Manuscript](docs/abstract_results_section.Rmd)**
 
+---
+
+## Flow Diagram
+
+![STROBE Flow Diagram](output/figures/figure1_flow_diagram.png)
+
+## Installation
+
+```bash
+git clone https://github.com/mufflyt/abstract_lifetime.git
+cd abstract_lifetime
 ```
-00_run_all.R                    # Master pipeline (runs all steps)
-R/
-  01b_parse_web.R               # Scrape JMIG supplements from ScienceDirect
-  01d_tag_session_type.R        # Classify Oral vs Video from TOC
-  02_clean_abstracts.R          # Normalize + extract 20+ predictor variables
-  03_search_pubmed.R            # 6-strategy PubMed search per abstract
-  03b_search_crossref.R         # CrossRef + Europe PMC + OpenAlex + Semantic Scholar
-  03c_doi_chain_search.R        # Reverse citation search via OpenAlex
-  04_score_matches.R            # 10-component composite scoring
-  05_adjudicate.R               # Cochrane-aligned 5-tier classification
-  09b_enrich_pub_types.R        # PubMed publication type extraction
-  09_enrich_authors.R           # Author names + affiliations from PubMed XML
-  09c_author_characteristics.R  # Gender, ACOG district, practice type, subspecialty
-  09d_enrich_metrics.R          # Citation counts + journal impact from OpenAlex
-  06_analyze_results.R          # KM, Cox PH, logistic regression, sensitivity
-  07_make_tables.R              # 4 publication-quality tables
-  08_make_figures.R             # 6 main + 4 supplementary figures
-  utils_*.R                     # Reusable utilities (scoring, text, states, etc.)
+
+```r
+# Install required packages
+install.packages(c(
+  "tidyverse", "here", "config", "cli", "rentrez", "xml2", "httr",
+  "jsonlite", "survival", "broom", "gender", "stringdist", "digest",
+  "rvest", "purrr", "DiagrammeR", "htmlwidgets", "webshot2", "scales"
+))
+
+# Optional (Shiny app + deployment)
+install.packages(c("shiny", "bslib", "DT", "shinyjs", "googlesheets4", "rsconnect"))
+
+# Optional (gender inference for international names)
+install.packages("gender")
 ```
 
 ## Quick Start
@@ -42,6 +54,47 @@ testthat::test_dir("tests/testthat")
 
 # Deploy Shiny adjudication app
 Rscript deploy_shiny.R aagl-adjudication
+```
+
+## Pipeline Architecture
+
+```
+00_run_all.R                         # Master pipeline (runs all steps sequentially)
+R/
+  01b_parse_web.R                    # Step 1: Scrape JMIG supplements from ScienceDirect
+  01d_tag_session_type.R             # Step 1d: Classify Oral vs Video from TOC
+  02_clean_abstracts.R               # Step 2: Normalize + extract 20+ predictor variables
+  03_search_pubmed.R                 # Step 3: 6-strategy PubMed search per abstract
+  03b_search_crossref.R              # Step 3b: CrossRef + Europe PMC + OpenAlex + Semantic Scholar
+  03c_doi_chain_search.R             # Step 3c: Reverse citation search via OpenAlex
+  04_score_matches.R                 # Step 4: 10-component composite scoring
+  05_adjudicate.R                    # Step 5: Cochrane-aligned 5-tier classification
+  09b_enrich_pub_types.R             # Step 5b: PubMed publication type extraction
+  09_enrich_authors.R                # Step 5c: Author names + affiliations from PubMed XML
+  09c_author_characteristics.R       # Step 5d: Gender, ACOG district, practice type
+  09d_enrich_metrics.R               # Step 5e: Citation counts + journal impact from OpenAlex
+  06_analyze_results.R               # Step 6: KM, Cox PH, logistic regression, sensitivity
+  07_make_tables.R                   # Step 7: 4 publication-quality tables
+  08_make_figures.R                  # Step 8: 6 main + 4 supplementary figures
+  utils_acog.R                       # US state -> ACOG district mapping
+  utils_affiliation.R                # Practice type, subspecialty, career stage from affiliations
+  utils_classify.R                   # Study design, research category, procedure classifiers
+  utils_congresses.R                 # Multi-congress date lookup
+  utils_crossref.R                   # CrossRef/OpenAlex/EuroPMC/SemanticScholar API wrappers
+  utils_positivity.R                 # Result direction classifier (positive/negative/neutral)
+  utils_pub_types.R                  # PubMed PublicationType canonicalization
+  utils_pubmed.R                     # PubMed E-Utilities search + XML parsing
+  utils_scoring.R                    # Composite match scoring algorithm
+  utils_states.R                     # US state parsing from affiliation text
+  utils_text.R                       # Text normalization, Jaccard similarity, keywords
+  validation_gold_standard.R         # Gold standard validation + threshold tuning
+scripts/
+  build_gold_standard.R              # Intensive PubMed verification of sampled abstracts
+  prefill_algorithm_decisions.R      # Push AUTO decisions to Google Sheet
+  backfill_*.R                       # Backfill new columns onto existing sheet rows
+  cleanup_no_match_rows.R            # Blank matched-pub fields on no_match decisions
+  rescue_2016.R                      # Recovery script for rate-limited congress years
+deploy_shiny.R                       # Build bundle + deploy to shinyapps.io
 ```
 
 ## Search Strategy
@@ -71,13 +124,15 @@ Six PubMed strategies per abstract, plus four supplementary databases and a nove
 
 Live at **https://mufflyt.shinyapps.io/aagl-adjudication/**
 
-Web-based tool for blinded manual review of probable/possible matches. Features:
+Web-based tool for blinded manual review of probable/possible matches:
+
 - Side-by-side abstract vs candidate comparison
 - Per-component score breakdowns
 - Google Sheets backend for multi-reviewer collaboration
 - Keyboard shortcuts (m/n/s/Enter/arrows)
-- Filters by congress year, classification tier
+- Filters by congress year (2012-2023), classification tier
 - Conflict detection between reviewers
+- Help tooltips on every control
 
 ## Variable Extraction
 
@@ -94,6 +149,7 @@ Web-based tool for blinded manual review of probable/possible matches. Features:
 ## Figures
 
 **Main manuscript** (6 figures):
+
 1. STROBE flow diagram
 2. Kaplan-Meier cumulative publication curve (pooled)
 3. KM curves stratified by congress year
@@ -101,18 +157,15 @@ Web-based tool for blinded manual review of probable/possible matches. Features:
 5. Cox PH forest plot (hazard ratios with 95% CI)
 6. Time to publication histogram
 
-**Supplementary** (4 figures):
-S1. Publication rate by congress year
-S2. Search strategy comparison
-S3. Score distribution by classification
-S4. Classification breakdown by year
+**Supplementary** (4 figures): publication rate by year, search strategy comparison, score distribution, classification breakdown by year
 
 ## Testing
 
 391 tests across 13 test files:
-- Unit tests for all utility functions (text normalization, scoring, state parsing, ACOG mapping, gender, affiliation classification, study design, procedures)
-- Semantic tests validating pipeline output plausibility against Cochrane benchmarks
-- Integration tests for Shiny app data integrity
+
+- **Unit tests**: text normalization, scoring, state parsing, ACOG mapping, gender, affiliation classification, study design, research category, procedure classification, publication type canonicalization
+- **Semantic tests**: pipeline output plausibility checks against Cochrane MR000005 benchmarks (publication rate bounds, time-to-publication bounds, classification vocabulary, predictor coverage thresholds, Cox PH validity)
+- **Integration tests**: Shiny app data integrity, Google Sheets schema consistency
 
 ```r
 testthat::test_dir("tests/testthat")
@@ -127,18 +180,43 @@ testthat::test_dir("tests/testthat")
 - Manuscript Rmd files use inline R code pulling from pipeline CSVs
 - Full re-run with populated cache: ~30 minutes
 
-## Data
+## Project Structure
 
-- `data/processed/`: Intermediate pipeline outputs (abstracts, candidates, scores, author characteristics)
-- `output/`: Final analysis results (CSVs, figures, tables)
-- `data/cache/`: API response cache (gitignored for large files)
-- `data/validation/`: Gold standard + ACGME teaching hospital names
+```
+data/
+  processed/          # Intermediate pipeline outputs (abstracts, candidates, scores)
+  cache/              # API response cache (PubMed XML, ScienceDirect HTML) [gitignored]
+  validation/         # Gold standard (50 abstracts) + ACGME teaching hospital names
+output/
+  *.csv               # Analysis results (aims 1-5, sensitivity, publication bias)
+  tables/             # Publication-quality tables (Table 1-4)
+  figures/            # Main (6) + supplementary (4) figures
+docs/
+  abstract_results_section.Rmd    # Full manuscript (Introduction + Methods + Results)
+  technical_appendix.Rmd          # Technical appendix (pipeline details)
+  reviewer_email.md               # Template email for adjudication reviewers
+shiny/
+  adjudication_app/   # Shiny app for human review of matches
+tests/
+  testthat/           # 391 automated tests
+config.yml            # All pipeline parameters (congresses, thresholds, API settings)
+```
 
 ## Requirements
 
 - R >= 4.4
 - Key packages: tidyverse, rentrez, xml2, httr, jsonlite, survival, gender, stringdist, DiagrammeR
 - Optional: googlesheets4 (Shiny backend), rsconnect (deployment), webshot2 (flow diagram PNG)
+
+## Contributing
+
+Contributions welcome. Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Add tests for new functionality
+4. Ensure `testthat::test_dir("tests/testthat")` passes
+5. Submit a pull request
 
 ## License
 
