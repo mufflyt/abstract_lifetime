@@ -55,6 +55,15 @@ score_component_cols <- c("title_sim", "title_pts", "abstract_pts",
 # Only include score columns that exist
 available_score_cols <- intersect(score_component_cols, names(results))
 
+# Exclude pre-conference publications entirely per study protocol.
+# These are papers published BEFORE the conference date — they represent
+# pre-existing work, not conference-to-publication conversions.
+n_excluded <- sum(results$classification == "excluded", na.rm = TRUE)
+if (n_excluded > 0) {
+  cli_alert_info("Excluding {n_excluded} pre-conference publications")
+  results <- results |> filter(classification != "excluded")
+}
+
 results_out <- results |>
   select(
     abstract_id, any_of("congress_year"), title,

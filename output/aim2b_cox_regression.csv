@@ -1,6 +1,12 @@
 term,estimate,std.error,statistic,p.value,conf.low,conf.high
-is_rctTRUE,1.506,0.397,1.03,0.303,0.691,3.281
-is_academicTRUE,1.152,0.3,0.472,0.637,0.64,2.074
-is_us_basedTRUE,2.565,0.285,3.31,0.001,1.468,4.481
-is_multicenterTRUE,2.382,0.468,1.856,0.063,0.953,5.957
-has_fundingTRUE,5.201,1.018,1.62,0.105,0.708,38.231
+is_rctTRUE,1.461,0.604,0.627,0.53,0.447,4.771
+is_academicTRUE,1.528,0.372,1.14,0.254,0.737,3.166
+is_us_basedTRUE,3.07,0.389,2.881,0.004,1.431,6.585
+n_authors,0.907,0.058,-1.69,0.091,0.811,1.016
+first_author_gendermale,0.475,0.351,-2.122,0.034,0.239,0.945
+practice_typecommunity,2.738,0.401,2.512,0.012,1.248,6.009
+practice_typemilitary_va,0,7265.487,-0.002,0.998,0,Inf
+practice_typeprivate_practice,0,7948.996,-0.002,0.998,0,Inf
+practice_typeresearch_institute,0,6288.514,-0.003,0.998,0,Inf
+is_multicenterTRUE,2.557,0.729,1.288,0.198,0.613,10.674
+has_fundingTRUE,7.109,1.059,1.853,0.064,0.893,56.616

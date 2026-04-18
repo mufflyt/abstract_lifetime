@@ -1,12 +1,12 @@
 step,n
-Total abstracts parsed,1154
-Video presentations excluded,48
-Oral abstracts included,1106
-Searched across 6 databases,1106
-With candidate publications,1102
-Without any candidates,4
-Definite matches,75
-Probable (review needed),229
-Possible (weak evidence),62
-Excluded (pre-conference pub),35
+Total abstracts parsed,1119
+Video excluded,48
+Oral included,1071
+Searched,1071
+With candidates,1067
+No candidates,4
+Definite,75
+Probable,229
+Possible,62
+Excluded,0
 No match,705

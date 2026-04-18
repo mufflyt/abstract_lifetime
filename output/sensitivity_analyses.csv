@@ -1,8 +1,8 @@
 scenario,n,n_published,rate
-Definite only,1106,75,6.8
-Definite + probable,1106,304,27.5
-Definite + reviewer-confirmed,818,78,9.5
-Published within 12 months,818,43,5.3
-Published within 24 months,818,70,8.6
-Published within 36 months,777,68,8.8
-Published within 48 months,725,55,7.6
+Definite only,1071,75,7
+Definite + probable,1071,304,28.4
+Definite + reviewer-confirmed,783,78,10
+Published within 12 months,783,28,3.6
+Published within 24 months,783,47,6
+Published within 36 months,744,45,6
+Published within 48 months,693,36,5.2

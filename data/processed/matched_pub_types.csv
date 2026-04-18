@@ -14,7 +14,6 @@ pmid,pub_types,pub_type_canonical
 38696840,Journal Article,Journal Article
 25145555,Journal Article,Journal Article
 24280958,Journal Article,Journal Article
-22587998,Journal Article,Journal Article
 35059616,Journal Article,Journal Article
 25243164,Journal Article,Journal Article
 41883950,Journal Article; Review,Review
@@ -34,7 +33,6 @@ pmid,pub_types,pub_type_canonical
 41834415,Journal Article; Practice Guideline,Journal Article
 27352560,Journal Article,Journal Article
 24575435,Journal Article; Comment,Editorial/Letter
-21847586,Comparative Study; Journal Article,Journal Article
 25247366,Journal Article,Journal Article
 23348163,Journal Article,Journal Article
 23154268,"Evaluation Study; Journal Article; Research Support, Non-U.S. Gov't",Journal Article
@@ -87,7 +85,6 @@ pmid,pub_types,pub_type_canonical
 24732005,Evaluation Study; Journal Article,Journal Article
 23635629,Journal Article,Journal Article
 25893193,"Comparative Study; Evaluation Study; Journal Article; Research Support, Non-U.S. Gov't",Journal Article
-22858236,Journal Article,Journal Article
 25201548,"Journal Article; Research Support, Non-U.S. Gov't",Journal Article
 30049658,"Evaluation Study; Journal Article; Research Support, Non-U.S. Gov't",Journal Article
 25706420,Journal Article,Journal Article
@@ -164,10 +161,8 @@ pmid,pub_types,pub_type_canonical
 26895919,Journal Article; Randomized Controlled Trial,RCT/Trial
 38731060,Journal Article; Review,Review
 26339279,Case Reports; Journal Article,Case Report
-24347933,Journal Article,Journal Article
 26223033,"Journal Article; Randomized Controlled Trial; Research Support, Non-U.S. Gov't",RCT/Trial
 34461131,Journal Article,Journal Article
-22395145,Journal Article,Journal Article
 38445009,Case Reports; Journal Article,Case Report
 26472151,"Journal Article; Research Support, Non-U.S. Gov't",Journal Article
 30287060,Journal Article,Journal Article
@@ -225,7 +220,6 @@ pmid,pub_types,pub_type_canonical
 29210163,Letter; Comment,Editorial/Letter
 27008889,"Journal Article; Practice Guideline; Research Support, Non-U.S. Gov't",Journal Article
 31328629,Journal Article,Journal Article
-25300058,Journal Article,Journal Article
 38061491,Journal Article,Journal Article
 26180972,Journal Article,Journal Article
 38631927,Journal Article; Review,Review
@@ -288,7 +282,6 @@ pmid,pub_types,pub_type_canonical
 27917727,Comparative Study; Journal Article,Journal Article
 28099699,Comparative Study; Journal Article; Randomized Controlled Trial,RCT/Trial
 31923185,"Journal Article; Research Support, Non-U.S. Gov't",Journal Article
-27679343,Journal Article,Journal Article
 35580531,Journal Article,Journal Article
 39350662,Journal Article; Review,Review
 39684483,Journal Article,Journal Article
@@ -301,8 +294,6 @@ pmid,pub_types,pub_type_canonical
 29138602,Journal Article,Journal Article
 28642090,Journal Article,Journal Article
 29359520,Journal Article,Journal Article
-27678766,Journal Article,Journal Article
-27678765,Journal Article,Journal Article
 38333268,Journal Article; Review,Review
 29527550,Journal Article; Review,Review
 28134608,Journal Article; Review,Review
@@ -319,7 +310,6 @@ pmid,pub_types,pub_type_canonical
 27365004,Comparative Study; Journal Article,Journal Article
 27924388,Journal Article; Randomized Controlled Trial,RCT/Trial
 37677843,Journal Article,Journal Article
-27679061,Journal Article,Journal Article
 41898400,Journal Article; Review,Review
 27980085,Journal Article,Journal Article
 26860976,Case Reports; Journal Article,Case Report
@@ -327,7 +317,6 @@ pmid,pub_types,pub_type_canonical
 27322107,Journal Article,Journal Article
 41932474,Journal Article,Journal Article
 30697559,Journal Article; Review,Review
-27679183,Journal Article,Journal Article
 41672949,Journal Article; Meta-Analysis; Systematic Review; Review,Review
 26437835,Editorial,Editorial/Letter
 34760563,Editorial,Editorial/Letter
@@ -339,7 +328,6 @@ pmid,pub_types,pub_type_canonical
 40112300,Journal Article; Video-Audio Media,Journal Article
 40217969,Journal Article,Journal Article
 26096349,Journal Article; Randomized Controlled Trial,RCT/Trial
-25439179,Comparative Study; Journal Article; Randomized Controlled Trial,RCT/Trial
 27403070,Journal Article,Journal Article
 28691238,Journal Article,Journal Article
 32229194,"Journal Article; Randomized Controlled Trial; Research Support, Non-U.S. Gov't",RCT/Trial
@@ -354,7 +342,6 @@ pmid,pub_types,pub_type_canonical
 28694681,Journal Article,Journal Article
 25629500,"Journal Article; Research Support, Non-U.S. Gov't",Journal Article
 27094982,Case Reports; Comparative Study; Journal Article,Case Report
-27679222,Journal Article,Journal Article
 27241922,Comparative Study; Journal Article; Multicenter Study,Journal Article
 26616648,Editorial,Editorial/Letter
 34369398,Journal Article,Journal Article
@@ -368,7 +355,6 @@ pmid,pub_types,pub_type_canonical
 27890646,Comparative Study; Journal Article,Journal Article
 40311814,Journal Article; Randomized Controlled Trial,RCT/Trial
 29344213,Journal Article,Journal Article
-27209341,"Equivalence Trial; Journal Article; Randomized Controlled Trial; Research Support, Non-U.S. Gov't",RCT/Trial
 33416792,"Journal Article; Research Support, Non-U.S. Gov't",Journal Article
 28676450,Journal Article; Multicenter Study,Journal Article
 34356280,Journal Article,Journal Article
@@ -455,7 +441,6 @@ pmid,pub_types,pub_type_canonical
 38307471,Letter,Editorial/Letter
 39764856,Journal Article; Systematic Review,Review
 39828414,Journal Article; Comparative Study,Journal Article
-28885273,Comparative Study; Journal Article,Journal Article
 32266158,Journal Article,Journal Article
 34729610,Journal Article,Journal Article
 33181817,Case Reports; Journal Article; Review,Review
@@ -466,7 +451,6 @@ pmid,pub_types,pub_type_canonical
 30573987,Journal Article,Journal Article
 31263977,Journal Article; Review,Review
 31256328,Comparative Study; Journal Article; Randomized Controlled Trial,RCT/Trial
-27059965,Journal Article,Journal Article
 40660016,Journal Article,Journal Article
 30476097,"Journal Article; Research Support, Non-U.S. Gov't",Journal Article
 29978599,Journal Article,Journal Article
@@ -479,7 +463,6 @@ pmid,pub_types,pub_type_canonical
 31197426,Case Reports; Journal Article,Case Report
 29683559,Journal Article,Journal Article
 28393285,Journal Article; Review,Review
-28168410,Journal Article; Video-Audio Media,Journal Article
 37519598,Case Reports; Journal Article,Case Report
 29894327,Case Reports; Journal Article,Case Report
 32433940,Journal Article,Journal Article
@@ -511,14 +494,12 @@ pmid,pub_types,pub_type_canonical
 31500786,Comparative Study; Journal Article,Journal Article
 30476879,Journal Article; Multicenter Study,Journal Article
 32686302,Journal Article,Journal Article
-28858908,"Journal Article; Research Support, Non-U.S. Gov't",Journal Article
 28956186,Journal Article; Review,Review
 29333613,Journal Article; Randomized Controlled Trial,RCT/Trial
 31112952,Journal Article; Randomized Controlled Trial,RCT/Trial
 41507598,Journal Article; Multicenter Study,Journal Article
 33413957,Historical Article; Journal Article; Review,Review
 39935247,Journal Article,Journal Article
-29318153,Clinical Trial; Journal Article,RCT/Trial
 29525777,Consensus Statement; Journal Article,Journal Article
 30738028,Historical Article; Journal Article,Journal Article
 31546278,Journal Article; Systematic Review,Review
@@ -538,7 +519,6 @@ pmid,pub_types,pub_type_canonical
 41899705,Journal Article,Journal Article
 41959726,Journal Article,Journal Article
 30503139,Case Reports; Journal Article; Video-Audio Media,Case Report
-30098702,Journal Article; Video-Audio Media,Journal Article
 31571921,Journal Article,Journal Article
 30810740,"Journal Article; Multicenter Study; Research Support, Non-U.S. Gov't",Journal Article
 31539642,Journal Article,Journal Article
@@ -583,10 +563,8 @@ pmid,pub_types,pub_type_canonical
 32451551,Journal Article,Journal Article
 40879962,Journal Article; Review,Review
 31345239,Journal Article; Systematic Review,Review
-24102958,Journal Article,Journal Article
 30629598,Journal Article; Systematic Review,Review
 31957899,Journal Article,Journal Article
-31110645,Journal Article,Journal Article
 38138920,Journal Article,Journal Article
 40633756,Journal Article; Case Reports,Case Report
 38639108,Journal Article; Comparative Study,Journal Article
@@ -631,7 +609,6 @@ pmid,pub_types,pub_type_canonical
 41891981,Journal Article,Journal Article
 34427668,"Journal Article; Research Support, Non-U.S. Gov't",Journal Article
 35210590,Published Erratum,Journal Article
-31082383,"Journal Article; Meta-Analysis; Research Support, Non-U.S. Gov't; Systematic Review",Review
 33331712,Journal Article,Journal Article
 39723204,Journal Article; Observational Study,Observational Study
 33039394,Journal Article,Journal Article
@@ -696,7 +673,6 @@ pmid,pub_types,pub_type_canonical
 41872666,Journal Article,Journal Article
 35004030,Case Reports; Journal Article,Case Report
 33241100,Journal Article; Review,Review
-29937153,Case Reports; Journal Article; Video-Audio Media,Case Report
 33202334,Journal Article,Journal Article
 33644899,Clinical Trial; Journal Article,RCT/Trial
 31930522,Journal Article; Systematic Review,Review
@@ -735,21 +711,17 @@ pmid,pub_types,pub_type_canonical
 41888309,Journal Article,Journal Article
 34165779,Journal Article; Systematic Review,Review
 35020188,Journal Article,Journal Article
-26675055,"Comparative Study; Journal Article; Randomized Controlled Trial; Research Support, Non-U.S. Gov't",RCT/Trial
 34463871,"Journal Article; Research Support, Non-U.S. Gov't",Journal Article
 37522105,Journal Article,Journal Article
 34774522,Journal Article,Journal Article
 35677700,Case Reports; Journal Article,Case Report
 35984411,"Journal Article; Research Support, Non-U.S. Gov't",Journal Article
 38418580,Comparative Study; Journal Article,Journal Article
-27355003,Case Reports; Journal Article,Case Report
 33942160,Journal Article,Journal Article
 33620905,"Journal Article; Multicenter Study; Randomized Controlled Trial; Research Support, Non-U.S. Gov't",RCT/Trial
 36531342,Journal Article; Review,Review
 41308470,Journal Article; Validation Study,Journal Article
 38942912,Journal Article,Journal Article
-30418263,Journal Article,Journal Article
-32349874,"Journal Article; Research Support, Non-U.S. Gov't",Journal Article
 33773807,"Journal Article; Research Support, N.I.H., Extramural",Journal Article
 34481135,Journal Article,Journal Article
 33485641,Journal Article; Multicenter Study,Journal Article
@@ -796,7 +768,6 @@ pmid,pub_types,pub_type_canonical
 40597336,Journal Article; Evaluation Study,Journal Article
 33589138,Case Reports; Journal Article; Video-Audio Media,Case Report
 36562673,English Abstract; Journal Article,Journal Article
-33992450,"Journal Article; Observational Study; Research Support, Non-U.S. Gov't",Observational Study
 35752301,Journal Article; Randomized Controlled Trial,RCT/Trial
 38632219,Case Reports; Journal Article; Video-Audio Media,Case Report
 38636771,Case Reports; Video-Audio Media; Journal Article,Case Report
@@ -838,7 +809,6 @@ pmid,pub_types,pub_type_canonical
 34800328,Journal Article; Validation Study,Journal Article
 36548105,Randomized Controlled Trial; Journal Article; Equivalence Trial,RCT/Trial
 38489558,Journal Article; Review,Review
-34130801,Comparative Study; Journal Article; Meta-Analysis; Systematic Review,Review
 35801041,Editorial,Editorial/Letter
 36171149,Case Reports; Journal Article,Case Report
 36817006,Journal Article,Journal Article
@@ -859,7 +829,6 @@ pmid,pub_types,pub_type_canonical
 39358769,Journal Article,Journal Article
 38342374,Journal Article,Journal Article
 36432708,Journal Article,Journal Article
-33688276,Journal Article,Journal Article
 41432883,Journal Article,Journal Article
 35372574,Journal Article; Review,Review
 37025444,Journal Article; Review,Review
@@ -946,7 +915,6 @@ pmid,pub_types,pub_type_canonical
 39870239,Journal Article,Journal Article
 40598535,Journal Article; Review,Review
 35499271,Randomized Controlled Trial; Journal Article,RCT/Trial
-35865828,Journal Article,Journal Article
 36996624,"Randomized Controlled Trial; Journal Article; Research Support, Non-U.S. Gov't",RCT/Trial
 37210009,Observational Study; Journal Article,Observational Study
 39578802,Journal Article,Journal Article
@@ -1009,13 +977,11 @@ pmid,pub_types,pub_type_canonical
 39618150,Journal Article,Journal Article
 40106946,Case Reports; Journal Article,Case Report
 38697259,Journal Article,Journal Article
-36852512,Randomized Controlled Trial; Journal Article,RCT/Trial
 40691413,Journal Article; Comparative Study,Journal Article
 38959323,Journal Article,Journal Article
 39520994,Letter,Editorial/Letter
 39504845,Journal Article,Journal Article
 41243041,Journal Article; Review,Review
-37271737,Journal Article,Journal Article
 39490891,Journal Article; Comparative Study,Journal Article
 41583717,English Abstract; Journal Article,Journal Article
 39964372,Journal Article; Review,Review
@@ -1029,5 +995,6 @@ pmid,pub_types,pub_type_canonical
 39265173,Journal Article; Randomized Controlled Trial; Equivalence Trial,RCT/Trial
 39260558,Journal Article,Journal Article
 37944155,Meta-Analysis; Systematic Review; Journal Article,Review
+37271737,Journal Article,Journal Article
 39307234,Journal Article,Journal Article
 40521575,Journal Article,Journal Article

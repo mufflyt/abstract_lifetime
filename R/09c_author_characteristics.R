@@ -18,7 +18,7 @@
 
 suppressPackageStartupMessages({
   library(here); library(dplyr); library(readr); library(stringr)
-  library(tibble); library(purrr); library(cli)
+  library(tibble); library(purrr); library(cli); library(httr)
 })
 
 source(here("R", "utils_acog.R"))
@@ -70,6 +70,8 @@ ssa_result <- tryCatch({
 cli_alert_info("SSA resolved: {nrow(ssa_result)} / {length(unique(first_names$name_clean))}")
 
 # Pass 2: genderize.io for names SSA missed
+# Uses GENDERIZE_API_KEY env var if set (higher rate limit: 1000/day free, unlimited paid).
+# Batches requests at 10 names per call to stay within the API's URL length limits.
 ssa_names <- if (nrow(ssa_result) > 0) tolower(ssa_result$name_clean) else character()
 unresolved <- unique(first_names$name_clean[!tolower(first_names$name_clean) %in% ssa_names])
 unresolved <- unresolved[!is.na(unresolved) & nchar(unresolved) >= 2]
@@ -77,15 +79,53 @@ unresolved <- unresolved[!is.na(unresolved) & nchar(unresolved) >= 2]
 genderize_result <- tibble()
 if (length(unresolved) > 0) {
   cli_alert_info("Querying genderize.io for {length(unresolved)} remaining names...")
+  api_key <- Sys.getenv("GENDERIZE_API_KEY", "")
+
+  fetch_genderize_batch <- function(names_batch) {
+    params <- paste0("name[]=", URLencode(names_batch), collapse = "&")
+    if (nchar(api_key) > 0) params <- paste0(params, "&apikey=", api_key)
+    url  <- paste0("https://api.genderize.io/?", params)
+    resp <- tryCatch(httr::GET(url, httr::timeout(15)), error = function(e) NULL)
+    if (is.null(resp) || httr::status_code(resp) != 200) return(tibble())
+    parsed <- tryCatch(httr::content(resp, "parsed"), error = function(e) NULL)
+    if (is.null(parsed) || length(parsed) == 0) return(tibble())
+    purrr::map(parsed, function(x) {
+      tibble(
+        name_clean         = x$name %||% NA_character_,
+        gender             = x$gender %||% NA_character_,
+        probability        = x$probability %||% NA_real_,
+        proportion_male    = if (!is.null(x$gender) && !is.na(x$gender) && x$gender == "male")
+                               x$probability else 1 - (x$probability %||% NA_real_),
+        proportion_female  = if (!is.null(x$gender) && !is.na(x$gender) && x$gender == "female")
+                               x$probability else 1 - (x$probability %||% NA_real_)
+      )
+    }) |> purrr::list_rbind()
+  }
+
+  batches <- split(unresolved, ceiling(seq_along(unresolved) / 10))
+  genderize_rows <- vector("list", length(batches))
+  for (i in seq_along(batches)) {
+    genderize_rows[[i]] <- tryCatch(
+      fetch_genderize_batch(batches[[i]]),
+      error = function(e) { cli_alert_warning("genderize batch {i} failed: {e$message}"); tibble() }
+    )
+    Sys.sleep(0.5)  # polite: free tier allows ~1 req/sec
+  }
   genderize_result <- tryCatch({
-    # genderize method in gender package handles the API call
-    gender::gender(unresolved, method = "genderize") |>
-      select(name_clean = name, gender, proportion_male, proportion_female)
+    bound <- bind_rows(genderize_rows)
+    if (nrow(bound) > 0 && all(c("name_clean", "gender") %in% names(bound))) {
+      bound |>
+        filter(!is.na(name_clean), !is.na(gender)) |>
+        select(name_clean, gender, proportion_male, proportion_female)
+    } else tibble()
   }, error = function(e) {
-    cli_alert_warning("genderize.io failed: {e$message}")
+    cli_alert_warning("genderize.io result merge failed: {e$message}")
     tibble()
   })
+
   cli_alert_info("genderize.io resolved: {nrow(genderize_result)} / {length(unresolved)}")
+  if (nchar(api_key) == 0)
+    cli_alert_info("Tip: set GENDERIZE_API_KEY in .Renviron for higher rate limits")
 }
 
 # Combine both passes (SSA takes priority where both resolve)
@@ -129,7 +169,12 @@ first_auth <- authors |>
   select(-first_author_state_raw) |>
   left_join(gender_lkp, by = c("first_author_first" = "first_name")) |>
   mutate(
-    first_author_acog_district = vapply(first_author_state, acog_district_for_state, character(1)),
+    first_author_acog_district = mapply(function(state, aff) {
+      d <- acog_district_for_state(state)
+      if (!is.na(d)) return(d)
+      country <- parse_country(aff)
+      if (!is.na(country) && country != "USA") country else NA_character_
+    }, first_author_state, first_author_aff, USE.NAMES = FALSE),
     practice_type = mapply(classify_practice_type, first_author_aff, first_author_all_aff,
                            USE.NAMES = FALSE),
     subspecialty = vapply(first_author_aff, classify_subspecialty, character(1)),

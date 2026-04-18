@@ -1,6 +1,6 @@
 abstract_id,n_authors,n_unique_affiliations,n_authors_aagl,first_author_last,first_author_first,first_author_country,first_author_state,first_author_gender,first_author_gender_p,first_author_acog_district,practice_type,subspecialty,career_stage
 AAGL2012_001,6,6,5,Galen,Donald I,USA. drgalen@drgalen.com.,CA,male,0.996,IX,NA,general_OBGYN,NA
-AAGL2012_002,6,1,5,Banks,Erika,DC.,WA,female,0.9958,VIII,academic,REI,NA
+AAGL2012_002,6,1,5,Banks,Erika,DC.,OH,female,0.9958,V,academic,REI,NA
 AAGL2012_003,10,5,5,Garza-Cavazos,Arturo,Illinois.,IL,male,0.9955,VII,academic,general_OBGYN,NA
 AAGL2012_004,3,1,3,Adelowo,Amos,MD.,MA,male,0.9983,I,academic,FPMRS,NA
 AAGL2012_005,4,4,4,Dahiya,Mini,India.,NA,female,1,India,academic,NA,NA
@@ -14,7 +14,7 @@ AAGL2012_012,11,1,3,Shapiro,Edan Y,New York.,NY,male,0.8717,II,academic,urology,
 AAGL2012_013,6,5,5,Hoffman,Mitchel,United States of America.,FL,male,0.998,XI,academic,NA,NA
 AAGL2012_014,4,1,5,Schiff,Lauren,schiff.lauren@gmail.com.,MI,female,0.9904,V,academic,NA,NA
 AAGL2012_015,3,1,3,Hashemi,Lida,Islamic Republic of Iran. morsali_a@modares.ac.ir.,NA,female,1,Iran,academic,NA,NA
-AAGL2012_016,11,1,5,Santulli,Pietro,France. pietro.santulli@inserm.fr,NA,male,1,France,academic,obstetrics,NA
+AAGL2012_016,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2012_017,9,2,5,Chapron,Charles,France.,NA,male,0.9949,France,NA,NA,NA
 AAGL2012_018,7,3,5,Borghese,Bruno,France.,NA,male,1,France,research_institute,NA,NA
 AAGL2012_019,6,1,5,Wei,Jianling,People's Republic of China.,NA,NA,NA,China,academic,obstetrics,NA
@@ -23,9 +23,9 @@ AAGL2012_021,3,1,2,Benagiano,Giuseppe,Italy.,NA,male,1,Italy,academic,obstetrics
 AAGL2012_022,4,3,5,Spinoni,Marta,Italy.,NA,female,0.9973,Italy,academic,NA,NA
 AAGL2012_023,3,3,4,Martin,Dan,UK. damartin@lincoln.ac.uk.,NA,male,0.9953,United Kingdom,academic,NA,NA
 AAGL2012_024,2,2,2,van der Wat,Johan,South Africa.,NA,male,0.9839,South Africa,academic,MIGS,NA
-AAGL2012_025,6,6,5,Koninckx,Philippe R,United Arab Emirates - pkoninckx@gmail.com.,NA,male,1,UAE,academic,NA,NA
+AAGL2012_025,6,6,5,Koninckx,Philippe R,United Arab Emirates - pkoninckx@gmail.com.,NA,male,1,UAE,community,NA,NA
 AAGL2012_026,9,4,4,Desai,Roopal,UK.,NA,female,1,United Kingdom,academic,NA,NA
-AAGL2012_027,4,3,2,King,Carla,NY.,NY,female,0.9973,II,academic,NA,NA
+AAGL2012_027,4,3,2,King,Carla,NY.,NY,female,0.9973,II,NA,NA,NA
 AAGL2012_028,3,1,1,Orady,M,USA - monaorady@hotmail.com.,OH,NA,NA,V,community,general_OBGYN,NA
 AAGL2012_029,6,1,3,King,Cara R,Pennsylvania.,PA,female,0.9988,III,academic,NA,NA
 AAGL2012_030,2,1,2,Chamsy,Dina,Pennsylvania.,PA,female,0.9975,III,academic,general_OBGYN,NA
@@ -35,18 +35,18 @@ AAGL2012_033,8,8,5,Kim,Ju-Hyun,Korea.,NA,NA,NA,South Korea,academic,general_OBGY
 AAGL2012_034,6,0,5,Kanis,M J,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2012_035,4,0,4,Crosbie,E J,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2012_036,4,0,5,Crosbie,E J,NA,NA,NA,NA,NA,NA,NA,NA
-AAGL2012_037,8,1,5,Bae,Jong Woon,Republic of Korea.,NA,male,1,South Korea,academic,MIGS,NA
+AAGL2012_037,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2012_038,2,2,5,Singer,Tania,Germany. Electronic address: singer@cbs.mpg.de.,NA,female,0.9979,Germany,academic,NA,NA
 AAGL2012_039,3,1,3,Bodur,Serkan,Ankara; Turkey.,NA,male,1,Turkey,military_va,general_OBGYN,NA
 AAGL2012_040,5,1,3,Hellman,Kristina,Sweden. kristina.hellman@ki.se,NA,female,0.9975,Sweden,academic,general_OBGYN,NA
-AAGL2012_041,2,1,3,Sgroi,Joseph,Australia.,NA,male,0.9958,Australia,academic,NA,NA
-AAGL2012_042,3,3,4,Daghash,Mohamed Hasan,Qatar.,NA,male,1,Qatar,academic,NA,NA
+AAGL2012_041,2,1,3,Sgroi,Joseph,Australia.,NA,male,0.9958,Australia,community,NA,NA
+AAGL2012_042,3,3,4,Daghash,Mohamed Hasan,Qatar.,NA,male,1,Qatar,community,NA,NA
 AAGL2012_043,9,7,5,Santulli,Pietro,France. Electronic address: pietro.santulli@inserm.fr.,NA,male,1,France,research_institute,obstetrics,NA
 AAGL2012_044,3,1,5,Walsh,Tanya,M13 9PL.,NA,female,0.9967,United Kingdom,academic,NA,NA
 AAGL2012_045,3,3,5,Harris,Matthew,UK. matt.harris11@doctors.net.uk.,NA,male,0.9962,United Kingdom,NA,NA,NA
 AAGL2012_046,11,2,5,Karadag,Serdar,Turkey.,NA,male,1,Turkey,academic,urology,NA
 AAGL2012_047,3,1,3,Stapleton,Susan Rutledge,USA. susanstapleton71@gmail.com,NA,female,0.9978,NA,NA,NA,NA
-AAGL2012_048,6,1,5,Jost,S,France. jost.stephanie@hotmail.fr,NA,NA,NA,France,academic,general_OBGYN,NA
+AAGL2012_048,6,1,5,Jost,S,France. jost.stephanie@hotmail.fr,NA,NA,NA,France,community,general_OBGYN,NA
 AAGL2012_049,15,14,5,Laberge,Philippe,Canada. Electronic address: philippe.laberge@fmed.ulaval.ca.,NA,male,1,Canada,academic,general_OBGYN,NA
 AAGL2012_050,5,4,5,Berman,J,Canada. Electronic address: julie.berman@umontreal.ca.,NA,NA,NA,Canada,NA,NA,NA
 AAGL2012_051,1,1,1,Garcia,Ashlee,Arizona.,AZ,female,0.9943,VIII,academic,NA,NA
@@ -67,7 +67,7 @@ AAGL2012_065,6,3,4,Hebson,Camden,USA.,AL,male,0.9123,XI,academic,NA,NA
 AAGL2012_066,6,4,2,Kohn,J R,USA.,TX,NA,NA,X,academic,NA,NA
 AAGL2012_067,6,5,5,Penninx,Josien P M,The Netherlands. Electronic address: josienp@hotmail.com.,NA,NA,NA,Netherlands,academic,obstetrics,NA
 AAGL2012_068,4,2,5,Figueres,Lucile,UK.,NA,female,0.9979,United Kingdom,academic,NA,NA
-AAGL2012_069,6,4,5,Panel,Pierre,France. ppanel@ch-versailles.fr.,NA,male,0.995,France,academic,obstetrics,NA
+AAGL2012_069,6,4,5,Panel,Pierre,France. ppanel@ch-versailles.fr.,NA,male,0.995,France,community,obstetrics,NA
 AAGL2012_070,5,1,5,Ahlborg,Liv,Sweden.,NA,female,1,Sweden,academic,general_OBGYN,NA
 AAGL2012_071,7,1,3,Bonrath,Esther M,Germany. bonrathe@smh.ca,NA,female,0.9959,Germany,academic,surgery_other,NA
 AAGL2012_072,6,0,2,Kumar,Rajesh,NA,NA,male,1,NA,NA,NA,NA
@@ -89,7 +89,7 @@ AAGL2012_087,4,1,3,Shroff,Rushad,India.,NA,male,1,India,academic,NA,NA
 AAGL2012_088,4,1,5,Ecker,Amanda M,PA.,PA,female,0.9974,III,academic,general_OBGYN,NA
 AAGL2012_089,3,1,5,Gyang,Anthony,Florida.,FL,male,0.9946,XI,academic,MIGS,NA
 AAGL2012_090,8,4,5,Long,Cheng-Yu,Taiwan.,NA,NA,NA,Taiwan,academic,general_OBGYN,NA
-AAGL2012_091,7,1,5,Yurteri-Kaplan,Ladin A,USA. ladin.yurteri-kaplan@medstar.net,WA,NA,NA,VIII,academic,FPMRS,NA
+AAGL2012_091,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2012_092,6,1,4,López-Leal,Gamaliel,México. gamlopez@ccg.unam.mx.,NA,male,1,NA,NA,NA,NA
 AAGL2012_093,13,10,3,Hympánová,Lucie,Czech Republic.,NA,female,1,Czech Republic,academic,surgery_other,NA
 AAGL2012_094,4,0,2,Flora,Rupinder,NA,NA,female,1,NA,NA,NA,NA
@@ -102,16 +102,16 @@ AAGL2013_005,7,1,5,McIlwaine,Kate,Australia.,NA,female,0.9988,Australia,academic
 AAGL2013_006,7,5,5,El Hachem,Lena,NY.,NY,female,0.9978,II,academic,MIGS,NA
 AAGL2013_007,3,3,4,Raso,Rosanne,USA.,NY,female,0.9997,II,academic,NA,NA
 AAGL2013_008,7,5,2,Bourgin,C,France.,NA,NA,NA,France,academic,general_OBGYN,NA
-AAGL2013_009,2,2,2,Akrivos,Nikolaos,UK. nakrivos@hotmail.com.,NA,male,1,United Kingdom,academic,general_OBGYN,NA
+AAGL2013_009,2,2,2,Akrivos,Nikolaos,UK. nakrivos@hotmail.com.,NA,male,1,United Kingdom,community,general_OBGYN,NA
 AAGL2013_010,2,1,5,Kho,Kimberly,Georgia.,GA,female,0.9951,XI,academic,MIGS,NA
 AAGL2013_011,5,1,5,Chang,Stephen Kin Yong,cfscky@nus.edu.sg.,NA,male,0.9964,Singapore,academic,surgery_other,NA
-AAGL2013_012,10,7,5,Yang,Jie,China. Electronic address: Yang.Jie@mayo.edu.,AZ,male,0.8187,VIII,academic,general_OBGYN,NA
+AAGL2013_012,10,7,5,Yang,Jie,China. Electronic address: Yang.Jie@mayo.edu.,MN,male,0.8187,VI,academic,general_OBGYN,NA
 AAGL2013_013,4,3,4,Yang,Guangyuan,China.,NA,NA,NA,China,academic,NA,NA
 AAGL2013_014,6,2,3,Zechmeister,Jenna R,NY.,NY,female,0.9983,II,academic,GYN_ONC,NA
 AAGL2013_015,2,1,2,Nezhat,Farr R,USA.,NY,NA,NA,II,academic,general_OBGYN,NA
 AAGL2013_016,4,0,5,Gomez,Nicole,NA,NA,female,0.9968,NA,NA,NA,NA
 AAGL2013_017,8,3,5,Buchweitz,Olaf,Germany. olafbuchweitz@aol.com.,NA,male,1,Germany,NA,NA,NA
-AAGL2013_018,8,1,4,Wu,Wenjing,China. shenzhong114@sina.com.,NA,NA,NA,China,academic,surgery_other,NA
+AAGL2013_018,8,1,4,Wu,Wenjing,China. shenzhong114@sina.com.,NA,NA,NA,China,community,surgery_other,NA
 AAGL2013_019,9,5,5,Daraï,Camille,France.,NA,female,0.9873,France,research_institute,NA,NA
 AAGL2013_020,8,3,5,Muzii,Ludovico,Italy. Electronic address: ludovico.muzii@uniroma1.it.,NA,NA,NA,Italy,academic,general_OBGYN,NA
 AAGL2013_021,3,2,3,Demir,Emine,Turkey.,NA,female,1,Turkey,academic,general_OBGYN,NA
@@ -128,11 +128,11 @@ AAGL2013_031,6,1,5,Siedhoff,Matthew T,North Carolina.,NC,male,0.9962,XI,academic
 AAGL2013_032,10,6,2,Xia,Leilei,PA. Electronic address: leilei.xia@uphs.upenn.edu.,PA,NA,NA,III,academic,urology,NA
 AAGL2013_033,8,8,3,Harris,Jeduthun,USA. Electronic address: Jeduthun.harris@howard.edu.,WA,NA,NA,VIII,academic,surgery_other,NA
 AAGL2013_034,3,3,4,Sasaki,Kirsten,Department of Obstetrics and Gynecology (Drs. Sasaki and Miller). Electronic address: Kirsten.Sasaki@aah.org.,NA,female,0.9962,NA,academic,general_OBGYN,NA
-AAGL2013_035,3,1,5,Esteban,Andrés,aesteban@ucigetafe.com.,OH,NA,NA,V,academic,NA,NA
-AAGL2013_036,2,1,1,Steege,John F,Massachusetts; e-mail: jeinarsson@partners.org.,NC,male,0.996,XI,academic,MIGS,NA
+AAGL2013_035,3,1,5,Esteban,Andrés,aesteban@ucigetafe.com.,OH,NA,NA,V,community,NA,NA
+AAGL2013_036,2,1,1,Steege,John F,Massachusetts; e-mail: jeinarsson@partners.org.,MA,male,0.996,I,academic,MIGS,NA
 AAGL2013_037,6,2,5,Puntambekar,Shailesh P,India. shase63@gmail.com.,NA,NA,NA,India,NA,NA,NA
 AAGL2013_038,9,4,2,Park,Soo-Hyun,Republic of Korea.,NA,NA,NA,South Korea,academic,NA,NA
-AAGL2013_039,2,2,5,Puntambekar,Shailesh,India.,NA,NA,NA,India,academic,NA,NA
+AAGL2013_039,2,2,5,Puntambekar,Shailesh,India.,NA,NA,NA,India,community,NA,NA
 AAGL2013_040,7,4,5,Bae,Jaeman,Republic of Korea.,NA,NA,NA,South Korea,academic,MIGS,NA
 AAGL2013_041,8,3,1,Lyngdoh,Bifica,India.,NA,NA,NA,India,academic,NA,NA
 AAGL2013_042,6,1,5,Cromi,Antonella,Italy.,NA,female,1,Italy,academic,GYN_ONC,NA
@@ -159,8 +159,8 @@ AAGL2013_062,10,8,5,Azizoglu,Mustafa,Turkey. Electronic address: mdmazizoglu@gma
 AAGL2013_063,3,3,2,Sarlos,Dimitri,Switzerland. Electronic address: dimitri.sarlos@ksa.ch.,NA,male,0.9848,Switzerland,academic,general_OBGYN,NA
 AAGL2013_064,6,2,5,Puntambekar,Shailesh,India. Electronic address: shase63@gmail.com.,NA,NA,NA,India,academic,surgery_other,NA
 AAGL2013_065,6,3,4,Tunitsky-Bitton,Elena,OH. Electronic address: lena0605@gmail.com.,OH,female,0.9984,V,community,FPMRS,NA
-AAGL2013_066,5,3,2,Pata,Giacomo,Italy. Electronic address: patagiacomo@gmail.com.,NA,male,1,Italy,academic,surgery_other,NA
-AAGL2013_067,5,3,2,Vleugels,Michel,The Netherlands. Electronic address: wings.michael@wxs.nl.,NA,male,0.7248,Netherlands,academic,NA,NA
+AAGL2013_066,5,3,2,Pata,Giacomo,Italy. Electronic address: patagiacomo@gmail.com.,NA,male,1,Italy,community,surgery_other,NA
+AAGL2013_067,5,3,2,Vleugels,Michel,The Netherlands. Electronic address: wings.michael@wxs.nl.,NA,male,0.7248,Netherlands,community,NA,NA
 AAGL2013_068,6,4,2,Adjei,Naomi N,and Adeyemo). Electronic address: nadjei@mdanderson.org.,CT,female,0.9983,I,academic,general_OBGYN,NA
 AAGL2013_069,2,2,5,Sohn,Beomseok,Korea.,NA,NA,NA,South Korea,academic,NA,NA
 AAGL2013_070,5,1,5,Oraif,Ayman,London ON.,NA,male,0.9818,NA,academic,REI,NA
@@ -168,13 +168,13 @@ AAGL2013_071,3,2,4,Youssef,Youssef,NY (all authors).,NY,male,1,II,academic,MIGS,
 AAGL2013_072,1,1,2,Gimpelson,Richard J,USA.,MO,male,0.9963,VII,academic,MIGS,NA
 AAGL2013_073,7,7,2,Morabito,Emily,Canada.,NA,female,0.9979,Canada,academic,NA,NA
 AAGL2013_074,6,5,5,Murji,Ally,Canada. amurji@mtsinai.on.ca.,NY,female,0.9987,II,academic,general_OBGYN,NA
-AAGL2013_075,9,6,4,Moawad,Gaby,USA.,WA,female,0.9748,VIII,academic,general_OBGYN,NA
+AAGL2013_075,9,6,4,Moawad,Gaby,USA.,DC,female,0.9748,IV,academic,general_OBGYN,NA
 AAGL2013_076,2,2,3,Powers,Claire,North Carolina USA.,NC,female,0.9933,XI,academic,NA,NA
-AAGL2013_077,1,1,1,Hanafi,Magdi,United States.,GA,NA,NA,XI,academic,NA,NA
+AAGL2013_077,1,NA,1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2013_078,7,2,5,Ahlborg,Liv,Sweden.,NA,female,1,Sweden,academic,NA,NA
 AAGL2013_079,5,2,5,Washburn,Erik,USA. Electronic address: ewashburn1@pennstatehealth.psu.edu.,PA,male,0.9952,III,community,NA,NA
-AAGL2013_080,6,1,2,Twijnstra,Andries R,the Netherlands. A.R.H.Twijnstra@lumc.nl,NA,NA,NA,Netherlands,academic,general_OBGYN,NA
-AAGL2013_081,5,5,5,Farrell,R,Australia.,NA,NA,NA,Australia,academic,NA,NA
+AAGL2013_080,2,NA,2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+AAGL2013_081,5,5,5,Farrell,R,Australia.,NA,NA,NA,Australia,NA,NA,NA
 AAGL2013_082,7,3,5,Ellett,Lenore,Australia lenore@crosbie.com.au.,NA,female,1,Australia,academic,NA,NA
 AAGL2013_083,1,1,1,Mun,Sungyong,South Korea. Electronic address: munsy@hanyang.ac.kr.,NA,NA,NA,South Korea,academic,NA,NA
 AAGL2013_084,9,7,5,Santulli,Pietro,France pietro.santulli@cch.aphp.fr.,NA,male,1,France,research_institute,obstetrics,NA
@@ -183,11 +183,11 @@ AAGL2013_086,7,4,3,Nezhat,Camran,USA.,CA,male,0.9334,IX,academic,NA,NA
 AAGL2013_087,1,1,5,Kojima,Jun,Japan. jdw06164@nifty.com,MD,male,0.9309,IV,academic,surgery_other,NA
 AAGL2013_088,16,7,5,Spagnolo,Emanuela,Spain.,NA,female,1,Spain,academic,general_OBGYN,NA
 AAGL2013_089,5,4,5,Ahmadi,Ehsan,Iran.,NA,male,1,Iran,academic,NA,NA
-AAGL2013_090,6,6,4,Koninckx,Philippe R,United Arab Emirates - pkoninckx@gmail.com.,NA,male,1,UAE,academic,NA,NA
+AAGL2013_090,6,6,4,Koninckx,Philippe R,United Arab Emirates - pkoninckx@gmail.com.,NA,male,1,UAE,community,NA,NA
 AAGL2013_091,8,7,5,Zanatta,Alysson,Brazil alysson.zanatta@gmail.com.,NA,female,1,Brazil,academic,general_OBGYN,NA
 AAGL2013_092,7,3,5,Exacoustos,Caterina,Italy. Electronic address: caterinaexacoustos@tiscali.it.,NA,female,1,Italy,academic,general_OBGYN,NA
-AAGL2013_093,1,1,3,Taniguchi,Fumiaki,Japan.,NA,NA,NA,Japan,academic,general_OBGYN,NA
-AAGL2013_094,11,3,4,Yamada,Kazutaka,Japan. k-yamada@magma.jp.,NA,NA,NA,Japan,academic,surgery_other,NA
+AAGL2013_093,1,1,3,Taniguchi,Fumiaki,Japan.,NA,NA,NA,Japan,community,general_OBGYN,NA
+AAGL2013_094,11,3,4,Yamada,Kazutaka,Japan. k-yamada@magma.jp.,NA,NA,NA,Japan,community,surgery_other,NA
 AAGL2013_095,3,2,5,Takano,Mariko,Japan.,NA,female,0.9949,Japan,academic,NA,NA
 AAGL2013_096,2,2,2,Navarro,Ester,USA. navarre1@stjohns.edu.,NY,female,0.9615,II,academic,NA,NA
 AAGL2014_001,1,1,5,Robbins,Anthony,Co-Editor E-mail: anthony.robbins@tufts.edu.,NA,male,0.9946,NA,NA,NA,NA
@@ -200,11 +200,11 @@ AAGL2014_007,4,3,5,Mathieu,Jordane A,France.,NA,female,0.9588,France,NA,NA,NA
 AAGL2014_008,3,0,5,Khalil,Eyyaz,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2014_009,5,1,3,Bina,Saiid,MD.,MD,male,1,IV,academic,NA,NA
 AAGL2014_010,4,3,3,Levy,Jared,Israel. Electronic address: jaredlevy@mail.tau.ac.il.,NA,male,0.9959,Israel,academic,NA,NA
-AAGL2014_011,12,1,2,Mamik,Mamta M,Texas.,RI,female,1,I,academic,NA,NA
+AAGL2014_011,12,1,2,Mamik,Mamta M,Texas.,NY,female,1,II,academic,NA,NA
 AAGL2014_012,6,2,4,Allemann,Pierre,Switzerland.,NA,male,0.995,Switzerland,academic,surgery_other,NA
 AAGL2014_013,5,3,5,Gungor,Mete,Turkey.,NA,male,1,Turkey,academic,general_OBGYN,NA
 AAGL2014_014,5,4,3,Penner,Kristine R,CA.,CA,female,0.9979,IX,academic,GYN_ONC,NA
-AAGL2014_015,1,1,1,Breen,Michael,Zambia.,NA,male,0.9947,NA,academic,NA,NA
+AAGL2014_015,1,1,1,Breen,Michael,Zambia.,NA,male,0.9947,NA,community,NA,NA
 AAGL2014_016,5,1,5,Akdemir,Ali,Turkey.,NA,male,0.6881,Turkey,academic,general_OBGYN,NA
 AAGL2014_017,3,1,4,Sinno,Abdulrahman K,USA.,MD,male,1,IV,academic,GYN_ONC,NA
 AAGL2014_018,6,1,5,Joshi,Shriya,USA.,GA,female,1,XI,academic,NA,NA
@@ -215,8 +215,8 @@ AAGL2014_022,2,2,4,Arendas,Kristina,ON.,NA,female,0.9975,NA,academic,general_OBG
 AAGL2014_023,8,5,5,Delgado-Floody,Pedro,Chile.,NA,male,0.9935,Chile,academic,NA,NA
 AAGL2014_024,2,2,1,Chua,Abigail L,USA. Abigail.Chua@jefferson.edu.,PA,female,0.9982,III,NA,NA,NA
 AAGL2014_025,4,3,3,Vanichtantikul,Asama,Thailand.,NA,NA,NA,Thailand,academic,general_OBGYN,NA
-AAGL2014_026,4,3,5,Moon,Hwa Sook,Republic of Korea.,NA,NA,NA,South Korea,academic,MIGS,NA
-AAGL2014_027,6,1,3,Jairath,Ankush,India.,NA,male,1,India,academic,urology,NA
+AAGL2014_026,4,3,5,Moon,Hwa Sook,Republic of Korea.,NA,NA,NA,South Korea,community,MIGS,NA
+AAGL2014_027,6,1,3,Jairath,Ankush,India.,NA,male,1,India,community,urology,NA
 AAGL2014_028,5,5,4,Williams,Kate,UK. Electronic address: kate.williams2@southwales.ac.uk.,NA,female,0.9988,United Kingdom,academic,NA,NA
 AAGL2014_029,6,5,2,Sheyn,David,OH. Electronic address: david.sheyn@uhhospitals.org.,OH,male,0.9963,V,academic,FPMRS,NA
 AAGL2014_030,9,6,3,Carrillo,Jorge,Spain.,NA,male,0.994,Spain,research_institute,NA,NA
@@ -224,7 +224,7 @@ AAGL2014_031,9,1,3,Gupta,Ankita,Michigan.,NM,female,1,VIII,academic,FPMRS,NA
 AAGL2014_032,3,3,1,Mosbrucker,Cindy,USA. dr.mos@pacificendo.net.,WA,female,0.9972,VIII,NA,surgery_other,NA
 AAGL2014_033,5,1,5,Balica,Adrian,08901.,NJ,male,0.9269,III,academic,general_OBGYN,NA
 AAGL2014_034,4,3,1,Manodoro,Stefano,Italy. stefano.manodoro@gmail.com.,NA,male,1,Italy,NA,NA,NA
-AAGL2014_035,7,4,5,Hugues,Clara,France.,NA,female,0.9966,France,academic,NA,NA
+AAGL2014_035,7,4,5,Hugues,Clara,France.,NA,female,0.9966,France,community,NA,NA
 AAGL2014_036,3,2,3,Ebell,Mark H,MC). ebell@uga.edu.,GA,male,0.9966,XI,academic,NA,NA
 AAGL2014_037,8,5,4,Andou,Miya,Japan.,NA,female,1,Japan,academic,NA,NA
 AAGL2014_038,4,4,5,Abuhammour,Adnan,United Arab Emirates. Electronic address: aabuhammour@yahoo.com.,NA,male,1,UAE,NA,NA,NA
@@ -234,7 +234,7 @@ AAGL2014_041,1,1,5,Kent,Athol,South Africa.,NA,male,1,South Africa,academic,gene
 AAGL2014_042,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2014_043,15,13,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2014_044,5,3,4,Ghai,Vishalli,UK.,NA,NA,NA,United Kingdom,academic,general_OBGYN,NA
-AAGL2014_045,8,3,5,Uzunlar,Ozlem,Turkey. Electronic address: ozlemuzunlars@hotmail.com.,NA,female,1,Turkey,academic,general_OBGYN,NA
+AAGL2014_045,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2014_046,7,3,5,Di Cello,Annalisa,Italy. Electronic address: annalisa_dicello84@yahoo.it.,NA,female,1,Italy,academic,general_OBGYN,NA
 AAGL2014_047,8,2,3,Caskey,Rachel,California.. Electronic address: rachelinacaskey@gmail.com.,CA,female,0.997,IX,academic,general_OBGYN,NA
 AAGL2014_048,6,1,5,Huang,Jidong,CA.,IL,NA,NA,VII,academic,NA,NA
@@ -263,7 +263,7 @@ AAGL2014_070,6,1,3,Fornalik,Hubert,IN.,IN,male,0.9976,V,academic,general_OBGYN,N
 AAGL2014_071,1,1,4,Einarsson,Jonas,Sweden me@jonaseinarsson.se.,NA,male,0.9984,Sweden,academic,NA,NA
 AAGL2014_072,2,2,2,Truong,Mireille,California. Electronic address: mireille.truong@gmail.com.,CA,female,1,IX,academic,NA,NA
 AAGL2014_073,2,1,1,Peters,Ann,USA.,PA,female,0.9972,III,academic,MIGS,NA
-AAGL2014_074,9,1,2,Chen,Chi Chung Grace,all participating institutions were members of the American College of Obstetricians and Gynecologists Simulations Working Group.,NC,female,0.5658,XI,academic,general_OBGYN,NA
+AAGL2014_074,9,1,2,Chen,Chi Chung Grace,all participating institutions were members of the American College of Obstetricians and Gynecologists Simulations Working Group.,MD,female,0.5658,IV,academic,general_OBGYN,NA
 AAGL2014_075,1,1,2,Mackenzie,Malcolm,MA.,MA,male,0.9981,I,NA,NA,NA
 AAGL2014_076,3,3,3,Takmaz,Ozguc,Turkey. Electronic address: ozguctakmaz@gmail.com.,NA,NA,NA,Turkey,academic,MIGS,NA
 AAGL2014_077,3,3,4,Murji,Ally,Canada. Electronic address: amurji@mtsinai.on.ca.,NY,female,0.9987,II,academic,general_OBGYN,NA
@@ -278,7 +278,7 @@ AAGL2014_085,3,0,5,Issat,Tadeusz,NA,NA,male,1,NA,NA,NA,NA
 AAGL2014_086,6,5,5,Billow,Megan,Ohio. Electronic address: billowm3@ccf.org.,OH,female,0.9976,V,community,MIGS,NA
 AAGL2014_087,3,1,5,Vallabh-Patel,Vaneesha,NJ.,NJ,NA,NA,III,academic,FPMRS,NA
 AAGL2014_088,12,3,3,Taylor,Charles,UK. Charles.taylor@stgeorges.nhs.uk.,NA,male,0.9949,United Kingdom,academic,NA,NA
-AAGL2014_089,4,3,3,Dhanani,Maya,USA.,FL,female,0.9981,XI,community,general_OBGYN,NA
+AAGL2014_089,4,3,3,Dhanani,Maya,USA.,MN,female,0.9981,VI,community,general_OBGYN,NA
 AAGL2014_090,8,7,5,Rees,Connie O,The Netherlands. Electronic address: connie.rees@catharinaziekenhuis.nl.,NA,female,0.9816,Netherlands,academic,obstetrics,NA
 AAGL2014_091,7,4,3,Coad,Jane,UK. Electronic address: jane.coad@coventry.ac.uk.,NA,female,0.9971,United Kingdom,academic,NA,NA
 AAGL2014_092,7,7,5,Borahay,Mostafa A,TX. Electronic address: maboraha@utmb.edu.,TX,male,1,X,academic,general_OBGYN,NA
@@ -287,13 +287,13 @@ AAGL2015_001,3,3,5,Stanhiser,Jamie,OH. Electronic address: jamiestanhiser@gmail.
 AAGL2015_002,6,5,5,Lyapis,Anna,California.,CA,female,0.9971,IX,NA,obstetrics,NA
 AAGL2015_003,4,1,4,Barron,Kenneth I,Florida.,FL,male,0.9957,XI,academic,MIGS,NA
 AAGL2015_004,1,1,5,Allahbadia,Gautam N,India.,NA,male,1,India,NA,NA,NA
-AAGL2015_005,11,6,4,Puntambekar,Shailesh,India. (Dr. Puntambekar).,NA,NA,NA,India,academic,NA,faculty_senior
+AAGL2015_005,11,6,4,Puntambekar,Shailesh,India. (Dr. Puntambekar).,NA,NA,NA,India,community,NA,faculty_senior
 AAGL2015_006,6,4,3,Jacob,Jack,Alaska.,AK,male,0.9967,VIII,private_practice,NA,NA
 AAGL2015_007,4,1,4,Kho,Kimberly A,Texas.,TX,female,0.9951,X,academic,general_OBGYN,NA
 AAGL2015_008,7,2,5,Martinelli,Fabio,Italy Fabio.Martinelli@istitutotumori.mi.it.,NA,male,1,Italy,NA,GYN_ONC,NA
 AAGL2015_009,9,8,5,Fazel,A,Iran.,NA,NA,NA,Iran,academic,NA,NA
 AAGL2015_010,5,3,5,Wang,Yan-zhou,People's Republic of China.,NA,NA,NA,China,military_va,general_OBGYN,NA
-AAGL2015_011,2,2,1,Iavazzo,Christos,UK. christosiavazzo@hotmail.com.,NA,male,1,United Kingdom,academic,general_OBGYN,NA
+AAGL2015_011,2,2,1,Iavazzo,Christos,UK. christosiavazzo@hotmail.com.,NA,male,1,United Kingdom,community,general_OBGYN,NA
 AAGL2015_012,8,5,5,Andou,Miya,Japan.,NA,female,1,Japan,academic,NA,NA
 AAGL2015_013,6,3,5,Ilnitsky,Sara,ON. Electronic address: sara.ilnitsky@gmail.com.,NA,female,0.9971,NA,academic,REI,NA
 AAGL2015_014,10,4,5,Di Spiezio Sardo,Attilio,Italy.,NA,male,1,Italy,academic,NA,NA
@@ -304,32 +304,32 @@ AAGL2015_018,8,4,2,Rajakumar,C,Canada.,NA,NA,NA,Canada,academic,surgery_other,fa
 AAGL2015_019,3,3,5,Sasaki,Kirsten,Department of Obstetrics and Gynecology (Drs. Sasaki and Miller). Electronic address: Kirsten.Sasaki@aah.org.,NA,female,0.9962,NA,academic,general_OBGYN,NA
 AAGL2015_020,5,2,5,Deimling,Timothy A,USA.,PA,male,0.9957,III,academic,MIGS,NA
 AAGL2015_021,11,2,5,Tsafrir,Ziv,Michigan.,MI,male,1,V,academic,MIGS,NA
-AAGL2015_022,6,2,5,Livinti,I,New York.,NY,NA,NA,II,academic,general_OBGYN,NA
+AAGL2015_022,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2015_023,3,3,5,Habte,Ruth,Canada.,MO,female,0.9962,VII,academic,general_OBGYN,NA
 AAGL2015_024,4,4,5,Simpson,Kara,USA.,DC,female,0.9973,IV,academic,NA,NA
 AAGL2015_025,8,2,5,Crocco,Paolina,Italy.,NA,female,1,Italy,academic,NA,NA
 AAGL2015_026,12,7,5,Mathews,Shyama,NY. Electronic address: Shyama.mathews@gmail.com.,NY,NA,NA,II,academic,NA,NA
 AAGL2015_027,5,1,5,Saito,Tsuyoshi,Japan.,NA,male,1,Japan,academic,general_OBGYN,NA
 AAGL2015_028,7,6,3,Whitcomb,B,USA. Electronic address: whitcomb@uchc.edu.,CT,NA,NA,I,academic,NA,NA
-AAGL2015_029,5,1,4,Wasson,Megan,Arizona.,AZ,female,0.9976,VIII,academic,MIGS,NA
+AAGL2015_029,5,1,4,Wasson,Megan,Arizona.,MN,female,0.9976,VI,academic,MIGS,NA
 AAGL2015_030,1,0,3,Guha,Paroma,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2015_031,15,1,3,Gu,Zheng,People's Republic of China.,NA,male,1,China,academic,obstetrics,NA
 AAGL2015_032,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2015_033,4,2,3,Rosenblatt,Peter,MA.,MA,male,0.9965,I,academic,FPMRS,NA
 AAGL2015_034,1,1,1,Hanes,Charles R,Alabama. Electronic address: hanes@urogynsa.com.,AL,male,0.9949,XI,academic,FPMRS,NA
 AAGL2015_035,6,2,5,Mikhail,Emad,USA.,FL,male,1,XI,academic,general_OBGYN,NA
-AAGL2015_036,2,1,2,Hanstede,M,Netherlands.,NA,NA,NA,Netherlands,NA,general_OBGYN,NA
-AAGL2015_037,1,1,1,A M,Luthra,India.,NA,NA,NA,India,academic,NA,NA
+AAGL2015_036,2,NA,2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+AAGL2015_037,1,NA,1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2015_038,5,1,2,Tjahyadi,Dian,Indonesia.,NA,female,0.9865,Indonesia,academic,general_OBGYN,NA
 AAGL2015_039,7,4,4,Huy,Nguyen Vu Quoc,Viet Nam.,NA,male,0.7676,NA,academic,obstetrics,NA
 AAGL2015_040,4,2,2,Shenoy,Chandrika,Canada.,NA,female,1,Canada,academic,NA,NA
-AAGL2015_041,3,3,3,Kapurubandara,Supuni,Australia.,NA,NA,NA,Australia,academic,general_OBGYN,NA
+AAGL2015_041,3,3,3,Kapurubandara,Supuni,Australia.,NA,NA,NA,Australia,community,general_OBGYN,NA
 AAGL2015_042,8,2,5,Caskey,Rachel,California.. Electronic address: rachelinacaskey@gmail.com.,CA,female,0.997,IX,academic,general_OBGYN,NA
 AAGL2015_043,7,2,4,Rosenbaum,Jonathan,France.,NA,male,0.9954,France,NA,NA,NA
 AAGL2015_044,3,1,3,Clancy,Aisling A,Ottawa ON.,NA,female,1,NA,academic,general_OBGYN,NA
 AAGL2015_045,6,3,5,Lemos,Nucelio,CEP: 04026-090. nucelio@gmail.com.,NA,NA,NA,Brazil,academic,general_OBGYN,NA
 AAGL2015_046,3,3,4,Pacis,Michelle,Pennsylvania. Electronic address: mpacis@pennstatehealth.psu.edu.,PA,female,0.9962,III,academic,MIGS,NA
-AAGL2015_047,6,4,5,Crochet,Patrice,France. pcrochet.marseille@gmail.com.,NA,female,0.9797,France,academic,general_OBGYN,NA
+AAGL2015_047,6,4,5,Crochet,Patrice,France. pcrochet.marseille@gmail.com.,NA,female,0.9797,France,community,general_OBGYN,NA
 AAGL2015_048,7,0,5,Kroft,Jamie,NA,NA,female,0.7702,NA,NA,NA,NA
 AAGL2015_049,5,4,2,Sanderson,Derrick J,USA.,NY,male,0.9924,II,academic,general_OBGYN,NA
 AAGL2015_050,1,1,2,DePasquale,Seth,Kentucky. seth.depasquale@mac.com.,KY,male,0.9966,V,NA,NA,NA
@@ -337,7 +337,7 @@ AAGL2015_051,5,3,3,Cooney,Erin,Texas.,TX,female,0.9732,X,academic,NA,NA
 AAGL2015_052,7,6,5,Polin,Michael R,NC. Electronic address: michael.polin@duke.edu.,NC,male,0.9947,XI,academic,FPMRS,NA
 AAGL2015_053,5,2,4,Thomaier,Lauren,USA. lthomai1@jhmi.edu.,MD,female,0.9904,IV,academic,obstetrics,NA
 AAGL2015_054,1,1,5,Dove,Jessica,The Ohio State University.,OH,female,0.9968,V,academic,NA,NA
-AAGL2015_055,4,2,4,Truong,M D,New York.,NY,NA,NA,II,academic,general_OBGYN,NA
+AAGL2015_055,4,NA,4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2015_056,7,3,4,Chen,Xi,China.,NA,NA,NA,China,academic,NA,NA
 AAGL2015_057,12,2,3,Koie,Takuya,Aomori.,NA,male,1,NA,academic,urology,NA
 AAGL2015_058,1,1,4,Woodall,John,Brazil; jackwoodall13@gmail.com.,NA,male,0.996,Brazil,academic,NA,NA
@@ -345,28 +345,28 @@ AAGL2015_059,4,2,4,Menderes,Gulden,USA. Electronic address: gulden.menderes@yale
 AAGL2015_060,6,1,4,Shirazian,Shayan,USA.,NY,male,0.9556,II,academic,NA,NA
 AAGL2015_061,7,3,3,Liu,Jie,PR China.,NA,male,0.8187,China,academic,NA,NA
 AAGL2015_062,4,1,5,Arian,Sara E,sarian@bcm.edu.,OH,female,0.9971,V,community,general_OBGYN,NA
-AAGL2015_063,7,2,5,Katebi Kashi,P,Virginia.,VA,NA,NA,IV,academic,obstetrics,NA
+AAGL2015_063,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2015_064,12,7,5,Mathews,Shyama,NY. Electronic address: Shyama.mathews@gmail.com.,NY,NA,NA,II,academic,NA,NA
-AAGL2015_065,6,2,3,Yin,Huijiao,China.,NA,NA,NA,China,academic,NA,NA
+AAGL2015_065,6,2,3,Yin,Huijiao,China.,NA,NA,NA,China,community,NA,NA
 AAGL2015_066,2,2,5,Gerges,Bassem,Australia. bgerges@gmail.com.,NA,male,1,Australia,academic,general_OBGYN,NA
 AAGL2015_067,2,2,5,Reid,Shannon,Advanced Minimally Invasive Gynaecological Surgery Unit University of New South Wales Liverpool Hospital Elizabeth & Goulburn St Liverpool 2170 NSW Australia.,NA,female,0.859,Australia,academic,MIGS,NA
 AAGL2015_068,1,1,5,Maher,Pamela,United States. Electronic address: pmaher@salk.edu.,CA,female,0.9978,IX,NA,NA,NA
 AAGL2015_069,9,1,5,Racca,A,Belgium.,NA,NA,NA,Belgium,NA,NA,NA
 AAGL2015_070,6,1,4,Yuk,Jin-Sung,Korea.,NA,NA,NA,South Korea,academic,general_OBGYN,NA
-AAGL2015_071,3,3,5,Shakir,Fevzi,UK. fevzi@doctors.org.uk.,NA,NA,NA,United Kingdom,academic,NA,NA
+AAGL2015_071,3,3,5,Shakir,Fevzi,UK. fevzi@doctors.org.uk.,NA,NA,NA,United Kingdom,community,NA,NA
 AAGL2015_072,6,5,4,Lyapis,Anna,California.,CA,female,0.9971,IX,NA,obstetrics,NA
 AAGL2015_073,2,2,5,Marinho,Feliciana Lage,Brazil.,NA,female,1,Brazil,NA,NA,NA
 AAGL2015_074,5,3,5,Ribeiro,Diana,Portugal.,NA,female,0.9965,Portugal,academic,NA,NA
 AAGL2015_075,4,1,4,Schmitt,Eric M,Hawaii.,HI,male,0.9947,VIII,military_va,MIGS,NA
 AAGL2015_076,3,2,5,Levin,Danielle,USA.,PA,female,0.9951,III,community,NA,NA
 AAGL2015_077,6,5,5,Valentin,L,France. Electronic address: lucvalentin2@gmail.com.,NA,NA,NA,France,NA,NA,NA
-AAGL2015_078,5,5,5,Bongers,Pim J,The Netherlands.,NA,NA,NA,Netherlands,academic,general_OBGYN,NA
+AAGL2015_078,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2015_079,5,2,5,Asoğlu,Mehmet Reşit,USA.,TX,male,1,X,academic,general_OBGYN,NA
 AAGL2015_080,2,2,4,Braun,Katrin,Germany.,NA,female,1,Germany,research_institute,NA,NA
 AAGL2015_081,6,3,5,Opoku-Anane,Jessica,CA. Electronic address: jopokua1@gmail.com.,CA,female,0.9968,IX,academic,general_OBGYN,NA
-AAGL2015_082,4,1,3,Senapati,Sangeeta,Kansas.,KS,female,1,VII,academic,general_OBGYN,NA
+AAGL2015_082,4,1,3,Senapati,Sangeeta,Kansas.,IL,female,1,VII,academic,general_OBGYN,NA
 AAGL2015_083,6,3,5,Chen,Changmao,cas.cn.,NA,NA,NA,China,academic,NA,NA
-AAGL2015_084,3,2,5,Clark,Nisse V,Massachusetts.,MA,NA,NA,I,academic,general_OBGYN,NA
+AAGL2015_084,3,2,5,Clark,Nisse V,Massachusetts.,MA,NA,NA,I,community,general_OBGYN,NA
 AAGL2015_085,4,3,5,Yuk,Jin-Sung,Republic of Korea.,NA,NA,NA,South Korea,academic,general_OBGYN,NA
 AAGL2015_086,3,2,1,Soygur,Bikem,Turkey.,NA,NA,NA,Turkey,academic,NA,NA
 AAGL2015_087,5,4,4,Murji,Ally,Canada. Electronic address: amurji@mtsinai.on.ca.,NY,female,0.9987,II,academic,general_OBGYN,NA
@@ -375,7 +375,7 @@ AAGL2015_089,11,4,5,Ajao,Mobolaji O,USA. majao@bwh.harvard.edu.,MA,male,1,I,acad
 AAGL2015_090,6,3,5,Mowers,Erika L,USA.,MI,female,0.9958,V,academic,general_OBGYN,NA
 AAGL2015_091,2,1,4,Chuang,Yaoyang,Taiwan.,NA,NA,NA,Taiwan,research_institute,NA,NA
 AAGL2015_092,3,2,5,Zeybek,Burak,USA. buzeybek@utmb.edu.,TX,male,1,X,academic,general_OBGYN,NA
-AAGL2015_093,3,1,3,Moiety,F,Egypt.,NA,NA,NA,Egypt,academic,general_OBGYN,NA
+AAGL2015_093,3,NA,3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2015_094,14,8,5,Fanfani,F,Italy. Electronic address: francesco.fanfani@unich.it.,NA,NA,NA,Italy,academic,NA,NA
 AAGL2015_095,4,2,5,Lianos,Georgios D,Greece.,NA,male,1,Greece,academic,surgery_other,NA
 AAGL2016_001,1,1,5,Kamdar,Nirav,CA.,CA,male,1,IX,academic,NA,NA
@@ -390,7 +390,7 @@ AAGL2016_009,5,2,2,Deshmukh,Uma,USA.,CT,female,1,I,academic,general_OBGYN,NA
 AAGL2016_010,4,4,5,Siedhoff,Matthew T,CA. Electronic address: Matthew.Siedhoff@cshs.org.,CA,male,0.9962,IX,academic,MIGS,NA
 AAGL2016_011,15,7,5,Ohtani,Yohei,Japan.,NA,male,1,Japan,academic,NA,NA
 AAGL2016_012,9,2,3,Du,Jiang,P.R. China.,NA,NA,NA,China,academic,general_OBGYN,NA
-AAGL2016_013,8,5,4,Dreyer,K,The Netherlands k.dreyer@vumc.nl.,NA,NA,NA,Netherlands,academic,NA,NA
+AAGL2016_013,4,NA,4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2016_014,2,0,2,Blomkvist,Pär,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2016_015,7,7,3,Fernandez,H,France. Electronic address: herve.fernandez@aphp.fr.,NA,NA,NA,France,academic,NA,NA
 AAGL2016_016,7,4,5,Vinklerová,Petra,Czech Republic.,NA,female,0.9967,Czech Republic,academic,obstetrics,NA
@@ -403,12 +403,12 @@ AAGL2016_022,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2016_023,6,2,4,Mourad,Sherif,Egypt.,NA,male,1,Egypt,academic,urology,NA
 AAGL2016_024,13,3,3,Lim,Prisca,USA.,NC,female,1,XI,academic,NA,NA
 AAGL2016_025,5,1,2,Shrivastava,Nitin,India.,NA,male,1,India,academic,urology,NA
-AAGL2016_026,5,2,3,Rompen,Ingmar F,Switzerland.,NA,male,1,Switzerland,academic,surgery_other,NA
-AAGL2016_027,1,1,1,Lee,YooKyung,Korea.,NA,NA,NA,South Korea,academic,MFM,NA
+AAGL2016_026,5,2,3,Rompen,Ingmar F,Switzerland.,NA,male,1,Switzerland,community,surgery_other,NA
+AAGL2016_027,1,1,1,Lee,YooKyung,Korea.,NA,NA,NA,South Korea,community,MFM,NA
 AAGL2016_028,6,3,5,To,Valérie,Australia. Valerie.to@mail.mcgill.ca.,NA,NA,NA,Australia,NA,NA,NA
 AAGL2016_029,6,5,5,Liu,Zhengwei,China.,NA,NA,NA,China,academic,NA,NA
 AAGL2016_030,2,2,5,Koops,Sanne,The Netherlands. Electronic address: s.koops@umcutrecht.nl.,NA,female,1,Netherlands,academic,NA,NA
-AAGL2016_031,4,2,3,Wasson,Megan,Arizona. Electronic address: wasson.megan@mayo.edu.,AZ,female,0.9976,VIII,academic,MIGS,NA
+AAGL2016_031,4,2,3,Wasson,Megan,Arizona. Electronic address: wasson.megan@mayo.edu.,MN,female,0.9976,VI,academic,MIGS,NA
 AAGL2016_032,9,9,4,Denys,Pierre,France.,NA,male,0.995,France,NA,NA,NA
 AAGL2016_033,5,2,3,Houlihan,Sara,Canada. houlihan@ualberta.ca.,NA,female,0.9971,Canada,academic,general_OBGYN,NA
 AAGL2016_034,5,3,3,Petersen,Shariska S,USA.,MI,NA,NA,V,academic,NA,NA
@@ -419,10 +419,10 @@ AAGL2016_038,2,1,5,Martinez,Mikaela Erlinda Germar,Philippines.,NA,female,1,Phil
 AAGL2016_039,1,1,4,Lavelanet,A,Switzerland.,NA,NA,NA,Switzerland,academic,NA,NA
 AAGL2016_040,9,6,3,Patanwala,Insiyyah Y,FL. Electronic address: insiyyah.patanwala.md@flhosp.org.,FL,NA,NA,XI,academic,general_OBGYN,NA
 AAGL2016_041,4,3,4,Aoun,Joe,St. Elizabeth's Medical Center.,MA,male,0.9741,I,academic,NA,NA
-AAGL2016_042,8,1,5,Mahnert,Nichole,Michigan.,MI,female,0.9972,V,academic,general_OBGYN,NA
+AAGL2016_042,8,1,5,Mahnert,Nichole,Michigan.,AZ,female,0.9972,VIII,academic,general_OBGYN,NA
 AAGL2016_043,6,0,5,Palma-Granados,P,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2016_044,4,1,2,Molinos-Albert,Luis M,Spain.,NA,male,0.9938,Spain,academic,NA,NA
-AAGL2016_045,6,6,2,Gutman,Robert E,DC. Electronic address: Robert.e.gutman@medstar.net.,WA,male,0.9958,VIII,academic,NA,NA
+AAGL2016_045,6,6,2,Gutman,Robert E,DC. Electronic address: Robert.e.gutman@medstar.net.,DC,male,0.9958,IV,academic,NA,NA
 AAGL2016_046,1,1,5,Lichtman,Andrew,USA. Email: alichtman@bwh.harvard.edu.,MA,male,0.996,I,academic,NA,NA
 AAGL2016_047,3,2,5,Alammari,Roa,Massachusetts.,MA,NA,NA,I,academic,MIGS,NA
 AAGL2016_048,5,2,3,Glaser,Laura M,USA. Electronic address: l-matthews@northwestern.edu.,IL,female,0.9969,VII,academic,MIGS,NA
@@ -432,8 +432,8 @@ AAGL2016_051,4,3,2,Watkins,Jeffrey R,USA.,TX,male,0.9962,X,academic,surgery_othe
 AAGL2016_052,5,2,4,Gerges,B,Australia.,NA,NA,NA,Australia,academic,general_OBGYN,NA
 AAGL2016_053,2,2,2,Truong,Mireille,California. Electronic address: mireille.truong@gmail.com.,CA,female,1,IX,academic,NA,NA
 AAGL2016_054,3,2,3,Lerner,Vladimir,Israel.,NA,male,1,Israel,academic,NA,NA
-AAGL2016_055,1,1,2,Lee,YooKyung,Korea.,NA,NA,NA,South Korea,academic,MFM,NA
-AAGL2016_056,9,4,5,Vargas,Maria V,DC. Electronic address: mvvargas@mfa.gwu.edu.,WA,female,0.9927,VIII,academic,general_OBGYN,NA
+AAGL2016_055,1,1,2,Lee,YooKyung,Korea.,NA,NA,NA,South Korea,community,MFM,NA
+AAGL2016_056,9,4,5,Vargas,Maria V,DC. Electronic address: mvvargas@mfa.gwu.edu.,DC,female,0.9927,IV,academic,general_OBGYN,NA
 AAGL2016_057,13,2,5,Garg,Divyani,India.,NA,NA,NA,India,academic,NA,NA
 AAGL2016_058,6,3,4,Linares,C,Spain.,NA,NA,NA,Spain,academic,NA,NA
 AAGL2016_059,4,2,3,King,Lindy,Australia.,NA,female,0.8694,Australia,academic,NA,NA
@@ -442,11 +442,11 @@ AAGL2016_061,13,12,5,Ito,Hiroe,Japan.,NA,NA,NA,Japan,academic,general_OBGYN,NA
 AAGL2016_062,9,1,3,Ruiz,Maria P,New York.,NY,female,0.9927,II,academic,NA,NA
 AAGL2016_063,16,5,5,Elaïb,Ziane,France.,NA,female,1,France,NA,NA,NA
 AAGL2016_064,4,2,2,Boulus,Sari,France. Electronic address: boulos_sari@hotmail.com.,NA,female,0.9932,Denmark,academic,obstetrics,NA
-AAGL2016_065,6,6,5,Gomes,Helena Henriques,Portugal. Electronic address: leninha_mhg@hotmail.com.,NA,female,1,Portugal,academic,obstetrics,NA
+AAGL2016_065,6,6,5,Gomes,Helena Henriques,Portugal. Electronic address: leninha_mhg@hotmail.com.,NA,female,1,Portugal,community,obstetrics,NA
 AAGL2016_066,8,3,5,Zhang,Ning,China.,NA,NA,NA,China,academic,general_OBGYN,NA
 AAGL2016_067,6,2,5,Mabrouk,Mohamed,Italy.,NA,male,1,Italy,academic,general_OBGYN,NA
 AAGL2016_068,2,2,3,Cáceres,Alejandro,Spain. alejandro.caceres@isglobal.org.,NA,male,0.9926,Spain,NA,NA,NA
-AAGL2016_069,4,2,5,Raiza,Luciana Cristina Pasquini,Brazil.,NY,female,1,II,academic,NA,NA
+AAGL2016_069,4,2,5,Raiza,Luciana Cristina Pasquini,Brazil.,NY,female,1,II,community,NA,NA
 AAGL2016_070,8,2,5,Martire,Francesco Giuseppe,Italy.,NA,male,1,Italy,academic,general_OBGYN,NA
 AAGL2016_071,2,2,4,Galhotra,Sheena,AZ. Electronic address: sheenagalhotra@gmail.com.,AZ,female,0.9971,VIII,academic,general_OBGYN,NA
 AAGL2016_072,6,6,5,Jørgensen,E,Denmark. Electronic address: elinj@sund.ku.dk.,NA,NA,NA,Denmark,academic,NA,NA
@@ -455,19 +455,19 @@ AAGL2016_074,10,2,2,Li,Peiling,xxmu.edu.cn.,NA,NA,NA,China,academic,NA,NA
 AAGL2016_075,9,6,5,Robinson,Elena,Switzerland.,NA,female,0.9984,Switzerland,academic,NA,NA
 AAGL2016_076,6,3,3,Gannagé-Yared,Marie-Hélène,Lebanon.,NA,NA,NA,Lebanon,academic,NA,NA
 AAGL2016_077,10,8,2,Qiu,Jin,People's Republic of China.,NA,male,0.7084,China,academic,NA,NA
-AAGL2016_078,1,1,1,Breen,Michael,Zambia.,NA,male,0.9947,NA,academic,NA,NA
-AAGL2016_079,6,3,3,Rattray,Darrien D,Canada.,NA,male,0.882,Canada,academic,general_OBGYN,NA
+AAGL2016_078,1,1,1,Breen,Michael,Zambia.,NA,male,0.9947,NA,community,NA,NA
+AAGL2016_079,6,3,3,Rattray,Darrien D,Canada.,NA,male,0.882,Canada,community,general_OBGYN,NA
 AAGL2016_080,2,2,3,Stockwell,Erica,Nevada.,NV,female,0.9958,VIII,academic,MIGS,NA
 AAGL2016_081,3,2,4,Bends,Ralf,ralf.bends@evk-koeln.de.,NA,male,1,Germany,academic,general_OBGYN,NA
 AAGL2016_082,10,5,1,Ben Hamou,Adrien,France.,NA,male,0.8173,France,academic,NA,NA
 AAGL2016_083,2,2,2,Huirne,Judith,Netherlands. Electronic address: J.Huirne@vumc.nl.,NA,female,0.9974,Netherlands,academic,general_OBGYN,NA
 AAGL2016_084,9,6,5,McKenzie,Lara B,USA.,OH,female,0.9989,V,research_institute,NA,NA
 AAGL2016_085,8,5,5,Chauvet,Pauline,France.,NA,female,0.9961,France,academic,MIGS,NA
-AAGL2016_086,8,2,5,Usta,Tugay,Türkiye.,NA,NA,NA,NA,academic,NA,NA
+AAGL2016_086,8,2,5,Usta,Tugay,Türkiye.,NA,NA,NA,NA,community,NA,NA
 AAGL2016_087,7,6,4,Vilos,George A,Canada. Electronic address: george.vilos@lhsc.on.ca.,NA,male,0.9931,Canada,academic,general_OBGYN,NA
 AAGL2016_088,4,4,5,Al,Serhat,Turkey. Electronic address: serhatal@erciyes.edu.tr.,NA,male,1,Turkey,academic,NA,NA
-AAGL2016_089,5,5,5,Moawad,Gaby,Maryland. Electronic address: gnmoawad@gmail.com.,WA,female,0.9748,VIII,academic,general_OBGYN,NA
-AAGL2016_090,6,3,5,Shanmugam,Victoria K,USA.,WA,female,0.9975,VIII,academic,NA,NA
+AAGL2016_089,5,5,5,Moawad,Gaby,Maryland. Electronic address: gnmoawad@gmail.com.,DC,female,0.9748,IV,academic,general_OBGYN,NA
+AAGL2016_090,6,3,5,Shanmugam,Victoria K,USA.,DC,female,0.9975,IV,academic,NA,NA
 AAGL2016_091,3,3,3,Harvey,Lara F B,Tennessee. Electronic address: lara.harvey@vanderbilt.edu.,TN,female,0.9989,X,academic,MIGS,NA
 AAGL2016_092,3,1,5,Hartley,Jennifer,UK.,NA,female,0.9969,United Kingdom,academic,NA,NA
 AAGL2016_093,4,4,4,Croft,Katherine,North Carolina. Electronic address: katherine.croft@carolinashealthcare.org.,NC,female,0.9972,XI,academic,general_OBGYN,NA
@@ -482,10 +482,10 @@ AAGL2017_005,3,3,4,Nezhat,Ceana,Georgia. Electronic address: ceana@nezhat.com.,G
 AAGL2017_006,3,3,2,Wright,Kelly,CA 90048. Electronic address: Kelly.wright@cshs.org.,CA,female,0.8632,IX,academic,MIGS,NA
 AAGL2017_007,14,14,5,Bogani,Giorgio,Italy. Electronic address: giorgiobogani@yahoo.it.,NA,male,1,Italy,NA,GYN_ONC,NA
 AAGL2017_008,4,1,5,Varma,Shruti O,India.,NA,female,1,India,academic,NA,NA
-AAGL2017_009,5,1,5,Zhang,Menglei,China.,NA,NA,NA,China,academic,general_OBGYN,NA
+AAGL2017_009,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2017_010,10,2,5,Fazel,Asita,Germany.,NA,NA,NA,Germany,academic,surgery_other,faculty_senior
 AAGL2017_011,9,1,5,Curcio,Erin,New Jersey.,NJ,female,0.9732,III,academic,GYN_ONC,NA
-AAGL2017_012,4,1,3,Vargas,Rómulo,Colombia.,NA,NA,NA,Colombia,academic,NA,NA
+AAGL2017_012,4,1,3,Vargas,Rómulo,Colombia.,NA,NA,NA,Colombia,community,NA,NA
 AAGL2017_013,11,4,2,Han,Jongsuk,Republic of Korea.,NA,NA,NA,South Korea,academic,NA,NA
 AAGL2017_014,6,2,5,Matanes,Emad,Israel.,NA,male,1,Israel,academic,general_OBGYN,NA
 AAGL2017_015,4,4,1,Kaaki,Bilal,USA. Bilal.Kaaki@unitypoint.org.,IA,male,0.9986,VI,academic,NA,NA
@@ -493,24 +493,24 @@ AAGL2017_016,3,2,5,Espinal,Mariana,USA.,IL,female,0.9974,VII,academic,MFM,NA
 AAGL2017_017,7,2,5,Baker,B Wycke,bwbaker@texaschildrens.org.,TX,NA,NA,X,academic,general_OBGYN,NA
 AAGL2017_018,4,3,4,Menderes,Gulden,USA. gulden.menderes@yale.edu.,CT,NA,NA,I,academic,GYN_ONC,NA
 AAGL2017_019,7,5,1,Steck-Bayat,Kayvahn P,USA. Kayvahn@gmail.com.,AZ,NA,NA,VIII,academic,MIGS,NA
-AAGL2017_020,5,2,5,Aitchison,Lucy Ping,Australia.,NA,female,0.9974,Australia,academic,NA,NA
+AAGL2017_020,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2017_021,5,2,4,Strug,Michael,USA. mrstrug@gmail.com.,CA,male,0.9947,IX,academic,REI,NA
 AAGL2017_022,14,4,3,Pérez-Brangulí,Francesc,Germany.,NA,female,0.6679,Germany,academic,NA,NA
 AAGL2017_023,6,2,5,Daykan,Yair,Israel.,NA,male,1,Israel,academic,general_OBGYN,NA
 AAGL2017_024,6,5,5,Sheyn,David,OH. Electronic address: david.sheyn@uhhospitals.org.,OH,male,0.9963,V,academic,FPMRS,NA
 AAGL2017_025,1,1,4,Noorchashm,Hooman,Pennsylvania.,PA,male,1,III,NA,NA,NA
-AAGL2017_026,7,5,2,Saber,Alan A,USA. Electronic address: Saber6231@gmail.com.,NJ,male,0.9968,III,academic,surgery_other,faculty_senior
-AAGL2017_027,6,4,2,Siragusa,Melina Jazmin,Argentina. Electronic address: melina.siragusa@hospitalitaliano.org.ar.,NA,female,1,Argentina,academic,NA,NA
+AAGL2017_026,7,5,2,Saber,Alan A,USA. Electronic address: Saber6231@gmail.com.,MA,male,0.9968,I,academic,surgery_other,faculty_senior
+AAGL2017_027,6,4,2,Siragusa,Melina Jazmin,Argentina. Electronic address: melina.siragusa@hospitalitaliano.org.ar.,NA,female,1,Argentina,community,NA,NA
 AAGL2017_028,5,2,4,Padilla,Pablo,France.,NA,male,0.9981,France,NA,NA,NA
 AAGL2017_029,12,7,2,Schivardi,Gabriella,MN.,MN,female,0.9994,VI,academic,obstetrics,NA
 AAGL2017_030,8,3,5,Gupta,Natasha,USA. docnatasha3@gmail.com.,TN,female,0.9971,X,academic,MIGS,NA
 AAGL2017_031,3,2,5,Jansen,Sierra M,USA. sjansen@uwhealth.org.,WI,female,0.9972,VI,academic,general_OBGYN,NA
 AAGL2017_032,8,4,4,Li,H-D,China.,NA,NA,NA,China,academic,NA,NA
 AAGL2017_033,7,6,2,Rowland,Ian,UK. publications@ilsieurope.be.,NA,male,0.9962,United Kingdom,academic,NA,NA
-AAGL2017_034,5,3,5,Bretschneider,C Emi,USA. bretscc@ccf.org.,OH,NA,NA,V,community,FPMRS,NA
-AAGL2017_035,2,2,5,Altshuler,Paulina C,USA.,CO,female,0.9997,VIII,academic,general_OBGYN,NA
+AAGL2017_034,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+AAGL2017_035,2,2,5,Altshuler,Paulina C,USA.,UT,female,0.9997,VIII,academic,general_OBGYN,NA
 AAGL2017_036,4,2,3,Bastawros,Dina,and.,NA,female,0.9975,NA,academic,FPMRS,NA
-AAGL2017_037,9,4,5,Clarizia,Roberto,Italy. Electronic address: roberto.clarizia@gmail.com.,NA,male,0.9918,Italy,academic,MIGS,NA
+AAGL2017_037,9,4,5,Clarizia,Roberto,Italy. Electronic address: roberto.clarizia@gmail.com.,NA,male,0.9918,Italy,community,MIGS,NA
 AAGL2017_038,8,6,5,Colón-Caraballo,Mariano,USA.,PR,male,1,XI,academic,NA,NA
 AAGL2017_039,6,6,5,Barel,Ortal,Israel. Electronic address: Ortal.Barel@sheba.health.gov.il.,NA,NA,NA,Israel,research_institute,NA,NA
 AAGL2017_040,16,5,5,Elaïb,Ziane,France.,NA,female,1,France,NA,NA,NA
@@ -532,11 +532,11 @@ AAGL2017_055,1,1,5,Till,Sara R,Michigan. Electronic address: tillsa@med.umich.ed
 AAGL2017_056,10,1,5,Puntambekar,Shailesh,India.,NA,NA,NA,India,academic,MIGS,NA
 AAGL2017_057,4,4,3,Beran,Benjamin,Wisconsin. Electronic address: bberan@mcw.edu.,WI,male,0.9962,VI,academic,obstetrics,NA
 AAGL2017_058,2,2,3,Truong,Mireille,California. Electronic address: mireille.truong@gmail.com.,CA,female,1,IX,academic,NA,NA
-AAGL2017_059,9,4,5,Clarizia,Roberto,Italy. Electronic address: roberto.clarizia@gmail.com.,NA,male,0.9918,Italy,academic,MIGS,NA
+AAGL2017_059,9,4,5,Clarizia,Roberto,Italy. Electronic address: roberto.clarizia@gmail.com.,NA,male,0.9918,Italy,community,MIGS,NA
 AAGL2017_060,5,4,3,Fogelson,Noa,Spain. Electronic address: nfogelson@gmail.com.,NA,female,0.7299,Spain,academic,NA,NA
 AAGL2017_061,9,2,5,Arena,Alessandro,Italy.,NA,male,1,Italy,academic,general_OBGYN,NA
 AAGL2017_062,1,1,5,Clark,Nancy,Canada.,NA,female,0.9972,Canada,academic,NA,NA
-AAGL2017_063,24,1,5,Surrey,Eric,Illinois.,SC,male,0.9947,XI,academic,general_OBGYN,NA
+AAGL2017_063,24,1,5,Surrey,Eric,Illinois.,DC,male,0.9947,IV,academic,general_OBGYN,NA
 AAGL2017_064,7,2,2,Qi,Hang,China.,NA,female,1,China,academic,general_OBGYN,NA
 AAGL2017_065,1,1,3,Tam,Theresa,Canada.,NA,female,0.997,Canada,NA,NA,NA
 AAGL2017_066,3,3,5,Yeung,Patrick,Missouri. Electronic address: ppyeungjr@gmail.com.,MO,male,0.9955,VII,academic,general_OBGYN,NA
@@ -545,7 +545,7 @@ AAGL2017_068,2,2,5,Nasioudis,Dimitrios,USA. Electronic address: dimitrios.nasiou
 AAGL2017_069,3,3,2,Paek,Jiheum,South Korea.,NA,NA,NA,South Korea,academic,GYN_ONC,NA
 AAGL2017_070,9,8,4,Tyan,Paul,United States.,NC,male,0.9959,XI,academic,MIGS,NA
 AAGL2017_071,8,1,3,Yoo,Hae K,South Korea.,NA,female,1,South Korea,academic,general_OBGYN,NA
-AAGL2017_072,3,1,3,Nie,Ji-Chan,China.,NA,NA,NA,China,academic,general_OBGYN,NA
+AAGL2017_072,3,NA,3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2017_073,4,2,2,Magee,Corey,UK.,NA,male,0.9502,United Kingdom,academic,NA,NA
 AAGL2017_074,7,3,3,Liu,Jie,PR China.,NA,male,0.8187,China,academic,NA,NA
 AAGL2017_075,3,2,5,Davis,J L,USA.,VA,NA,NA,IV,military_va,NA,NA
@@ -554,7 +554,7 @@ AAGL2017_077,7,5,5,Yang,Fuheng,China.,NA,NA,NA,China,academic,NA,NA
 AAGL2017_078,20,9,1,Song,Tingwei,China.,NA,NA,NA,China,academic,NA,NA
 AAGL2017_079,3,3,3,Bhagavath,Bala,Wisconsin. Electronic address: bbhagavath@wisc.edu.,WI,NA,NA,VI,academic,REI,NA
 AAGL2017_080,5,1,5,Cohen,Stav,CFW).,NA,female,0.5391,Israel,academic,NA,NA
-AAGL2017_081,2,1,2,Rimbach,Stefan,Germany.,NA,male,0.9975,Germany,academic,obstetrics,NA
+AAGL2017_081,2,NA,2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2017_082,8,8,2,van der Heijde,Désirée,The Netherlands.,NA,NA,NA,Netherlands,academic,NA,NA
 AAGL2017_083,3,3,4,Bougie,Olga,Canada. Electronic address: bougieo@kgh.kari.net.,NA,female,0.9958,Canada,academic,general_OBGYN,NA
 AAGL2017_084,5,1,5,Benetti-Pinto,Cristina Laguna,Brazil.,NA,female,0.9949,Brazil,academic,general_OBGYN,NA
@@ -571,16 +571,16 @@ AAGL2017_094,6,6,5,Savona-Ventura,Charles,Malta. Electronic address: charles.sav
 AAGL2017_095,2,2,4,Krispin,Eyal,MA.,MA,male,1,I,academic,NA,NA
 AAGL2017_096,2,2,2,Downing,Janelle M,South Carolina. Electronic address: jdown@mailbox.sc.edu.,SC,female,0.9984,XI,academic,NA,NA
 AAGL2017_097,5,3,4,Arabkhazaeli,Moona,NY.,NY,female,1,II,academic,general_OBGYN,NA
-AAGL2018_001,12,4,5,Brullet,Enric,Spain.,NA,NA,NA,Spain,academic,NA,NA
+AAGL2018_001,12,4,5,Brullet,Enric,Spain.,NA,NA,NA,Spain,community,NA,NA
 AAGL2018_002,5,3,5,Ratna,Sumanth,United States.,CT,male,1,I,academic,NA,NA
 AAGL2018_003,7,1,5,Franchini,Michela,Italy.,NA,female,1,Italy,academic,NA,NA
 AAGL2018_004,4,3,2,Huizar,Grace D,USA.,TX,female,0.9978,X,academic,NA,NA
 AAGL2018_005,2,2,2,Sanders,Ari P,Canada. Electronic address: arisanders@hotmail.com.,NY,male,0.8457,II,academic,general_OBGYN,NA
-AAGL2018_006,2,2,3,Sanders,Ari P,Canada.,NY,male,0.8457,II,academic,general_OBGYN,NA
+AAGL2018_006,3,NA,3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2018_007,10,2,5,Fazel,Asita,Germany.,NA,NA,NA,Germany,academic,surgery_other,faculty_senior
 AAGL2018_008,8,3,2,Tang,Xiaoyan,People's Republic of China.,NA,NA,NA,China,academic,general_OBGYN,NA
 AAGL2018_009,7,3,5,Jørgensen,Siv Lykke,Denmark.,NA,NA,NA,Denmark,academic,obstetrics,NA
-AAGL2018_010,7,4,5,Carrubba,Aakriti R,USA. Electronic address: carrubba.aakriti@mayo.edu.,FL,female,1,XI,community,general_OBGYN,NA
+AAGL2018_010,7,4,5,Carrubba,Aakriti R,USA. Electronic address: carrubba.aakriti@mayo.edu.,MN,female,1,VI,community,general_OBGYN,NA
 AAGL2018_011,4,1,2,Li,Huang,China.,NA,NA,NA,China,academic,surgery_other,NA
 AAGL2018_012,4,1,4,Andou,Masaaki,Japan.,NA,male,1,Japan,community,general_OBGYN,NA
 AAGL2018_013,9,4,2,Park,Bombi,Korea.,NA,NA,NA,South Korea,academic,surgery_other,NA
@@ -590,14 +590,14 @@ AAGL2018_016,6,0,3,Coote,Susan,NA,NA,female,0.9978,NA,NA,NA,NA
 AAGL2018_017,12,12,3,Royce,Celeste S,MA. Electronic address: croyce@bidmc.harvard.edu.,MA,female,0.9992,I,academic,general_OBGYN,NA
 AAGL2018_018,6,2,5,Ribeiro,Diogo,Portugal.,NA,male,1,Portugal,NA,NA,NA
 AAGL2018_019,7,2,5,Bensouda-Miguet,Chloe,France.,NA,female,0.9984,France,academic,general_OBGYN,NA
-AAGL2018_020,13,9,4,Shen,Fang,PR China.,NA,NA,NA,China,academic,NA,NA
+AAGL2018_020,13,9,4,Shen,Fang,PR China.,NA,NA,NA,China,community,NA,NA
 AAGL2018_021,3,1,5,Padilla,Pablo,France.,NA,male,0.9981,France,NA,NA,NA
 AAGL2018_022,11,5,5,Soloff,Michelle A,NY.,NY,female,0.9962,II,academic,general_OBGYN,NA
 AAGL2018_023,3,2,5,Foley,Christine E,USA. christine.e.foley@gmail.com.,NY,female,0.9967,II,academic,general_OBGYN,NA
-AAGL2018_024,11,5,5,Ceccaroni,Marcello,Italy.,NA,male,0.9975,Italy,academic,MIGS,NA
+AAGL2018_024,11,5,5,Ceccaroni,Marcello,Italy.,NA,male,0.9975,Italy,community,MIGS,NA
 AAGL2018_025,4,2,5,Namkung,Jeong,Republic of Korea.,NA,male,1,South Korea,academic,general_OBGYN,NA
-AAGL2018_026,4,4,3,Jan,Hanif,Pakistan.,NA,male,1,Pakistan,academic,NA,NA
-AAGL2018_027,3,2,1,Ceccaroni,Marcello,Italy (all authors).. Electronic address: issaschool@gmail.com.,NA,male,0.9975,Italy,academic,MIGS,NA
+AAGL2018_026,4,4,3,Jan,Hanif,Pakistan.,NA,male,1,Pakistan,community,NA,NA
+AAGL2018_027,3,2,1,Ceccaroni,Marcello,Italy (all authors).. Electronic address: issaschool@gmail.com.,NA,male,0.9975,Italy,community,MIGS,NA
 AAGL2018_028,2,1,2,Chao,Lisa,Pennsylvania.,PA,female,0.9973,III,academic,general_OBGYN,NA
 AAGL2018_029,6,5,5,Bastawros,Dina,NC.,NC,female,0.9975,XI,academic,FPMRS,NA
 AAGL2018_030,6,4,5,Page,Ann-Sophie,Belgium.,NA,NA,NA,Belgium,academic,FPMRS,NA
@@ -627,19 +627,19 @@ AAGL2018_053,7,3,5,Belilovets,Anastasia,USA.,NV,female,0.9993,VIII,academic,gene
 AAGL2018_054,8,6,3,Melnyk,Angela,Canada.,MO,female,0.997,VII,academic,NA,NA
 AAGL2018_055,1,1,1,Woo,Jean,Hong Kong. jeanwoowong@cuhk.edu.hk.,NA,female,0.9467,Hong Kong,academic,NA,NA
 AAGL2018_056,4,2,5,Bradley,Susan,UK. Susan.Bradley@city.ac.uk.,NA,female,0.9978,United Kingdom,academic,NA,NA
-AAGL2018_057,5,1,5,Ouchi,Nozomi,Japan.,NA,female,1,Japan,academic,general_OBGYN,NA
+AAGL2018_057,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2018_058,7,4,5,Bourdel,Nicolas,France.,NA,male,0.9975,France,academic,general_OBGYN,NA
 AAGL2018_059,8,4,5,Valerio,Francesca,Italy.,NA,female,0.9987,Italy,NA,NA,NA
-AAGL2018_060,6,3,5,Abuzeid,Omar M,USA.,MI,male,0.9945,V,academic,general_OBGYN,NA
-AAGL2018_061,9,6,5,Baù,Maria Grazia,Italy.,NA,female,0.9927,Italy,academic,obstetrics,NA
-AAGL2018_062,4,2,5,Fuentes,Francisco,Chile. Electronic address: Franciscojfuentes88@gmail.com.,NA,male,0.9921,Chile,academic,general_OBGYN,NA
+AAGL2018_060,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+AAGL2018_061,9,6,5,Baù,Maria Grazia,Italy.,NA,female,0.9927,Italy,community,obstetrics,NA
+AAGL2018_062,4,2,5,Fuentes,Francisco,Chile. Electronic address: Franciscojfuentes88@gmail.com.,NA,male,0.9921,Chile,community,general_OBGYN,NA
 AAGL2018_063,4,2,4,Moein,Anita,Canada.,MO,female,0.9968,VII,academic,NA,NA
 AAGL2018_064,6,4,5,Jaramillo-Cardoso,Adrian,USA. amarceljc@gmail.com.,MA,male,0.9269,I,academic,NA,NA
 AAGL2018_065,3,1,5,Jung,Yoon Bin,Korea.,NA,male,0.6826,South Korea,academic,surgery_other,NA
 AAGL2018_066,4,3,3,Al Kibria,Gulam Muhammed,MD 21201. Email: gkibria1@outlook.com.,MD,NA,NA,IV,academic,NA,NA
 AAGL2018_067,6,2,5,Lauterbach,Roy,Israel.,NA,male,0.9936,Israel,academic,general_OBGYN,NA
 AAGL2018_068,6,3,5,Declas,Estelle,France. Electronic address: estelle.declas@outlook.fr.,NA,female,0.9985,France,academic,general_OBGYN,NA
-AAGL2018_069,5,1,4,Shumate,Ashley M,USA.,FL,female,0.9839,XI,community,urology,NA
+AAGL2018_069,5,1,4,Shumate,Ashley M,USA.,MN,female,0.9839,VI,community,urology,NA
 AAGL2018_070,10,1,2,Liu,Xue-Jun,China.,NA,NA,NA,China,academic,NA,NA
 AAGL2018_071,3,2,5,Haider,Noor-Ul-Eman,Pakistan. noorulemanhaider@gmail.com.,NA,NA,NA,Pakistan,academic,NA,NA
 AAGL2018_072,20,0,1,San,Sovannarith,NA,NA,NA,NA,NA,NA,NA,NA
@@ -658,7 +658,7 @@ AAGL2018_084,6,2,4,Leborne,Perrine,France. perrine.leborne@gmail.com.,NA,female,
 AAGL2018_085,5,3,4,Ghai,Vishalli,UK.,NA,NA,NA,United Kingdom,academic,general_OBGYN,NA
 AAGL2018_086,4,3,5,Leyland,Nicholas,Toronto (Ont.).,NA,male,0.9963,NA,NA,NA,NA
 AAGL2018_087,8,6,4,Andriani,Leslie,United States of America.,PA,female,0.7724,III,academic,GYN_ONC,NA
-AAGL2018_088,7,3,3,Dior,Uri P,Australia.,NA,male,0.9605,Australia,academic,general_OBGYN,NA
+AAGL2018_088,7,3,3,Dior,Uri P,Australia.,NA,male,0.9605,Australia,NA,general_OBGYN,NA
 AAGL2018_089,4,3,1,Ayik,Nizameddin,Germany.,NA,NA,NA,Germany,academic,surgery_other,NA
 AAGL2018_090,6,3,5,Opoku-Anane,Jessica,CA. Electronic address: jopokua1@gmail.com.,CA,female,0.9968,IX,academic,general_OBGYN,NA
 AAGL2018_091,3,1,3,Kita,Shunbun,Department of Metabolic Medicine.,NA,NA,NA,NA,academic,NA,NA
@@ -678,7 +678,7 @@ AAGL2019_009,7,3,3,Smith,Rachael B,USA. Electronic address: rachaelsmith.DO@gmai
 AAGL2019_010,3,1,3,Lee,Eunhye,Republic of Korea.,NA,NA,NA,South Korea,academic,NA,NA
 AAGL2019_011,6,1,5,Fan,Xiaorong,China.,NA,NA,NA,China,academic,NA,NA
 AAGL2019_012,11,5,4,Slootbeek,Peter H J,The Netherlands.,NA,male,0.9965,Netherlands,academic,NA,NA
-AAGL2019_013,11,8,5,Cusimano,Maria C,Canada.,NA,female,0.9927,Canada,academic,obstetrics,NA
+AAGL2019_013,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2019_014,3,3,5,Post,Rene,Amsterdam.,NA,male,0.6702,NA,NA,NA,NA
 AAGL2019_015,14,5,5,Poddubskaya,Elena,Russia.,NA,female,0.9984,Russia,academic,NA,NA
 AAGL2019_016,4,4,4,Moulder,Janelle K,NC. Electronic address: janelle.moulder@gmail.com.,NC,female,0.9984,XI,academic,general_OBGYN,NA
@@ -688,7 +688,7 @@ AAGL2019_019,3,1,2,Sert,Mediha,Turkey.,NA,NA,NA,Turkey,academic,NA,NA
 AAGL2019_020,10,1,5,Sawada,Masanaru,Department of Medicine Nihon University School of Medicine Tokyo Japan.,MD,NA,NA,IV,academic,NA,NA
 AAGL2019_021,5,1,1,Birge,Ozer,Turkey.,NA,NA,NA,Turkey,academic,GYN_ONC,NA
 AAGL2019_022,3,2,3,Souza,Cristiane,Portugal.,NA,NA,NA,Portugal,NA,NA,NA
-AAGL2019_023,18,1,3,Munro,Malcolm G,Utah.,MA,male,0.9981,I,military_va,general_OBGYN,NA
+AAGL2019_023,18,1,3,Munro,Malcolm G,Utah.,WA,male,0.9981,VIII,military_va,general_OBGYN,NA
 AAGL2019_024,4,2,2,Jones,Carly,61 83027733.,NA,female,0.9974,Australia,academic,NA,NA
 AAGL2019_025,4,4,5,Coelho Neto,M A,Brazil.,NA,NA,NA,Brazil,academic,general_OBGYN,NA
 AAGL2019_026,4,2,5,Ozceltik,Gokay,Turkey. Electronic address: gokayozceltik@hotmail.com.,NA,NA,NA,Turkey,academic,general_OBGYN,NA
@@ -705,14 +705,14 @@ AAGL2019_036,4,3,3,Davenport,Erica,Las Vegas Minimally Invasive Surgery/Universi
 AAGL2019_037,2,2,2,Leach,D Allan,USA. leach.douglas@mayo.edu.,MN,NA,NA,VI,community,MIGS,NA
 AAGL2019_038,3,3,3,Boyd,Susan,Canada. Electronic address: scboyd@uvic.ca.,NA,female,0.9978,Canada,academic,NA,NA
 AAGL2019_039,6,1,2,Qiu,Jun-Jun,China.,NA,NA,NA,China,academic,general_OBGYN,NA
-AAGL2019_040,10,5,5,Bertocchi,Elisa,and Ruffo). Electronic address: elisa.bertocchi@sacrocuore.it.,NA,female,0.9969,NA,academic,surgery_other,NA
+AAGL2019_040,10,5,5,Bertocchi,Elisa,and Ruffo). Electronic address: elisa.bertocchi@sacrocuore.it.,NA,female,0.9969,NA,community,surgery_other,NA
 AAGL2019_041,9,1,5,Lee,Chia-Yi,Taiwan.,NA,NA,NA,Taiwan,academic,general_OBGYN,NA
 AAGL2019_042,8,3,4,Roman,Horace,France.,NA,male,0.9957,France,NA,NA,NA
 AAGL2019_043,3,2,5,Souza,Cristiane,Portugal.,NA,NA,NA,Portugal,NA,NA,NA
 AAGL2019_044,6,4,5,Zakhari,Andrew,Canada.,NY,male,0.996,II,academic,general_OBGYN,NA
 AAGL2019_045,8,3,5,Lapointe,Mathilde,France.,NA,female,1,France,NA,general_OBGYN,NA
 AAGL2019_046,6,3,4,Farra,Chantal,Lebanon.,NA,female,0.9992,Lebanon,academic,NA,NA
-AAGL2019_047,10,7,5,Sroussi,Jérémy,France. Electronic address: jeremy.sroussi@gmail.com.,NA,NA,NA,France,academic,general_OBGYN,NA
+AAGL2019_047,10,7,5,Sroussi,Jérémy,France. Electronic address: jeremy.sroussi@gmail.com.,NA,NA,NA,France,community,general_OBGYN,NA
 AAGL2019_048,5,2,3,Guo,Xiaoyue Mona,USA.,IL,NA,NA,VII,academic,general_OBGYN,NA
 AAGL2019_049,1,0,3,Wu,Chengyuan,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2019_050,1,0,3,Wu,Chengyuan,NA,NA,NA,NA,NA,NA,NA,NA
@@ -724,7 +724,7 @@ AAGL2019_055,2,2,3,Seaman,Sierra,New York (all authors).,NY,female,0.9972,II,aca
 AAGL2019_056,5,4,5,Beletsky,Alexander,USA.,CA,male,0.9921,IX,academic,NA,NA
 AAGL2019_057,3,1,1,Guan,Xiaoming,Texas.,TX,NA,NA,X,academic,MIGS,NA
 AAGL2019_058,10,10,3,Green,Isabel,Minnesota. Electronic address: green.isabel@mayo.edu.,MN,female,0.9851,VI,academic,MIGS,NA
-AAGL2019_059,2,2,3,Baekelandt,J,Belgium. Electronic address: jan.baekelandt@imelda.be.,NA,NA,NA,Belgium,academic,MIGS,NA
+AAGL2019_059,2,2,3,Baekelandt,J,Belgium. Electronic address: jan.baekelandt@imelda.be.,NA,NA,NA,Belgium,community,MIGS,NA
 AAGL2019_060,3,2,4,Jackson,Emma F,Australia. emma.jackson3@hdr.mq.edu.au.,NA,female,0.9978,Australia,academic,NA,NA
 AAGL2019_061,3,3,4,Chao,Lisa,USA. Electronic address: Lisa.Chao@utsouthwestern.edu.,TX,female,0.9973,X,academic,general_OBGYN,NA
 AAGL2019_062,5,2,5,Kennedy,Uttara,Australia.,NA,NA,NA,Australia,academic,NA,NA
@@ -748,7 +748,7 @@ AAGL2019_079,16,2,1,Liang,Zelin,China.,NA,NA,NA,China,academic,NA,NA
 AAGL2019_080,5,2,4,Kontomanolis,Emmanuel,GRC.,NA,male,0.9943,NA,academic,general_OBGYN,NA
 AAGL2019_081,4,3,3,Davenport,Erica,Las Vegas Minimally Invasive Surgery/University of Nevada Las Vegas.,NV,female,0.9958,VIII,academic,MIGS,fellow
 AAGL2019_082,10,2,3,Gill,Corey M,USA.,NY,male,0.9502,II,academic,general_OBGYN,NA
-AAGL2019_083,7,3,5,Liu,Juan,China.,NA,male,0.9915,China,academic,NA,NA
+AAGL2019_083,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2019_084,3,1,1,Liu,Jian-Hong,Sichuan University.,NA,NA,NA,China,academic,general_OBGYN,NA
 AAGL2019_085,7,4,5,Handelzalts,Jonathan E,USA. Electronic address: jhandelzalts@gmail.com.,MI,male,0.9954,V,academic,NA,NA
 AAGL2019_086,4,2,5,Elder,Simone,USA.,NY,female,0.9823,II,academic,general_OBGYN,NA
@@ -761,15 +761,15 @@ AAGL2019_092,6,6,2,Decker,Kaethel,Canada. Electronic address: Kaethel.decker@ahs
 AAGL2019_093,13,7,2,Leal,Jenine,Canada. Electronic address: Jenine.leal@ucalgary.ca.,NA,female,1,Canada,academic,NA,NA
 AAGL2019_094,17,6,1,Krysko,Olga,Belgium.,NA,female,0.9958,Belgium,academic,NA,faculty_senior
 AAGL2019_095,5,3,2,Hanstede,Miriam M F,Spaarne Gasthuis Haarlem Haarlem The Netherlands.,NA,female,0.9967,Netherlands,academic,general_OBGYN,NA
-AAGL2019_096,6,6,1,Ortiz Vazquez,Estephano Fabian,MEX.,NA,NA,NA,NA,academic,general_OBGYN,NA
+AAGL2019_096,6,6,1,Ortiz Vazquez,Estephano Fabian,MEX.,NA,NA,NA,NA,community,general_OBGYN,NA
 AAGL2020_001,4,2,4,Luchristt,Douglas,IL. Electronic address: douglas.h.luchristt@gmail.com.,IL,male,0.9965,VII,academic,FPMRS,NA
 AAGL2020_002,2,2,3,Ross,Wendy,UK. w.ross@kingston.ac.uk.,NA,female,0.9965,United Kingdom,academic,NA,NA
 AAGL2020_003,2,1,3,Cruz,Janet,California.,CA,female,0.9973,IX,academic,general_OBGYN,NA
-AAGL2020_004,7,1,5,Puntambekar,Shailesh,Maharashtra 411004 India.,NA,NA,NA,India,academic,NA,NA
+AAGL2020_004,7,1,5,Puntambekar,Shailesh,Maharashtra 411004 India.,NA,NA,NA,India,community,NA,NA
 AAGL2020_005,5,3,5,Bisch,Steven,Canada.,NA,male,0.9963,Canada,NA,GYN_ONC,NA
 AAGL2020_006,5,2,2,Edwards,Darl,Canada.,NY,male,0.9641,II,academic,general_OBGYN,NA
 AAGL2020_007,6,3,2,Khatib,Ghanim,Turkey,NA,NA,NA,Turkey,academic,GYN_ONC,NA
-AAGL2020_008,4,3,4,Cosgriff,Lauren,Maryland. Electronic address: lauren.l.cosgriff@medstar.net.,MD,female,0.9904,IV,academic,general_OBGYN,NA
+AAGL2020_008,4,3,4,Cosgriff,Lauren,Maryland. Electronic address: lauren.l.cosgriff@medstar.net.,DC,female,0.9904,IV,academic,general_OBGYN,NA
 AAGL2020_009,7,3,4,Benabou,Kelly,USA.,CT,female,0.8632,I,academic,general_OBGYN,NA
 AAGL2020_010,8,4,4,Sermer,Corey,Canada.,NY,male,0.9502,II,academic,NA,NA
 AAGL2020_011,3,2,5,Kolhe,Sunanda,India.,NA,NA,NA,India,academic,NA,NA
@@ -780,15 +780,15 @@ AAGL2020_015,7,1,5,Kingery,Matthew T,NY.,NY,male,0.9962,II,academic,surgery_othe
 AAGL2020_016,8,7,4,Piszczek,Carolyn C,OR. Electronic address: carolynfortune@gmail.com.,OR,female,0.9972,VIII,private_practice,general_OBGYN,NA
 AAGL2020_017,4,2,5,Nam,Jaehyun,South Korea.,NA,NA,NA,South Korea,academic,NA,NA
 AAGL2020_018,19,13,5,Wang,Qifeng,China.,NA,NA,NA,China,academic,NA,NA
-AAGL2020_019,6,5,5,Corinti,Mariana,Brazil.,NY,female,0.9974,II,academic,GYN_ONC,NA
+AAGL2020_019,6,5,5,Corinti,Mariana,Brazil.,NY,female,0.9974,II,community,GYN_ONC,NA
 AAGL2020_020,16,14,5,Al-Hendy,Ayman,IL. Electronic address: aalhendy@uic.edu.,IL,male,0.9818,VII,academic,general_OBGYN,NA
 AAGL2020_021,7,6,5,Stewart,Elizabeth A,MN. Electronic address: stewart.elizabeth@mayo.edu.,MN,female,0.9969,VI,academic,REI,NA
 AAGL2020_022,7,7,5,Kang,Juseong,Republic of Korea.,NA,NA,NA,South Korea,academic,NA,NA
 AAGL2020_023,5,1,5,Urbina,Pietro,Spain.,NA,male,1,Spain,NA,NA,NA
-AAGL2020_024,2,2,2,Gundavda,Kaival,India.,NA,NA,NA,India,academic,surgery_other,NA
+AAGL2020_024,2,2,2,Gundavda,Kaival,India.,NA,NA,NA,India,community,surgery_other,NA
 AAGL2020_025,6,2,5,Oderkerk,Tamara J,the Netherlands.,NA,female,0.997,Netherlands,academic,general_OBGYN,NA
 AAGL2020_026,5,2,5,Mohr-Sasson,Aya,Israel. Mohraya@gmail.com.,NA,female,1,Israel,academic,general_OBGYN,NA
-AAGL2020_027,7,2,3,Sayyah-Melli,M,Iran. Electronic address: Manizheh.sayyahmelli@gmail.com.,NA,NA,NA,Iran,academic,NA,NA
+AAGL2020_027,3,NA,3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2020_028,3,3,3,Kim,Chang Woo,Korea.,NA,male,0.9831,South Korea,academic,surgery_other,NA
 AAGL2020_029,2,1,2,Michel,Lindsey,CT. (all authors).,NA,female,0.9632,NA,academic,general_OBGYN,NA
 AAGL2020_030,5,4,3,Pickett,Charlotte M,IN. Electronic address: cpicket@iu.edu.,IN,female,0.9978,V,academic,general_OBGYN,NA
@@ -797,19 +797,19 @@ AAGL2020_032,2,2,3,Stanton,Adam,School of Informatics and Digital Engineering. a
 AAGL2020_033,7,3,5,Förster,Christiane E,Switzerland.,NA,female,0.9974,Switzerland,academic,general_OBGYN,NA
 AAGL2020_034,2,2,4,Galhotra,Sheena,AZ. Electronic address: sheenagalhotra@gmail.com.,AZ,female,0.9971,VIII,academic,general_OBGYN,NA
 AAGL2020_035,3,1,1,Guan,Xiaoming,Texas.,TX,NA,NA,X,academic,MIGS,NA
-AAGL2020_036,4,3,3,Rupley,Devon M,USA.,NY,male,0.7649,II,academic,general_OBGYN,NA
+AAGL2020_036,3,NA,3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2020_037,10,5,5,Ruggieri,Serena,Italy.,NA,female,0.9996,Italy,academic,NA,NA
 AAGL2020_038,6,4,5,Bastawros,Dina,Winston-Salem.,NC,female,0.9975,XI,NA,NA,NA
 AAGL2020_039,3,1,4,Marceddu,Roberto,Italy.,NA,male,0.9918,Italy,academic,NA,NA
 AAGL2020_040,8,4,4,Ji,Yijia,Australia.,NA,NA,NA,Australia,academic,NA,NA
 AAGL2020_041,16,8,2,Morais,Luana,Brazil. lumoraiss@ymail.com.,NA,female,1,Brazil,academic,NA,NA
-AAGL2020_042,7,0,5,Chapman,Graham C,NA,NA,male,0.9965,NA,NA,NA,NA
-AAGL2020_043,13,6,5,Kogan,Liron,Canada.,NA,male,0.6065,Canada,academic,GYN_ONC,NA
+AAGL2020_042,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+AAGL2020_043,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2020_044,11,6,3,Filippova,Olga T,United States of America.,NY,female,0.9958,II,academic,general_OBGYN,NA
 AAGL2020_045,6,4,5,Mun,Jaehee,Republic of Korea.,NA,NA,NA,South Korea,academic,general_OBGYN,NA
 AAGL2020_046,29,12,5,Bogani,Giorgio,Italy. Electronic address: Giorgio.bogani@istitutotumori.mi.it.,NA,male,1,Italy,NA,general_OBGYN,NA
 AAGL2020_047,8,5,5,Bogani,Giorgio,Italy. Electronic address: giorgiobogani@yahoo.it.,NA,male,1,Italy,academic,general_OBGYN,NA
-AAGL2020_048,4,2,4,Tymon-Rosario,Joan,USA.,CT,female,0.9891,I,academic,general_OBGYN,NA
+AAGL2020_048,4,NA,4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2020_049,5,4,2,Pickett,Charlotte M,IN. Electronic address: cpicket@iu.edu.,IN,female,0.9978,V,academic,general_OBGYN,NA
 AAGL2020_050,4,2,5,Pepin,Kristen,New York. Electronic address: kjp9013@med.cornell.edu.,NY,female,0.9911,II,academic,general_OBGYN,NA
 AAGL2020_051,5,3,5,Celikgun,Beyza,Turkey.,NA,female,1,Turkey,academic,NA,NA
@@ -817,19 +817,19 @@ AAGL2020_052,6,1,2,Muir,Teale M,California.,PA,female,1,III,military_va,MIGS,NA
 AAGL2020_053,10,9,5,Levin,Gabriel,Canada. Electronic address: levin.gaby@gmail.com.,NA,male,0.9766,Canada,academic,GYN_ONC,NA
 AAGL2020_054,8,4,2,Yang,Wenming,China.,NA,NA,NA,China,academic,surgery_other,NA
 AAGL2020_055,4,2,3,Orlando,Megan S,Colorado. Electronic address: megan.orlando@cuanschutz.edu.,CO,female,0.9976,VIII,academic,general_OBGYN,NA
-AAGL2020_056,5,2,5,Benlolo,Samantha,Canada. Electronic address: samantha.benlolo@gmail.com.,NA,female,0.998,Canada,academic,NA,NA
-AAGL2020_057,5,2,5,Hamouie,Angie,DC.,WA,female,0.9978,VIII,academic,surgery_other,NA
+AAGL2020_056,5,2,5,Benlolo,Samantha,Canada. Electronic address: samantha.benlolo@gmail.com.,NA,female,0.998,Canada,community,NA,NA
+AAGL2020_057,5,2,5,Hamouie,Angie,DC.,DC,female,0.9978,IV,academic,surgery_other,NA
 AAGL2020_058,5,2,1,GiglioAyers,Patricia,USA.,CT,female,0.997,I,academic,general_OBGYN,NA
 AAGL2020_059,5,2,5,Willson,Stephanie F,USA.,NY,female,0.9966,II,academic,NA,NA
-AAGL2020_060,10,5,4,Marcelin,Clément,France. clement.marcelin@gmail.com.,NA,NA,NA,France,academic,NA,NA
+AAGL2020_060,10,5,4,Marcelin,Clément,France. clement.marcelin@gmail.com.,NA,NA,NA,France,community,NA,NA
 AAGL2020_061,7,2,5,Nguyen,Damnhien,USA.,CA,NA,NA,IX,academic,NA,NA
 AAGL2020_062,8,4,4,Sermer,Corey,Canada.,NY,male,0.9502,II,academic,NA,NA
 AAGL2020_063,8,4,2,You,Fuming,China.,NA,NA,NA,China,academic,NA,NA
 AAGL2020_064,4,3,5,Laughman,Kimberly,Illinois.,IL,female,0.9951,VII,academic,general_OBGYN,NA
-AAGL2020_065,5,3,5,Haverland,Rachael,Arizona.,AZ,female,0.9978,VIII,academic,MIGS,NA
-AAGL2020_066,6,6,5,Delara,Ritchie,Arizona. ORCID: https://orcid.org/0000-0002-2770-2155.,AZ,male,0.9905,VIII,community,general_OBGYN,NA
+AAGL2020_065,5,3,5,Haverland,Rachael,Arizona.,MN,female,0.9978,VI,academic,MIGS,NA
+AAGL2020_066,6,6,5,Delara,Ritchie,Arizona. ORCID: https://orcid.org/0000-0002-2770-2155.,MN,male,0.9905,VI,community,general_OBGYN,NA
 AAGL2020_067,22,10,5,Klotz,Rosa,Germany rosa.klotz@med.uni-heidelberg.de.,NA,female,0.9927,Germany,academic,surgery_other,NA
-AAGL2020_068,12,5,2,Yu,Victor,Australia.,NA,male,0.9938,Australia,academic,urology,NA
+AAGL2020_068,12,5,2,Yu,Victor,Australia.,NA,male,0.9938,Australia,community,urology,NA
 AAGL2020_069,5,5,2,Kamioka,Hiroharu,Japan.,NA,NA,NA,Japan,academic,NA,NA
 AAGL2020_070,2,2,3,Miles,Shana,USA.,MD,female,0.9964,IV,academic,MIGS,NA
 AAGL2020_071,4,2,5,Souza,Carla,Brazil.,NA,female,0.9973,Brazil,academic,NA,NA
@@ -850,15 +850,15 @@ AAGL2020_085,2,0,2,Benabou,Kelly,NA,NA,female,0.8632,NA,NA,NA,NA
 AAGL2020_086,11,1,4,Movilla,Peter,USA.,MA,male,0.9965,I,academic,MIGS,NA
 AAGL2020_087,5,1,4,Duncan,Jonathan,United States of America.,AZ,male,0.9954,VIII,academic,NA,NA
 AAGL2020_088,2,1,4,Dou,Lei,China.,NA,female,0.9702,China,academic,general_OBGYN,NA
-AAGL2020_089,3,3,1,da Costa,Adriano Carneiro,UK. Adriano.Costa@ebserh.gov.br.,NA,male,1,United Kingdom,academic,surgery_other,NA
+AAGL2020_089,3,3,1,da Costa,Adriano Carneiro,UK. Adriano.Costa@ebserh.gov.br.,NA,male,1,United Kingdom,community,surgery_other,NA
 AAGL2020_090,3,3,3,Katebi Kashi,Payam,VA. Electronic address: pkatebi1@gmail.com.,VA,male,1,IV,military_va,general_OBGYN,NA
 AAGL2020_091,4,1,2,Abouzeid,Bassel,USA.,IL,male,1,VII,academic,general_OBGYN,NA
 AAGL2020_092,5,3,3,Nassar,Daniel,and Ms. Chen).,NY,male,0.9954,II,academic,general_OBGYN,NA
 AAGL2020_093,16,6,5,León,Maela,Spain.,NA,female,1,Spain,NA,NA,NA
 AAGL2020_094,9,5,3,Michail,Maria,UK. m.michail@bham.ac.uk.,AL,female,0.9927,XI,academic,NA,NA
-AAGL2020_095,5,4,3,Tanvir,Tanvir,India. Electronic address: tanvirsinghtan@gmail.com.,NA,male,0.9681,India,academic,general_OBGYN,NA
-AAGL2021_001,8,4,5,Goncharov,A L,Russia.,NA,NA,NA,Russia,academic,NA,NA
-AAGL2021_002,8,6,5,Matsuo,Koji,USA. Electronic address: koji.matsuo@med.usc.edu.,CA,male,1,IX,academic,GYN_ONC,NA
+AAGL2020_095,5,4,3,Tanvir,Tanvir,India. Electronic address: tanvirsinghtan@gmail.com.,NA,male,0.9681,India,community,general_OBGYN,NA
+AAGL2021_001,8,4,5,Goncharov,A L,Russia.,NA,NA,NA,Russia,community,NA,NA
+AAGL2021_002,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2021_003,7,3,5,Tzur,Yossi,Israel. Electronic address: yossitzur@gmail.com.,NA,male,1,Israel,academic,general_OBGYN,NA
 AAGL2021_004,5,2,1,Shapera,Emanuel,USA.,FL,male,0.9979,XI,academic,NA,NA
 AAGL2021_005,6,4,3,Guraslan,Hakan,Turkey. Electronic address: guraslanhakan@gmail.com.,NA,male,1,Turkey,academic,general_OBGYN,NA
@@ -878,12 +878,12 @@ AAGL2021_018,20,9,2,Lim,Pascal,France.,NA,male,0.9961,France,NA,NA,NA
 AAGL2021_019,5,2,3,Kobayashi,Hiroaki,Japan.,NA,male,1,Japan,academic,general_OBGYN,NA
 AAGL2021_020,2,1,5,Vieira,Margarida,Portugal.,NA,female,1,Portugal,academic,NA,NA
 AAGL2021_021,5,4,5,Thanasa,Anna,Greece.,NA,female,0.9971,Greece,academic,NA,NA
-AAGL2021_022,5,1,5,Pereira,Sergio,PRT.,NA,male,0.9946,NA,academic,NA,NA
+AAGL2021_022,5,1,5,Pereira,Sergio,PRT.,NA,male,0.9946,NA,community,NA,NA
 AAGL2021_023,2,2,5,Mijatovic,Velja,The Netherlands.,NA,NA,NA,Netherlands,academic,general_OBGYN,NA
 AAGL2021_024,5,4,4,Pereira,Rita,Portugal. id10080@uminho.pt.,NA,female,0.9972,Portugal,academic,NA,NA
 AAGL2021_025,5,3,5,Bar-El,Liron,New York. Electronic address: Lironbarel@gmail.com.,NY,male,0.6065,II,academic,general_OBGYN,NA
 AAGL2021_026,5,1,3,Mrugała,Maja,Poland.,NA,female,1,Poland,academic,general_OBGYN,NA
-AAGL2021_027,3,3,4,Rao,Tanushree,Australia.,NA,NA,NA,Australia,academic,MIGS,NA
+AAGL2021_027,3,3,4,Rao,Tanushree,Australia.,NA,NA,NA,Australia,community,MIGS,NA
 AAGL2021_028,3,3,2,Hardman,Danielle,Florida. Electronic address: dehardman@usf.edu.,FL,female,0.9951,XI,academic,general_OBGYN,NA
 AAGL2021_029,4,2,4,Beroukhim,Gabriela,Connecticut.,CT,female,0.9951,I,academic,general_OBGYN,NA
 AAGL2021_030,9,7,5,As-Sanie,Sawsan,Michigan. Electronic address: sassanie@med.umich.edu.,MI,female,1,V,academic,general_OBGYN,NA
@@ -905,29 +905,29 @@ AAGL2021_045,3,2,5,Kim,Soo Jung,Republic of Korea.,NA,female,0.9186,South Korea,
 AAGL2021_046,5,2,3,Heraganahally,Subash S,Australia.,NA,NA,NA,Australia,academic,NA,NA
 AAGL2021_047,5,2,5,Braxton,Elizabeth Gw,From the Department of Obstetrics and Gynecology.,NA,female,0.9969,NA,academic,general_OBGYN,NA
 AAGL2021_048,12,5,5,Loverro,Matteo,IRCCS.,NA,male,1,NA,community,NA,NA
-AAGL2021_049,5,3,5,Rosen,Adam,Canada.,NY,male,0.9959,II,academic,general_OBGYN,NA
+AAGL2021_049,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2021_050,3,2,4,Souza,Claudineia,Brazil.,NA,NA,NA,Brazil,NA,NA,NA
 AAGL2021_051,5,2,4,Kanno,Kiyoshi,Japan. Electronic address: less_is_more71@yahoo.co.jp.,NA,male,0.9732,Japan,community,general_OBGYN,NA
 AAGL2021_052,7,2,4,Braxton,Emily,U.K.,NA,female,0.9979,NA,academic,NA,NA
 AAGL2021_053,22,9,5,Barber,Bridget E,Australia.,NA,female,0.9983,Australia,research_institute,NA,NA
 AAGL2021_054,3,3,4,Radtke,Sarah,USA.,MD,female,0.9971,IV,academic,NA,NA
-AAGL2021_055,5,2,5,Benlolo,Samantha,Canada. Electronic address: samantha.benlolo@gmail.com.,NA,female,0.998,Canada,academic,NA,NA
+AAGL2021_055,5,2,5,Benlolo,Samantha,Canada. Electronic address: samantha.benlolo@gmail.com.,NA,female,0.998,Canada,community,NA,NA
 AAGL2021_056,5,2,2,Haikal,Samantha,United States.,IL,female,0.998,VII,academic,NA,NA
 AAGL2021_057,11,1,4,Aharon,Devora,New York.,NY,female,1,II,academic,general_OBGYN,NA
 AAGL2021_058,4,2,4,Lovell,Daniel Y,North Carolina. (Dr. Lovell).,NC,male,0.9954,XI,academic,general_OBGYN,NA
 AAGL2021_059,1,1,5,Chen,Ang,USA.,NC,male,1,XI,academic,NA,NA
-AAGL2021_060,3,2,3,Ramirez-Caban,Laura,USA. Lramirezcaban@gmail.com.,FL,female,0.9969,XI,community,general_OBGYN,NA
+AAGL2021_060,3,2,3,Ramirez-Caban,Laura,USA. Lramirezcaban@gmail.com.,OH,female,0.9969,V,community,general_OBGYN,NA
 AAGL2021_061,2,2,4,Sunkara,Sowmya,Texas.,TX,female,1,X,academic,MIGS,NA
-AAGL2021_062,16,10,3,Etrusco,Andrea,Italy.,NA,female,0.9875,Italy,academic,general_OBGYN,NA
+AAGL2021_062,16,10,3,Etrusco,Andrea,Italy.,NA,female,0.9875,Italy,NA,general_OBGYN,NA
 AAGL2021_063,13,13,4,Rodolakis,Alexandros,Greece.,NA,male,1,Greece,academic,general_OBGYN,NA
 AAGL2021_064,10,4,2,Ham,In-Hye,Republic of Korea.,NA,NA,NA,South Korea,academic,surgery_other,NA
 AAGL2021_065,5,1,5,Shu,Michael,Williamsville.,NA,male,0.9947,NA,academic,MIGS,NA
-AAGL2021_066,9,2,3,Mihetiu,Alin,Romania.,NA,female,0.7561,Romania,academic,NA,NA
+AAGL2021_066,9,2,3,Mihetiu,Alin,Romania.,NA,female,0.7561,Romania,NA,NA,NA
 AAGL2021_067,8,1,5,Kho,Katherine,Indonesia.,NA,female,0.9972,Indonesia,academic,NA,NA
 AAGL2021_068,5,4,5,Li,Yuan-Li,China.,NA,NA,NA,China,academic,NA,NA
 AAGL2021_069,9,4,5,Meyer,Raanan,Israel. Electronic address: Raanan.Meyer@cshs.org.,CA,male,1,IX,academic,MIGS,NA
 AAGL2021_070,6,3,4,Chitkara,Aman,India.,NA,male,0.9147,India,academic,NA,NA
-AAGL2021_071,3,3,3,Christoffel,Ladina,Switzerland.,NA,female,1,Switzerland,NA,NA,NA
+AAGL2021_071,3,NA,3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2021_072,14,7,4,Ito,Tetsuro,Japan. tito@u-gifu-ms.ac.jp.,NA,NA,NA,Japan,academic,NA,NA
 AAGL2021_073,32,26,3,Cornejo,José,Peru.,IL,NA,NA,VII,NA,NA,NA
 AAGL2021_074,4,1,3,Alani,Sanah,Canada.,NA,female,1,Canada,academic,general_OBGYN,NA
@@ -942,7 +942,7 @@ AAGL2021_082,2,2,5,Westbrook,Katherine E,OH westbrk@ccf.org.,OH,female,0.9972,V,
 AAGL2021_083,2,2,3,Salazar-Villamizar,Mary Elízabeth,Colombia. Electronic address: maryesv@gmail.com.,NA,female,0.9964,Colombia,NA,NA,NA
 AAGL2021_084,5,2,4,Kanno,Kiyoshi,Japan. Electronic address: less_is_more71@yahoo.co.jp.,NA,male,0.9732,Japan,community,general_OBGYN,NA
 AAGL2021_085,3,3,5,Wondwosen,Mekete,Ethiopia.,NA,NA,NA,NA,academic,surgery_other,NA
-AAGL2021_086,3,3,2,Rao,Tanushree,Australia.,NA,NA,NA,Australia,academic,MIGS,NA
+AAGL2021_086,3,3,2,Rao,Tanushree,Australia.,NA,NA,NA,Australia,community,MIGS,NA
 AAGL2021_087,6,5,3,Cybulsky,Marta,Canada.,NA,female,0.9973,Canada,academic,general_OBGYN,NA
 AAGL2021_088,10,4,5,Nishio,Naoki,Department of Otorhinolaryngology Nagoya University Graduate School of Medicine Nagoya Aichi Japan.,NA,male,0.9555,Japan,academic,NA,NA
 AAGL2021_089,2,1,5,Foley,Anne Marie,financial or otherwise.,NY,female,0.9974,II,academic,NA,NA
@@ -962,7 +962,7 @@ AAGL2022_004,3,3,3,Kirschen,Gregory W,USA. Gkirsch7@jh.edu.,MD,male,0.9957,IV,ac
 AAGL2022_005,5,5,5,Sinha,Annika,NC. Electronic address: annikasinha@gmail.com.,NC,female,1,XI,academic,general_OBGYN,NA
 AAGL2022_006,9,3,4,Al Baalharith,Maha,SAU.,NA,female,1,NA,academic,general_OBGYN,NA
 AAGL2022_007,10,3,5,Richtarova,Adela,Czech Republic adela.richtarova@vfn.cz.,NA,female,1,Czech Republic,academic,general_OBGYN,NA
-AAGL2022_008,4,2,2,Duncan,Jordann-Mishael,USA.,AZ,NA,NA,VIII,community,general_OBGYN,NA
+AAGL2022_008,4,2,2,Duncan,Jordann-Mishael,USA.,MN,NA,NA,VI,community,general_OBGYN,NA
 AAGL2022_009,10,3,5,Barra,Fabio,Italy.,NA,male,1,Italy,academic,general_OBGYN,NA
 AAGL2022_010,3,3,1,Noar,Mark,USA.,MD,male,0.9966,IV,research_institute,NA,NA
 AAGL2022_011,5,2,5,Zorzi,Chantal,UK.,NA,female,0.9992,United Kingdom,academic,NA,NA
@@ -998,7 +998,7 @@ AAGL2022_040,8,6,4,Adamyan,Leila,Russia.,NA,female,0.9998,Russia,academic,MFM,NA
 AAGL2022_041,5,2,5,McKenna,Megan,UK.,NA,female,0.9976,United Kingdom,academic,NA,NA
 AAGL2022_042,11,1,4,Montauban,Pierre,UK.,NA,male,0.995,United Kingdom,academic,surgery_other,NA
 AAGL2022_043,5,3,4,Boyd,Sarah S,USA. sboyd@pennstatehealth.psu.edu.,PA,female,0.9971,III,academic,FPMRS,NA
-AAGL2022_044,5,5,3,Malekzadeh,Maral,USA.,MD,female,1,IV,academic,general_OBGYN,NA
+AAGL2022_044,5,5,3,Malekzadeh,Maral,USA.,DC,female,1,IV,academic,general_OBGYN,NA
 AAGL2022_045,12,3,5,Mathewlynn,S,UK.,NA,NA,NA,United Kingdom,academic,NA,NA
 AAGL2022_046,1,1,1,Saini,Sunil,India.,NA,male,1,India,academic,surgery_other,NA
 AAGL2022_047,8,5,5,Bogani,Giorgio,Italy. Electronic address: giorgiobogani@yahoo.it.,NA,male,1,Italy,academic,general_OBGYN,NA
@@ -1010,7 +1010,7 @@ AAGL2022_052,8,2,5,Zhang,Yuqi,USA.,TX,NA,NA,X,academic,NA,NA
 AAGL2022_053,29,17,5,Bogani,Giorgio,Italy. Electronic address: giorgiobogani@yahoo.it.,NA,male,1,Italy,academic,general_OBGYN,NA
 AAGL2022_054,5,3,5,Shivji,Azra,ON. Electronic address: azra.shivji@mail.utoronto.ca.,NA,female,0.98,NA,academic,general_OBGYN,NA
 AAGL2022_055,4,0,4,Gencer,Aylin,NA,NA,female,0.9993,NA,NA,NA,NA
-AAGL2022_056,5,4,5,Horwood,Genevieve,Canada. ghorwood@toh.ca.,NA,female,0.9992,Canada,academic,general_OBGYN,NA
+AAGL2022_056,5,4,5,Horwood,Genevieve,Canada. ghorwood@toh.ca.,NA,female,0.9992,Canada,community,general_OBGYN,NA
 AAGL2022_057,3,2,1,Marguerie,Monique,Alta. monique.marguerie@albertahealthservices.ca.,NA,female,0.9954,NA,academic,MIGS,NA
 AAGL2022_058,3,2,5,Sancar,Serpil,Turkey. Electronic address: serpil.sancar@sbu.edu.tr.,NA,NA,NA,Turkey,academic,surgery_other,NA
 AAGL2022_059,6,3,5,Fan,Wei,China.,NA,male,0.7691,China,academic,NA,NA
@@ -1020,9 +1020,9 @@ AAGL2022_062,7,5,5,Fajardo,Olga M,USA.,WI,female,0.9958,VI,academic,MIGS,NA
 AAGL2022_063,6,3,4,Ruhotina,Merima,VT. Electronic address: Merima.ruhotina@uvmhealth.org.,VT,female,1,I,academic,general_OBGYN,NA
 AAGL2022_064,3,3,5,Shu,Mincong,China.,NA,NA,NA,China,academic,NA,NA
 AAGL2022_065,12,1,2,Seltzer,Harrison,USA.,MI,male,0.9961,V,academic,NA,student
-AAGL2022_066,13,3,5,Marchand,Greg J,USA.,AZ,male,0.998,VIII,NA,MIGS,NA
+AAGL2022_066,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2022_067,13,8,3,Bahadoer,Renu R,the Netherlands.,NA,female,1,Netherlands,academic,surgery_other,NA
-AAGL2022_068,5,3,5,Maudot,Constance,France.,NA,female,0.9973,France,academic,obstetrics,NA
+AAGL2022_068,5,3,5,Maudot,Constance,France.,NA,female,0.9973,France,community,obstetrics,NA
 AAGL2022_069,6,4,5,Lu,Keji,China.,NA,NA,NA,China,academic,general_OBGYN,NA
 AAGL2022_070,8,5,3,Arruda,Jonas,Germany.,NA,male,0.9984,Germany,academic,NA,NA
 AAGL2022_071,6,2,2,Chan,I-San,Taiwan.,NA,NA,NA,Taiwan,academic,general_OBGYN,NA
@@ -1030,11 +1030,11 @@ AAGL2022_072,9,3,5,Dedes,Ioannis,Switzerland.,NA,male,1,Switzerland,academic,gen
 AAGL2022_073,5,4,5,Yastı,Ahmet Ç,Turkey.,NA,male,1,Turkey,academic,surgery_other,NA
 AAGL2022_074,6,3,5,Mishra,I,UK.,AL,NA,NA,XI,academic,NA,NA
 AAGL2022_075,5,3,5,Kobylianskii,Anna,Canada.,NY,female,0.9971,II,academic,general_OBGYN,NA
-AAGL2022_076,9,4,5,Bruno,Matteo,Italy.,NA,male,1,Italy,academic,general_OBGYN,NA
+AAGL2022_076,9,4,5,Bruno,Matteo,Italy.,NA,male,1,Italy,community,general_OBGYN,NA
 AAGL2022_077,6,1,5,Mára,Michal,Czech Republic.,NA,female,0.5163,Czech Republic,academic,MIGS,NA
 AAGL2022_078,6,3,2,Bar-El,Liron,USA.,CA,male,0.6065,IX,academic,MIGS,NA
 AAGL2022_079,2,2,5,Frost,Allison,NC.,NC,female,0.9914,XI,academic,NA,NA
-AAGL2022_080,9,5,4,Cao,Xianghua,China.,NA,NA,NA,China,academic,NA,NA
+AAGL2022_080,9,5,4,Cao,Xianghua,China.,NA,NA,NA,China,community,NA,NA
 AAGL2022_081,8,4,5,Barel,Oshri,and Levy). Electronic address: Oshrib@assuta.co.il.,NA,NA,NA,Israel,academic,general_OBGYN,NA
 AAGL2022_082,7,4,5,Zizolfi,Brunella,Italy. Electronic address: brunelllazizolfi@hotmail.it.,NA,female,1,Italy,academic,NA,NA
 AAGL2022_083,11,11,5,Allahqoli,Leila,Iran.,NA,female,0.9998,Iran,NA,NA,NA
@@ -1052,7 +1052,7 @@ AAGL2023_004,8,3,5,Umesh,Amith,CA.,CA,male,1,IX,academic,surgery_other,NA
 AAGL2023_005,4,3,5,Namboodiri,Surya L,USA.,TX,male,0.7265,X,academic,NA,NA
 AAGL2023_006,2,2,2,Pfeuti,Courtney Kay,Deleware (all authors). Electronic address: ckpfeuti@icloud.com.,NJ,female,0.9273,III,academic,general_OBGYN,NA
 AAGL2023_007,5,3,5,González Peña,Tavia,and Fajardo). Electronic address: tavia.gonzalez.pena@vumc.org.,TN,female,1,X,academic,general_OBGYN,NA
-AAGL2023_008,3,1,3,Johannesson,Ulrika,Sweden.,NA,female,1,Sweden,academic,NA,NA
+AAGL2023_008,3,1,3,Johannesson,Ulrika,Sweden.,NA,female,1,Sweden,community,NA,NA
 AAGL2023_009,7,4,5,Al-Hendy,Ayman,IL. Electronic address: aalhendy@uchicago.edu.,IL,male,0.9818,VII,academic,general_OBGYN,NA
 AAGL2023_010,4,3,5,Ziadi,Chiraz,Spain.,NA,NA,NA,Spain,NA,NA,NA
 AAGL2023_011,7,1,5,Mitro,Susanna D,Massachusetts.,MA,female,1,I,academic,general_OBGYN,NA
@@ -1070,7 +1070,7 @@ AAGL2023_022,16,5,5,Ahmad,Gulzar,Pakistan.,NA,NA,NA,Pakistan,academic,NA,NA
 AAGL2023_023,9,7,5,As-Sanie,Sawsan,Michigan. Electronic address: sassanie@med.umich.edu.,MI,female,1,V,academic,general_OBGYN,NA
 AAGL2023_024,4,4,2,Lunardhi,Alicia,California.,CA,female,0.997,IX,academic,general_OBGYN,NA
 AAGL2023_025,1,1,1,Fisher,Jane,UK.,NA,female,0.9971,United Kingdom,academic,NA,NA
-AAGL2023_026,8,1,5,Zhou,Ruiqiong,China.,NA,NA,NA,China,academic,NA,NA
+AAGL2023_026,8,1,5,Zhou,Ruiqiong,China.,NA,NA,NA,China,community,NA,NA
 AAGL2023_027,8,4,5,Barel,Oshri,and Levy). Electronic address: Oshrib@assuta.co.il.,NA,NA,NA,Israel,academic,general_OBGYN,NA
 AAGL2023_028,5,3,5,Twidale,Emily K,New Zealand.,NA,female,0.9979,New Zealand,academic,NA,NA
 AAGL2023_029,4,4,4,Zelivianskaia,Anna,Pennsylvania (Dr. Zelivianskaia). Electronic address: anna.zelivianskaia@tuhs.temple.edu.,PA,female,0.9971,III,academic,general_OBGYN,NA
@@ -1080,24 +1080,24 @@ AAGL2023_032,1,1,5,Hollis,Aidan,Canada. ahollis@ucalgary.ca.,NA,male,0.9734,Cana
 AAGL2023_033,1,1,4,Orsi,Franco,Italy.,NA,male,1,Italy,NA,NA,NA
 AAGL2023_034,2,1,5,Ayodele,Aderonke,USA.,NC,female,1,XI,academic,NA,NA
 AAGL2023_035,16,4,5,Saeed,Anum,USA.,PA,female,1,III,academic,NA,NA
-AAGL2023_036,4,3,5,Malkan,Nur Derya,TUR.,NA,female,0.7905,NA,academic,general_OBGYN,NA
+AAGL2023_036,4,3,5,Malkan,Nur Derya,TUR.,NA,female,0.7905,NA,community,general_OBGYN,NA
 AAGL2023_037,15,6,5,Abu Halimah,Jalal,SAU.,NA,male,1,NA,academic,surgery_other,NA
 AAGL2023_038,5,2,4,Chen,Ximing,China.,NA,NA,NA,China,academic,NA,NA
 AAGL2023_039,2,1,5,Rees,Coral,Wales.,NA,female,0.9856,United Kingdom,academic,NA,NA
-AAGL2023_040,5,2,5,Nakagawa,Masataka,Japan.,NA,male,1,Japan,academic,surgery_other,NA
-AAGL2023_041,4,2,4,GiglioAyers,Patricia,Rhode Island (all authors).. Electronic address: pgiglioayers@wihri.org.,RI,female,0.997,I,academic,general_OBGYN,NA
-AAGL2023_042,14,1,5,McCormack,Lalla,Australia.,NA,female,1,Australia,NA,NA,NA
+AAGL2023_040,5,2,5,Nakagawa,Masataka,Japan.,NA,male,1,Japan,community,surgery_other,NA
+AAGL2023_041,4,2,4,GiglioAyers,Patricia,Rhode Island (all authors).. Electronic address: pgiglioayers@wihri.org.,RI,female,0.997,I,community,general_OBGYN,NA
+AAGL2023_042,5,NA,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2023_043,3,2,5,Yang,Qiannan,USA.,TX,NA,NA,X,academic,general_OBGYN,NA
 AAGL2023_044,3,3,5,Anderson,Michaela R,USA.,PA,female,0.9986,III,academic,NA,NA
 AAGL2023_045,2,2,5,Rees,Colin,UK.,NA,male,0.996,United Kingdom,academic,NA,NA
 AAGL2023_046,9,4,5,Matot,Ran,Israel. Electronic address: ran.matoth@gmail.com.,NA,male,1,Israel,academic,general_OBGYN,NA
-AAGL2023_047,9,8,1,Ferreira,Nestor Lemos,Brazil.,NA,male,1,Brazil,academic,NA,NA
+AAGL2023_047,9,8,1,Ferreira,Nestor Lemos,Brazil.,NA,male,1,Brazil,community,NA,NA
 AAGL2023_048,5,2,5,Wu,Jenny,USA.,NC,female,0.9937,XI,academic,obstetrics,NA
 AAGL2023_049,5,2,4,Isaac,Amital,(all authors).,MA,NA,NA,I,academic,general_OBGYN,NA
 AAGL2023_050,2,0,4,An,Eunmi,NA,NA,NA,NA,NA,NA,NA,NA
 AAGL2023_051,10,5,5,Xiao,Lekui,USA. xiao.lekui@mayo.edu.,MN,NA,NA,VI,academic,NA,NA
 AAGL2023_052,4,2,5,Bak,B M,USA.,MN,NA,NA,VI,academic,NA,NA
-AAGL2023_053,7,2,5,Garrett,Celine,Australia. celinegarrett@gmail.com.,NA,female,1,Australia,academic,NA,NA
+AAGL2023_053,7,2,5,Garrett,Celine,Australia. celinegarrett@gmail.com.,NA,female,1,Australia,NA,NA,NA
 AAGL2023_054,7,2,5,Kavoussi,Arman,Texas.,TX,male,1,X,academic,NA,NA
 AAGL2023_055,4,2,5,Marwah,Vikas,India.,NA,male,1,India,NA,NA,NA
 AAGL2023_056,6,4,4,Sadowski,Karol,Poland.,NA,female,0.8965,Poland,academic,NA,NA

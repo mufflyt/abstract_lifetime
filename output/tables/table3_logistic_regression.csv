@@ -1,8 +1,14 @@
 term,or_ci,p.value,significance
-(Intercept),0.05 (0.03-0.09),0,***
-is_rctTRUE,1.61 (0.64-3.57),0.27,
-log_sample_size,0.95 (0.85-1.06),0.369,
-is_academicTRUE,1.26 (0.64-2.34),0.481,
-is_us_basedTRUE,2.63 (1.51-4.79),0.001,**
-is_multicenterTRUE,2.58 (0.81-6.98),0.077,
-has_fundingTRUE,6.27 (0.27-73.97),0.156,
+(Intercept),0.09 (0.04-0.18),0,***
+is_rctTRUE,1.97 (0.62-5.27),0.204,
+log_sample_size,0.93 (0.81-1.06),0.27,
+is_academicTRUE,1.40 (0.65-2.85),0.366,
+is_us_basedTRUE,3.06 (1.59-6.24),0.001,**
+n_authors,0.95 (0.86-1.02),0.235,
+first_author_gendermale,0.71 (0.39-1.26),0.251,
+practice_typecommunity,1.99 (0.80-4.48),0.113,
+practice_typemilitary_va,0.93 (0.05-6.22),0.951,
+practice_typeprivate_practice,0.00 (NA-1229978969692042102953059898653545645211648.00),0.99,
+practice_typeresearch_institute,1.28 (0.07-7.92),0.822,
+is_multicenterTRUE,2.99 (0.62-11.33),0.126,
+has_fundingTRUE,53646582.95 (0.00-NA),0.994,

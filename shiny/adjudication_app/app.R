@@ -998,14 +998,17 @@ server <- function(input, output, session) {
 
     bits <- list()
     if (!is.na(na))  bits[[length(bits)+1]] <- sprintf("%s authors", na)
-    if (!is.na(nua)) bits[[length(bits)+1]] <- sprintf("%s affiliation%s", nua, if (nua == 1) "" else "s")
-    if (!is.na(st) || !is.na(dist)) {
-      lbl <- paste0(na_if(st, ""), if (!is.na(dist)) sprintf(" (ACOG %s)", dist) else "")
+    if (!is.na(nua)) bits[[length(bits)+1]] <- sprintf("%s affiliation%s", nua, if (as.integer(nua) == 1) "" else "s")
+    if (!is.na(st)) {
+      lbl <- st
+      if (!is.na(dist)) lbl <- paste0(lbl, " (ACOG ", dist, ")")
       bits[[length(bits)+1]] <- lbl
+    } else if (!is.na(dist)) {
+      bits[[length(bits)+1]] <- sprintf("ACOG %s", dist)
     }
     if (!is.na(g)) bits[[length(bits)+1]] <- sprintf("1st au: %s", g)
     if (length(bits) == 0) return(tags$em("n/a"))
-    span(style = "font-size: 0.9em;", paste(unlist(bits), collapse = " • "))
+    span(style = "font-size: 0.9em;", paste(unlist(bits), collapse = " - "))
   })
 
   output$abs_pub_type_badge <- renderUI({
