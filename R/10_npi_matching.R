@@ -61,6 +61,14 @@ abstracts <- read_csv(here("data", "processed", "abstracts_cleaned.csv"), show_c
 char <- read_csv(here("data", "processed", "author_characteristics.csv"), show_col_types = FALSE)
 matches_csv <- read_csv(here("output", "abstracts_with_matches.csv"), show_col_types = FALSE)
 
+# OpenAlex full names (resolves initials for ~1000 authors)
+oa_names <- tryCatch({
+  oa <- read_csv(here("data", "processed", "openalex_author_names.csv"), show_col_types = FALSE)
+  oa |> filter(name_agrees == TRUE, !is.na(oa_first_name), nchar(oa_first_name) > 1) |>
+    select(abstract_id, oa_first_name, oa_full_name)
+}, error = function(e) tibble(abstract_id = character()))
+cli_alert_info("OpenAlex full names available: {nrow(oa_names)}")
+
 # PubMed full names for confirmed matches
 pubmed_fa <- tryCatch({
   a <- read_csv(here("data", "processed", "authors_pubmed.csv"), show_col_types = FALSE)
@@ -97,12 +105,17 @@ lookup <- abstracts |>
   select(-parsed, -author_norm) |>
   filter(!is.na(last_name), !is.na(first_initial), nchar(last_name) > 0) |>
   left_join(pubmed_fa, by = "abstract_id") |>
+  left_join(oa_names, by = "abstract_id") |>
   mutate(
     pubmed_name_matches_aagl = !is.na(pubmed_last_name) &
       tolower(trimws(pubmed_last_name)) == tolower(trimws(last_name)),
-    has_full_name = pubmed_name_matches_aagl &
-      !is.na(pubmed_first_name) & nchar(pubmed_first_name) > 2,
-    full_first_name = if_else(has_full_name, pubmed_first_name, NA_character_),
+    # Full name priority: OpenAlex (broadest) > PubMed confirmed match
+    has_full_name = (!is.na(oa_first_name) & nchar(oa_first_name) > 1) |
+      (pubmed_name_matches_aagl & !is.na(pubmed_first_name) & nchar(pubmed_first_name) > 2),
+    full_first_name = coalesce(
+      oa_first_name,
+      if_else(pubmed_name_matches_aagl, pubmed_first_name, NA_character_)
+    ),
     last_name_upper = toupper(last_name)
   ) |>
   left_join(
