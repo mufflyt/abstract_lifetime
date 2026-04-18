@@ -36,7 +36,9 @@ is_teaching_hospital <- function(aff) {
 #' @param aff Primary affiliation string.
 #' @param all_aff Optional: all affiliations (pipe-separated). Checked for
 #'   university signals if primary affiliation looks community.
-classify_practice_type <- function(aff, all_aff = NA_character_) {
+#' @param country Optional: parsed country string. Non-US hospitals default to
+#'   academic rather than community (international healthcare systems differ).
+classify_practice_type <- function(aff, all_aff = NA_character_, country = NA_character_) {
   if (is.na(aff) || nchar(aff) < 5) return(NA_character_)
   lc <- tolower(aff)
   lc_all <- tolower(if (!is.na(all_aff) && nchar(all_aff) > 0) all_aff else aff)
@@ -81,10 +83,14 @@ classify_practice_type <- function(aff, all_aff = NA_character_) {
     return("private_practice")
 
   # Community hospital / health system (no university affiliation in ANY affiliation)
+  # International hospitals default to academic — non-US systems don't follow the
+  # US community-vs-academic distinction and we can't reliably classify them.
+  is_us <- is.na(country) || str_detect(tolower(country), "^usa$|united states|^u\\.s\\.")
   if (str_detect(lc, "hospital|medical center|health system|health sciences? cent|clinic") &&
       !str_detect(lc_all, "university|medical school|school of medicine|college of medicine") &&
-      !is_teaching_hospital(all_aff))
-    return("community")
+      !is_teaching_hospital(all_aff)) {
+    return(if (is_us) "community" else "academic")
+  }
 
   # If we detect a department but no institution type, assume academic (most PubMed authors)
   if (str_detect(lc, "department of|division of|section of"))
