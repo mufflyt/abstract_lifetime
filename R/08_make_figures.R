@@ -386,7 +386,8 @@ if (file.exists(cox_path)) {
       ) +
       theme_pub +
       theme(panel.grid.major.y = element_blank(),
-            legend.position = c(0.85, 0.15))
+            legend.position = "bottom",
+            legend.justification = "center")
 
     ggsave(here("output", "figures", "figure5_cox_forest.png"), fig5,
            width = 9, height = 6, dpi = 300)
