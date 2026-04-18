@@ -11,6 +11,7 @@ library(digest)
 source(here("R", "utils_text.R"))
 
 cfg <- config::get(file = here("config.yml"))
+`%||%` <- function(a, b) if (is.null(a) || length(a) == 0) b else a
 
 cli_h2("Cleaning Abstracts")
 
@@ -193,12 +194,35 @@ abstracts <- abstracts |>
     has_funding = str_detect(search_text_lc,
       "funded by|grant|supported by|\\bnih\\b|\\bnichd\\b|foundation|sponsor|funding"),
     stat_sig_reported = str_detect(search_text_lc,
-      "p\\s*[<=]\\s*0\\.|confidence interval|odds ratio|hazard ratio|relative risk|\\bci\\b.*\\d")
+      "p\\s*[<=]\\s*0\\.|confidence interval|odds ratio|hazard ratio|relative risk|\\bci\\b.*\\d"),
+
+    # Numeric results present in measurements/conclusion (p-values, ORs, percentages)
+    has_numeric_results = str_detect(
+      tolower(coalesce(abstract_measurements, abstract_conclusion, "")),
+      "\\d+\\.\\d|p\\s*[<=]|\\bor\\b\\s|\\bhr\\b\\s|\\brr\\b\\s|\\d+%|\\bci\\b"),
+
+    # Database study (administrative/national database as data source)
+    is_database_study = str_detect(search_text_lc,
+      "\\bnsqip\\b|\\bacs-nsqip\\b|\\bhcup\\b|\\bnis\\b|\\bnrd\\b|\\bseer\\b|\\bncdb\\b|\\bsart\\b|\\bpuf\\b|\\bnational inpatient\\b|\\bnationwide.*database\\b|\\bnational.*database\\b|\\bamerican college of surgeons.*quality\\b|\\bpremier\\b|\\bmarketscan\\b|\\btrinetx\\b"),
+
+    # Industry involvement (device/pharma company names in text)
+    has_industry = str_detect(search_text_lc,
+      "intuitive surgical|medtronic|ethicon|hologic|cooper surgical|myovant|abbvie|allergan|bayer|merck|pfizer|stryker|karl storz|olympus|applied medical|conceptus|novadaq|lumenis|gynesonics|acessa|sonata|minerva|\\bnovure\\b|\\bcoloplast\\b"),
+
+    # Trial registration number (NCT or ISRCTN)
+    has_trial_registration = str_detect(search_text_lc,
+      "nct\\d{5,}|isrctn\\d+|clinicaltrials\\.gov|trial regist"),
+
+    # IRB / ethics statement
+    has_irb_statement = str_detect(search_text_lc,
+      "\\birb\\b|institutional review board|ethics committee|ethical approval|ethically approved|exempt.*review|human subjects")
   ) |>
   select(-search_text_lc)
 
 cli_alert_info("Study design: {paste(names(table(abstracts$study_design)), table(abstracts$study_design), sep='=', collapse=', ')}")
 cli_alert_info("Multicenter: {sum(abstracts$is_multicenter, na.rm=TRUE)} | Funded: {sum(abstracts$has_funding, na.rm=TRUE)} | Stat sig reported: {sum(abstracts$stat_sig_reported, na.rm=TRUE)}")
+cli_alert_info("Numeric results: {sum(abstracts$has_numeric_results, na.rm=TRUE)} | Database study: {sum(abstracts$is_database_study, na.rm=TRUE)} | Industry: {sum(abstracts$has_industry, na.rm=TRUE)}")
+cli_alert_info("Trial registration: {sum(abstracts$has_trial_registration, na.rm=TRUE)} | IRB statement: {sum(abstracts$has_irb_statement, na.rm=TRUE)}")
 
 # --- Result positivity classification (Cochrane MR000005) ---
 # Scan multiple text fields in priority order: conclusion > measurements/results

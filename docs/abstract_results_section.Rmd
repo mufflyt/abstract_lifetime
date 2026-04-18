@@ -75,6 +75,13 @@ title_changed_pct <- round(mean(fid$title_changed, na.rm = TRUE) * 100, 1)
 design_tbl <- table(d$study_design)
 n_rct <- unname(design_tbl["rct"])
 n_retro <- unname(design_tbl["retrospective_cohort"])
+
+# New Cochrane variables
+n_numeric_results <- sum(d$has_numeric_results, na.rm = TRUE)
+n_database <- sum(d$is_database_study, na.rm = TRUE)
+n_industry <- sum(d$has_industry, na.rm = TRUE)
+n_trial_reg <- sum(d$has_trial_registration, na.rm = TRUE)
+n_irb <- sum(d$has_irb_statement, na.rm = TRUE)
 ```
 
 ## Results
@@ -82,6 +89,8 @@ n_retro <- unname(design_tbl["retrospective_cohort"])
 ### Cohort Characteristics
 
 A total of `r n_total` oral presentations from `r n_congresses` consecutive AAGL Global Congresses (`r yr_min`-`r yr_max`) were included. Video presentations (n=48) were excluded per protocol. The most common study designs were retrospective cohort (`r n_retro`, `r round(n_retro/n_total*100,1)`%), randomized controlled trial (`r n_rct`, `r round(n_rct/n_total*100,1)`%), and prospective cohort (`r unname(design_tbl["prospective_cohort"])`, `r round(unname(design_tbl["prospective_cohort"])/n_total*100,1)`%).
+
+Of the `r n_total` abstracts, `r n_numeric_results` (`r round(n_numeric_results/n_total*100,1)`%) reported numeric results (p-values, odds ratios, or effect sizes), `r n_database` (`r round(n_database/n_total*100,1)`%) utilized national administrative databases (NSQIP, NIS, SEER, NCDB, or equivalent), `r n_industry` (`r round(n_industry/n_total*100,1)`%) disclosed industry involvement, `r n_trial_reg` (`r round(n_trial_reg/n_total*100,1)`%) reported a trial registration number, and `r n_irb` (`r round(n_irb/n_total*100,1)`%) included an IRB or ethics committee statement.
 
 Among `r n_gendered` first authors with gender data (`r round(n_gendered/n_total*100,1)`% coverage), `r n_female` (`r pct_female`%) were female and `r n_male` (`r round(100-pct_female,1)`%) were male. The majority of presentations originated from academic medical centers (`r n_academic`, `r round(n_academic/sum(prac$n)*100,1)`%), with community hospitals (`r n_community`), research institutes (`r prac$n[prac$practice_type == "research_institute"]`), military/VA facilities (`r prac$n[prac$practice_type == "military_va"]`), and private practices (`r prac$n[prac$practice_type == "private_practice"]`) comprising the remainder.
 
