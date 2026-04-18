@@ -162,4 +162,4 @@ If you use this pipeline or methodology, please cite:
 
 ## License
 
-This project is for academic research purposes.
+MIT License. See [LICENSE](LICENSE) for details.
