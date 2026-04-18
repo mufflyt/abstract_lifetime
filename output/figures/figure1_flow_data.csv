@@ -1,9 +1,12 @@
 step,n
-Total abstracts parsed,1109
-After cleaning,1109
-PubMed candidates found,1105
+Total abstracts parsed,1154
+Video presentations excluded,48
+Oral abstracts included,1106
+Searched across 6 databases,1106
+With candidate publications,1102
+Without any candidates,4
 Definite matches,75
-Probable (review needed),232
+Probable (review needed),229
 Possible (weak evidence),62
+Excluded (pre-conference pub),35
 No match,705
-Excluded (pre-conference),35

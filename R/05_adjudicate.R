@@ -61,7 +61,7 @@ results_out <- results |>
     first_author_normalized, last_author_normalized,
     author_count, is_rct, sample_size, is_academic, is_us_based,
     any_of(c("session_type", "study_design", "is_multicenter",
-             "has_funding", "stat_sig_reported", "result_positivity",
+             "has_funding", "stat_sig_reported",
              "has_numeric_results", "is_database_study", "has_industry",
              "has_trial_registration", "has_irb_statement",
              "abstract_word_count",

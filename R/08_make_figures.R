@@ -61,31 +61,104 @@ congress_colors <- c(
 )
 
 # ============================================================
-# Figure 1: CONSORT-style flow diagram data (text-based)
+# Figure 1: STROBE flow diagram (PRISMA-style for search process)
 # ============================================================
-cli_alert_info("Figure 1: Flow diagram data")
+cli_alert_info("Figure 1: Flow diagram")
+
+n_video_excluded <- 48  # fixed from original scrape
+n_scraped <- n_total + n_video_excluded
+n_with_candidates <- sum(results$n_candidates > 0, na.rm = TRUE)
+n_definite_fig <- sum(results$classification == "definite", na.rm = TRUE)
+n_probable_fig <- sum(results$classification == "probable", na.rm = TRUE)
+n_possible_fig <- sum(results$classification == "possible", na.rm = TRUE)
+n_no_match_fig <- sum(results$classification %in% c("no_match", "no_candidates"), na.rm = TRUE)
+n_excluded_fig <- sum(results$classification == "excluded", na.rm = TRUE)
 
 flow <- tibble::tibble(
   step = c("Total abstracts parsed",
-           "After cleaning",
-           "PubMed candidates found",
+           "Video presentations excluded",
+           "Oral abstracts included",
+           "Searched across 6 databases",
+           "With candidate publications",
+           "Without any candidates",
            "Definite matches",
            "Probable (review needed)",
            "Possible (weak evidence)",
-           "No match",
-           "Excluded (pre-conference)"),
-  n = c(
-    n_total,
-    sum(!is.na(results$title)),
-    sum(results$n_candidates > 0, na.rm = TRUE),
-    sum(results$classification == "definite", na.rm = TRUE),
-    sum(results$classification == "probable", na.rm = TRUE),
-    sum(results$classification == "possible", na.rm = TRUE),
-    sum(results$classification %in% c("no_match", "no_candidates"), na.rm = TRUE),
-    sum(results$classification == "excluded", na.rm = TRUE)
-  )
+           "Excluded (pre-conference pub)",
+           "No match"),
+  n = c(n_scraped, n_video_excluded, n_total,
+        n_total, n_with_candidates, n_total - n_with_candidates,
+        n_definite_fig, n_probable_fig, n_possible_fig,
+        n_excluded_fig, n_no_match_fig)
 )
 write_csv(flow, here("output", "figures", "figure1_flow_data.csv"))
+
+# Render visual flow diagram
+tryCatch({
+  if (requireNamespace("DiagrammeR", quietly = TRUE)) {
+    grViz_code <- sprintf('
+    digraph flow {
+      graph [rankdir=TB, fontname="Helvetica", fontsize=11, nodesep=0.3, ranksep=0.4]
+      node [shape=box, style="filled,rounded", fillcolor="#E8F4FD", fontname="Helvetica", fontsize=10, width=3.5]
+      edge [arrowsize=0.7]
+
+      id [label="Abstracts identified from\\nJMIG supplements\\n(n = %d)", fillcolor="#B3D9FF"]
+      ex [label="Video presentations excluded\\n(n = %d)", fillcolor="#FFD6D6", shape=box]
+      inc [label="Oral abstracts included\\n(n = %d)", fillcolor="#B3D9FF"]
+      search [label="Searched: PubMed, CrossRef,\\nEurope PMC, OpenAlex,\\nSemantic Scholar, DOI-chain"]
+      cand [label="With candidate publications\\n(n = %d)"]
+      nocand [label="No candidates found\\n(n = %d)", fillcolor="#FFD6D6"]
+
+      def [label="Definite match\\n(n = %d)", fillcolor="#C8E6C9"]
+      prob [label="Probable match\\n(n = %d)", fillcolor="#FFF9C4"]
+      poss [label="Possible match\\n(n = %d)", fillcolor="#FFE0B2"]
+      excl [label="Excluded\\n(pre-conference, n = %d)", fillcolor="#FFD6D6"]
+      nomatch [label="No match\\n(n = %d)", fillcolor="#FFCDD2"]
+
+      id -> ex [style=dashed]
+      id -> inc
+      inc -> search
+      search -> cand
+      search -> nocand [style=dashed]
+      cand -> def
+      cand -> prob
+      cand -> poss
+      cand -> excl [style=dashed]
+      cand -> nomatch
+
+      {rank=same; ex}
+      {rank=same; nocand}
+      {rank=same; def; prob; poss; excl; nomatch}
+    }',
+    n_scraped, n_video_excluded, n_total,
+    n_with_candidates, n_total - n_with_candidates,
+    n_definite_fig, n_probable_fig, n_possible_fig,
+    n_excluded_fig, n_no_match_fig)
+
+    g <- DiagrammeR::grViz(grViz_code)
+
+    # Save as PNG via htmlwidgets + webshot
+    html_file <- tempfile(fileext = ".html")
+    htmlwidgets::saveWidget(g, html_file, selfcontained = TRUE)
+    if (requireNamespace("webshot2", quietly = TRUE)) {
+      webshot2::webshot(html_file,
+                        here("output", "figures", "figure1_flow_diagram.png"),
+                        vwidth = 800, vheight = 700, zoom = 2)
+      cli_alert_success("Figure 1 flow diagram saved (PNG)")
+    } else if (requireNamespace("webshot", quietly = TRUE)) {
+      webshot::webshot(html_file,
+                        here("output", "figures", "figure1_flow_diagram.png"),
+                        vwidth = 800, vheight = 700, zoom = 2)
+      cli_alert_success("Figure 1 flow diagram saved (PNG)")
+    } else {
+      cli_alert_warning("Install webshot2 for PNG rendering: install.packages('webshot2')")
+    }
+  } else {
+    cli_alert_warning("Install DiagrammeR for flow diagram: install.packages('DiagrammeR')")
+  }
+}, error = function(e) {
+  cli_alert_warning("Flow diagram rendering failed: {e$message}")
+})
 
 # ============================================================
 # Figure 2: Time to publication histogram (all years, faceted)
@@ -397,6 +470,68 @@ if ("congress_year" %in% names(results)) {
   ggsave(here("output", "figures", "figure9_class_by_year.pdf"), fig9,
          width = 10, height = 6)
   cli_alert_success("Figure 9 saved")
+}
+
+# ============================================================
+# Figure 10: Forest plot of Cox proportional hazards ratios
+# ============================================================
+cli_alert_info("Figure 10: Cox PH forest plot")
+
+cox_path <- here("output", "aim2b_cox_regression.csv")
+if (file.exists(cox_path)) {
+  cox <- read_csv(cox_path, show_col_types = FALSE) |>
+    filter(term != "(Intercept)") |>
+    mutate(
+      # Clean up term names for display
+      label = case_when(
+        term == "is_rctTRUE" ~ "RCT design",
+        term == "log_sample_size" ~ "Sample size (log)",
+        term == "is_academicTRUE" ~ "Academic affiliation",
+        term == "is_us_basedTRUE" ~ "US-based",
+        term == "session_typeVideo" ~ "Video session",
+        term == "n_authors" ~ "Number of authors",
+        term == "first_author_gendermale" ~ "Male first author",
+        term == "practice_typecommunity" ~ "Community (vs Academic)",
+        term == "practice_typemilitary_va" ~ "Military/VA",
+        term == "practice_typeprivate_practice" ~ "Private practice",
+        term == "practice_typeresearch_institute" ~ "Research institute",
+        term == "is_multicenterTRUE" ~ "Multicenter study",
+        term == "has_fundingTRUE" ~ "Funding reported",
+        TRUE ~ gsub("TRUE$", "", gsub("_", " ", term))
+      ),
+      label = factor(label, levels = rev(label)),
+      significant = p.value < 0.05
+    ) |>
+    filter(!is.na(estimate), estimate > 0, !is.na(conf.low))
+
+  if (nrow(cox) > 0) {
+    fig10 <- ggplot(cox, aes(x = estimate, y = label)) +
+      geom_vline(xintercept = 1, linetype = "dashed", color = "gray50") +
+      geom_errorbarh(aes(xmin = conf.low, xmax = pmin(conf.high, 15)),
+                     height = 0.25, linewidth = 0.6) +
+      geom_point(aes(color = significant), size = 3) +
+      scale_color_manual(values = c("TRUE" = "#D32F2F", "FALSE" = "#333333"),
+                         labels = c("TRUE" = "p < 0.05", "FALSE" = "NS"),
+                         name = "") +
+      scale_x_log10(breaks = c(0.1, 0.25, 0.5, 1, 2, 4, 8)) +
+      labs(
+        title = "Predictors of Time to Publication",
+        subtitle = "Cox Proportional Hazards Model - Hazard Ratios with 95% CI",
+        x = "Hazard Ratio (log scale)",
+        y = ""
+      ) +
+      theme_pub +
+      theme(
+        panel.grid.major.y = element_blank(),
+        legend.position = c(0.85, 0.15)
+      )
+
+    ggsave(here("output", "figures", "figure10_cox_forest.png"), fig10,
+           width = 9, height = 6, dpi = 300)
+    ggsave(here("output", "figures", "figure10_cox_forest.pdf"), fig10,
+           width = 9, height = 6)
+    cli_alert_success("Figure 10 saved")
+  }
 }
 
 cli_alert_success("All figures generated in output/figures/")
