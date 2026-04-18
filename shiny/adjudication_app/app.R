@@ -940,7 +940,17 @@ server <- function(input, output, session) {
       notes_val <- if (!is.na(prev$reviewer_notes[1])) prev$reviewer_notes[1] else ""
       updateTextAreaInput(session, "notes", value = notes_val)
     } else {
-      updateRadioButtons(session, "decision", selected = "skip")
+      # No prior human decision — pre-fill from algorithm classification so
+      # reviewers can confirm with one click rather than changing from "skip".
+      rq_row <- d$review_queue[d$review_queue$abstract_id == abs_id, , drop = FALSE]
+      algo_cls <- if (nrow(rq_row) > 0 && "classification" %in% names(rq_row))
+        rq_row$classification[1] else NA_character_
+      default_decision <- dplyr::case_when(
+        algo_cls %in% c("definite")                          ~ "match",
+        algo_cls %in% c("no_match", "no_candidates", "excluded") ~ "no_match",
+        TRUE                                                  ~ "skip"
+      )
+      updateRadioButtons(session, "decision", selected = default_decision)
       updateTextInput(session, "manual_pmid", value = "")
       updateTextAreaInput(session, "notes", value = "")
     }
@@ -1304,7 +1314,18 @@ server <- function(input, output, session) {
         ),
         div(class = "comparison-grid",
           div(
-            tags$div(class = "fw-bold small mb-1", "Original abstract"),
+            tags$div(class = "fw-bold small mb-1",
+              "Original abstract",
+              help_icon(HTML(paste(
+                "The AAGL conference abstract text scraped from ScienceDirect.",
+                "Abstract text is available for <b>2019-2023</b> only.",
+                "Congresses <b>2012-2018</b> do not have parseable abstract",
+                "text on ScienceDirect (older page format), so this panel",
+                "will show 'No abstract text available' for those years.",
+                "The matching algorithm still works via title + author",
+                "matching even without abstract text."
+              )))
+            ),
             div(class = "comparison-pane abstract-source",
               format_abstract_html(current_abstract_text())
             )

@@ -39,7 +39,16 @@ copy_if <- function(src, dst) {
 copy_if(here("output", "abstracts_with_matches.csv"),       file.path(bundle_dir, "output"))
 copy_if(here("output", "manual_review_queue.csv"),          file.path(bundle_dir, "output"))
 copy_if(here("output", "manual_review_decisions.csv"),      file.path(bundle_dir, "output"))
-copy_if(here("data", "processed", "pubmed_candidates.csv"), file.path(bundle_dir, "data", "processed"))
+# Slim pubmed_candidates to only abstracts in review queue (full file is 150MB+)
+cand_src <- here("data", "processed", "pubmed_candidates.csv")
+if (file.exists(cand_src)) {
+  rq <- readr::read_csv(here("output", "abstracts_with_matches.csv"), show_col_types = FALSE)
+  cands <- readr::read_csv(cand_src, show_col_types = FALSE) |>
+    dplyr::filter(abstract_id %in% rq$abstract_id)
+  cand_dst <- file.path(bundle_dir, "data", "processed", "pubmed_candidates.csv")
+  readr::write_csv(cands, cand_dst)
+  cli_alert_success("slimmed pubmed_candidates: {nrow(cands)} rows ({round(file.info(cand_dst)$size/1e6,1)} MB)")
+}
 copy_if(here("data", "processed", "match_scores_detailed.rds"), file.path(bundle_dir, "data", "processed"))
 copy_if(here("data", "processed", "abstracts_cleaned.csv"), file.path(bundle_dir, "data", "processed"))
 copy_if(here("config.yml"),                                  bundle_dir)
