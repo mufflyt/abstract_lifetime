@@ -81,6 +81,16 @@ results_out <- results |>
     months_to_pub
   )
 
+# Blank publication-level fields for no_match/possible/no_candidates —
+# these come from a wrong candidate, not the abstract's actual publication.
+pub_cols <- c("pub_title", "pub_journal", "pub_year", "pub_doi",
+              "pub_first_author", "months_to_pub")
+wrong <- results_out$classification %in% c("no_match", "no_candidates", "possible")
+for (col in intersect(pub_cols, names(results_out))) {
+  results_out[[col]][wrong] <- NA
+}
+cli_alert_info("Blanked pub fields for {sum(wrong)} no_match/possible abstracts")
+
 write_csv(results_out, here("output", "abstracts_with_matches.csv"))
 cli_alert_success("Full results: output/abstracts_with_matches.csv")
 
