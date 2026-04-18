@@ -91,6 +91,14 @@ for (c in c("cited_by_count", "journal_impact_proxy")) {
 }
 matches <- matches |>
   left_join(metrics |> select(abstract_id, cited_by_count, journal_impact_proxy),
-            by = "abstract_id")
+            by = "abstract_id") |>
+  # Only report citation/impact metrics for definite/probable matches.
+  # For no_match abstracts, these reflect a random wrong candidate's paper.
+  mutate(
+    cited_by_count = if_else(classification %in% c("definite", "probable"),
+                              cited_by_count, NA_integer_),
+    journal_impact_proxy = if_else(classification %in% c("definite", "probable"),
+                                    journal_impact_proxy, NA_real_)
+  )
 write_csv(matches, here("output", "abstracts_with_matches.csv"))
-cli_alert_success("Merged citation metrics into abstracts_with_matches.csv")
+cli_alert_success("Merged citation metrics into abstracts_with_matches.csv (definite/probable only)")

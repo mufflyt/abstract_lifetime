@@ -199,7 +199,7 @@ first_auth <- authors |>
       if (!is.na(country) && country != "USA") country else NA_character_
     }, first_author_state, first_author_aff, USE.NAMES = FALSE),
     practice_type = mapply(classify_practice_type, first_author_aff, first_author_all_aff,
-                           USE.NAMES = FALSE),
+                           first_author_country, USE.NAMES = FALSE),
     subspecialty = vapply(first_author_aff, classify_subspecialty, character(1)),
     career_stage = vapply(first_author_aff, classify_career_stage, character(1))
   ) |>
@@ -208,7 +208,7 @@ first_auth <- authors |>
 agg <- authors |>
   group_by(abstract_id) |>
   summarise(
-    n_authors = n_distinct(position),
+    n_authors = n_distinct(position),  # from PubMed matched pub (fallback only)
     n_unique_affiliations = n_distinct(affiliation[!is.na(affiliation) & nchar(affiliation) > 0]),
     .groups = "drop"
   )
@@ -229,7 +229,10 @@ char_tbl <- abstracts |>
   left_join(aagl_counts, by = "abstract_id") |>
   left_join(first_auth, by = "abstract_id") |>
   mutate(
-    n_authors = coalesce(n_authors, n_authors_aagl)
+    # Use AAGL author count only (from the abstract itself).
+    # PubMed n_authors is from the matched publication — a different paper
+    # with a different author list. Never use it.
+    n_authors = n_authors_aagl
   )
 
 write_csv(char_tbl, here("data", "processed", "author_characteristics.csv"))
