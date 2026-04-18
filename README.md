@@ -2,21 +2,7 @@
 
 **Publication Rate, Time to Publication, and Predictors of Full Publication Among Oral Presentations at the AAGL Global Congress, 2012-2023**
 
-A fully automated, reproducible pipeline that tracks whether conference abstracts presented at the AAGL Global Congress on Minimally Invasive Gynecology progress to full peer-reviewed publication. Designed to meet the methodological standards recommended by the Cochrane review on abstract-to-publication conversion (Scherer et al., MR000005).
-
-## Key Results
-
-| Metric | Value |
-|--------|-------|
-| Abstracts analyzed | 1,106 oral presentations |
-| Congresses covered | 12 (2012-2023) |
-| Definite matches | 75 (6.8%) |
-| Probable matches (pending review) | 229 (20.7%) |
-| Definite + probable rate | 27.7% |
-| Median time to publication | 10.8 months (IQR 3.8-16.7) |
-| Only significant predictor | US-based affiliation (HR 2.65, p=0.004) |
-| Algorithm sensitivity | 100% |
-| Algorithm specificity | 69.4% |
+A fully automated, reproducible pipeline that tracks whether conference abstracts presented at the AAGL Global Congress on Minimally Invasive Gynecology progress to full peer-reviewed publication. Designed to meet the methodological standards recommended by the [Cochrane review on full publication of results initially presented in abstracts](https://doi.org/10.1002/14651858.MR000005.pub4) (Scherer et al., 2018).
 
 ## Pipeline Architecture
 
@@ -153,12 +139,6 @@ testthat::test_dir("tests/testthat")
 - R >= 4.4
 - Key packages: tidyverse, rentrez, xml2, httr, jsonlite, survival, gender, stringdist, DiagrammeR
 - Optional: googlesheets4 (Shiny backend), rsconnect (deployment), webshot2 (flow diagram PNG)
-
-## Citation
-
-If you use this pipeline or methodology, please cite:
-
-> Muffly T. Publication Rate, Time to Publication, and Predictors of Full Publication Among Oral Presentations at the AAGL Global Congress, 2012-2023: A Retrospective Cohort Study. *Journal of Minimally Invasive Gynecology*. 2026.
 
 ## License
 
