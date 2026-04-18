@@ -311,3 +311,132 @@ The deployed Shiny application was stress-tested under simulated load:
 | Sustained rapid switching | 30/30 success |
 
 The application supports 2-3 concurrent reviewers without degradation. The 503 responses under 20-concurrent load reflect the shinyapps.io single-worker instance limit, not an application defect.
+
+## A10. NPI Identity Resolution
+
+### A10.1 Overview
+
+To obtain physician-level demographics independent of the abstract-to-publication matching pipeline, first authors with US-based affiliations were linked to National Provider Identifiers (NPIs) using a probabilistic identity resolution approach. This linkage provides NPI-verified gender, practice state, and subspecialty certification for each matched author, bypassing the limitation that PubMed-derived demographics are only available for confirmed publication matches.
+
+### A10.2 Candidate Pool
+
+Rather than searching the full NPPES registry (2.1 million providers, 213,000 with OB/GYN taxonomy codes), candidates were drawn from the isochrones project's canonical ABOG-NPI dataset: 60,846 board-certified obstetrician-gynecologists with validated NPI linkages, full names, practice states, gender, and ABOG subspecialty certifications (Generalist, MIG [minimally invasive gynecology], Female Pelvic Medicine & Reconstructive Surgery, Gynecologic Oncology, Maternal-Fetal Medicine, Reproductive Endocrinology and Infertility, Complex Family Planning, and others). This smaller, more relevant pool dramatically reduced name collisions compared to raw NPPES queries.
+
+### A10.3 Name Parsing
+
+Author names from the AAGL abstract listings (e.g., "R.S. Guido", "E. Chapman-Davis", "J.P.M. Penninx") were parsed using the `humaniformat` R package, which correctly handles compound surnames (El Hachem, Chapman-Davis, St. Louis), multi-initial first names, and suffixes. A fallback to regex-based normalization was applied for edge cases. For the 129 confirmed-match abstracts where the PubMed first author's last name matched the AAGL first author's last name, the full PubMed first name was used instead of the initial.
+
+### A10.4 Matching Strategies
+
+Two strategies were applied sequentially:
+
+**Strategy A (exact full name):** For authors with full first names (from confirmed PubMed matches where names agreed), the ABOG pool was searched by exact first name and last name. Base confidence: 0.95.
+
+**Strategy B (initial + last name):** For the remaining authors with initials only, the pool was searched by last name and first initial. Base confidence: 0.70.
+
+A fuzzy last-name fallback was applied when exact matching returned no candidates: hyphens and spaces were stripped from both the query and pool names (e.g., "CHAPMANDAVIS" matching "CHAPMAN-DAVIS"), recovering compound-name mismatches.
+
+### A10.5 Scoring
+
+```{r npi-scoring-table, echo=FALSE}
+scoring <- tibble::tibble(
+  Feature = c("Exact first + last name match",
+              "Initial + last name match",
+              "Affiliation state = NPI practice state",
+              "Gender agreement",
+              "MIG (MIGS) subspecialty",
+              "FPMRS + pelvic floor procedure",
+              "GYN_ONC + oncology procedure",
+              "REI + ectopic pregnancy procedure",
+              "Rare name (<=3 in ABOG OB/GYN pool)"),
+  Points = c("+50", "+15", "+20", "+10", "+25", "+15", "+15", "+10", "+10")
+)
+knitr::kable(scoring, caption = "NPI matching composite scoring system")
+```
+
+The MIGS subspecialty bonus (+25 points) reflects the strong prior that presenters at the AAGL Global Congress --- the premier minimally invasive gynecology meeting --- are disproportionately likely to hold MIG certification. Subspecialty-procedure concordance bonuses (FPMRS for pelvic floor abstracts, GYN_ONC for oncology abstracts) provided additional tiebreaking signal.
+
+### A10.6 Classification Tiers
+
+```{r npi-tiers, echo=FALSE}
+tiers <- tibble::tibble(
+  Tier = c("A: High confidence", "A: High confidence (relaxed)",
+           "B: Ambiguous", "C: No match"),
+  Criteria = c("Score >= 50 AND unique top candidate (gap >= 10 to second)",
+               "Score >= 35 AND exactly 1 candidate in entire ABOG pool (single-candidate relaxation)",
+               "Score 30-49 OR multiple candidates within 10 points",
+               "Score < 30 OR no candidates after filtering"),
+  Action = c("Auto-accept", "Auto-accept", "Withheld", "Unmatched")
+)
+knitr::kable(tiers, caption = "NPI match classification tiers")
+```
+
+### A10.7 Single-Candidate Relaxation Rule
+
+The standard Tier A threshold requires a composite score of at least 50 points with a 10-point gap to the second-best candidate. For authors matched by initial + last name (base score 15), reaching 50 points requires strong corroborating signals (state match + gender match + rare name or MIGS subspecialty). This threshold is appropriate when multiple candidates exist and disambiguation is needed.
+
+However, when the ABOG pool contains exactly one board-certified OB/GYN with a given last name and first initial, the probability of a false match is inherently low regardless of corroborating signals. In such cases, the threshold was relaxed to 35 points. The rationale:
+
+1. **Base rate argument.** The ABOG pool contains 60,846 physicians. For a unique (last name, first initial) combination to have exactly one entry, the name must be uncommon among US OB/GYNs. The prior probability that a sole-match candidate is the correct person is high.
+
+2. **No disambiguation needed.** The gap-to-second criterion exists to prevent ambiguous assignments when multiple candidates score similarly. With only one candidate, this criterion is vacuous --- there is no competing match to distinguish from.
+
+3. **Minimum score guard.** The 35-point floor ensures that at least the initial match (+15) plus one corroborating signal (e.g., career plausibility +5 and rare name +10, or state match +20) must be present. Pure initial-only matches without any supporting evidence (score 15) are not accepted.
+
+```{r relaxation-stats, echo=FALSE}
+npi_path <- here::here("data", "processed", "npi_matches.csv")
+if (file.exists(npi_path)) {
+  npi <- readr::read_csv(npi_path, show_col_types = FALSE)
+  n_relaxed <- sum(npi$npi_match_confidence == "high" &
+                   npi$npi_match_score >= 35 & npi$npi_match_score < 50 &
+                   npi$npi_n_candidates == 1, na.rm = TRUE)
+  n_standard <- sum(npi$npi_match_confidence == "high" &
+                    npi$npi_match_score >= 50, na.rm = TRUE)
+  n_total_a <- sum(npi$npi_match_confidence == "high", na.rm = TRUE)
+
+  cat(sprintf("Of %d Tier A matches, %d (%.0f%%) met the standard threshold (score >= 50) and %d (%.0f%%) were accepted via single-candidate relaxation (score 35-49, sole candidate).",
+              n_total_a, n_standard, n_standard/n_total_a*100,
+              n_relaxed, n_relaxed/n_total_a*100))
+}
+```
+
+### A10.8 One-to-One Enforcement
+
+After scoring, a greedy one-to-one assignment was enforced: if multiple abstracts claimed the same NPI, only the highest-scoring assignment was retained; lower-scoring claimants were demoted to Tier B (ambiguous). This prevents a single prolific physician from being "consumed" by an earlier, weaker match.
+
+### A10.9 Results
+
+```{r npi-results, echo=FALSE}
+if (file.exists(npi_path)) {
+  npi <- readr::read_csv(npi_path, show_col_types = FALSE)
+  n_us <- nrow(npi)
+  tier_a <- sum(npi$npi_match_confidence == "high")
+  tier_b <- sum(npi$npi_match_confidence == "ambiguous")
+  tier_c <- sum(npi$npi_match_confidence == "low")
+  n_migs <- sum(npi$npi_subspecialty == "MIG", na.rm = TRUE)
+
+  results_tbl <- tibble::tibble(
+    Tier = c("A: High confidence", "B: Ambiguous", "C: No match", "Total US authors"),
+    N = c(tier_a, tier_b, tier_c, n_us),
+    Percent = c(sprintf("%.1f%%", tier_a/n_us*100),
+                sprintf("%.1f%%", tier_b/n_us*100),
+                sprintf("%.1f%%", tier_c/n_us*100), "100%")
+  )
+  knitr::kable(results_tbl, caption = "NPI matching results by confidence tier")
+
+  cat(sprintf("\n\nOf %d Tier A matches, %d (%.0f%%) held MIG (minimally invasive gynecology) subspecialty certification.",
+              tier_a, n_migs, n_migs/tier_a*100))
+}
+```
+
+### A10.10 Limitations
+
+The NPI matching approach has several inherent limitations:
+
+1. **Initial-only names.** The AAGL abstract listing provides only first initials for most authors (e.g., "J. Smith"). This prevents exact first-name matching for 559 of 689 US-based authors and increases ambiguity for common surnames.
+
+2. **ABOG pool scope.** The candidate pool includes only ABOG board-certified physicians. Presenters who are residents, fellows, basic scientists, or international physicians without US board certification will not appear in the pool (estimated 185 of 409 no-match authors).
+
+3. **Name changes.** Authors who changed surnames (e.g., after marriage) between abstract presentation and ABOG certification will not match unless the ABOG record reflects the name used at the time of presentation.
+
+4. **Single-candidate relaxation risk.** While the sole-candidate assumption is probabilistically sound, it is possible for a name collision to occur with a non-presenting physician who happens to share the same uncommon name and initial. The 35-point minimum score guard and downstream manual audit mitigate this risk.
