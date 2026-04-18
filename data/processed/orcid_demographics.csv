@@ -1,0 +1,186 @@
+abstract_id,orcid,oa_full_name,orcid_name,orcid_country,orcid_institution,orcid_department,orcid_role,is_us_orcid,is_intl_orcid
+AAGL2012_015,0009-0000-9272-779X,Lobat Hashemi,leila hashemi,NA,NA,NA,NA,FALSE,FALSE
+AAGL2012_016,0000-0002-4985-7326,Piétro Santulli,Pietro Santulli,FR,Assistance Publique - Hôpitaux de Paris- Cochin Port Royal ,Department of Gynaecology Obstetrics II and Reproductive Medicine,"MD, PhD",FALSE,TRUE
+AAGL2012_019,0000-0001-5572-7205,Jenny Wei,Jenny Wei,US,University of Southern California Keck School of Medicine,NA,NA,TRUE,FALSE
+AAGL2012_021,0000-0001-8082-6272,Pavan Patel,Pavan Patel,US,Fox Chase Cancer Center,Molecular Therapeutics,Scientific Technician,TRUE,FALSE
+AAGL2012_038,0000-0003-2495-4151,Thomas P. Singer,Thomas Singer,NA,NA,NA,NA,FALSE,FALSE
+AAGL2012_046,0000-0002-7128-8086,Ömer Lütfi Tapısız,Omer Tapisiz,TR,Güven Hastanesi,Obstetrics and Gynecology,Head of Department,FALSE,TRUE
+AAGL2012_067,0000-0001-5490-3940,Josien Penninx,Josien Penninx,NA,NA,NA,NA,FALSE,FALSE
+AAGL2012_069,0000-0002-2163-3435,P. Panel,Pierre Panel,NA,NA,NA,NA,FALSE,FALSE
+AAGL2012_074,0000-0002-1470-619X,Alireza Fazel,Alireza Fazel,IR,Mashhad University of Medical Sciences,Anatomy & cell biology,NA,FALSE,TRUE
+AAGL2013_004,0000-0003-2225-5568,Simone Ferrero,Simone Ferrero,NA,NA,NA,NA,FALSE,FALSE
+AAGL2013_005,0000-0001-7939-3043,Lenore Ellett,Lenore Ellett,AU,Mercy Hospital for Women,Endosurgery,Gynaecologist,FALSE,TRUE
+AAGL2013_008,0000-0002-1349-8579,Eloise Chapman‐Davis,eloise chapman,NA,NA,NA,NA,FALSE,FALSE
+AAGL2013_016,0000-0002-9389-2858,N.A. Gomez,Nadia Gómez ,NA,NA,NA,NA,FALSE,FALSE
+AAGL2013_022,0000-0001-5566-8479,Emanuela Spagnolo,emanuela spagnolo,NA,NA,NA,NA,FALSE,FALSE
+AAGL2013_032,0000-0002-3169-344X,Jamie Price,Jamie Price,US,"Stop, Breathe & Think",NA,Co Founder,TRUE,FALSE
+AAGL2013_045,0000-0003-1359-770X,Roberta Venturella,Roberta Venturella,IT,Universita degli Studi Magna Graecia di Catanzaro,Medicina Sperimentale e Clinica,Professore II fascia,FALSE,TRUE
+AAGL2013_048,0000-0002-7238-2779,Hui Xu,Hui Xu,NA,NA,NA,NA,FALSE,FALSE
+AAGL2013_049,0000-0002-6385-5829,Bruno Borghese,Bruno Borghese,NA,NA,NA,NA,FALSE,FALSE
+AAGL2013_052,0000-0002-2454-1413,Annalisa Di Cello,annalisa di cello,IT,"Lamezia Terme Hospital, ASP of Catanzaro,","Department of Obstetrics and Gynecology, Maternal and Child Health Unit, 88046 ",phd,FALSE,TRUE
+AAGL2013_054,0000-0001-6353-4489,Michael P. Diamond,Michael Diamond,US,Augusta University,Obstetrics and Gynecology,"Senior Vice President for Research, Leon Henri Charbonnier Endowed Chair, Professor of Obstetrics and Gynecology, Associate Dean for Research (Medical College of Georgia)",TRUE,FALSE
+AAGL2013_055,0000-0001-9182-8767,N.P. Kuijsters,Nienke Kuijsters,NL,Radboudumc,Radiotherapie,Resident in training,FALSE,TRUE
+AAGL2013_059,0000-0003-0735-6301,Errico Zupi,errico zupi,IT,Universita degli Studi di Roma Tor Vergata,biomedicina e prevenzione,professore associato,FALSE,TRUE
+AAGL2013_069,0000-0002-6294-9591,Byeong Seok Sohn,Byeong Seok Sohn,NA,NA,NA,NA,FALSE,FALSE
+AAGL2013_070,0000-0002-6768-3155,Ayman Oraif,ayman oraif,SA,King Abdulaziz University,NA,NA,FALSE,TRUE
+AAGL2013_074,0000-0002-4216-4172,Ally Murji,Ally Murji,NA,NA,NA,NA,FALSE,FALSE
+AAGL2013_079,0000-0003-0096-1832,Erin E. Washburn,Erin Washburn,NA,NA,NA,NA,FALSE,FALSE
+AAGL2013_091,0000-0002-9326-611X,Alberto Zanatta,ALBERTO ZANATTA,IT,Università degli Studi di Padova,Scienze Cardio-Toraco-Vascolari e Sanità pubblica,Ricercatore in Storia della Medicina,FALSE,TRUE
+AAGL2013_092,0000-0003-3821-201X,C. Exacoustós,caterina exacoustos,IT,Universita degli Studi di Roma Tor Vergata,NA,NA,FALSE,TRUE
+AAGL2014_020,0000-0001-5359-8841,Keqin Hua,Keqin Hua,CN,Obstetrics and Gynecology Hospital of Fudan University,NA,NA,FALSE,TRUE
+AAGL2014_038,0009-0001-2500-7407,Stephanie Ricci,Stephanie Ricci,US,Cleveland Clinic,NA,NA,TRUE,FALSE
+AAGL2014_040,0000-0002-6796-9823,Jamie Kroft,Jamie Kroft,NA,NA,NA,NA,FALSE,FALSE
+AAGL2014_045,0000-0003-3453-3852,Özlem Uzunlar,Ozlem Uzunlar,TR,"Ministry of Health, Ankara City Hospital",NA,NA,FALSE,TRUE
+AAGL2014_053,0000-0003-2014-3028,Roopina Sangha,Hareena Sangha,NA,NA,NA,NA,FALSE,FALSE
+AAGL2014_071,0009-0001-9944-6146,K.C. Wang,Kechao Wang,CN,Hangzhou Dianzi University,Hangzhou Dianzi University,Graduate student,FALSE,TRUE
+AAGL2014_079,0000-0001-6969-1119,Sunita Tandulwadkar,Sunita Tandulwadkar,IN,Dr D Y Patil Vidyapeeth University,IVF & Endoscopy Dept,Head,FALSE,TRUE
+AAGL2014_085,0000-0002-3647-3550,Tadeusz Issat,Tadeusz Issat,PL,Instytut Matki i Dziecka,Klinika Położnictwa i Ginekologii,NA,FALSE,TRUE
+AAGL2015_008,0000-0002-4863-1747,Fabio Martinelli,Fabio Martinelli,IT,HUMANITAS UNIVERSITY,Dipartimento Scienze Biomediche,Ricercatori a tempo determinato,FALSE,TRUE
+AAGL2015_016,0000-0003-3173-2311,Tarek Shokeir,Tarek Shokeir,NA,NA,NA,NA,FALSE,FALSE
+AAGL2015_021,0000-0002-5151-8091,Ziv Tsafrir,Ziv Tsafrir,NA,NA,NA,NA,FALSE,FALSE
+AAGL2015_038,0000-0001-7837-5361,Neena Malhotra,NEENA MALHOTRA,NA,NA,NA,NA,FALSE,FALSE
+AAGL2015_063,0000-0002-0138-5868,Payam Katebi Kashi,Payam Katebi Kashi ,US,Inova Fairfax Hospital,Gynecology Oncology/ OB/GYN ,Physician/Scientist ,TRUE,FALSE
+AAGL2015_069,0000-0002-2494-9830,Annalisa Racca,Annalisa Racca,ES,Hospital Universitari Dexeus,"Obstetrics, Gynecology and Reproductive Medicine",MD PhD,FALSE,TRUE
+AAGL2015_071,0000-0002-6784-4473,Fevzi Shakir,Fevzi Shakir,NA,NA,NA,NA,FALSE,FALSE
+AAGL2015_093,0000-0002-4016-9420,Fady M. Shawky Moiety,Fady Moiety,EG,Alexandria University Faculty of Medicine,NA,NA,FALSE,TRUE
+AAGL2016_009,0000-0002-6732-4224,Alison M. Hill,Alison Marie Hill,AU,The University of South Australia,NA,NA,FALSE,TRUE
+AAGL2016_035,0000-0001-7346-3987,Çağdaş Şahin,cagdas sahin,NA,NA,NA,NA,FALSE,FALSE
+AAGL2016_037,0000-0002-3217-1141,A.S. Arakelyan,Alek Arakelyan,RU,"National Medical Research Center for Obstetrics, Gynecology and Perinatology named after Academician V.I.Kulakov of the Ministry of Healthcare of the Russian Federation",NA,NA,FALSE,TRUE
+AAGL2016_061,0000-0002-8613-3845,Hiroe Ito,Hiroe Ito,JP,Tokyo Medical University,obstetrics and gynecology,NA,FALSE,TRUE
+AAGL2016_067,0000-0002-9762-6979,Mohamed Mabrouk,Mohamed Mabrouk,NA,NA,NA,NA,FALSE,FALSE
+AAGL2016_081,0000-0001-5997-8570,Ralf Bends,Ralf Bends,DE,Evangelisches Klinikum Köln-Weyertal,Gynecology and Obstetrics,Attending Physician,FALSE,TRUE
+AAGL2016_083,0000-0002-8248-2677,Judith A.F. Huirne,Judith Huirne,NL,"Amsterdam University Medical Centers, location VUmc and AMC",Obstetrics and Gynaecology,Head Gynaecology,FALSE,TRUE
+AAGL2016_085,0000-0001-9103-860X,Pauline Chauvet,Pauline Chauvet,NA,NA,NA,NA,FALSE,FALSE
+AAGL2017_007,0000-0001-8373-8569,Giorgio Bogani,Giorgio Bogani,IT,Fondazione IRCCS Istituto Nazionale dei Tumori,Chirurgia,M.D.; Ph.D,FALSE,TRUE
+AAGL2017_020,0000-0002-5875-0272,Lucy P. Aitchison,lucy Aitchison,NA,NA,NA,NA,FALSE,FALSE
+AAGL2017_026,0009-0001-9133-027X,Anya Wang,Anya Wang,NA,NA,NA,NA,FALSE,FALSE
+AAGL2017_033,0000-0001-8685-9526,Nan Jia,Nan Jia,NA,NA,NA,NA,FALSE,FALSE
+AAGL2017_034,0000-0002-8129-9643,C. Emi Bretschneider,C. Emi Bretschneider,NA,NA,NA,NA,FALSE,FALSE
+AAGL2017_039,0000-0003-3535-5314,Oshri Barel,Oshri Barel,NA,NA,NA,NA,FALSE,FALSE
+AAGL2017_045,0000-0002-4561-7659,Noam Smorgick,Noam Smorgick,NA,NA,NA,NA,FALSE,FALSE
+AAGL2017_068,0000-0001-8010-4181,Mete Güngör,Mete GUNGOR,NA,NA,NA,NA,FALSE,FALSE
+AAGL2017_071,0000-0002-9673-1152,Kyungah Jeong,Kyungah Jeong,NA,NA,NA,NA,FALSE,FALSE
+AAGL2017_072,0000-0001-8900-9607,Jichan Nie,Nie Jichan,NA,NA,NA,NA,FALSE,FALSE
+AAGL2017_081,0000-0002-5493-6563,S. Rimbach,Stefan Rimbach,NA,NA,NA,NA,FALSE,FALSE
+AAGL2017_085,0000-0003-4716-2886,Anna V. Borisova,Anna Borisova,RU,Peoples' Friendship University of Russia,NA,ассистент кафедры акушерства и гинекологии с курсом перинатологии,FALSE,TRUE
+AAGL2017_088,0000-0002-3798-7342,Jessica Ottolina,Jessica Ottolina,IT,Ospedale San Raffaele,Gynecology,NA,FALSE,TRUE
+AAGL2017_094,0000-0002-3952-5483,George Pados,George Pados,NA,NA,NA,NA,FALSE,FALSE
+AAGL2018_001,0000-0001-6485-5735,Attilio Di Spiezio Sardo,Attilio Di Spiezio Sardo,IT,University of Naples Federico II,NA,Full Professor,FALSE,TRUE
+AAGL2018_031,0000-0002-8554-8280,J Laufer,joel laufer,NA,NA,NA,NA,FALSE,FALSE
+AAGL2018_034,0000-0002-0748-1746,Dominique Thomas,Dominique Thomas,NA,NA,NA,NA,FALSE,FALSE
+AAGL2018_038,0000-0001-8043-9344,Olga Bougie,Olga Bougie,NA,NA,NA,NA,FALSE,FALSE
+AAGL2018_059,0000-0002-4049-0185,Fernando Passador Valério,Fernando Passador Valerio,BR,Universidade de São Paulo Faculdade de Medicina de Ribeirão Preto,NA,NA,FALSE,TRUE
+AAGL2018_065,0000-0002-7949-0166,Kil‐yong Lee,Kil-yong Lee,KR,Uijeongbu Saint Mary's Hospital,Surgery,NA,FALSE,TRUE
+AAGL2018_079,0000-0002-1123-270X,Amid Yazdani,Amid Yazdani,US,Johns Hopkins Medicine,NA,NA,TRUE,FALSE
+AAGL2018_085,0000-0003-1674-0583,Vishalli Ghai,Vishalli Ghai,NA,NA,NA,NA,FALSE,FALSE
+AAGL2018_086,0000-0003-3437-0723,Nicholas Leyland,Nicholas Leyland,CA,McMaster University,Obstetrics and Gynecology,Chair Academic department/ Chief of Hamilton Health Sciences,FALSE,TRUE
+AAGL2019_008,0000-0002-9795-3275,Lin Chen,Lin Chen,NA,NA,NA,NA,FALSE,FALSE
+AAGL2019_012,0000-0001-5972-3498,Eric R. Wright,Eric Wright,US,Georgia State University,Sociology,Professor of Sociology and Public Health,TRUE,FALSE
+AAGL2019_018,0000-0003-2301-0829,Yuan Gu,YUAN GU,CN,Fudan University,Zhongshan Hospital of Fudan University,Surgical Resident,FALSE,TRUE
+AAGL2019_026,0000-0002-2022-2765,Z. Guan,Zhihong Guan,CN,Fudan University,NA,NA,FALSE,TRUE
+AAGL2019_039,0000-0002-2063-2684,Junjun Qiu,Junjun Qiu,NA,NA,NA,NA,FALSE,FALSE
+AAGL2019_040,0000-0003-3832-6295,Giovanni Roviglione,Giovanni Roviglione,NA,NA,NA,NA,FALSE,FALSE
+AAGL2019_042,0000-0002-7473-2066,C.R. Zhu,Christina Zhu,US,MedStar Georgetown University Hospital,Otolaryngology,Research Fellow,TRUE,FALSE
+AAGL2019_044,0000-0003-4575-0393,Andrew Zakhari,Andrew Zakhari,NA,NA,NA,NA,FALSE,FALSE
+AAGL2019_045,0000-0003-2463-6890,Sadikah Behbehani,Sadikah Behbehani,NA,NA,NA,NA,FALSE,FALSE
+AAGL2019_047,0000-0002-1437-4818,J. Sroussi,jérémy sroussi,NA,NA,NA,NA,FALSE,FALSE
+AAGL2019_058,0000-0001-8357-3426,Sung‐Jae Kim,Sung-Jae Kim,KR,Yonsei University College of Medicine,Department of Orthopaedic Surgery,Emeritus Professor,FALSE,TRUE
+AAGL2019_062,0009-0005-5648-8708,H. Reddy,HARSHITHA S REDDY,IN,M.S. Ramaiah Medical College,ORTHOPEDICS,RESIDENT DOCTOR,FALSE,TRUE
+AAGL2019_065,0000-0001-8546-4266,Justin Mui,Justin Mui,CA,Vancouver Coastal Health Authority,Obstetrics & Gynaecology,Resident,FALSE,TRUE
+AAGL2019_083,0009-0005-8715-1462,J Liu,Jaehong Liu,KR,Yonsei University Health System,Department of Plastic & Reconstructive Surgery,Resident,FALSE,TRUE
+AAGL2019_084,0000-0002-6227-6112,Yan‐Jiang Wang,Yan-Jiang Wang,CN,Third Military Medical University Daping Hospital and Research Institute of Surgery,Department of Neurology,Director/ Professor,FALSE,TRUE
+AAGL2019_086,0000-0002-9250-1296,Ching Wan Chan,Ching Wan Chan,SG,National University of Singapore,Department of General Surgery,Assistant Professor,FALSE,TRUE
+AAGL2019_089,0000-0002-6990-9592,Emad Matanes,Emad Matanes,NA,NA,NA,NA,FALSE,FALSE
+AAGL2019_095,0000-0001-7837-5070,Miriam M.F. Hanstede,Miriam Hanstede,NL,Spaarnegasthuis,OB/GYN,Asherman specialist,FALSE,TRUE
+AAGL2020_001,0000-0002-3534-7800,Douglas Luchristt,Douglas Luchristt,US,Duke University,Obstetrics and Gynecology,NA,TRUE,FALSE
+AAGL2020_011,0000-0002-1319-8752,Ricardo Pereira,Ricardo Pereira,BR,Universidade Estadual de Campinas Faculdade de Ciencias Medicas,Pediatria,NA,FALSE,TRUE
+AAGL2020_013,0000-0001-7201-4725,Jessica Traylor,Jessica Traylor,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_014,0000-0001-6294-0741,Christopher Simmonds,Christopher Simmonds,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_022,0000-0002-6865-3468,Gustavo Anderman Silva Barison,Gustavo Barison,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_026,0000-0001-9818-3041,Aya Mohr‐Sasson,Aya Mohr Sasson,US,The University of Texas Health Science Center at Houston School of Public Health,"Department of Obstetrics, Gynecology & Reproductive Science",Fellow,TRUE,FALSE
+AAGL2020_030,0000-0002-5573-6694,А. В. Козаченко,Andrey Kozachenko,RU,"National Medical Research Center of Obstetrics, Gynecology and Perinatology",Operative Gynecology,Senior Researcher,FALSE,TRUE
+AAGL2020_032,0000-0002-2649-2627,Amanda P. Stanton,Amanda Stanton,US,Mayo Clinic,Colon and Rectal Surgery,Lead Physician Assistant,TRUE,FALSE
+AAGL2020_037,0000-0003-0288-3866,Stefania Ruggieri,stefania ruggieri,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_039,0000-0002-8673-7825,Aakriti R. Carrubba,Aakriti Carrubba,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_041,0000-0001-7423-3518,Luiza Russo de Morais,LUIZA MORAIS,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_043,0000-0002-6358-3966,Liron Kogan,Liron Kogan,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_045,0000-0002-0734-2850,Je‐Ho Mun,Je-Ho Mun,KR,Seoul National University College of Medicine,Dermatology,Professor,FALSE,TRUE
+AAGL2020_048,0000-0002-8969-8307,Joan Tymon‐Rosario,Joan Tymon-Rosario,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_051,0000-0002-5749-9987,Nura Fitnat Topbaş Selçuki,Nura Fitnat Topbas Selcuki,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_053,0000-0003-1282-5379,Gabriel Levin,Gabriel Levin,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_055,0000-0002-2177-9717,C.A. Jago,Caitlin Jago,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_056,0000-0002-5217-709X,Samantha Benlolo,Samantha Benlolo,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_059,0000-0003-0125-7302,Phillip A. Romanski,Phillip Romanski,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_060,0000-0002-1875-3065,J Gisseman,Jordan Gisseman,US,Brooke Army Medical Center,NA,NA,TRUE,FALSE
+AAGL2020_061,0000-0002-1967-5548,Dong Bach Nguyen,Dong Bach Nguyen,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_065,0000-0002-8703-2974,Rachael Haverland,Rachael Haverland,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_071,0000-0003-3557-5499,Carolina Augusto de Souza,Carolina Souza,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_073,0000-0003-0057-0524,Kiyoshi Aiko,KIYOSHI AIKO,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_076,0000-0001-8604-9574,Luc Michel,Luc MICHEL,BE,Université Catholique de Louvain,Surgery at Mont-Godinne University Hospital,"Professor, Chief of Surgical Services",FALSE,TRUE
+AAGL2020_077,0009-0009-0379-5981,J.S. Kim,JAE SEUNG KIM,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_080,0000-0003-1071-4683,Xingping Zhao,xingping zhao,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_082,0000-0001-5177-6595,Aditya V. Kulkarni,Aditya Kulkarni,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_089,0000-0003-3376-2629,S Mohling,Shanti Mohling,NA,NA,NA,NA,FALSE,FALSE
+AAGL2020_093,0000-0003-1168-9977,M.G. Leon,Mateo Leon,NA,NA,NA,NA,FALSE,FALSE
+AAGL2021_003,0000-0001-6965-6321,Yossi Tzur,Yossi Tzur,CA,McGill University,NA,NA,FALSE,TRUE
+AAGL2021_006,0000-0003-1321-9442,Bruno Roberto Braga Azevedo,Bruno Roberto Braga  Azevedo ,NA,NA,NA,NA,FALSE,FALSE
+AAGL2021_008,0000-0002-3110-3147,Kristin Ambacher,Kristin Ambacher,NA,NA,NA,NA,FALSE,FALSE
+AAGL2021_009,0000-0002-7334-3341,Shobhit Mathur,Shobhit Mathur,NA,NA,NA,NA,FALSE,FALSE
+AAGL2021_010,0000-0002-7538-6345,Saksham Gupta,Saksham Gupta,NA,NA,NA,NA,FALSE,FALSE
+AAGL2021_018,0000-0001-9714-1595,Peter Lim,Peter  Lim,US,Center of Hope @ Reno,Gynecologic Oncology,MD/Medical Director,TRUE,FALSE
+AAGL2021_020,0000-0002-2128-7798,Marcelo de Andrade Vieira,Marcelo Vieira,NA,NA,NA,NA,FALSE,FALSE
+AAGL2021_021,0000-0002-7598-9613,M. Corinti,Mariana Corinti,BR,Universidade Federal de Sao Paulo Escola Paulista de Medicina,NA,NA,FALSE,TRUE
+AAGL2021_027,0009-0003-4485-4008,B. Tharmarajah,Brindhan Tharmarajah,NA,NA,NA,NA,FALSE,FALSE
+AAGL2021_031,0000-0003-2906-4377,Claudia Becker,Claudia Becker,NA,NA,NA,NA,FALSE,FALSE
+AAGL2021_033,0000-0003-2179-6565,Kristin J. Moore,Kristin Moore,NA,NA,NA,NA,FALSE,FALSE
+AAGL2021_037,0000-0003-2828-8037,Steven Weyers,Steven Weyers,BE,Ghent University,Human Structure and Repair,Professor,FALSE,TRUE
+AAGL2021_041,0000-0001-8748-9352,María A. Hincapié,Maria Antonia Hincapie-Restrepo,NA,NA,NA,NA,FALSE,FALSE
+AAGL2021_042,0000-0002-9538-9463,Attilio Di Spiezio Sardo,ATTILIO DI SPIEZIO SARDO,NA,NA,NA,NA,FALSE,FALSE
+AAGL2021_045,0000-0002-5071-236X,S.Y. Park,Su-yeon Park,KR,Institute for Basic Science,Center for Underground Physics,Post doctor,FALSE,TRUE
+AAGL2021_049,0000-0002-1204-2289,Adam B. Rosen,Adam Rosen,US,University of Nebraska at Omaha,School of Health and Kinesiology,Assistant Professor,TRUE,FALSE
+AAGL2021_050,0000-0002-9453-3240,Cristiano Antonio de Souza,Cristiano Antonio Souza,BR,Federal University of Santa Catarina,NA,NA,FALSE,TRUE
+AAGL2021_051,0000-0002-2394-9644,Kiyoshi Kanno,Kiyoshi Kanno,NA,NA,NA,NA,FALSE,FALSE
+AAGL2021_068,0000-0002-9179-7638,Katherine F. Chaves,KATHERINE CHAVES,NA,NA,NA,NA,FALSE,FALSE
+AAGL2021_075,0000-0002-3253-4512,L.V. Adamyan,Adamyan Leila,NA,NA,NA,NA,FALSE,FALSE
+AAGL2021_078,0000-0001-5572-4143,Judy M.Y. Wong,Judy Wong,CA,The University of British Columbia,Faculty of Pharmaceutical Sciences,Professor,FALSE,TRUE
+AAGL2021_081,0000-0003-1069-0693,Debasish Kumar Das,Debasish Das,AU,UNSW Canberra,NA,Lecturer (Assistant Professor) in Economics,FALSE,TRUE
+AAGL2021_093,0000-0002-6111-9377,J.J. Woo,Jeffrey Woo,NA,NA,NA,NA,FALSE,FALSE
+AAGL2021_095,0000-0002-3455-9908,Gil Dubernard,Gil DUBERNARD,FR,Université Claude Bernard Lyon 1 - UFR Odontologie,NA,NA,FALSE,TRUE
+AAGL2021_097,0000-0002-6815-6445,Danilo Acosta,Danilo Acosta,US,Inova Health System,OB/GYN,Minimally Invasive Gynecologic Surgeon ,TRUE,FALSE
+AAGL2022_001,0000-0003-1110-2400,Elizabeth A. Stewart,Elizabeth Stewart,US,Mayo Clinic,Reproductive Endrocrinology & Infertility,Division Chair,TRUE,FALSE
+AAGL2022_005,0000-0002-7625-8695,Megan S. Orlando,Megan Orlando,NA,NA,NA,NA,FALSE,FALSE
+AAGL2022_007,0000-0001-7635-4858,Adéla Richtárová,Adéla Richtarova,CZ,Všeobecná fakultní nemocnice v Praze Gynekologicko-porodnická klinika 1 LF UK,NA,NA,FALSE,TRUE
+AAGL2022_011,0000-0002-5441-2348,Claudio Zorzi,Claudio Zorzi,NA,NA,NA,NA,FALSE,FALSE
+AAGL2022_012,0000-0003-2346-6850,Jason Mak,Jason Mak,NA,NA,NA,NA,FALSE,FALSE
+AAGL2022_013,0000-0002-8258-6724,S. Allen,Sarah Allen,US,UPMC Magee Women's Hospital ,Gynecologic Specialties ,Fellow in Minimally Invasive Gynecologic Surgery ,TRUE,FALSE
+AAGL2022_031,0000-0002-0298-4547,Ilya Levin,Ilya Levin,IL,Holon Institute of Technology,School of Computer Science,Head of the School of Comuter Science,FALSE,TRUE
+AAGL2022_040,0000-0003-1822-9164,I. F. Kozachenko,Irena Kozachenko,RU,"Russian Scientific Center for Obstetrics, Gynecology and Perinatology named after Kulakov V.I.",operative gynecology,NA,FALSE,TRUE
+AAGL2022_046,0009-0000-0391-536X,Soniya Saini,Shubhangi Saini,NA,NA,NA,NA,FALSE,FALSE
+AAGL2022_048,0009-0003-7291-6392,Yanlin Tong,Yanhua Tong,NA,NA,NA,NA,FALSE,FALSE
+AAGL2022_055,0009-0007-2914-3880,Fares Shalabi,Fares Shalabi,NA,NA,NA,NA,FALSE,FALSE
+AAGL2022_062,0000-0001-9544-383X,O. Fajardo,Olga Fajardo,US,University of Wisconsin–Madison,NA,NA,TRUE,FALSE
+AAGL2022_063,0000-0002-4125-968X,Merima Ruhotina,Merima Ruhotina,NA,NA,NA,NA,FALSE,FALSE
+AAGL2022_068,0000-0001-7742-3050,C.O. Rees,Connie Rees,NL,Catharina Ziekenhuis,Gynaecology & Obstetrics,Resident ,FALSE,TRUE
+AAGL2022_076,0000-0003-4372-4220,Matteo Bruno,Matteo Bruno,NA,NA,NA,NA,FALSE,FALSE
+AAGL2022_077,0000-0001-8222-3141,Michal Mára,Michal Mára,CZ,"Charles University and General University Hospital in Prague, First Faculty of Medicine",Department of Obstetrics and Gynaecology,"M.D., ",FALSE,TRUE
+AAGL2022_082,0000-0002-3409-7504,Brunella Zizolfi,Brunella Zizolfi,NA,NA,NA,NA,FALSE,FALSE
+AAGL2022_083,0000-0003-1628-6317,Roberto Clarizia,Roberto Clarizia,NA,NA,NA,NA,FALSE,FALSE
+AAGL2022_087,0000-0003-2553-9021,Elizabeth Miazga,Elizabeth Miazga,NA,NA,NA,NA,FALSE,FALSE
+AAGL2022_090,0000-0003-2895-735X,Nishita Pondugula,Nishita Pondugula,US,Yale School of Medicine,NA,NA,TRUE,FALSE
+AAGL2023_001,0009-0002-2519-9549,Shigeo Takenaka,Shigeo Takenaka,JP,Osaka Metropolitan University,Nutrition,Professor,FALSE,TRUE
+AAGL2023_004,0000-0003-4988-0814,Gang Zhou,Gang Zhou,NA,NA,NA,NA,FALSE,FALSE
+AAGL2023_008,0000-0002-5714-4641,Ulrika Johannesson,Ulrika Johannesson,SE,Karolinska Institutet,NA,NA,FALSE,TRUE
+AAGL2023_009,0000-0002-8778-4447,Ayman Al‐Hendy,Ayman Al-Hendy,US,The University of Chicago,Obstetrics and Gynecology,Professor and Vice Chair,TRUE,FALSE
+AAGL2023_010,0000-0002-8595-6364,R Schneyer,Rebecca Schneyer,US,Stanford Medicine,NA,NA,TRUE,FALSE
+AAGL2023_011,0000-0003-3147-6020,Eve Zaritsky,eve zaritsky,NA,NA,NA,NA,FALSE,FALSE
+AAGL2023_021,0000-0001-5951-4792,Peter Thiel,Peter Thiel,NA,NA,NA,NA,FALSE,FALSE
+AAGL2023_022,0009-0003-6076-1880,Gulfam Ahmad,Gulfam Ahmad,AU,The University of Melbourne,NA,NA,FALSE,TRUE
+AAGL2023_023,0000-0002-7166-1979,Sawsan As‐Sanie,Sawsan As-Sanie,US,University of Michigan,OBGYN,Assistant Professor,TRUE,FALSE
+AAGL2023_028,0000-0001-8524-1839,Emily Twidale,Emily Twidale,NA,NA,NA,NA,FALSE,FALSE
+AAGL2023_031,0000-0001-9644-2572,Chétana Lim,Chetana Lim,NA,NA,NA,NA,FALSE,FALSE
+AAGL2023_032,0000-0002-6434-0595,Alexander C. Hollis,Alexander Hollis,NA,NA,NA,NA,FALSE,FALSE
+AAGL2023_033,0000-0002-7330-0499,Franco Orsi,Franco Orsi,IT,European Institute of Oncology,Division of Interventional Radiology,Chief,FALSE,TRUE
+AAGL2023_035,0000-0002-3664-847X,Amir Akdam,Amir Akdam,NA,NA,NA,NA,FALSE,FALSE
+AAGL2023_046,0000-0002-3237-1696,Ran Matot,Ran Matot,NA,NA,NA,NA,FALSE,FALSE
+AAGL2023_053,0000-0002-5440-7426,Mikhail Sarofim,Mikhail Sarofim,NA,NA,NA,NA,FALSE,FALSE
+AAGL2023_055,0000-0002-5703-8742,V. Marwah,Vivek Marwah,NA,NA,NA,NA,FALSE,FALSE
