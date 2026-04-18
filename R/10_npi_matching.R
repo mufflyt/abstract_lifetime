@@ -13,6 +13,7 @@ suppressPackageStartupMessages({
 })
 
 source(here("R", "utils_text.R"))
+source(here("R", "utils_states.R"))
 source(here("R", "utils_acog.R"))
 
 cfg <- config::get(file = here("config.yml"))
@@ -44,7 +45,9 @@ pubmed_fa <- tryCatch({
       matches |> filter(classification %in% c("definite", "probable")) |> select(abstract_id),
       by = "abstract_id"
     ) |>
-    select(abstract_id, pubmed_first_name = first_name, pubmed_last_name = last_name)
+    select(abstract_id, pubmed_first_name = first_name, pubmed_last_name = last_name,
+           pubmed_city = affiliation_city, pubmed_state = affiliation_state,
+           pubmed_aff = affiliation)
 }, error = function(e) tibble(abstract_id = character()))
 
 # ---- Step 1: Build lookup table ----
@@ -53,7 +56,7 @@ cli_h2("Step 1: Building author lookup table")
 # Parse AAGL author names
 lookup <- abstracts |>
   filter(is_us_based == TRUE) |>
-  select(abstract_id, congress_year, author_name_first) |>
+  select(abstract_id, congress_year, author_name_first, primary_procedure) |>
   mutate(
     # normalize_author returns "lastname F" format
     author_norm = vapply(author_name_first, normalize_author, character(1)),
@@ -66,8 +69,12 @@ lookup <- abstracts |>
 
   left_join(pubmed_fa, by = "abstract_id") |>
   mutate(
-    has_full_name = !is.na(pubmed_first_name) & nchar(pubmed_first_name) > 2,
-    # Use PubMed name if confirmed; otherwise initial only
+    # Only use PubMed full name when the PubMed last name matches the AAGL
+    # last name — the matched paper's first author may be a different person.
+    pubmed_name_matches_aagl = !is.na(pubmed_last_name) &
+      tolower(trimws(pubmed_last_name)) == tolower(trimws(last_name)),
+    has_full_name = pubmed_name_matches_aagl &
+      !is.na(pubmed_first_name) & nchar(pubmed_first_name) > 2,
     full_first_name = if_else(has_full_name, pubmed_first_name, NA_character_),
     last_name_upper = toupper(last_name)
   ) |>
@@ -75,6 +82,17 @@ lookup <- abstracts |>
   left_join(
     char |> select(abstract_id, first_author_state, first_author_gender),
     by = "abstract_id"
+  ) |>
+  mutate(
+    # Only use PubMed affiliation data when the PubMed author IS the AAGL author
+    state_hint = coalesce(
+      if_else(pubmed_name_matches_aagl, pubmed_state, NA_character_),
+      if_else(pubmed_name_matches_aagl,
+              vapply(coalesce(pubmed_aff, ""), parse_us_state, character(1)),
+              NA_character_),
+      first_author_state
+    ),
+    city_hint = if_else(pubmed_name_matches_aagl, pubmed_city, NA_character_)
   )
 
 n_us <- nrow(lookup)
@@ -126,7 +144,8 @@ if (nrow(full_authors) > 0) {
 
     q <- sprintf("
       SELECT DISTINCT npi, first_name, last_name, gender,
-             practice_address_state, taxonomy_1, npi_enumeration_date
+             practice_address_state, practice_address_city,
+             taxonomy_1, npi_enumeration_date
       FROM temporal_all_years_fixed
       WHERE UPPER(TRIM(last_name)) IN (%s)
         AND UPPER(TRIM(first_name)) IN (%s)
@@ -168,7 +187,8 @@ if (nrow(initial_authors) > 0) {
 
     q <- sprintf("
       SELECT DISTINCT npi, first_name, last_name, gender,
-             practice_address_state, taxonomy_1, npi_enumeration_date
+             practice_address_state, practice_address_city,
+             taxonomy_1, npi_enumeration_date
       FROM temporal_all_years_fixed
       WHERE UPPER(TRIM(last_name)) IN (%s)
         AND (taxonomy_1 LIKE '207V%%' OR taxonomy_1 IN ('390200000X', '174400000X'))
@@ -202,7 +222,9 @@ score_author <- function(author_row, cands, name_freq_tbl) {
   abs_id <- author_row$abstract_id
   congress_yr <- author_row$congress_year
   has_full <- author_row$has_full_name
-  state_hint <- author_row$first_author_state
+  state_hint <- author_row$state_hint
+  city_hint <- author_row$city_hint
+  procedure <- author_row$primary_procedure
   gender_hint <- author_row$first_author_gender
   last_up <- author_row$last_name_upper
   fi <- author_row$first_initial
@@ -284,7 +306,26 @@ score_author <- function(author_row, cands, name_freq_tbl) {
       )],
       pts_rarity = if_else(!is.na(rarity) & rarity < 5, 10L, 0L),
 
-      total_score = pts_name + pts_state + pts_gender + pts_career + pts_rarity
+      # City match
+      pts_city = if_else(
+        !is.na(city_hint) & !is.na(practice_address_city) &
+          tolower(trimws(city_hint)) == tolower(trimws(practice_address_city)),
+        10L, 0L
+      ),
+
+      # Subspecialty preference (small tiebreaker, never excludes)
+      pts_subspecialty = if_else(
+        !is.na(procedure) & procedure != "NA" & !is.na(taxonomy_1),
+        case_when(
+          procedure %in% c("sacrocolpopexy", "pelvic_floor") & taxonomy_1 == "207VF0040X" ~ 5L,
+          procedure == "gynecologic_oncology" & taxonomy_1 == "207VG0400X" ~ 5L,
+          TRUE ~ 0L
+        ),
+        0L
+      ),
+
+      total_score = pts_name + pts_state + pts_gender + pts_career +
+                    pts_rarity + pts_city + pts_subspecialty
     ) |>
     arrange(desc(total_score))
 
@@ -317,6 +358,7 @@ score_author <- function(author_row, cands, name_freq_tbl) {
 # Combine all candidates — ensure columns exist even if one strategy returned 0
 empty_cand <- tibble(npi = character(), first_name = character(), last_name = character(),
                      gender = character(), practice_address_state = character(),
+                     practice_address_city = character(),
                      taxonomy_1 = character(), npi_enumeration_date = as.Date(character()),
                      last_upper = character(), first_upper = character(), strategy = character())
 all_candidates <- bind_rows(
