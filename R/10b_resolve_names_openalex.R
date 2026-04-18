@@ -104,9 +104,10 @@ oa_names <- oa_names |>
   mutate(
     aagl_norm = vapply(aagl_author, function(x) {
       n <- tryCatch(humaniformat::parse_names(x)$last_name, error = function(e) NA_character_)
-      toupper(trimws(n))
+      toupper(trimws(gsub("[\u2010\u2011\u2012\u2013\u2014\u2015\uFE58\uFE63\uFF0D]", "-", n)))
     }, character(1)),
-    oa_last = toupper(trimws(str_extract(oa_full_name, "\\S+$"))),
+    oa_last = toupper(trimws(gsub("[\u2010\u2011\u2012\u2013\u2014\u2015\uFE58\uFE63\uFF0D]", "-",
+                                   str_extract(oa_full_name, "\\S+$")))),
     name_agrees = !is.na(aagl_norm) & !is.na(oa_last) & aagl_norm == oa_last
   )
 

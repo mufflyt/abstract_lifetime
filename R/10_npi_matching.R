@@ -22,6 +22,12 @@ source(here("R", "utils_text.R"))
 source(here("R", "utils_states.R"))
 source(here("R", "utils_acog.R"))
 
+# Normalize Unicode dashes/hyphens to ASCII (U+2010, U+2011, U+2012, U+2013,
+# U+2014, U+2015, U+FE58, U+FE63, U+FF0D all → plain hyphen U+002D)
+normalize_dashes <- function(x) {
+  gsub("[\u2010\u2011\u2012\u2013\u2014\u2015\uFE58\uFE63\uFF0D]", "-", x)
+}
+
 cfg <- config::get(file = here("config.yml"))
 
 cli_h1("NPI Matching for AAGL First Authors")
@@ -37,8 +43,8 @@ pool <- read_csv(abog_path, show_col_types = FALSE) |>
   filter(!is.na(first_name), !is.na(last_name), nchar(first_name) > 0) |>
   transmute(
     npi = as.character(npi),
-    pool_first = toupper(trimws(first_name)),
-    pool_last = toupper(trimws(last_name)),
+    pool_first = toupper(trimws(normalize_dashes(first_name))),
+    pool_last = toupper(trimws(normalize_dashes(last_name))),
     pool_gender = npi_gender,
     pool_state = state,
     pool_subspecialty = subspecialty,
@@ -112,11 +118,11 @@ lookup <- abstracts |>
     # Full name priority: OpenAlex (broadest) > PubMed confirmed match
     has_full_name = (!is.na(oa_first_name) & nchar(oa_first_name) > 1) |
       (pubmed_name_matches_aagl & !is.na(pubmed_first_name) & nchar(pubmed_first_name) > 2),
-    full_first_name = coalesce(
+    full_first_name = normalize_dashes(coalesce(
       oa_first_name,
       if_else(pubmed_name_matches_aagl, pubmed_first_name, NA_character_)
-    ),
-    last_name_upper = toupper(last_name)
+    )),
+    last_name_upper = toupper(normalize_dashes(last_name))
   ) |>
   left_join(
     char |> select(abstract_id, first_author_state, first_author_gender),
@@ -165,7 +171,7 @@ score_author <- function(author_row) {
 
   # Find candidates in ABOG pool — exact last name first, fuzzy fallback
   if (has_full) {
-    full_up <- toupper(trimws(author_row$full_first_name))
+    full_up <- toupper(trimws(normalize_dashes(author_row$full_first_name %||% "")))
     my_cands <- pool |> filter(pool_last == last_up, pool_first == full_up)
     if (nrow(my_cands) == 0) {
       my_cands <- pool |> filter(pool_last == last_up, pool_first_initial == fi)

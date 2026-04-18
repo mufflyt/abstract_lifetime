@@ -101,8 +101,8 @@ AAGL2013_004,S. Ferrero,Simone Ferrero,Simone,https://orcid.org/0000-0003-2225-5
 AAGL2013_005,L.C. Ellett,Lenore Ellett,Lenore,https://orcid.org/0000-0001-7939-3043,5,ELLETT,ELLETT,TRUE
 AAGL2013_006,L. El Hachem,Lena El Hachem,Lena,https://orcid.org/0000-0001-6016-3555,8,HACHEM,HACHEM,TRUE
 AAGL2013_007,C. Prabakar,Cheruba Prabakar,Cheruba,NA,4,PRABAKAR,PRABAKAR,TRUE
-AAGL2013_008,E. Chapman-Davis,Eloise Chapman‐Davis,Eloise,https://orcid.org/0000-0002-1349-8579,2,CHAPMAN-DAVIS,CHAPMAN‐DAVIS,FALSE
-AAGL2013_009,P. Barton-Smith,Peter Barton‐Smith,Peter,NA,2,BARTON-SMITH,BARTON‐SMITH,FALSE
+AAGL2013_008,E. Chapman-Davis,Eloise Chapman‐Davis,Eloise,https://orcid.org/0000-0002-1349-8579,2,CHAPMAN-DAVIS,CHAPMAN-DAVIS,TRUE
+AAGL2013_009,P. Barton-Smith,Peter Barton‐Smith,Peter,NA,2,BARTON-SMITH,BARTON-SMITH,TRUE
 AAGL2013_010,K.A. Kho,Kimberly A. Kho,Kimberly,https://orcid.org/0000-0003-3607-5779,5,KHO,KHO,TRUE
 AAGL2013_011,J.L. Green,J.L. Green,J.L.,NA,5,GREEN,GREEN,TRUE
 AAGL2013_012,J. Yi,Johnny Yi,Johnny,https://orcid.org/0000-0002-7480-6344,6,YI,YI,TRUE
@@ -363,7 +363,7 @@ AAGL2015_077,B Rabischong,B. Rabischong,B.,NA,7,RABISCHONG,RABISCHONG,TRUE
 AAGL2015_078,PJ Bongers,PJ Bongers,PJ,NA,5,BONGERS,BONGERS,TRUE
 AAGL2015_079,T Achjian,Tamar Achjian,Tamar,NA,5,ACHJIAN,ACHJIAN,TRUE
 AAGL2015_080,KM Braun,KM Braun,KM,NA,4,BRAUN,BRAUN,TRUE
-AAGL2015_081,J Opoku-Anane,Jessica Opoku‐Anane,Jessica,https://orcid.org/0000-0003-2252-1571,7,OPOKU-ANANE,OPOKU‐ANANE,FALSE
+AAGL2015_081,J Opoku-Anane,Jessica Opoku‐Anane,Jessica,https://orcid.org/0000-0003-2252-1571,7,OPOKU-ANANE,OPOKU-ANANE,TRUE
 AAGL2015_082,S Senapati,S. Senapati,S.,NA,3,SENAPATI,SENAPATI,TRUE
 AAGL2015_083,CCG Chen,CCG Chen,CCG,NA,8,CHEN,CHEN,TRUE
 AAGL2015_084,NV Clark,NV Clark,NV,NA,5,CLARK,CLARK,TRUE
@@ -393,7 +393,7 @@ AAGL2016_012,P Magtibay,Paul M. Magtibay,Paul,https://orcid.org/0000-0001-5494-3
 AAGL2016_013,MH Emanuel,MH Emanuel,MH,NA,4,EMANUEL,EMANUEL,TRUE
 AAGL2016_014,M Hanstede,Miriam M.F. Hanstede,Miriam,https://orcid.org/0000-0001-7837-5070,2,HANSTEDE,HANSTEDE,TRUE
 AAGL2016_015,H Fernandez,H. Fernandez,H.,https://orcid.org/0000-0002-6463-1018,3,FERNANDEZ,FERNANDEZ,TRUE
-AAGL2016_016,JC Rosa-e-Silva,JC Rosa‐e‐Silva,JC,NA,6,ROSA-E-SILVA,ROSA‐E‐SILVA,FALSE
+AAGL2016_016,JC Rosa-e-Silva,JC Rosa‐e‐Silva,JC,NA,6,ROSA-E-SILVA,ROSA-E-SILVA,TRUE
 AAGL2016_017,D Xu,Dabao Xu,Dabao,https://orcid.org/0000-0002-5455-5592,5,XU,XU,TRUE
 AAGL2016_018,M Lutz,M. Lutz,M.,https://orcid.org/0009-0009-8141-8006,3,LUTZ,LUTZ,TRUE
 AAGL2016_019,MV Vargas,MV Vargas,MV,NA,7,VARGAS,VARGAS,TRUE
@@ -517,7 +517,7 @@ AAGL2017_040,Y.B. Aznaurova,Y.B. Aznaurova,Y.B.,NA,5,AZNAUROVA,AZNAUROVA,TRUE
 AAGL2017_041,M.A. Stuparich,Mallory Stuparich,Mallory,https://orcid.org/0000-0001-6185-6097,2,STUPARICH,STUPARICH,TRUE
 AAGL2017_042,L. Chao,Lisa Chao,Lisa,https://orcid.org/0000-0002-8133-2626,2,CHAO,CHAO,TRUE
 AAGL2017_043,A.P. Hutchinson,Anne P. Hutchinson,Anne,https://orcid.org/0000-0001-7401-8682,6,HUTCHINSON,HUTCHINSON,TRUE
-AAGL2017_044,S. Maheux-Lacroix,Sarah Maheux‐Lacroix,Sarah,https://orcid.org/0000-0003-4187-3708,6,MAHEUX-LACROIX,MAHEUX‐LACROIX,FALSE
+AAGL2017_044,S. Maheux-Lacroix,Sarah Maheux‐Lacroix,Sarah,https://orcid.org/0000-0003-4187-3708,6,MAHEUX-LACROIX,MAHEUX-LACROIX,TRUE
 AAGL2017_045,N. Smorgick,Noam Smorgick,Noam,https://orcid.org/0000-0002-4561-7659,6,SMORGICK,SMORGICK,TRUE
 AAGL2017_046,X. Yi,X. Yi,X.,NA,5,YI,YI,TRUE
 AAGL2017_047,S. Krantz,Sanford B. Krantz,Sanford,NA,3,KRANTZ,KRANTZ,TRUE
@@ -617,7 +617,7 @@ AAGL2018_043,S. Quinn,Stephen Quinn,Stephen,https://orcid.org/0000-0001-5254-954
 AAGL2018_044,T. Kim,Tae Yeong Kim,Tae,NA,7,KIM,KIM,TRUE
 AAGL2018_045,A. Cholkeri-Singh,Aarathi Cholkeri-Singh,Aarathi,https://orcid.org/0000-0003-2231-8418,2,CHOLKERI-SINGH,CHOLKERI-SINGH,TRUE
 AAGL2018_046,L.K. Newcomb,Laura K. Newcomb,Laura,NA,2,NEWCOMB,NEWCOMB,TRUE
-AAGL2018_047,J. Opoku-Anane,Jessica Opoku‐Anane,Jessica,https://orcid.org/0000-0003-2252-1571,6,OPOKU-ANANE,OPOKU‐ANANE,FALSE
+AAGL2018_047,J. Opoku-Anane,Jessica Opoku‐Anane,Jessica,https://orcid.org/0000-0003-2252-1571,6,OPOKU-ANANE,OPOKU-ANANE,TRUE
 AAGL2018_048,L. Chao,L. Chao,L.,NA,2,CHAO,CHAO,TRUE
 AAGL2018_049,J.D. Miller,Jeffrey D. Miller,Jeffrey,https://orcid.org/0000-0002-7916-6366,5,MILLER,MILLER,TRUE
 AAGL2018_050,K. Vu,Kim‐Nhien Vu,Kim‐Nhien,https://orcid.org/0000-0003-3154-6463,9,VU,VU,TRUE
@@ -634,7 +634,7 @@ AAGL2018_060,O. Abuzeid,Omar Abuzeid,Omar,https://orcid.org/0000-0001-5848-2856,
 AAGL2018_061,G. Lanzo,Gabriele Lanzo,Gabriele,https://orcid.org/0000-0002-0850-6503,5,LANZO,LANZO,TRUE
 AAGL2018_062,A.F. Vigueras Smith,Amy Smith,Amy,NA,5,SMITH,SMITH,TRUE
 AAGL2018_063,M.B. Secter,Michael Secter,Michael,NA,4,SECTER,SECTER,TRUE
-AAGL2018_064,A.M. Jaramillo-Cardoso,Adrian Jaramillo‐Cardoso,Adrian,https://orcid.org/0000-0002-7617-0757,7,JARAMILLO-CARDOSO,JARAMILLO‐CARDOSO,FALSE
+AAGL2018_064,A.M. Jaramillo-Cardoso,Adrian Jaramillo‐Cardoso,Adrian,https://orcid.org/0000-0002-7617-0757,7,JARAMILLO-CARDOSO,JARAMILLO-CARDOSO,TRUE
 AAGL2018_065,K. Lee,Kil‐yong Lee,Kil‐yong,https://orcid.org/0000-0002-7949-0166,5,LEE,LEE,TRUE
 AAGL2018_066,N. Amirlatifi,Nikki Amirlatifi,Nikki,NA,3,AMIRLATIFI,AMIRLATIFI,TRUE
 AAGL2018_067,E. Matanes,Emad Matanes,Emad,https://orcid.org/0000-0002-6990-9592,6,MATANES,MATANES,TRUE
@@ -648,7 +648,7 @@ AAGL2018_074,J.L. Kenner,Jamaan L. Kenner,Jamaan,NA,2,KENNER,KENNER,TRUE
 AAGL2018_075,V.L. Lawn,Victoria Lawn,Victoria,NA,6,LAWN,LAWN,TRUE
 AAGL2018_076,P. Mwesigwa,P. Mwesigwa,P.,NA,3,MWESIGWA,MWESIGWA,TRUE
 AAGL2018_077,M.T. Siedhoff,Matthew T. Siedhoff,Matthew,https://orcid.org/0000-0001-7524-2467,5,SIEDHOFF,SIEDHOFF,TRUE
-AAGL2018_078,R. Rodriguez,Roberto Rodríguez–Jiménez,Roberto,https://orcid.org/0000-0003-2251-7249,3,RODRIGUEZ,RODRÍGUEZ–JIMÉNEZ,FALSE
+AAGL2018_078,R. Rodriguez,Roberto Rodríguez–Jiménez,Roberto,https://orcid.org/0000-0003-2251-7249,3,RODRIGUEZ,RODRÍGUEZ-JIMÉNEZ,FALSE
 AAGL2018_079,A. Yazdani,Amid Yazdani,Amid,https://orcid.org/0000-0002-1123-270X,1,YAZDANI,YAZDANI,TRUE
 AAGL2018_080,C.R. King,C. King,C.,NA,4,KING,KING,TRUE
 AAGL2018_081,A. Melnyk,A. Melnyk,A.,NA,3,MELNYK,MELNYK,TRUE
@@ -660,7 +660,7 @@ AAGL2018_086,N. Leyland,Nicholas Leyland,Nicholas,https://orcid.org/0000-0003-34
 AAGL2018_087,L. Andriani,Lisa Andriani,Lisa,NA,4,ANDRIANI,ANDRIANI,TRUE
 AAGL2018_088,U. Dior,Uri P. Dior,Uri,https://orcid.org/0000-0002-1130-7791,3,DIOR,DIOR,TRUE
 AAGL2018_089,R.H. Demir,R.H. Demir,R.H.,https://orcid.org/0000-0002-8124-6816,1,DEMIR,DEMIR,TRUE
-AAGL2018_090,J. Opoku-Anane,Jessica Opoku‐Anane,Jessica,https://orcid.org/0000-0003-2252-1571,6,OPOKU-ANANE,OPOKU‐ANANE,FALSE
+AAGL2018_090,J. Opoku-Anane,Jessica Opoku‐Anane,Jessica,https://orcid.org/0000-0003-2252-1571,6,OPOKU-ANANE,OPOKU-ANANE,TRUE
 AAGL2018_091,S. Kita,S. Kita,S.,NA,3,KITA,KITA,TRUE
 AAGL2018_092,E.M. Jorgensen,Elisa M. Jorgensen,Elisa,https://orcid.org/0000-0002-6405-867X,4,JORGENSEN,JORGENSEN,TRUE
 AAGL2018_093,S. Sedra,Silvana Sedra,Silvana,NA,7,SEDRA,SEDRA,TRUE
@@ -781,13 +781,13 @@ AAGL2020_016,R. Sinha,Risha Sinha,Risha,https://orcid.org/0000-0001-7505-4837,4,
 AAGL2020_017,C.J. Jolliffe,Courtney J. Jolliffe,Courtney,NA,9,JOLLIFFE,JOLLIFFE,TRUE
 AAGL2020_018,Y.B. Aznaurova,Y.B. Aznaurova,Y.B.,NA,6,AZNAUROVA,AZNAUROVA,TRUE
 AAGL2020_019,G.A. Barison,G.A. Barison,G.A.,NA,5,BARISON,BARISON,TRUE
-AAGL2020_020,A. Al-Hendy,Ayman Al‐Hendy,Ayman,https://orcid.org/0000-0002-8778-4447,8,AL-HENDY,AL‐HENDY,FALSE
+AAGL2020_020,A. Al-Hendy,Ayman Al‐Hendy,Ayman,https://orcid.org/0000-0002-8778-4447,8,AL-HENDY,AL-HENDY,TRUE
 AAGL2020_021,E.A. Stewart,Elizabeth A. Stewart,Elizabeth,https://orcid.org/0000-0003-1110-2400,6,STEWART,STEWART,TRUE
 AAGL2020_022,G.A. Barison,Gustavo Anderman Silva Barison,Gustavo,https://orcid.org/0000-0002-6865-3468,6,BARISON,BARISON,TRUE
 AAGL2020_023,P. Urbina,P. Urbina,P.,NA,7,URBINA,URBINA,TRUE
 AAGL2020_024,B.N. Davis,Brittany N. Davis,Brittany,https://orcid.org/0000-0002-4908-8141,2,DAVIS,DAVIS,TRUE
 AAGL2020_025,C. Bergeron,C Bergeron,C,NA,7,BERGERON,BERGERON,TRUE
-AAGL2020_026,A. Mohr-Sasson,Aya Mohr‐Sasson,Aya,https://orcid.org/0000-0001-9818-3041,5,MOHR-SASSON,MOHR‐SASSON,FALSE
+AAGL2020_026,A. Mohr-Sasson,Aya Mohr‐Sasson,Aya,https://orcid.org/0000-0001-9818-3041,5,MOHR-SASSON,MOHR-SASSON,TRUE
 AAGL2020_027,S. Bidadi,Sanam Bidadi,Sanam,NA,3,BIDADI,BIDADI,TRUE
 AAGL2020_028,T.Y. Sia,Tiffany Sia,Tiffany,https://orcid.org/0000-0001-7890-207X,3,SIA,SIA,TRUE
 AAGL2020_029,L. Michel,Luc Michel,Luc,https://orcid.org/0000-0001-8604-9574,2,MICHEL,MICHEL,TRUE
@@ -809,7 +809,7 @@ AAGL2020_044,C. Persenaire,Christianne Persenaire,Christianne,https://orcid.org/
 AAGL2020_045,J. Mun,Je‐Ho Mun,Je‐Ho,https://orcid.org/0000-0002-0734-2850,5,MUN,MUN,TRUE
 AAGL2020_046,G. Bogani,Giorgio Bogani,Giorgio,https://orcid.org/0000-0001-8373-8569,6,BOGANI,BOGANI,TRUE
 AAGL2020_047,G. Bogani,Giorgio Bogani,Giorgio,https://orcid.org/0000-0001-8373-8569,6,BOGANI,BOGANI,TRUE
-AAGL2020_048,J.R. Tymon-Rosario,Joan Tymon‐Rosario,Joan,https://orcid.org/0000-0002-8969-8307,4,TYMON-ROSARIO,TYMON‐ROSARIO,FALSE
+AAGL2020_048,J.R. Tymon-Rosario,Joan Tymon‐Rosario,Joan,https://orcid.org/0000-0002-8969-8307,4,TYMON-ROSARIO,TYMON-ROSARIO,TRUE
 AAGL2020_049,L.M. Kent,Laura Kent,Laura,NA,2,KENT,KENT,TRUE
 AAGL2020_050,K.J. Pepin,Kristen Pepin,Kristen,https://orcid.org/0000-0003-4370-3593,5,PEPIN,PEPIN,TRUE
 AAGL2020_051,N.F.T. Topbas Selcuki,Nura Fitnat Topbaş Selçuki,Nura,https://orcid.org/0000-0002-5749-9987,5,SELCUKI,SELÇUKI,FALSE
@@ -886,7 +886,7 @@ AAGL2021_026,L. Cosgriff,Lauren Cosgriff,Lauren,https://orcid.org/0000-0003-1615
 AAGL2021_027,B. Tharmarajah,B. Tharmarajah,B.,https://orcid.org/0009-0003-4485-4008,4,THARMARAJAH,THARMARAJAH,TRUE
 AAGL2021_028,B. Roberts,Brittany Roberts,Brittany,https://orcid.org/0000-0001-6008-278X,2,ROBERTS,ROBERTS,TRUE
 AAGL2021_029,G. Beroukhim,Gabriela Beroukhim,Gabriela,https://orcid.org/0000-0003-1598-8210,4,BEROUKHIM,BEROUKHIM,TRUE
-AAGL2021_030,S. As-Sanie,Sawsan As‐Sanie,Sawsan,https://orcid.org/0000-0002-7166-1979,11,AS-SANIE,AS‐SANIE,FALSE
+AAGL2021_030,S. As-Sanie,Sawsan As‐Sanie,Sawsan,https://orcid.org/0000-0002-7166-1979,11,AS-SANIE,AS-SANIE,TRUE
 AAGL2021_031,C.M. Becker,Claudia Becker,Claudia,https://orcid.org/0000-0003-2906-4377,8,BECKER,BECKER,TRUE
 AAGL2021_032,M.A. Dejenie,Menbere A. Dejenie,Menbere,NA,5,DEJENIE,DEJENIE,TRUE
 AAGL2021_033,K.J. Moore,Kristin J. Moore,Kristin,https://orcid.org/0000-0003-2179-6565,7,MOORE,MOORE,TRUE
@@ -916,7 +916,7 @@ AAGL2021_056,S. Haikal,Samantha Haikal,Samantha,NA,2,HAIKAL,HAIKAL,TRUE
 AAGL2021_057,R.S. Kim,R.S. Kim,R.S.,NA,4,KIM,KIM,TRUE
 AAGL2021_058,D. Lovell,D.Y. Lovell,D.Y.,NA,4,LOVELL,LOVELL,TRUE
 AAGL2021_059,G.K. Lewis,G.K. Lewis,G.K.,https://orcid.org/0000-0003-4922-1165,5,LEWIS,LEWIS,TRUE
-AAGL2021_060,L.C. Ramirez-Caban,Laura Ramirez‐Caban,Laura,https://orcid.org/0000-0002-8924-3441,3,RAMIREZ-CABAN,RAMIREZ‐CABAN,FALSE
+AAGL2021_060,L.C. Ramirez-Caban,Laura Ramirez‐Caban,Laura,https://orcid.org/0000-0002-8924-3441,3,RAMIREZ-CABAN,RAMIREZ-CABAN,TRUE
 AAGL2021_061,S. Sunkara,Sowmya Sunkara,Sowmya,https://orcid.org/0000-0002-3307-356X,4,SUNKARA,SUNKARA,TRUE
 AAGL2021_062,J. Savoni,JJ Savoni,JJ,NA,3,SAVONI,SAVONI,TRUE
 AAGL2021_063,M. McHale,Michael McHale,Michael,https://orcid.org/0000-0002-6471-362X,4,MCHALE,MCHALE,TRUE
@@ -1053,7 +1053,7 @@ AAGL2023_005,P Chang,Patricia Chang,Patricia,NA,9,CHANG,CHANG,TRUE
 AAGL2023_006,CK Pfeuti,CK Pfeuti,CK,NA,2,PFEUTI,PFEUTI,TRUE
 AAGL2023_007,Peña TI González,Peña TI González,Peña,NA,5,GONZÁLEZ,GONZÁLEZ,TRUE
 AAGL2023_008,U Johannesson,Ulrika Johannesson,Ulrika,https://orcid.org/0000-0002-5714-4641,3,JOHANNESSON,JOHANNESSON,TRUE
-AAGL2023_009,A Al-Hendy,Ayman Al‐Hendy,Ayman,https://orcid.org/0000-0002-8778-4447,5,AL-HENDY,AL‐HENDY,FALSE
+AAGL2023_009,A Al-Hendy,Ayman Al‐Hendy,Ayman,https://orcid.org/0000-0002-8778-4447,5,AL-HENDY,AL-HENDY,TRUE
 AAGL2023_010,R Schneyer,R Schneyer,R,https://orcid.org/0000-0002-8595-6364,6,SCHNEYER,SCHNEYER,TRUE
 AAGL2023_011,E Zaritsky,Eve Zaritsky,Eve,https://orcid.org/0000-0003-3147-6020,6,ZARITSKY,ZARITSKY,TRUE
 AAGL2023_012,MR Cantor,Monica Cantor,Monica,NA,2,NA,CANTOR,FALSE
@@ -1067,7 +1067,7 @@ AAGL2023_019,J Mak,Jason Mak,Jason,https://orcid.org/0000-0003-2346-6850,5,MAK,M
 AAGL2023_020,H VanDeman,Holly VanDeman,Holly,NA,7,VANDEMAN,VANDEMAN,TRUE
 AAGL2023_021,P Thiel,Peter Thiel,Peter,https://orcid.org/0000-0001-5951-4792,7,THIEL,THIEL,TRUE
 AAGL2023_022,G Ahmad,Gulfam Ahmad,Gulfam,https://orcid.org/0009-0003-6076-1880,7,AHMAD,AHMAD,TRUE
-AAGL2023_023,S As-Sanie,Sawsan As‐Sanie,Sawsan,https://orcid.org/0000-0002-7166-1979,7,AS-SANIE,AS‐SANIE,FALSE
+AAGL2023_023,S As-Sanie,Sawsan As‐Sanie,Sawsan,https://orcid.org/0000-0002-7166-1979,7,AS-SANIE,AS-SANIE,TRUE
 AAGL2023_024,KM Demery,KM Demery,KM,NA,2,DEMERY,DEMERY,TRUE
 AAGL2023_025,JE Fisher,J.E. Fisher,J.E.,NA,1,FISHER,FISHER,TRUE
 AAGL2023_026,DI Nassie,DI Nassie,DI,NA,7,NASSIE,NASSIE,TRUE
