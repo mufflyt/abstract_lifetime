@@ -132,8 +132,11 @@ abstracts <- abstracts |>
         val <- as.numeric(str_remove_all(num_str, ","))
         if (length(drop_years(val)) > 0) return(val)
       }
-      # Fallback: largest number in text, excluding years
-      all_nums <- as.numeric(str_extract_all(text, "\\d+")[[1]])
+      # Fallback: largest number in text, excluding years and long IDs
+      # (NCT trial IDs, DOI fragments, page numbers ≥ 5 digits are not sample sizes)
+      raw_strs <- str_extract_all(text, "\\d+")[[1]]
+      raw_strs <- raw_strs[nchar(raw_strs) <= 5]   # drop 6+-digit IDs
+      all_nums <- as.numeric(raw_strs)
       all_nums <- all_nums[!is.na(all_nums) & all_nums > 1]
       all_nums <- drop_years(all_nums)
       if (length(all_nums) > 0) return(max(all_nums))
@@ -215,7 +218,38 @@ abstracts <- abstracts |>
 
     # IRB / ethics statement
     has_irb_statement = str_detect(search_text_lc,
-      "\\birb\\b|institutional review board|ethics committee|ethical approval|ethically approved|exempt.*review|human subjects")
+      "\\birb\\b|institutional review board|ethics committee|ethical approval|ethically approved|exempt.*review|human subjects"),
+
+    # Abstract word count (from full text)
+    abstract_word_count = sapply(strsplit(coalesce(abstract_full_text, abstract_text, ""), "\\s+"),
+                                 function(x) sum(nchar(x) > 0)),
+
+    # Research category (mutually exclusive, priority order)
+    research_category = case_when(
+      str_detect(search_text_lc, "\\bcell\\b|molecular|protein|gene\\b|expression|pathway|receptor|histolog|tissue|\\bin vitro\\b|\\bin vivo\\b|biomarker") ~ "basic_science",
+      str_detect(search_text_lc, "simulation|training|curriculum|learner|education|teaching|\\bvr\\b|virtual reality|warm.?up|\\bosce\\b") & study_design != "rct" ~ "education",
+      str_detect(search_text_lc, "quality improvement|\\bqi\\b|compliance|safety culture|\\beras\\b|enhanced recovery|protocol implement|checklist|bundle") ~ "quality_improvement",
+      str_detect(search_text_lc, "cost|utilization|disparit|access|insurance|medicaid|medicare|socioeconomic|equity|racial|ethnic|rural|urban|readmission|length of stay") ~ "health_services",
+      str_detect(search_text_lc, "robot|davinci|da vinci|\\bai\\b|artificial intelligence|machine learning|deep learning|computer vision|instrument|device|platform") ~ "device_technology",
+      str_detect(search_text_lc, "patient|surgery|procedure|operative|clinical|outcome|complication|surgical") ~ "clinical",
+      TRUE ~ "other"
+    ),
+
+    # Primary procedure (most specific wins)
+    primary_procedure = case_when(
+      str_detect(search_text_lc, "sacrocolpopex|sacrocervicopex") ~ "sacrocolpopexy",
+      str_detect(search_text_lc, "myomectom") ~ "myomectomy",
+      str_detect(search_text_lc, "hysterectom") ~ "hysterectomy",
+      str_detect(search_text_lc, "endometrios") ~ "endometriosis",
+      str_detect(search_text_lc, "oophorectom|salpingo|adnex") ~ "adnexal_surgery",
+      str_detect(search_text_lc, "sling|incontinence|prolapse|pelvic organ") ~ "pelvic_floor",
+      str_detect(search_text_lc, "steriliz|tubal|essure") ~ "sterilization",
+      str_detect(search_text_lc, "ectopic|pregnancy") ~ "ectopic_pregnancy",
+      str_detect(search_text_lc, "cerclage|cervical insuff") ~ "cerclage",
+      str_detect(search_text_lc, "fibroid|leiomyoma|uterine artery") ~ "fibroids",
+      str_detect(search_text_lc, "cancer|malignan|oncolog|staging|sentinel") ~ "gynecologic_oncology",
+      TRUE ~ NA_character_
+    )
   ) |>
   select(-search_text_lc)
 

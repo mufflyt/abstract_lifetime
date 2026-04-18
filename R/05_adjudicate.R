@@ -18,9 +18,10 @@ candidates <- read_csv(here("data", "processed", "pubmed_candidates.csv"), show_
 
 # Join abstracts with their best matches
 results <- abstracts |>
-  left_join(scores, by = "abstract_id") |>
+  left_join(scores |> mutate(best_pmid = as.character(best_pmid)), by = "abstract_id") |>
   left_join(
     candidates |>
+      mutate(pmid = as.character(pmid)) |>
       select(pmid, pub_title, pub_journal, pub_year, pub_month, pub_doi,
              pub_first_author, pub_last_author) |>
       distinct(pmid, .keep_all = TRUE),
@@ -62,7 +63,9 @@ results_out <- results |>
     any_of(c("session_type", "study_design", "is_multicenter",
              "has_funding", "stat_sig_reported", "result_positivity",
              "has_numeric_results", "is_database_study", "has_industry",
-             "has_trial_registration", "has_irb_statement")),
+             "has_trial_registration", "has_irb_statement",
+             "abstract_word_count",
+             "research_category", "primary_procedure")),
     best_pmid, best_score, classification, has_tie, n_candidates,
     all_of(available_score_cols),
     pub_title, pub_journal, pub_year, pub_doi, pub_first_author,
