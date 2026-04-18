@@ -205,8 +205,47 @@ config.yml            # All pipeline parameters (congresses, thresholds, API set
 ## Requirements
 
 - R >= 4.4
-- Key packages: tidyverse, rentrez, xml2, httr, jsonlite, survival, gender, stringdist, DiagrammeR
+- Key packages: tidyverse, rentrez, xml2, httr, jsonlite, survival, gender, stringdist, humaniformat, DiagrammeR
 - Optional: googlesheets4 (Shiny backend), rsconnect (deployment), webshot2 (flow diagram PNG)
+- DuckDB database: `/Volumes/MufflySamsung/DuckDB/nber_my_duckdb.duckdb` (for NPI matching, Mac-local)
+- ABOG-NPI file: `isochrones/data/canonical_abog/canonical_abog_npi_LATEST.csv` (for NPI matching)
+
+## API Keys & Environment Variables
+
+The pipeline uses several external APIs. All work without keys but with lower rate limits. Set these in `~/.Renviron` for better performance:
+
+```bash
+# NCBI E-Utilities (PubMed search) — 3 req/sec without key, 10 req/sec with key
+# Get one at: https://www.ncbi.nlm.nih.gov/account/settings/ → "API Key Management"
+ENTREZ_KEY=your_ncbi_api_key_here
+
+# genderize.io (international gender inference) — 100 req/day free, unlimited with key
+# Get one at: https://store.genderize.io/ (free tier available)
+GENDERIZE_API_KEY=your_genderize_key_here
+
+# Google Sheets (Shiny adjudication app backend)
+# Place service account JSON at: shiny/adjudication_app/google_credentials.json
+# Get one at: https://console.cloud.google.com → IAM & Admin → Service Accounts → Create Key
+GOOGLE_SHEETS_ID=your_google_sheet_id_here
+
+# Contact email for polite API pools (OpenAlex, CrossRef)
+# Used in User-Agent headers per API terms of service
+PIPELINE_EMAIL=your.email@example.com
+```
+
+**No-key APIs** (work without authentication):
+- **OpenAlex** — polite pool with `mailto` parameter (set via `PIPELINE_EMAIL`); no key needed
+- **CrossRef** — polite pool with `mailto`; no key needed
+- **Europe PMC** — fully open; no key needed
+- **Semantic Scholar** — public API; no key needed (rate limited to ~100 req/5min)
+- **ORCID** — public API for reading; no key needed
+- **NPPES/NPI Registry** — public API; no key needed
+
+**shinyapps.io deployment** (optional):
+```r
+# Configure once — get token at https://www.shinyapps.io/admin/#/tokens
+rsconnect::setAccountInfo(name = "your_account", token = "YOUR_TOKEN", secret = "YOUR_SECRET")
+```
 
 ## Contributing
 
