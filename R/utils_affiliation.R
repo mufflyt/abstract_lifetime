@@ -61,7 +61,18 @@ classify_practice_type <- function(aff, all_aff = NA_character_) {
     "\\bgme\\b|medical college|institut(e|o) of|",
     "children.?s hospital.*university|",  # children's hospitals affiliated with universities
     "\\bharvard\\b|\\bstanford\\b|\\byale\\b|\\bduke\\b|\\bjohns hopkins\\b|",
-    "\\bcornell\\b|\\bcolumbia\\b|\\bnyu\\b|\\bucsf\\b|\\bucla\\b"
+    "\\bcornell\\b|\\bcolumbia\\b|\\bnyu\\b|\\bucsf\\b|\\bucla\\b|",
+    # Major non-university academic/research hospitals (US)
+    "cleveland clinic|mayo clinic|cedars.?sinai|mount sinai|",
+    "memorial sloan|md anderson|brigham and women|massachusetts general|",
+    "new york.?presbyterian|rush university|northwestern memorial|",
+    # International academic hospital patterns
+    "\\birccs\\b|\\bchu\\b|\\bchru\\b|\\bap.?hp\\b|charit|",
+    "centre hospitalier universitaire|hopital universitaire|",
+    "h.?pital.*universit|ospedale.*universit|krankenhaus.*universit|",
+    "academic hospital|universitair|universitets|universit.ts|",
+    "\\binserm\\b|\\bcnrs\\b|\\bnhs\\b|\\bking.?s college hospital\\b|",
+    "imperial college|oxford university hospital|cambridge university hospital"
   )
   if (str_detect(lc, academic_patterns)) return("academic")
 

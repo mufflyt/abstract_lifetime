@@ -231,14 +231,80 @@ fetch_article_abstract <- function(article_url, cache_dir = here::here("data", "
       }
     }
 
-    # Full abstract text fallback
+    # Full abstract text fallback (structured abstract container)
     abstract_full <- page |>
       html_element("div.abstract.author, div.abstract, section#abstracts") |>
       html_text(trim = TRUE)
+    abstract_full <- str_squish(abstract_full %||% NA_character_)
+
+    # ── Section snippets fallback (older/paywalled ScienceDirect pages) ──────
+    # For 2012-2018 supplement issues the full abstract is paywalled, but
+    # ScienceDirect exposes "Section snippets" in the initial HTML inside
+    # id="preview-section-snippets". Headings (h2/h3/h4) are followed by
+    # sibling text nodes — extract them with a heading-to-next-heading scan.
+    if ((is.na(abstract_full) || nchar(abstract_full) < 50) && length(sections) == 0) {
+
+      # Primary: id="preview-section-snippets" container (ScienceDirect 2012-2023)
+      snippets_node <- html_element(page, "#preview-section-snippets")
+      if (!is.na(snippets_node)) {
+        headings <- html_elements(snippets_node, "h2, h3, h4")
+        in_snippets <- FALSE
+        collected   <- character(0)
+        skip_headings <- c("section snippets", "references", "cited by",
+                           "recommended articles", "about sciencedirect")
+        for (h in headings) {
+          htxt <- str_squish(html_text(h, trim = TRUE))
+          lc   <- tolower(htxt)
+          if (any(str_detect(lc, fixed(skip_headings)))) next
+          # Grab all text siblings until the next heading
+          body_nodes <- html_elements(h, xpath =
+            "following-sibling::*[not(self::h2) and not(self::h3) and not(self::h4)][position()<=3]")
+          body <- paste(vapply(body_nodes, function(n)
+            str_squish(html_text(n, trim = TRUE)), character(1)), collapse = " ")
+          body <- str_squish(body)
+          if (nchar(body) > 10) {
+            sections[[htxt]] <- body
+            collected <- c(collected, paste0(htxt, ": ", body))
+          }
+        }
+        if (length(collected) > 0) abstract_full <- paste(collected, collapse = " ")
+      }
+
+      # Secondary: <dt>/<dd> pairs anywhere on the page
+      if (is.na(abstract_full) || nchar(abstract_full) < 50) {
+        dts <- html_elements(page, "dt")
+        dds <- html_elements(page, "dd")
+        if (length(dts) > 0 && length(dts) == length(dds)) {
+          parts <- mapply(function(dt, dd) {
+            h <- str_squish(html_text(dt, trim = TRUE))
+            b <- str_squish(html_text(dd, trim = TRUE))
+            if (nchar(h) > 0 && nchar(b) > 10) {
+              sections[[h]] <<- b
+              paste0(h, ": ", b)
+            } else NA_character_
+          }, dts, dds, USE.NAMES = FALSE)
+          parts <- parts[!is.na(parts)]
+          if (length(parts) > 0) abstract_full <- paste(parts, collapse = " ")
+        }
+      }
+
+      # Tertiary: named container elements
+      if (is.na(abstract_full) || nchar(abstract_full) < 50) {
+        for (sel in c("dl.snippets", "div.Snippets", "section.Snippets",
+                      "div[data-testid='section-snippets']")) {
+          node <- html_element(page, sel)
+          if (!is.na(node)) {
+            txt <- str_squish(html_text(node, trim = TRUE))
+            if (nchar(txt) > 50) { abstract_full <- txt; break }
+          }
+        }
+      }
+    }
 
     list(
       sections = sections,
-      abstract_full = str_squish(abstract_full %||% NA_character_)
+      abstract_full = if (is.na(abstract_full) || nchar(abstract_full) == 0)
+        NA_character_ else abstract_full
     )
   }, error = function(e) {
     cli_alert_warning("Error fetching {article_url}: {e$message}")

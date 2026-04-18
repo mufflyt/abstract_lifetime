@@ -147,6 +147,29 @@ parse_pubmed_xml <- function(xml_text) {
   }) |> purrr::list_rbind()
 }
 
+#' Fetch raw PubMed XML for a single PMID, using a disk cache.
+#'
+#' @param pmid      Character. A single PubMed ID.
+#' @param cache_dir Directory where <pmid>.xml files are stored.
+#' @param delay     Seconds to sleep before a live fetch (respects rate limits).
+#' @return Raw XML string, or NA_character_ on failure.
+fetch_pubmed_xml <- function(pmid, cache_dir, delay = 0.34) {
+  path <- file.path(cache_dir, paste0(pmid, ".xml"))
+  if (file.exists(path) && file.info(path)$size > 100) {
+    return(readr::read_file(path))
+  }
+  Sys.sleep(delay)
+  raw <- tryCatch(
+    rentrez::entrez_fetch(db = "pubmed", id = pmid, rettype = "xml"),
+    error = function(e) {
+      cli::cli_alert_warning("PubMed XML fetch failed for PMID {pmid}: {e$message}")
+      NA_character_
+    }
+  )
+  if (!is.na(raw) && nchar(raw) > 100) readr::write_file(raw, path)
+  raw
+}
+
 #' Build PubMed date range filter
 build_date_filter <- function(cfg = NULL) {
   if (is.null(cfg)) cfg <- config::get(file = here::here("config.yml"))

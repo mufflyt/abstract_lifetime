@@ -156,6 +156,101 @@ parse_us_state <- function(aff) {
   NA_character_
 }
 
+# Canonical country name lookup — maps common variants and abbreviations.
+.COUNTRY_CANONICAL <- c(
+  "japan" = "Japan", "nippon" = "Japan",
+  "china" = "China", "p.r. china" = "China", "people's republic of china" = "China",
+  "hong kong" = "Hong Kong",
+  "south korea" = "South Korea", "korea" = "South Korea", "republic of korea" = "South Korea",
+  "taiwan" = "Taiwan", "republic of china" = "Taiwan",
+  "india" = "India",
+  "singapore" = "Singapore",
+  "thailand" = "Thailand",
+  "malaysia" = "Malaysia",
+  "indonesia" = "Indonesia",
+  "philippines" = "Philippines",
+  "vietnam" = "Vietnam",
+  "pakistan" = "Pakistan",
+  "bangladesh" = "Bangladesh",
+  "sri lanka" = "Sri Lanka",
+  "nepal" = "Nepal",
+  "iran" = "Iran",
+  "israel" = "Israel",
+  "turkey" = "Turkey",
+  "saudi arabia" = "Saudi Arabia",
+  "united arab emirates" = "UAE", "uae" = "UAE",
+  "qatar" = "Qatar",
+  "egypt" = "Egypt",
+  "jordan" = "Jordan",
+  "lebanon" = "Lebanon",
+  "germany" = "Germany",
+  "france" = "France",
+  "italy" = "Italy",
+  "spain" = "Spain",
+  "united kingdom" = "United Kingdom", "uk" = "United Kingdom",
+  "england" = "United Kingdom", "scotland" = "United Kingdom",
+  "wales" = "United Kingdom", "northern ireland" = "United Kingdom",
+  "netherlands" = "Netherlands", "the netherlands" = "Netherlands",
+  "belgium" = "Belgium",
+  "sweden" = "Sweden",
+  "norway" = "Norway",
+  "denmark" = "Denmark",
+  "finland" = "Finland",
+  "switzerland" = "Switzerland",
+  "austria" = "Austria",
+  "portugal" = "Portugal",
+  "ireland" = "Ireland",
+  "poland" = "Poland",
+  "czech republic" = "Czech Republic", "czechia" = "Czech Republic",
+  "hungary" = "Hungary",
+  "romania" = "Romania",
+  "greece" = "Greece",
+  "russia" = "Russia",
+  "canada" = "Canada",
+  "australia" = "Australia",
+  "new zealand" = "New Zealand",
+  "brazil" = "Brazil",
+  "mexico" = "Mexico",
+  "colombia" = "Colombia",
+  "argentina" = "Argentina",
+  "chile" = "Chile",
+  "south africa" = "South Africa",
+  "nigeria" = "Nigeria",
+  "kenya" = "Kenya"
+)
+
+#' Extract the country from an affiliation string.
+#' Strategy: (1) check last comma-delimited token (most affiliations end "City, Country"),
+#' (2) scan full string for known country names.
+#' Returns canonical country name or NA_character_.
+parse_country <- function(aff) {
+  if (is.na(aff) || nchar(aff) < 3) return(NA_character_)
+
+  # US signals → return "USA" without further scanning
+  lc <- tolower(aff)
+  if (str_detect(lc, "\\b(usa|united states|u\\.s\\.a\\.)\\b") ||
+      !is.na(parse_us_state(aff))) return("USA")
+
+  # Strategy 1: last comma-delimited token is typically the country
+  parts <- str_trim(str_split(aff, ",")[[1]])
+  last_token <- tolower(parts[length(parts)])
+  last_token <- str_remove(last_token, "\\.\\s*$")
+  last_token <- str_squish(last_token)
+  if (last_token %in% names(.COUNTRY_CANONICAL)) {
+    return(unname(.COUNTRY_CANONICAL[last_token]))
+  }
+
+  # Strategy 2: scan full string for any known country name (longest match first)
+  country_order <- names(.COUNTRY_CANONICAL)[order(-nchar(names(.COUNTRY_CANONICAL)))]
+  for (cn in country_order) {
+    if (str_detect(lc, paste0("\\b", cn, "\\b"))) {
+      return(unname(.COUNTRY_CANONICAL[cn]))
+    }
+  }
+
+  NA_character_
+}
+
 #' Detect whether an affiliation is US-based (broader than state parsing).
 #' Returns TRUE if any US signal found, FALSE if non-US country detected, NA if ambiguous.
 is_us_affiliation <- function(aff) {

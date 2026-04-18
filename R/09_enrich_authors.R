@@ -21,6 +21,8 @@ suppressPackageStartupMessages({
   library(rentrez)
 })
 
+source(here("R", "utils_pubmed.R"))
+
 cfg <- config::get(file = here("config.yml"))
 `%||%` <- function(a, b) if (is.null(a) || length(a) == 0 || is.na(a)) b else a
 
@@ -76,23 +78,6 @@ if (nrow(targets) == 0) {
 
 has_key <- nchar(Sys.getenv("ENTREZ_KEY", "")) > 0
 delay   <- if (has_key) 1 / cfg$pubmed$rate_limit_with_key else 1 / cfg$pubmed$rate_limit_per_sec
-
-fetch_xml <- function(pmid) {
-  path <- file.path(cache_dir, paste0(pmid, ".xml"))
-  if (file.exists(path) && file.info(path)$size > 100) {
-    return(read_file(path))
-  }
-  Sys.sleep(delay)
-  raw <- tryCatch(
-    rentrez::entrez_fetch(db = "pubmed", id = pmid, rettype = "xml"),
-    error = function(e) {
-      cli_alert_warning("fetch failed for PMID {pmid}: {e$message}")
-      NA_character_
-    }
-  )
-  if (!is.na(raw) && nchar(raw) > 100) write_file(raw, path)
-  raw
-}
 
 # ---- Parse one PubmedArticle XML into author rows ------------------------
 
@@ -157,7 +142,7 @@ cli_progress_bar("Fetching PubMed XML", total = nrow(targets))
 author_rows <- vector("list", nrow(targets))
 for (i in seq_len(nrow(targets))) {
   row <- targets[i, ]
-  xml_text <- fetch_xml(row$pmid)
+  xml_text <- fetch_pubmed_xml(row$pmid, cache_dir, delay)
   author_rows[[i]] <- parse_authors(xml_text, row$pmid, row$abstract_id)
   cli_progress_update()
 }

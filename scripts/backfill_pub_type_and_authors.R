@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
-# Backfill pub_type + author characteristics columns onto existing Google Sheet
-# decision rows. Adds missing columns to the sheet header first.
+# Backfill ALL available columns from the pipeline onto the Google Sheet.
+# Safe to re-run: overwrites existing values with current pipeline data.
 
 suppressPackageStartupMessages({
   library(googlesheets4); library(dplyr); library(readr); library(here)
@@ -13,43 +13,53 @@ gs4_auth(path = here("shiny", "adjudication_app", "google_credentials.json"))
 
 matches <- read_csv(here("output", "abstracts_with_matches.csv"),
                     show_col_types = FALSE) |>
-  select(abstract_id,
-         matched_pub_type = pub_type_canonical,
-         matched_pub_types_raw = pub_types,
-         any_of(c("n_authors", "n_unique_affiliations",
-                  "first_author_state", "first_author_acog_district",
-                  "first_author_gender")))
+  mutate(across(everything(), as.character))
 
-new_cols <- c("matched_pub_type", "matched_pub_types_raw",
-              "n_authors", "n_unique_affiliations",
-              "first_author_state", "first_author_acog_district",
-              "first_author_gender")
+# All columns to push — abstract-level (every row) and match-level (rows with best_pmid)
+push_cols <- intersect(
+  c(
+    # Algorithm outcome
+    "classification", "n_candidates", "best_pmid", "best_score",
+    # Abstract characteristics (from text)
+    "sample_size", "is_rct", "is_multicenter", "is_us_based", "is_academic",
+    "has_funding", "has_industry", "has_trial_registration", "has_irb_statement",
+    "stat_sig_reported", "result_positivity", "has_numeric_results",
+    "is_database_study", "abstract_word_count", "research_category",
+    "primary_procedure", "study_design",
+    # Matched publication
+    "pub_doi", "pub_first_author", "months_to_pub",
+    # Author characteristics
+    "n_authors", "n_unique_affiliations", "n_authors_aagl",
+    "first_author_last", "first_author_first",
+    "first_author_state", "first_author_acog_district",
+    "first_author_country", "first_author_gender", "first_author_gender_p",
+    "practice_type", "subspecialty", "career_stage"
+  ),
+  names(matches)
+)
+
+cli_alert_info("Columns to push: {length(push_cols)}")
 
 d <- read_sheet(sid, sheet = "decisions", col_types = "c")
-missing <- setdiff(new_cols, names(d))
-if (length(missing) > 0) {
-  hdr <- c(names(d), missing)
+
+# Add any new columns to the sheet header
+missing_cols <- setdiff(push_cols, names(d))
+if (length(missing_cols) > 0) {
+  hdr <- c(names(d), missing_cols)
   hdr_tbl <- as.data.frame(setNames(replicate(length(hdr), character(),
                                               simplify = FALSE), hdr))
   range_write(sid, hdr_tbl, sheet = "decisions", range = "A1",
               col_names = TRUE, reformat = FALSE)
   d <- read_sheet(sid, sheet = "decisions", col_types = "c")
-  cli_alert_info("Added columns: {paste(missing, collapse=', ')}")
+  cli_alert_info("Added {length(missing_cols)} new columns: {paste(missing_cols, collapse=', ')}")
 }
 
-# Only touch rows that are AUTO-match rows or reviewer-confirmed matches —
-# those are the rows where the pub_type / author info for best_pmid applies.
-# For no_match/skip rows we deliberately leave these blank.
-target_idx <- which(d$manual_decision %in% "match")
-cli_alert_info("Rows eligible (decision=match): {length(target_idx)}")
+lkp <- matches |> distinct(abstract_id, .keep_all = TRUE)
 
-if (length(target_idx) > 0) {
-  lkp <- matches |> distinct(abstract_id, .keep_all = TRUE)
-  for (col in new_cols) {
-    d[[col]][target_idx] <- as.character(lkp[[col]][match(d$abstract_id[target_idx],
-                                                          lkp$abstract_id)])
-  }
-  range_write(sid, d, sheet = "decisions", range = "A1",
-              col_names = TRUE, reformat = FALSE)
-  cli_alert_success("Backfilled {length(target_idx)} match rows across {length(new_cols)} columns")
+for (col in push_cols) {
+  d[[col]] <- as.character(lkp[[col]][match(d$abstract_id, lkp$abstract_id)])
 }
+
+range_write(sid, d, sheet = "decisions", range = "A1",
+            col_names = TRUE, reformat = FALSE)
+cli_alert_success("Backfilled {nrow(d)} rows across {length(push_cols)} columns")

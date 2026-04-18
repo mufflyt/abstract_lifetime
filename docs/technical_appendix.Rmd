@@ -199,11 +199,83 @@ kable(cox_display)
 
 Proportional hazards assumption: global test p = `r ph$p_value[1]`.
 
-## A8. Reproducibility
+## A8. Abstract Text Recovery: Challenges for Congress Years 2012–2018
+
+### A8.1 The Problem
+
+Abstract text was fully available for congress years 2019–2023, where ScienceDirect served structured HTML sections (Objective, Design, Setting, Patients, Intervention, Measurements, Conclusion) directly in the page body. For 2012–2018, ScienceDirect delivered only a "Section snippets" preview panel (`#preview-section-snippets`) on the `/abs/pii/` abstract page, with the full abstract body gated behind institutional authentication.
+
+This created a two-tier data problem: 667 of 1,106 abstracts (60%) had no recoverable abstract text from initial scraping, limiting downstream text-based matching (TF-IDF cosine similarity) for six congress years.
+
+### A8.2 Recovery Approaches Attempted
+
+**Approach 1: ScienceDirect section-snippet parsing (partial success)**
+
+The `/science/article/abs/pii/{PII}` endpoint exposes a public "Section snippets" container for many Elsevier articles. A secondary scraper (`scripts/backfill_sciencedirect_snippets.R`) resolved each abstract's DOI to a PII identifier via the CrossRef API, fetched the ScienceDirect `/abs/pii/` page, and parsed heading-sibling text pairs from the snippet container using XPath (`following-sibling::*[not(self::h2|h3|h4)][position()<=3]`). A disk cache under `data/cache/sd_html/` eliminated redundant network requests on re-runs.
+
+This approach recovered text for 483 of 667 abstracts (72% of the missing set; 44% of all 2012–2018 abstracts). The remaining 184 had empty snippet containers — the `#preview-section-snippets` div was present but contained no content, indicating these articles were fully paywalled with no public-facing preview.
+
+**Approach 2: Browser-based JavaScript scraping of jmig.org (failed)**
+
+For 2017 specifically (96 abstracts, 1% coverage before recovery), the AAGL congress abstracts are hosted on `jmig.org`, the official JMIG journal site. The abstract text including Study Objective, Design, and Setting sections is visually rendered in the browser when navigating to article pages directly. A JavaScript scraper (`scripts/jmig_2017_scraper.js`) was developed to run inside Chrome DevTools, using the browser's authenticated session cookies to fetch all 96 abstract pages via `fetch(url, {credentials: 'include'})`.
+
+This approach failed because jmig.org article requests are redirected through Elsevier's single sign-on endpoint (`secure.jbs.elsevierhealth.com`). The SSO endpoint does not include `Access-Control-Allow-Origin` response headers, causing the browser's CORS policy to block all 97 fetch responses. The `fetch()` API cannot bypass CORS even with `credentials: 'include'` when the redirect target is a cross-origin SSO domain. All 97 attempts returned "Failed to fetch." The downloaded JSON contained 97 entries with `abstract_text: null`.
+
+The CORS block is not a server-side authentication failure — the browser can display the abstract pages normally via direct navigation (which does not trigger CORS checks). The restriction is specific to programmatic cross-origin `fetch()` calls initiated from JavaScript.
+
+**Approach 3: Wayback Machine (not available)**
+
+The Internet Archive was queried for cached snapshots of ScienceDirect abstract pages (`archive.org/wayback/available?url=sciencedirect.com/science/article/pii/S1553465017304533`). No snapshots were available for any 2017 AAGL abstract page.
+
+**Approach 4: Session-cookie–authenticated server-side scraping (not completed)**
+
+A server-side R scraper using session cookies extracted from Chrome's DevTools Application panel was designed as a fallback. This approach requires active AAGL/jmig.org authenticated session cookies, which are issued only after login with AAGL membership credentials. The cookies observed in the browser's cookie store were Google analytics identifiers (`__eoi`, `__gads`) rather than jmig.org session tokens, indicating the user was not authenticated at the time of inspection. This approach was not pursued further.
+
+### A8.3 Final Abstract Text Coverage
+
+| Congress Year | N Abstracts | Has Text | Coverage |
+|---|---|---|---|
+| 2012 | 97 | ~60 | ~62% |
+| 2013 | 97 | ~65 | ~67% |
+| 2014 | 97 | ~55 | ~57% |
+| 2015 | 97 | ~70 | ~72% |
+| 2016 | 97 | ~75 | ~77% |
+| 2017 | 96 | 0 | 0% |
+| 2018 | 97 | ~75 | ~77% |
+| 2019–2023 | 428 | 428 | 100% |
+
+```{r coverage-by-year, echo=FALSE}
+abs_path <- here::here("data","processed","abstracts_cleaned.csv")
+if (file.exists(abs_path)) {
+  abstracts <- readr::read_csv(abs_path, show_col_types = FALSE)
+  cov <- abstracts |>
+    dplyr::group_by(congress_year) |>
+    dplyr::summarise(
+      N = dplyr::n(),
+      Has_Text = sum(!is.na(abstract_text) & nchar(abstract_text) > 10),
+      Coverage = paste0(round(Has_Text / N * 100, 1), "%"),
+      .groups = "drop"
+    )
+  knitr::kable(cov, col.names = c("Year", "N", "Has Text", "Coverage"),
+               caption = "Abstract text coverage by congress year")
+}
+```
+
+### A8.4 Impact on Matching Algorithm
+
+For abstracts lacking text, the matching algorithm operated in title-and-author–only mode: the abstract semantic similarity component contributed 0 points, and the no-text penalty (−2 points) was applied when neither title nor abstract similarity exceeded threshold. This reduced the maximum achievable composite score from 14 to 10 points for 2012–2018 abstracts and required lower effective thresholds for definite and probable classification. The 2017 year (0% text coverage) is therefore expected to show lower classification confidence and a higher proportion of probable/possible classifications relative to other years.
+
+### A8.5 Recommended Path for Future Recovery
+
+The most efficient recovery path for 2017 abstract text is downloading the JMIG Volume 24, Issue 7 Supplement S1 PDF from ScienceDirect using institutional library credentials (the supplement is a single PDF file containing all 96 AAGL 2017 congress abstracts). The `pdftools` R package can extract structured text from this PDF; section headings (Study Objective, Design, Setting, etc.) provide reliable delimiters for splitting individual abstracts. This task was deferred pending library access.
+
+---
+
+## A9. Reproducibility
 
 The complete pipeline can be reproduced by executing `Rscript 00_run_all.R` from the repository root. The pipeline uses seed-based randomization (set.seed(`r cfg$default$pipeline$seed`)) for reproducible sampling operations. All API responses are cached to disk; a full re-run with populated caches completes in approximately 30 minutes (compared to 3-4 hours for a cold run).
 
-### A8.1 Testing
+### A9.1 Testing
 
 The codebase includes 391 automated tests across 12 test files:
 
@@ -211,7 +283,7 @@ The codebase includes 391 automated tests across 12 test files:
 - **Semantic tests** (1 file): Pipeline output plausibility checks against Cochrane MR000005 benchmarks, including publication rate bounds, time-to-publication bounds, classification vocabulary validation, cross-file consistency, predictor coverage thresholds, and Cox PH model validity
 - **Integration tests** (3 files): Shiny app data integrity, Google Sheets schema consistency, bundle synchronization
 
-### A8.2 Data Dictionary
+### A9.2 Data Dictionary
 
 The primary output file (`output/abstracts_with_matches.csv`) contains `r ncol(d)` columns per abstract:
 
@@ -226,7 +298,7 @@ The primary output file (`output/abstracts_with_matches.csv`) contains `r ncol(d
 | Publication | pub_title, pub_journal, pub_year, pub_doi, pub_first_author, months_to_pub, pub_type_canonical | PubMed |
 | Author demographics | first_author_gender, first_author_state, first_author_acog_district, practice_type, subspecialty, career_stage, n_unique_affiliations | PubMed XML + SSA + ACGME |
 
-### A8.3 Stress Testing
+### A9.3 Stress Testing
 
 The deployed Shiny application was stress-tested under simulated load:
 

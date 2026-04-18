@@ -12,6 +12,7 @@ suppressPackageStartupMessages({
 
 cfg <- config::get(file = here("config.yml"))
 source(here("R", "utils_pub_types.R"))
+source(here("R", "utils_pubmed.R"))
 
 cache_dir <- here("data", "cache", "pubmed_xml")
 dir.create(cache_dir, showWarnings = FALSE, recursive = TRUE)
@@ -36,18 +37,8 @@ cli_alert_info("Unique PMIDs to type: {length(target_pmids)}")
 has_key <- nchar(Sys.getenv("ENTREZ_KEY", "")) > 0
 delay <- if (has_key) 1 / cfg$pubmed$rate_limit_with_key else 1 / cfg$pubmed$rate_limit_per_sec
 
-fetch_xml <- function(pmid) {
-  p <- file.path(cache_dir, paste0(pmid, ".xml"))
-  if (file.exists(p) && file.info(p)$size > 100) return(read_file(p))
-  Sys.sleep(delay)
-  raw <- tryCatch(rentrez::entrez_fetch(db = "pubmed", id = pmid, rettype = "xml"),
-                  error = function(e) NA_character_)
-  if (!is.na(raw) && nchar(raw) > 100) write_file(raw, p)
-  raw
-}
-
 extract_types <- function(pmid) {
-  xt <- fetch_xml(pmid)
+  xt <- fetch_pubmed_xml(pmid, cache_dir, delay)
   if (is.na(xt) || nchar(xt) < 100) return(NA_character_)
   doc <- tryCatch(read_xml(xt), error = function(e) NULL)
   if (is.null(doc)) return(NA_character_)

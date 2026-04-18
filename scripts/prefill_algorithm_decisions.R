@@ -39,10 +39,10 @@ already_logged <- unique(existing$abstract_id[!is.na(existing$abstract_id)])
 cli_alert_info("Abstracts in matches file: {nrow(matches)}")
 cli_alert_info("Already in sheet: {length(already_logged)}")
 
-# Only auto-fill accepts, rejects, and no-candidates — leave "review" for humans.
+# Auto-fill ALL classifications so every abstract appears in the sheet.
+# Probable/possible are flagged for human review via manual_decision = "skip".
 auto_fill <- matches |>
-  filter(!abstract_id %in% already_logged) |>
-  filter(classification %in% c("accept", "reject", "no_candidates"))
+  filter(!abstract_id %in% already_logged)
 
 cli_alert_info("Rows to add: {nrow(auto_fill)}")
 if (nrow(auto_fill) == 0) {
@@ -62,7 +62,7 @@ rows <- lapply(seq_len(nrow(auto_fill)), function(i) {
   m <- auto_fill[i, ]
   abs_row <- abstracts |> filter(abstract_id == m$abstract_id)
 
-  is_match <- m$classification == "accept"
+  is_match <- m$classification == "definite"
 
   final_pmid <- if (is_match && !is.na(m$best_pmid) && nchar(as.character(m$best_pmid)) > 0) {
     as.character(m$best_pmid)
@@ -85,7 +85,10 @@ rows <- lapply(seq_len(nrow(auto_fill)), function(i) {
   tibble(
     abstract_id              = m$abstract_id,
     reviewer                 = "AUTO",
-    manual_decision          = if (is_match) "match" else "no_match",
+    manual_decision          = dplyr::case_when(
+                               is_match ~ "match",
+                               m$classification %in% c("probable", "possible") ~ "skip",
+                               TRUE ~ "no_match"),
     manual_pmid              = final_pmid,
     reviewer_notes           = sprintf("Auto-filled from algorithm (classification=%s, score=%.2f)",
                                        m$classification, m$best_score %||% 0),
