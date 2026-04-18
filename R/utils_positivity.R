@@ -4,9 +4,56 @@
 
 library(stringr)
 
-#' Classify result positivity from abstract conclusion or results text.
-#' @param text Character string — the abstract's conclusion or last paragraph.
-#' @return One of "positive", "negative", "neutral", "unclear"
+#' @title Classify Result Direction from Abstract Conclusion Text
+#'
+#' @description
+#' Classifies the directional result of an abstract as positive, negative,
+#' neutral, or unclear using regex-based NLP pattern matching applied to
+#' conclusion or results text. Supports publication-bias analysis aligned with
+#' Cochrane Methodology Review MR000005.
+#'
+#' @param text Character scalar. The conclusion section or last paragraph of
+#'   an abstract. Short or missing text (\code{NA} or fewer than 15
+#'   non-whitespace characters) returns \code{"unclear"}.
+#'
+#' @return Character scalar. One of \code{"positive"}, \code{"negative"},
+#'   \code{"neutral"}, or \code{"unclear"}.
+#'
+#' @details
+#' Three pattern sets are evaluated independently:
+#' \describe{
+#'   \item{Negative patterns}{Terms such as "no significant", "did not differ",
+#'     "failed to", p-values >= 0.05 (regex-based).}
+#'   \item{Positive patterns}{Terms such as "improved", "reduced", "effective",
+#'     "superior", statistically significant p < 0.05 (excluding negative-harm
+#'     phrasing).}
+#'   \item{Neutral patterns}{Terms such as "feasible", "further study needed",
+#'     "preliminary", "trend toward".}
+#' }
+#' Decision rule: the category with the most pattern hits wins. Ties between
+#' positive and negative are resolved as \code{"neutral"}. A text with no
+#' pattern matches is \code{"unclear"}.
+#'
+#' @examples
+#' \dontrun{
+#' classify_result_positivity(
+#'   "Laparoscopic hysterectomy significantly reduced blood loss (p < 0.01)."
+#' )
+#' # "positive"
+#'
+#' classify_result_positivity(
+#'   "There was no significant difference between groups (p = 0.43)."
+#' )
+#' # "negative"
+#'
+#' classify_result_positivity(
+#'   "This pilot study suggests trends toward improved outcomes."
+#' )
+#' # "neutral"
+#' }
+#'
+#' @seealso \code{\link{classify_study_design}}, \code{\link{classify_research_category}}
+#' @export
 classify_result_positivity <- function(text) {
   if (is.na(text) || nchar(str_squish(text)) < 15) return("unclear")
   lc <- tolower(text)

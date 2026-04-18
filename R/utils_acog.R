@@ -34,8 +34,37 @@ ACOG_DISTRICT <- c(
   PR = "XI", VI = "XI"
 )
 
-#' Return the ACOG district (Roman numeral) for a 2-letter state/territory code.
-#' Returns "AFS" for Armed Forces Section codes AA/AE/AP, NA otherwise.
+#' @title Return the ACOG District for a State or Territory Code
+#'
+#' @description
+#' Maps a 2-letter US state or territory abbreviation to its corresponding
+#' ACOG district Roman numeral. Handles all 50 states, DC, Puerto Rico, USVI,
+#' select Canadian provinces, and the Armed Forces Section (AFS).
+#'
+#' @param state Character scalar. A 2-letter state or territory abbreviation
+#'   (case-insensitive). Use "AA", "AE", or "AP" for Armed Forces Section codes.
+#'
+#' @return Character scalar. A Roman numeral string ("I" through "XI") for
+#'   recognized US/Canadian codes, "AFS" for Armed Forces Section codes,
+#'   or \code{NA_character_} if the code is unrecognized or missing.
+#'
+#' @details
+#' Districts I–XI follow the official ACOG district boundaries as published at
+#' \url{https://www.acog.org/community/districts}. Several Canadian provinces
+#' are included because ACOG grants membership and district affiliation to
+#' Canadian obstetricians. The lookup table \code{ACOG_DISTRICT} is a named
+#' character vector defined at the top of this file.
+#'
+#' @examples
+#' \dontrun{
+#' acog_district_for_state("TX")   # "X"
+#' acog_district_for_state("NY")   # "II"
+#' acog_district_for_state("AE")   # "AFS"
+#' acog_district_for_state("ZZ")   # NA_character_
+#' }
+#'
+#' @seealso \code{\link{parse_us_state}}, \code{ACOG_DISTRICT}
+#' @export
 acog_district_for_state <- function(state) {
   if (is.na(state) || nchar(state) == 0) return(NA_character_)
   s <- toupper(state)

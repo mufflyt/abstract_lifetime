@@ -110,9 +110,56 @@ INSTITUTION_STATE <- c(
   "university of virginia" = "VA", "virginia commonwealth" = "VA", "inova" = "VA"
 )
 
-#' Parse a US state from a PubMed affiliation string.
-#' Tries: (1) spelled-out state name, (2) 2-letter code + ZIP, (3) city lookup,
-#' (4) institution lookup. Returns 2-letter state code or NA.
+#' @title Parse a US State Abbreviation from a PubMed Affiliation String
+#'
+#' @description
+#' Extracts a 2-letter US state or territory abbreviation from a raw PubMed
+#' affiliation string using a four-strategy waterfall: institution name lookup,
+#' spelled-out state name, 2-letter code with optional ZIP, and city name
+#' lookup.
+#'
+#' @param aff Character scalar. Raw affiliation text, typically from a PubMed
+#'   author record. Returns \code{NA_character_} for \code{NA} or empty input.
+#'
+#' @return Character scalar. A 2-letter uppercase state abbreviation (e.g.,
+#'   \code{"TX"}, \code{"CA"}, \code{"DC"}) or \code{NA_character_} if no
+#'   US state can be identified.
+#'
+#' @details
+#' Strategy priority (highest to lowest):
+#' \enumerate{
+#'   \item \strong{Institution lookup} — matches against \code{INSTITUTION_STATE},
+#'     a curated table of well-known US academic medical centers and hospitals
+#'     (e.g., "Johns Hopkins" → "MD"). Names are tested longest-first to avoid
+#'     partial matches. This prevents "George Washington University" → "WA"
+#'     (should be "DC") and "Mayo Clinic, Rochester" → "NY" (should be "MN").
+#'   \item \strong{Spelled-out state name} — tests each state name from
+#'     \code{STATE_NAMES} as a word-bounded regex, longest-first.
+#'   \item \strong{2-letter code + optional ZIP} — scans comma-split tokens
+#'     for a trailing \code{[A-Z]\{2\}} optionally followed by a ZIP code.
+#'     Also handles period-separated abbreviations (\code{N.Y.}).
+#'   \item \strong{City lookup} — matches against \code{CITY_STATE}, a
+#'     curated table of top US academic medical center cities,
+#'     longest-first to avoid short-name ambiguity.
+#' }
+#' Email addresses and "Electronic address:" suffixes are stripped before
+#' matching.
+#'
+#' @examples
+#' \dontrun{
+#' parse_us_state("Department of OB/GYN, Mayo Clinic, Rochester, MN 55905")
+#' # "MN"
+#'
+#' parse_us_state("Johns Hopkins Hospital, Baltimore, MD")
+#' # "MD"
+#'
+#' parse_us_state("Hôpital Lariboisière, Paris, France")
+#' # NA_character_
+#' }
+#'
+#' @seealso \code{\link{parse_country}}, \code{\link{is_us_affiliation}},
+#'   \code{\link{acog_district_for_state}}
+#' @export
 parse_us_state <- function(aff) {
   if (is.na(aff) || nchar(aff) == 0) return(NA_character_)
   # Strip email addresses, electronic address tags, and trailing periods
@@ -219,10 +266,45 @@ parse_us_state <- function(aff) {
   "kenya" = "Kenya"
 )
 
-#' Extract the country from an affiliation string.
-#' Strategy: (1) check last comma-delimited token (most affiliations end "City, Country"),
-#' (2) scan full string for known country names.
-#' Returns canonical country name or NA_character_.
+#' @title Extract the Country from an Affiliation String
+#'
+#' @description
+#' Identifies the country of origin for a PubMed affiliation using two
+#' strategies: checking the last comma-delimited token (where country typically
+#' appears) and scanning the full string for known country names.
+#'
+#' @param aff Character scalar. Raw affiliation text. Returns
+#'   \code{NA_character_} for \code{NA} or strings shorter than 3 characters.
+#'
+#' @return Character scalar. A canonical country name from
+#'   \code{.COUNTRY_CANONICAL} (e.g., \code{"USA"}, \code{"Japan"},
+#'   \code{"United Kingdom"}) or \code{NA_character_} if no country is
+#'   identified.
+#'
+#' @details
+#' US affiliations are detected first (via explicit keywords and
+#' \code{\link{parse_us_state}()}) and return \code{"USA"} without further
+#' scanning. For non-US affiliations, the last comma-delimited token is
+#' checked against \code{.COUNTRY_CANONICAL}; if not matched, the full string
+#' is scanned with word-bounded patterns in longest-match-first order to
+#' reduce false positives (e.g., "Korea" matched before "South Korea" would
+#' be wrong).
+#'
+#' @examples
+#' \dontrun{
+#' parse_country("Department of Surgery, Keio University, Tokyo, Japan")
+#' # "Japan"
+#'
+#' parse_country("University of Texas MD Anderson Cancer Center, Houston, TX")
+#' # "USA"
+#'
+#' parse_country("Charité Universitätsmedizin Berlin, Germany")
+#' # "Germany"
+#' }
+#'
+#' @seealso \code{\link{parse_us_state}}, \code{\link{is_us_affiliation}},
+#'   \code{.COUNTRY_CANONICAL}
+#' @export
 parse_country <- function(aff) {
   if (is.na(aff) || nchar(aff) < 3) return(NA_character_)
 
@@ -251,8 +333,40 @@ parse_country <- function(aff) {
   NA_character_
 }
 
-#' Detect whether an affiliation is US-based (broader than state parsing).
-#' Returns TRUE if any US signal found, FALSE if non-US country detected, NA if ambiguous.
+#' @title Detect Whether an Affiliation Is US-Based
+#'
+#' @description
+#' Returns a logical indicator of whether a PubMed affiliation string belongs
+#' to a US-based institution. More robust than \code{\link{parse_us_state}()}
+#' for ambiguous affiliations because it checks for explicit non-US country
+#' keywords before attempting state detection.
+#'
+#' @param aff Character scalar. Raw affiliation text. Returns \code{NA} for
+#'   \code{NA} or empty strings.
+#'
+#' @return Logical scalar. \code{TRUE} if the affiliation contains US signals
+#'   ("USA", "United States", a parseable US state, or a trailing "US" token).
+#'   \code{FALSE} if a non-US country keyword is found. \code{NA} if neither
+#'   US nor non-US signals are present (ambiguous, typically for bare department
+#'   names with no geography).
+#'
+#' @details
+#' Non-US country list covers ~40 countries commonly appearing in AAGL
+#' conference abstract submissions. The check is applied in word-boundary
+#' context to avoid false positives (e.g., "turkey" as a food item is unlikely
+#' in a medical affiliation, but the function relies on context). When both US
+#' and non-US signals appear (unusual), US signals take precedence because
+#' explicit "USA" or a ZIP code is more specific than a matching country name.
+#'
+#' @examples
+#' \dontrun{
+#' is_us_affiliation("Mayo Clinic, Rochester, MN 55905, USA")   # TRUE
+#' is_us_affiliation("University of Tokyo, Tokyo, Japan")       # FALSE
+#' is_us_affiliation("Department of Surgery")                   # NA
+#' }
+#'
+#' @seealso \code{\link{parse_us_state}}, \code{\link{parse_country}}
+#' @export
 is_us_affiliation <- function(aff) {
   if (is.na(aff) || nchar(aff) == 0) return(NA)
   lc <- tolower(aff)

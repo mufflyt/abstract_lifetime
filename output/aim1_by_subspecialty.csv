@@ -1,10 +1,8 @@
 subspecialty,n,n_published,rate
-FPMRS,18,7,38.9
-general_OBGYN,213,76,35.7
-MIGS,64,18,28.1
-REI,4,1,25
-obstetrics,27,6,22.2
-GYN_ONC,14,1,7.1
-surgery_other,53,1,1.9
-MFM,9,0,0
-urology,12,0,0
+FPMRS,7,7,100
+GYN_ONC,1,1,100
+MIGS,18,18,100
+REI,1,1,100
+general_OBGYN,76,76,100
+obstetrics,6,6,100
+surgery_other,1,1,100

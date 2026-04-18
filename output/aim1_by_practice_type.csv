@@ -1,6 +1,4 @@
 practice_type,n,n_published,rate
-military_va,14,4,28.6
-community,86,19,22.1
-research_institute,13,2,15.4
-academic,616,88,14.3
-private_practice,5,0,0
+academic,108,108,100
+military_va,4,4,100
+research_institute,2,2,100

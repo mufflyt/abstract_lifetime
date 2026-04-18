@@ -3,10 +3,48 @@
 
 library(stringr)
 
-#' Classify study design from abstract text.
-#' @param text Lowercase abstract text (search_text or abstract_full_text).
-#' @param is_rct Logical from RCT detection.
-#' @return One of 12 study design categories.
+#' @title Classify Study Design from Abstract Text
+#'
+#' @description
+#' Assigns a study-design category to an abstract using ordered regex rules
+#' applied to the full abstract text. Returns a single canonical label that is
+#' used downstream for stratified publication-rate analysis.
+#'
+#' @param text Character scalar. Full abstract text (or the pre-processed
+#'   \code{search_text} field). Case will be lowered internally; the caller
+#'   may pass raw text.
+#' @param is_rct Logical scalar. Pre-computed indicator that the abstract
+#'   describes a randomized controlled trial. If \code{TRUE} the function
+#'   short-circuits and returns \code{"rct"} without further regex evaluation.
+#'   Defaults to \code{FALSE}.
+#'
+#' @return Character scalar. One of \code{"rct"}, \code{"systematic_review"},
+#'   \code{"prospective_cohort"}, \code{"retrospective_cohort"},
+#'   \code{"case_control"}, \code{"case_series"}, \code{"cross_sectional"},
+#'   \code{"quality_improvement"}, \code{"cost_analysis"},
+#'   \code{"simulation_lab"}, \code{"validation"}, or \code{"other"}.
+#'
+#' @details
+#' Rules are evaluated in priority order: systematic reviews and meta-analyses
+#' first, then trial types, then observational designs. National database
+#' keywords (NSQIP, NIS, SEER, SART, etc.) map to
+#' \code{"retrospective_cohort"}. Returns \code{"other"} when no pattern
+#' matches or when text is missing or shorter than 10 characters.
+#'
+#' @examples
+#' \dontrun{
+#' classify_study_design("We performed a retrospective chart review of 200 patients.")
+#' # "retrospective_cohort"
+#'
+#' classify_study_design("This is an NSQIP database analysis.")
+#' # "retrospective_cohort"
+#'
+#' classify_study_design("A systematic review and meta-analysis was conducted.")
+#' # "systematic_review"
+#' }
+#'
+#' @seealso \code{\link{classify_research_category}}, \code{\link{classify_primary_procedure}}
+#' @export
 classify_study_design <- function(text, is_rct = FALSE) {
   if (is_rct) return("rct")
   if (is.na(text) || nchar(text) < 10) return("other")
@@ -32,11 +70,44 @@ classify_study_design <- function(text, is_rct = FALSE) {
   "other"
 }
 
-#' Classify research category from abstract text.
-#' @param text Lowercase abstract text.
-#' @param study_design Output of classify_study_design (for exclusion).
-#' @return One of: basic_science, education, quality_improvement,
-#'   health_services, device_technology, clinical, other.
+#' @title Classify Research Category from Abstract Text
+#'
+#' @description
+#' Assigns a broad research-domain category to an abstract using keyword
+#' detection applied to the full text. Complements \code{classify_study_design}
+#' by capturing thematic content independent of methodological design.
+#'
+#' @param text Character scalar. Full abstract text (raw or pre-processed).
+#'   Case is lowered internally.
+#' @param study_design Character scalar. Output of \code{classify_study_design()}
+#'   for the same abstract. Used to avoid misclassifying simulation RCTs as
+#'   \code{"education"} — when \code{study_design == "rct"} the education
+#'   branch is skipped. Defaults to \code{"other"}.
+#'
+#' @return Character scalar. One of \code{"basic_science"}, \code{"education"},
+#'   \code{"quality_improvement"}, \code{"health_services"},
+#'   \code{"device_technology"}, \code{"clinical"}, or \code{"other"}.
+#'
+#' @details
+#' Rules are evaluated in priority order: basic-science molecular keywords
+#' first, then education/simulation, then QI, then health-services/disparities,
+#' then device/AI, then general clinical. Returns \code{"other"} for missing or
+#' very short text.
+#'
+#' @examples
+#' \dontrun{
+#' classify_research_category("We assessed disparities in Medicaid coverage for hysterectomy.")
+#' # "health_services"
+#'
+#' classify_research_category("Robot-assisted surgery using da Vinci platform.")
+#' # "device_technology"
+#'
+#' classify_research_category("A PDSA cycle was implemented to improve OR checklists.")
+#' # "quality_improvement"
+#' }
+#'
+#' @seealso \code{\link{classify_study_design}}, \code{\link{classify_primary_procedure}}
+#' @export
 classify_research_category <- function(text, study_design = "other") {
   if (is.na(text) || nchar(text) < 10) return("other")
   lc <- tolower(text)
@@ -49,9 +120,44 @@ classify_research_category <- function(text, study_design = "other") {
   "other"
 }
 
-#' Classify primary surgical procedure from abstract text.
-#' @param text Lowercase abstract text.
-#' @return Procedure name or NA.
+#' @title Classify the Primary Surgical Procedure from Abstract Text
+#'
+#' @description
+#' Identifies the dominant gynecologic surgical procedure described in an
+#' abstract using ordered keyword matching. Returns a single canonical
+#' procedure label used for stratified publication-rate analysis.
+#'
+#' @param text Character scalar. Full abstract text (raw or pre-processed).
+#'   Case is lowered internally.
+#'
+#' @return Character scalar. One of \code{"sacrocolpopexy"},
+#'   \code{"myomectomy"}, \code{"hysterectomy"}, \code{"endometriosis"},
+#'   \code{"adnexal_surgery"}, \code{"pelvic_floor"}, \code{"sterilization"},
+#'   \code{"ectopic_pregnancy"}, \code{"cerclage"}, \code{"fibroids"},
+#'   \code{"gynecologic_oncology"}, or \code{NA_character_} if no procedure
+#'   keyword is detected.
+#'
+#' @details
+#' Matching is ordered from most-specific to broadest: sacrocolpopexy and
+#' myomectomy before hysterectomy (all hysterectomies match "hysterectom" but
+#' only some are for fibroids or prolapse). \code{NA_character_} is returned
+#' for non-procedural abstracts (e.g., pure health-services or education
+#' papers) rather than a fallback category.
+#'
+#' @examples
+#' \dontrun{
+#' classify_primary_procedure("Laparoscopic sacrocolpopexy for pelvic organ prolapse.")
+#' # "sacrocolpopexy"
+#'
+#' classify_primary_procedure("Outcomes following total laparoscopic hysterectomy.")
+#' # "hysterectomy"
+#'
+#' classify_primary_procedure("Patient satisfaction survey.")
+#' # NA_character_
+#' }
+#'
+#' @seealso \code{\link{classify_study_design}}, \code{\link{classify_research_category}}
+#' @export
 classify_primary_procedure <- function(text) {
   if (is.na(text) || nchar(text) < 10) return(NA_character_)
   lc <- tolower(text)

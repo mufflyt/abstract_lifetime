@@ -7,8 +7,68 @@ library(stringr)
 source(here::here("R", "utils_text.R"))
 source(here::here("R", "utils_congresses.R"))
 
-#' Score a candidate publication against an abstract
-#' Returns a named list with total score and component scores
+#' @title Score a Candidate Publication Against a Conference Abstract
+#'
+#' @description
+#' Computes a multi-component match score comparing a candidate PubMed
+#' publication to a conference abstract. The score combines title similarity,
+#' abstract semantic similarity, author matching, journal fit, keyword overlap,
+#' and publication timing relative to the conference.
+#'
+#' @param abstract Named list or single-row data frame. The conference abstract,
+#'   with fields: \code{title}, \code{abstract_text},
+#'   \code{first_author_normalized}, \code{last_author_normalized},
+#'   \code{all_authors_str} (semicolon-separated), \code{keywords} (character
+#'   vector), \code{congress_year} (integer or \code{NULL}).
+#' @param candidate Named list or single-row data frame. A PubMed candidate
+#'   article, with fields: \code{pub_title}, \code{pub_abstract},
+#'   \code{pub_first_author}, \code{pub_last_author}, \code{pub_all_authors},
+#'   \code{pub_journal}, \code{pub_keywords}, \code{pub_year},
+#'   \code{pub_month}, \code{pub_day}.
+#' @param cfg List or \code{NULL}. Parsed config object (auto-loaded when
+#'   \code{NULL}). Must contain a \code{scoring} sub-list with thresholds:
+#'   \code{title_jaccard_high}, \code{title_jaccard_mid},
+#'   \code{title_jaccard_low}, \code{abstract_semantic_high},
+#'   \code{abstract_semantic_mid}, \code{author_fuzzy_threshold},
+#'   \code{pub_date_early_months}, \code{pub_date_late_months},
+#'   \code{pre_conference_penalty}.
+#'
+#' @return Named list with component scores and a \code{total} field:
+#' \describe{
+#'   \item{title_sim}{Raw Jaccard similarity (0–1).}
+#'   \item{title_points}{0, 1, 2, or 3.}
+#'   \item{abstract_semantic}{Raw cosine-TF similarity (0–1).}
+#'   \item{abstract_points}{0, 1, or 2.}
+#'   \item{first_author_points}{0, 1, or 2.}
+#'   \item{last_author_points}{0, 1, or 2.}
+#'   \item{coauthor_points}{0 or 1.}
+#'   \item{author_team_bonus}{0 or 1 (awarded when first-author matches and
+#'     coauthor overlap >= 2).}
+#'   \item{journal_points}{0–1 Jaro-Winkler similarity to OB/GYN journals.}
+#'   \item{keyword_points}{0 or 1.}
+#'   \item{date_points}{Positive, zero, or \code{pre_conference_penalty}.}
+#'   \item{no_text_penalty}{-2 if neither title nor abstract evidence present.}
+#'   \item{total}{Numeric sum of all component scores.}
+#' }
+#'
+#' @details
+#' The no-text-evidence penalty (\code{-2}) prevents purely author-based
+#' coincidental matches from being accepted when title/abstract similarity
+#' is below the detection threshold. Pre-conference publications receive a
+#' configurable negative penalty because abstracts cannot be published before
+#' their conference presentation. Coauthor overlap uses semicolon-split
+#' \code{all_authors_str} (the CSV-serializable form) rather than the list
+#' column dropped at save time.
+#'
+#' @examples
+#' \dontrun{
+#' cfg <- config::get(file = here::here("config.yml"))
+#' score_match(abstracts[1, ], candidates[3, ], cfg)
+#' }
+#'
+#' @seealso \code{\link{score_abstract_candidates}}, \code{\link{classify_match}},
+#'   \code{\link{jaccard_similarity}}, \code{\link{compute_text_similarity}}
+#' @export
 score_match <- function(abstract, candidate, cfg = NULL) {
   if (is.null(cfg)) cfg <- config::get(file = here::here("config.yml"))
   sc <- cfg$scoring
@@ -192,8 +252,43 @@ score_match <- function(abstract, candidate, cfg = NULL) {
   scores
 }
 
-#' Compute text similarity using TF-IDF + cosine
-#' Lightweight alternative to full text2vec embeddings
+#' @title Compute Text Similarity Using TF-Weighted Cosine Similarity
+#'
+#' @description
+#' Computes a cosine similarity score between two text strings using term-
+#' frequency vectors over a shared vocabulary, after removing stopwords and
+#' short tokens. Serves as a lightweight alternative to full embedding models
+#' for abstract-to-publication semantic matching.
+#'
+#' @param text_a Character scalar. First text (abstract or title).
+#' @param text_b Character scalar. Second text (candidate publication).
+#'
+#' @return Numeric scalar in \code{[0, 1]}. Returns \code{0} when either
+#'   input is \code{NA}, when all tokens are removed by the stopword filter,
+#'   or when either TF vector has zero norm.
+#'
+#' @details
+#' Preprocessing applies \code{\link{normalize_title}()} (lowercase, remove
+#' punctuation, collapse whitespace), removes tokens shorter than 3 characters,
+#' and strips an internal list of ~60 common medical and structural stopwords
+#' (e.g., "patients", "results", "methods", "background"). The cosine
+#' similarity is computed as \eqn{\frac{\mathbf{a} \cdot \mathbf{b}}
+#' {|\mathbf{a}||\mathbf{b}|}} over the union vocabulary. No IDF weighting
+#' is applied (the corpus is too small to estimate reliable document
+#' frequencies).
+#'
+#' @examples
+#' \dontrun{
+#' compute_text_similarity(
+#'   "Laparoscopic hysterectomy reduces blood loss and operative time.",
+#'   "Minimally invasive hysterectomy is associated with decreased blood loss."
+#' )
+#' # ~ 0.35
+#' }
+#'
+#' @seealso \code{\link{score_match}}, \code{\link{jaccard_similarity}},
+#'   \code{\link{normalize_title}}
+#' @export
 compute_text_similarity <- function(text_a, text_b) {
   if (is.na(text_a) || is.na(text_b)) return(0)
 
@@ -233,10 +328,55 @@ compute_text_similarity <- function(text_a, text_b) {
   dot / (norm_a * norm_b)
 }
 
-#' Classify match using Cochrane-aligned vocabulary
-#' Returns "definite", "probable", "possible", "no_match", or "excluded"
-#' @param has_text_evidence Logical — TRUE if title_pts >= 1 or abstract_pts >= 1
-#' @param pre_conference Logical — TRUE if best candidate published before conference
+#' @title Classify a Match Score Using Cochrane-Aligned Vocabulary
+#'
+#' @description
+#' Maps a numeric match score to a Cochrane-aligned match-confidence category.
+#' Categories follow the vocabulary recommended in Cochrane Methodology Review
+#' MR000005 for tracking abstract-to-publication linkage certainty.
+#'
+#' @param score Numeric scalar. The \code{total} field from
+#'   \code{\link{score_match}()}.
+#' @param cfg List or \code{NULL}. Parsed config object (auto-loaded when
+#'   \code{NULL}). Must contain \code{scoring$auto_accept} and
+#'   \code{scoring$manual_review} thresholds.
+#' @param has_text_evidence Logical scalar. \code{TRUE} if the candidate has
+#'   at least one point from title or abstract similarity (\code{title_pts >= 1}
+#'   or \code{abstract_pts >= 1}). Prevents author-only matches from reaching
+#'   \code{"definite"} or \code{"probable"}. Defaults to \code{TRUE}.
+#' @param pre_conference Logical scalar. \code{TRUE} if the best candidate was
+#'   published before the conference date. Forces \code{"excluded"} regardless
+#'   of score. Defaults to \code{FALSE}.
+#'
+#' @return Character scalar. One of \code{"definite"}, \code{"probable"},
+#'   \code{"possible"}, \code{"no_match"}, or \code{"excluded"}.
+#'
+#' @details
+#' Classification logic (in order):
+#' \enumerate{
+#'   \item \code{pre_conference} TRUE → \code{"excluded"}.
+#'   \item \code{score >= auto_accept} AND \code{has_text_evidence} →
+#'     \code{"definite"}.
+#'   \item \code{score >= manual_review} AND \code{has_text_evidence} →
+#'     \code{"probable"}.
+#'   \item \code{score >= manual_review} (no text evidence) →
+#'     \code{"possible"}.
+#'   \item Otherwise → \code{"no_match"}.
+#' }
+#' Ties between candidates further demote \code{"definite"} to
+#' \code{"probable"} in \code{\link{score_abstract_candidates}()}.
+#'
+#' @examples
+#' \dontrun{
+#' cfg <- config::get(file = here::here("config.yml"))
+#' classify_match(8.5, cfg, has_text_evidence = TRUE)   # "definite"
+#' classify_match(5.0, cfg, has_text_evidence = FALSE)  # "possible"
+#' classify_match(2.0, cfg)                             # "no_match"
+#' classify_match(9.0, cfg, pre_conference = TRUE)      # "excluded"
+#' }
+#'
+#' @seealso \code{\link{score_match}}, \code{\link{score_abstract_candidates}}
+#' @export
 classify_match <- function(score, cfg = NULL, has_text_evidence = TRUE,
                            pre_conference = FALSE) {
   if (is.null(cfg)) cfg <- config::get(file = here::here("config.yml"))
@@ -249,7 +389,46 @@ classify_match <- function(score, cfg = NULL, has_text_evidence = TRUE,
   "no_match"
 }
 
-#' Score all candidates for one abstract and return best match + classification
+#' @title Score All Candidates for One Abstract and Return the Best Match
+#'
+#' @description
+#' Applies \code{\link{score_match}()} to every candidate publication in
+#' \code{candidates_df}, selects the highest-scoring candidate, and returns
+#' its classification alongside score details for all candidates.
+#'
+#' @param abstract_row Single-row data frame or named list. The conference
+#'   abstract, compatible with \code{\link{score_match}()}.
+#' @param candidates_df Data frame. Candidate PubMed publications to score
+#'   against \code{abstract_row}. Each row is passed to
+#'   \code{\link{score_match}()} individually. An empty data frame causes an
+#'   immediate return with classification \code{"no_candidates"}.
+#' @param cfg List or \code{NULL}. Parsed config object; auto-loaded when
+#'   \code{NULL}.
+#'
+#' @return A \code{\link[tibble]{tibble}} with one row containing:
+#' \describe{
+#'   \item{abstract_id}{The abstract's ID from \code{abstract_row}.}
+#'   \item{best_pmid}{PMID of the top-scoring candidate (character).}
+#'   \item{best_score}{Total score of the best candidate (numeric).}
+#'   \item{classification}{Cochrane-aligned label from
+#'     \code{\link{classify_match}()}.}
+#'   \item{has_tie}{Logical; \code{TRUE} if two candidates share the top
+#'     score (causes \code{"definite"} to demote to \code{"probable"}).}
+#'   \item{n_candidates}{Integer; total number of candidates scored.}
+#'   \item{score_details}{List-column containing a tibble of all candidate
+#'     scores, sorted descending by \code{total_score}.}
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' cfg <- config::get(file = here::here("config.yml"))
+#' result <- score_abstract_candidates(abstracts[1, ], candidate_details, cfg)
+#' result$classification
+#' result$score_details[[1]]
+#' }
+#'
+#' @seealso \code{\link{score_match}}, \code{\link{classify_match}}
+#' @export
 score_abstract_candidates <- function(abstract_row, candidates_df, cfg = NULL) {
   if (nrow(candidates_df) == 0) {
     return(tibble::tibble(

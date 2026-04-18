@@ -8,8 +8,45 @@ library(cli)
 
 `%||%` <- function(a, b) if (is.null(a) || length(a) == 0 || is.na(a)) b else a
 
-#' Search CrossRef by title
-#' Returns a tibble of candidate matches with DOI and metadata
+#' @title Search CrossRef by Title and Return Candidate Matches
+#'
+#' @description
+#' Queries the CrossRef REST API using bibliographic title search and returns
+#' a tidy tibble of candidate publications with DOI, authors, journal, year,
+#' and abstract text. Used in the multi-source matching pipeline to supplement
+#' PubMed search results.
+#'
+#' @param title Character scalar. The conference abstract title to search for.
+#'   Returns an empty tibble if \code{NA} or shorter than 10 characters.
+#' @param max_results Integer scalar. Maximum number of CrossRef results to
+#'   return per query. Defaults to \code{5}.
+#' @param date_start Character scalar. Earliest publication date filter in
+#'   \code{"YYYY-MM-DD"} format. Defaults to \code{"2023-11-01"}.
+#' @param date_end Character scalar. Latest publication date filter in
+#'   \code{"YYYY-MM-DD"} format. Defaults to \code{"2026-04-01"}.
+#'
+#' @return A \code{\link[tibble]{tibble}} with columns: \code{doi},
+#'   \code{cr_title}, \code{cr_first_author}, \code{cr_last_author},
+#'   \code{cr_all_authors}, \code{cr_journal}, \code{cr_abstract},
+#'   \code{cr_year}, \code{cr_month}, \code{source} (always
+#'   \code{"crossref"}). Returns an empty tibble on API error or no results.
+#'
+#' @details
+#' Uses the \code{query.bibliographic} parameter for best title matching.
+#' Polite pool access is enabled by setting the \code{mailto} parameter from
+#' the \code{CROSSREF_EMAIL} environment variable. HTML tags are stripped from
+#' any returned abstract text. On non-200 HTTP responses or network errors the
+#' function logs a warning and returns an empty tibble rather than stopping.
+#'
+#' @examples
+#' \dontrun{
+#' Sys.setenv(CROSSREF_EMAIL = "researcher@example.com")
+#' search_crossref("Laparoscopic hysterectomy operative time", max_results = 3)
+#' }
+#'
+#' @seealso \code{\link{search_europmc}}, \code{\link{search_openalex}},
+#'   \code{\link{search_semantic_scholar}}
+#' @export
 search_crossref <- function(title, max_results = 5,
                             date_start = "2023-11-01", date_end = "2026-04-01") {
   if (is.na(title) || nchar(title) < 10) return(tibble())
@@ -96,8 +133,25 @@ search_crossref <- function(title, max_results = 5,
   })
 }
 
-#' Run a single Europe PMC query and parse results
-#' @return tibble of results
+#' @title Run a Single Europe PMC REST Query and Parse Results
+#'
+#' @description
+#' Internal helper that executes one Europe PMC \code{/search} API call and
+#' returns a tidy tibble. Called by \code{search_europmc()} for each of its
+#' search strategies.
+#'
+#' @param query Character scalar. A fully-formed Europe PMC query string (e.g.,
+#'   \code{"TITLE:hysterectomy AND PUB_YEAR:[2023 TO 2026]"}).
+#' @param max_results Integer scalar. Number of records to request (maps to
+#'   \code{pageSize}). Defaults to \code{5}.
+#'
+#' @return A \code{\link[tibble]{tibble}} with columns: \code{pmid},
+#'   \code{doi}, \code{epmc_title}, \code{epmc_first_author},
+#'   \code{epmc_journal}, \code{epmc_year}, \code{epmc_abstract},
+#'   \code{source} (\code{"europmc"}). Returns an empty tibble on error or
+#'   no results.
+#'
+#' @keywords internal
 .epmc_query <- function(query, max_results = 5) {
   base_url <- "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
 
@@ -133,8 +187,21 @@ search_crossref <- function(title, max_results = 5,
   })
 }
 
-#' Extract distinctive title keywords for search queries
-#' Removes stopwords and very short words, returns top N terms
+#' @title Extract Distinctive Keywords from a Title for API Queries
+#'
+#' @description
+#' Tokenizes a title string, removes common stopwords and very short words,
+#' and returns the top \code{n} remaining terms. These terms are used to
+#' construct multi-source search queries in place of a raw title.
+#'
+#' @param title Character scalar. The abstract title to process.
+#' @param n Integer scalar. Maximum number of keywords to return. Defaults to
+#'   \code{5}.
+#'
+#' @return Character vector of up to \code{n} unique lowercase keywords, each
+#'   at least 4 characters long and not in the internal stopword list.
+#'
+#' @keywords internal
 .title_keywords <- function(title, n = 5) {
   stops <- c("the", "a", "an", "and", "or", "but", "in", "on", "at", "to",
              "for", "of", "with", "by", "from", "is", "was", "were", "are",
@@ -152,7 +219,20 @@ search_crossref <- function(title, max_results = 5,
   head(unique(words), n)
 }
 
-#' Extract the last name from a normalized author string like "johannesson U"
+#' @title Extract Last Name from a Normalized Author String
+#'
+#' @description
+#' Splits a normalized author string (e.g., \code{"johannesson U"} or
+#' \code{"van der berg A"}) and returns everything except the trailing
+#' initial(s) as the last name component.
+#'
+#' @param normalized_author Character scalar. An author name already processed
+#'   by \code{normalize_author()}, in \code{"lastname FI"} format.
+#'
+#' @return Character scalar with the last-name portion, or \code{NULL} if the
+#'   input is \code{NA} or empty.
+#'
+#' @keywords internal
 .author_lastname <- function(normalized_author) {
   if (is.na(normalized_author) || normalized_author == "") return(NULL)
   parts <- str_split(str_squish(normalized_author), "\\s+")[[1]]
@@ -164,8 +244,50 @@ search_crossref <- function(title, max_results = 5,
   }
 }
 
-#' Search OpenAlex using multi-strategy keyword search
-#' Returns a tibble with pmid, doi, title, authors, journal, year
+#' @title Search OpenAlex Using Multi-Strategy Keyword Search
+#'
+#' @description
+#' Queries the OpenAlex API using up to two complementary search strategies
+#' (keywords-only and author-plus-keywords) and returns a deduplicated tibble
+#' of candidate publications. JMIG supplement articles are excluded from results.
+#'
+#' @param title Character scalar. The conference abstract title.
+#' @param first_author Character scalar or \code{NULL}. Normalized first-author
+#'   name (e.g., \code{"smith J"}). When provided, enables the author-plus-
+#'   keyword strategy. Defaults to \code{NULL}.
+#' @param max_results Integer scalar. Records requested per strategy call.
+#'   Defaults to \code{5}.
+#' @param date_start Character scalar. Start of publication date filter
+#'   (\code{"YYYY-MM-DD"}). Defaults to \code{"2023-11-01"}.
+#' @param date_end Character scalar. End of publication date filter
+#'   (\code{"YYYY-MM-DD"}). Defaults to \code{"2026-04-01"}.
+#'
+#' @return A \code{\link[tibble]{tibble}} with columns: \code{oa_id},
+#'   \code{pmid}, \code{doi}, \code{oa_title}, \code{oa_first_author},
+#'   \code{oa_last_author}, \code{oa_all_authors}, \code{oa_journal},
+#'   \code{oa_year}, \code{oa_pub_date}, \code{oa_affiliation},
+#'   \code{oa_country}, \code{oa_strategy}, \code{source} (\code{"openalex"}).
+#'   Returns an empty tibble if no results are found.
+#'
+#' @details
+#' Strategy 1 uses the top 6 title keywords. Strategy 2 prepends the author
+#' last name to the top 4 keywords. Both strategies call \code{.openalex_query()}
+#' and results are combined with deduplication on \code{oa_id}. JMIG supplement
+#' issues within the date range are excluded because they contain the conference
+#' abstracts themselves, which would produce spurious self-matches.
+#'
+#' @examples
+#' \dontrun{
+#' search_openalex(
+#'   title = "Robot-assisted sacrocolpopexy outcomes",
+#'   first_author = "smith J",
+#'   max_results = 5
+#' )
+#' }
+#'
+#' @seealso \code{\link{search_crossref}}, \code{\link{search_europmc}},
+#'   \code{\link{search_semantic_scholar}}, \code{.openalex_query}
+#' @export
 search_openalex <- function(title, first_author = NULL, max_results = 5,
                             date_start = "2023-11-01", date_end = "2026-04-01") {
   if (is.na(title) || nchar(title) < 10) return(tibble())
@@ -216,7 +338,29 @@ search_openalex <- function(title, first_author = NULL, max_results = 5,
   combined
 }
 
-#' Execute a single OpenAlex API query and parse results
+#' @title Execute a Single OpenAlex API Query and Parse Results
+#'
+#' @description
+#' Internal helper that performs one HTTP GET to the OpenAlex \code{/works}
+#' endpoint and coerces the JSON response into a tidy tibble. Extracts PMIDs
+#' from the \code{ids.pmid} field and affiliations from the first authorship.
+#'
+#' @param base_url Character scalar. OpenAlex works endpoint URL.
+#' @param search_term Character scalar. Keyword search string.
+#' @param date_filter Character scalar. OpenAlex filter expression for
+#'   publication date range (e.g.,
+#'   \code{"from_publication_date:2023-11-01,to_publication_date:2026-04-01"}).
+#' @param max_results Integer scalar. Number of records to request per page.
+#' @param email Character scalar. Polite-pool identifier (sent as
+#'   \code{mailto} query parameter when non-empty).
+#'
+#' @return A \code{\link[tibble]{tibble}} with \code{oa_id}, \code{pmid},
+#'   \code{doi}, \code{oa_title}, \code{oa_first_author},
+#'   \code{oa_last_author}, \code{oa_all_authors}, \code{oa_journal},
+#'   \code{oa_year}, \code{oa_pub_date}, \code{oa_affiliation},
+#'   \code{oa_country}. Returns an empty tibble on error.
+#'
+#' @keywords internal
 .openalex_query <- function(base_url, search_term, date_filter, max_results, email) {
   tryCatch({
     params <- list(
@@ -309,8 +453,52 @@ search_openalex <- function(title, first_author = NULL, max_results = 5,
   })
 }
 
-#' Search Europe PMC using multiple strategies
-#' Returns combined deduplicated results across all strategies
+#' @title Search Europe PMC Using Multiple Query Strategies
+#'
+#' @description
+#' Queries the Europe PMC REST API using up to three complementary strategies
+#' and returns a deduplicated tibble of candidate publications. JMIG supplement
+#' articles are excluded from results to prevent self-matching.
+#'
+#' @param title Character scalar. The conference abstract title.
+#' @param first_author Character scalar or \code{NULL}. Normalized first-author
+#'   name. When provided, enables author-based strategies. Defaults to
+#'   \code{NULL}.
+#' @param max_results Integer scalar. Maximum records per strategy query.
+#'   Defaults to \code{5}.
+#' @param year_start Integer scalar. Start year for publication date filter.
+#'   Defaults to \code{2023}.
+#' @param year_end Integer scalar. End year for publication date filter.
+#'   Defaults to \code{2026}.
+#'
+#' @return A \code{\link[tibble]{tibble}} with columns: \code{pmid},
+#'   \code{doi}, \code{epmc_title}, \code{epmc_first_author},
+#'   \code{epmc_journal}, \code{epmc_year}, \code{epmc_abstract},
+#'   \code{epmc_strategy}, \code{source} (\code{"europmc"}). Returns an empty
+#'   tibble if no results are found.
+#'
+#' @details
+#' Three strategies are tried in order:
+#' \enumerate{
+#'   \item Author last name + top 4 title keywords (most precise).
+#'   \item Top 5 title keywords only (handles author name changes).
+#'   \item Author last name + top 2 title keywords (broad catch-all).
+#' }
+#' Results are combined and deduplicated on (\code{pmid}, \code{doi}) before
+#' JMIG supplement filtering.
+#'
+#' @examples
+#' \dontrun{
+#' search_europmc(
+#'   title = "Laparoscopic myomectomy blood loss",
+#'   first_author = "jones A",
+#'   year_start = 2023, year_end = 2026
+#' )
+#' }
+#'
+#' @seealso \code{\link{search_crossref}}, \code{\link{search_openalex}},
+#'   \code{\link{search_semantic_scholar}}, \code{.epmc_query}
+#' @export
 search_europmc <- function(title, first_author = NULL, max_results = 5,
                            year_start = 2023, year_end = 2026) {
   if (is.na(title) || nchar(title) < 10) return(tibble())
@@ -370,9 +558,49 @@ search_europmc <- function(title, first_author = NULL, max_results = 5,
   combined
 }
 
-#' Search Semantic Scholar using bulk search endpoint
-#' Uses keyword-based search with year filtering and extracts PMIDs
-#' Bulk endpoint is more generous with rate limits than relevance endpoint
+#' @title Search Semantic Scholar Using the Bulk Search Endpoint
+#'
+#' @description
+#' Queries the Semantic Scholar Graph API bulk-search endpoint using keyword
+#' strategies and returns a deduplicated tibble of candidate publications with
+#' PMIDs extracted from external identifiers. JMIG supplement articles are
+#' excluded.
+#'
+#' @param title Character scalar. The conference abstract title.
+#' @param first_author Character scalar or \code{NULL}. Normalized first-author
+#'   name. When provided, enables the author-plus-keyword strategy. Defaults
+#'   to \code{NULL}.
+#' @param max_results Integer scalar. Maximum records per strategy call.
+#'   Defaults to \code{5}.
+#' @param year_start Integer scalar. Start year for publication year filter.
+#'   Defaults to \code{2023}.
+#' @param year_end Integer scalar. End year for publication year filter.
+#'   Defaults to \code{2026}.
+#'
+#' @return A \code{\link[tibble]{tibble}} with columns: \code{s2_id},
+#'   \code{pmid}, \code{doi}, \code{s2_title}, \code{s2_first_author},
+#'   \code{s2_last_author}, \code{s2_all_authors}, \code{s2_journal},
+#'   \code{s2_year}, \code{s2_pub_date}, \code{s2_strategy},
+#'   \code{source} (\code{"semantic_scholar"}). Returns an empty tibble on
+#'   no results.
+#'
+#' @details
+#' Uses the bulk endpoint (\code{/graph/v1/paper/search/bulk}) which offers
+#' more generous rate limits than the relevance endpoint. On HTTP 429 (rate
+#' limited) the function sleeps 5 seconds and retries once. Two strategies
+#' are used: (1) top 6 keywords, (2) author last name + top 4 keywords.
+#'
+#' @examples
+#' \dontrun{
+#' search_semantic_scholar(
+#'   title = "Endometriosis fertility outcomes",
+#'   first_author = "chen M"
+#' )
+#' }
+#'
+#' @seealso \code{\link{search_crossref}}, \code{\link{search_europmc}},
+#'   \code{\link{search_openalex}}, \code{.s2_query}
+#' @export
 search_semantic_scholar <- function(title, first_author = NULL, max_results = 5,
                                     year_start = 2023, year_end = 2026) {
   if (is.na(title) || nchar(title) < 10) return(tibble())
@@ -419,7 +647,25 @@ search_semantic_scholar <- function(title, first_author = NULL, max_results = 5,
   combined
 }
 
-#' Execute a single Semantic Scholar bulk search query
+#' @title Execute a Single Semantic Scholar Bulk Search Query
+#'
+#' @description
+#' Internal helper that performs one HTTP GET to the Semantic Scholar bulk
+#' search endpoint and coerces the JSON response into a tidy tibble. Handles
+#' HTTP 429 rate-limit responses with one automatic retry.
+#'
+#' @param base_url Character scalar. Semantic Scholar bulk search endpoint URL.
+#' @param search_term Character scalar. Space-separated keyword query.
+#' @param year_filter Character scalar. Year range string in
+#'   \code{"YYYY-YYYY"} format (e.g., \code{"2023-2026"}).
+#' @param max_results Integer scalar. Maximum records to return per query.
+#'
+#' @return A \code{\link[tibble]{tibble}} with \code{s2_id}, \code{pmid},
+#'   \code{doi}, \code{s2_title}, \code{s2_first_author}, \code{s2_last_author},
+#'   \code{s2_all_authors}, \code{s2_journal}, \code{s2_year},
+#'   \code{s2_pub_date}. Returns an empty tibble on error.
+#'
+#' @keywords internal
 .s2_query <- function(base_url, search_term, year_filter, max_results) {
   tryCatch({
     resp <- httr::GET(base_url, query = list(

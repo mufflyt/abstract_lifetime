@@ -15,6 +15,15 @@ TEACHING_HOSPITAL_NAMES <- if (file.exists(.teaching_names_path)) {
 
 # Precompile a single alternation regex at load time so is_teaching_hospital()
 # makes one grepl() call instead of 2,754 per affiliation.
+
+#' @title Normalize an Affiliation String for Fixed-String Matching
+#' @description Lowercases, strips non-alphanumeric characters, and collapses
+#'   whitespace so that affiliation strings and hospital names can be compared
+#'   with fixed (non-regex) string search. Used internally by
+#'   \code{is_teaching_hospital()}.
+#' @param x Character scalar or vector. Raw affiliation text.
+#' @return Character scalar or vector. Normalized string(s).
+#' @keywords internal
 .normalize_aff <- function(x) gsub("\\s+", " ", trimws(gsub("[^a-z0-9 ]", " ", tolower(x))))
 
 # Normalize hospital names at load time; stored as a plain character vector.
@@ -23,8 +32,35 @@ TEACHING_HOSPITAL_NAMES <- if (file.exists(.teaching_names_path)) {
   norms[nchar(norms) > 3]
 } else character()
 
-#' Check if an affiliation matches any known teaching/academic hospital name.
-#' Uses vectorized fixed-string search — avoids regex alternation length limits.
+#' @title Check Whether an Affiliation Matches a Known Teaching Hospital
+#'
+#' @description
+#' Returns \code{TRUE} if the affiliation string contains the name of one of
+#' 2,754 ACGME-accredited teaching hospitals loaded from
+#' \code{data/validation/teaching_hospital_names.txt}. Uses fixed-string
+#' vectorized matching to avoid regex alternation length limits.
+#'
+#' @param aff Character scalar. Raw affiliation text from a PubMed author record.
+#'
+#' @return Logical scalar. \code{TRUE} if the affiliation matches at least one
+#'   known teaching hospital name; \code{FALSE} otherwise (including when the
+#'   reference list has not been loaded).
+#'
+#' @details
+#' Both the query affiliation and the reference names are passed through
+#' \code{.normalize_aff()} (lowercase, strip non-alphanumeric, collapse spaces)
+#' before comparison. Names shorter than 10 characters are excluded from the
+#' reference list at load time. If the external file is absent the function
+#' always returns \code{FALSE} without error.
+#'
+#' @examples
+#' \dontrun{
+#' is_teaching_hospital("Johns Hopkins Hospital, Baltimore, MD")  # TRUE
+#' is_teaching_hospital("Dr. Smith Private Practice")             # FALSE
+#' }
+#'
+#' @seealso \code{\link{classify_practice_type}}, \code{.normalize_aff}
+#' @export
 is_teaching_hospital <- function(aff) {
   if (is.na(aff) || nchar(aff) < 5 || length(.TEACHING_NAMES_NORM) == 0)
     return(FALSE)
@@ -32,12 +68,57 @@ is_teaching_hospital <- function(aff) {
   any(stringr::str_detect(aff_norm, stringr::fixed(.TEACHING_NAMES_NORM)))
 }
 
-#' Classify affiliation as academic, community, private_practice, research_institute, or military.
-#' @param aff Primary affiliation string.
-#' @param all_aff Optional: all affiliations (pipe-separated). Checked for
-#'   university signals if primary affiliation looks community.
-#' @param country Optional: parsed country string. Non-US hospitals default to
-#'   academic rather than community (international healthcare systems differ).
+#' @title Classify an Affiliation's Practice Type
+#'
+#' @description
+#' Returns a single category label describing the institutional setting of a
+#' PubMed affiliation. Categories are: \code{"academic"}, \code{"community"},
+#' \code{"private_practice"}, \code{"research_institute"}, \code{"military_va"}.
+#'
+#' @param aff Character scalar. The primary (first-listed) affiliation string.
+#' @param all_aff Character scalar. All affiliations concatenated (pipe- or
+#'   semicolon-separated). Used to detect university signals when the primary
+#'   affiliation alone looks community. Defaults to \code{NA_character_}.
+#' @param country Character scalar. Parsed country name (e.g., from
+#'   \code{parse_country()}). International affiliations default to
+#'   \code{"academic"} rather than \code{"community"} because community vs.
+#'   academic distinctions differ outside the US. Defaults to \code{NA_character_}.
+#'
+#' @return Character scalar. One of \code{"academic"}, \code{"community"},
+#'   \code{"private_practice"}, \code{"research_institute"},
+#'   \code{"military_va"}, or \code{NA_character_} if no signal is found.
+#'
+#' @details
+#' Classification priority (highest to lowest):
+#' \enumerate{
+#'   \item Military / VA keyword match.
+#'   \item Research institute without a university co-affiliation.
+#'   \item ACGME teaching-hospital cross-reference via \code{is_teaching_hospital()}.
+#'   \item Regex match against a curated list of academic signals including
+#'         named elite institutions (Harvard, Stanford, etc.) and international
+#'         academic hospital patterns.
+#'   \item Private-practice / group-practice keywords (LLC, PC, etc.).
+#'   \item Remaining hospital/clinic affiliations are \code{"community"} for
+#'         US and \code{"academic"} for non-US.
+#'   \item Department-level affiliations without institution type default to
+#'         \code{"academic"}.
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' classify_practice_type("Department of OB/GYN, Harvard Medical School, Boston, MA")
+#' # "academic"
+#'
+#' classify_practice_type("Walter Reed National Military Medical Center")
+#' # "military_va"
+#'
+#' classify_practice_type("Women's Health Associates LLC")
+#' # "private_practice"
+#' }
+#'
+#' @seealso \code{\link{is_teaching_hospital}}, \code{\link{classify_subspecialty}},
+#'   \code{\link{classify_career_stage}}
+#' @export
 classify_practice_type <- function(aff, all_aff = NA_character_, country = NA_character_) {
   if (is.na(aff) || nchar(aff) < 5) return(NA_character_)
   lc <- tolower(aff)
@@ -99,7 +180,41 @@ classify_practice_type <- function(aff, all_aff = NA_character_, country = NA_ch
   NA_character_
 }
 
-#' Extract OB/GYN subspecialty from affiliation or department text.
+#' @title Classify OB/GYN Subspecialty from an Affiliation String
+#'
+#' @description
+#' Detects the primary OB/GYN subspecialty of an author based on keywords
+#' found in their institutional affiliation or department name.
+#'
+#' @param aff Character scalar. Raw affiliation text (e.g., from PubMed).
+#'
+#' @return Character scalar. One of \code{"MIGS"}, \code{"REI"},
+#'   \code{"GYN_ONC"}, \code{"FPMRS"}, \code{"MFM"},
+#'   \code{"family_planning"}, \code{"general_OBGYN"}, \code{"obstetrics"},
+#'   \code{"urology"}, \code{"surgery_other"}, or \code{NA_character_} if no
+#'   subspecialty keyword is detected.
+#'
+#' @details
+#' Rules are applied in priority order: MIGS > REI > GYN_ONC > FPMRS > MFM >
+#' family_planning > general_OBGYN > obstetrics > general gyn > urology >
+#' other surgery. The first match wins. Detection is case-insensitive and
+#' based on common abbreviations and phrases (e.g., \code{"\\bfpmrs\\b"},
+#' \code{"minimally invasive"}, \code{"gyn.?onc"}).
+#'
+#' @examples
+#' \dontrun{
+#' classify_subspecialty("Division of FPMRS, University of Colorado")
+#' # "FPMRS"
+#'
+#' classify_subspecialty("Department of Gynecologic Oncology")
+#' # "GYN_ONC"
+#'
+#' classify_subspecialty("General Surgery")
+#' # "surgery_other"
+#' }
+#'
+#' @seealso \code{\link{classify_practice_type}}, \code{\link{classify_career_stage}}
+#' @export
 classify_subspecialty <- function(aff) {
   if (is.na(aff) || nchar(aff) < 5) return(NA_character_)
   lc <- tolower(aff)
@@ -130,7 +245,41 @@ classify_subspecialty <- function(aff) {
   NA_character_
 }
 
-#' Detect whether the author is likely a trainee (resident/fellow) vs faculty.
+#' @title Classify Author Career Stage from Affiliation Text
+#'
+#' @description
+#' Infers whether an author is a medical student, resident, fellow, junior
+#' faculty, or senior faculty based on keywords in their affiliation string.
+#'
+#' @param aff Character scalar. Raw affiliation text from a PubMed author record.
+#'
+#' @return Character scalar. One of \code{"resident"}, \code{"fellow"},
+#'   \code{"student"}, \code{"faculty_junior"}, \code{"faculty_senior"},
+#'   or \code{NA_character_} if no career-stage signal is detected.
+#'
+#' @details
+#' Rules are applied in priority order: trainee terms (resident, fellow,
+#' student) are checked before faculty titles. Within faculty, junior ranks
+#' (assistant professor, associate professor, instructor, lecturer) are checked
+#' before senior titles (professor, chief, director, chair, head) to prevent
+#' \code{"assistant professor"} from matching the senior \code{"professor"}
+#' pattern. Affiliation text alone may not reliably distinguish staff physicians
+#' from faculty — \code{NA_character_} is returned rather than guessing.
+#'
+#' @examples
+#' \dontrun{
+#' classify_career_stage("PGY-3 Resident, OB/GYN, Mayo Clinic")
+#' # "resident"
+#'
+#' classify_career_stage("Associate Professor of OB/GYN, Stanford")
+#' # "faculty_junior"
+#'
+#' classify_career_stage("Chair, Department of Gynecology")
+#' # "faculty_senior"
+#' }
+#'
+#' @seealso \code{\link{classify_practice_type}}, \code{\link{classify_subspecialty}}
+#' @export
 classify_career_stage <- function(aff) {
   if (is.na(aff) || nchar(aff) < 5) return(NA_character_)
   lc <- tolower(aff)

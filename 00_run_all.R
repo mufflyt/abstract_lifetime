@@ -35,6 +35,14 @@ source(here("R", "01d_tag_session_type.R"))
 cli_h2("Step 2: Cleaning Abstracts")
 source(here("R", "02_clean_abstracts.R"))
 
+# Step 2b: Backfill abstract text from PubMed XML (2012-2018)
+cli_h2("Step 2b: Abstract Text Backfill (PubMed XML)")
+source(here("R", "02b_backfill_abstract_text.R"))
+
+# Step 2c: Backfill abstract text from ScienceDirect snippets (2012-2018)
+cli_h2("Step 2c: Abstract Text Backfill (ScienceDirect snippets)")
+source(here("scripts", "backfill_sciencedirect_snippets.R"))
+
 # Step 3: Search PubMed
 cli_h2("Step 3: PubMed Search")
 source(here("R", "03_search_pubmed.R"))
@@ -71,9 +79,33 @@ source(here("R", "09c_author_characteristics.R"))
 cli_h2("Step 5e: Citation Metrics")
 source(here("R", "09d_enrich_metrics.R"))
 
+# Step 5f: Backfill affiliation_raw from cached ScienceDirect HTML
+cli_h2("Step 5f: Affiliation Backfill")
+source(here("scripts", "backfill_affiliations_from_cache.R"))
+
+# Step 5g: ORCID enrichment (career stage, subspecialty, works count)
+cli_h2("Step 5g: ORCID Enrichment")
+source(here("R", "09e_enrich_orcid.R"))
+
+# Step 5h: NPI matching (US first authors → ABOG-NPI for subspecialty/gender)
+cli_h2("Step 5h: NPI Matching")
+source(here("R", "10_npi_matching.R"))
+
+# Step 5i: Fidelity checks (abstract vs published paper comparison)
+cli_h2("Step 5i: Fidelity Checks")
+source(here("R", "09e_fidelity_checks.R"))
+
 # Step 6: Analyze
 cli_h2("Step 6: Analysis")
 source(here("R", "06_analyze_results.R"))
+
+# Step 6b: Gold standard validation
+cli_h2("Step 6b: Gold Standard Validation")
+source(here("R", "validation_gold_standard.R"))
+
+# Step 6c: Interrater agreement (Cohen's kappa)
+cli_h2("Step 6c: Interrater Agreement")
+source(here("R", "10_interrater.R"))
 
 # Step 7: Tables
 cli_h2("Step 7: Tables")
