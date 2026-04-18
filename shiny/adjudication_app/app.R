@@ -546,6 +546,7 @@ ui <- page_sidebar(
         )))
       ),
       card_body(
+        uiOutput("match_quality_banner"),
         div(class = "candidate-workspace",
           div(class = "candidate-table-wrap",
             DTOutput("candidates_table")
@@ -1350,6 +1351,53 @@ server <- function(input, output, session) {
     updateTextInput(session, "manual_pmid", value = as.character(cand_row$pmid[1]))
     updateRadioButtons(session, "decision", selected = "match")
     showNotification(paste("Using selected PMID", cand_row$pmid[1]), type = "message")
+  })
+
+  # --- Match quality warning banner ---
+  output$match_quality_banner <- renderUI({
+    d <- data()
+    req(d)
+    abs_id <- input$abstract_select
+    if (is.null(abs_id) || abs_id == "") return(NULL)
+    row <- d$review_queue[d$review_queue$abstract_id == abs_id, , drop = FALSE]
+    if (nrow(row) == 0) return(NULL)
+
+    cls <- row$classification[1]
+    score <- row$best_score[1]
+
+    if (cls %in% c("no_match", "no_candidates")) {
+      tags$div(
+        class = "alert alert-danger mb-2",
+        role = "alert",
+        icon("triangle-exclamation"),
+        tags$strong(" Low-confidence candidates. "),
+        sprintf("The algorithm classified this abstract as '%s' (score: %.1f). ",
+                cls, if (is.na(score)) 0 else score),
+        "The candidates below are the best the search found, but ",
+        tags$strong("none are likely the correct published version. "),
+        "Consider selecting 'No match found' unless you identify the paper manually."
+      )
+    } else if (cls == "excluded") {
+      tags$div(
+        class = "alert alert-warning mb-2",
+        role = "alert",
+        icon("circle-exclamation"),
+        tags$strong(" Pre-conference publication. "),
+        "The top candidate was published before the conference date, ",
+        "suggesting it is a pre-existing paper rather than a conference-to-publication conversion."
+      )
+    } else if (cls == "possible") {
+      tags$div(
+        class = "alert alert-info mb-2",
+        role = "alert",
+        icon("circle-info"),
+        tags$strong(" Weak evidence. "),
+        sprintf("Score: %.1f. ", if (is.na(score)) 0 else score),
+        "The match has limited text overlap or tied candidates. Review carefully."
+      )
+    } else {
+      NULL
+    }
   })
 
   # --- Candidates table with per-candidate scores ---

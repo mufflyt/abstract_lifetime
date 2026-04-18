@@ -46,7 +46,7 @@ if (file.exists(checkpoint_path)) {
 remaining <- abstracts_doi |> filter(!abstract_id %in% completed_ids)
 cli_alert_info("{nrow(remaining)} remaining to search")
 
-ua_email <- "tyler.muffly@dhha.org"
+ua_email <- Sys.getenv("PIPELINE_EMAIL", cfg$contact_email %||% "abstract.lifetime@example.com")
 
 #' Rate-limited OpenAlex GET
 oa_get <- function(url) {

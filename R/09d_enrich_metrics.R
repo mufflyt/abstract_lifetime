@@ -11,7 +11,7 @@ suppressPackageStartupMessages({
 })
 
 cfg <- config::get(file = here("config.yml"))
-ua_email <- "tyler.muffly@dhha.org"
+ua_email <- Sys.getenv("PIPELINE_EMAIL", cfg$contact_email %||% "abstract.lifetime@example.com")
 
 `%||%` <- function(a, b) if (is.null(a) || length(a) == 0 || is.na(a)) b else a
 

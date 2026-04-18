@@ -175,7 +175,12 @@ default:
     target_sensitivity: 0.80
 
   # --- Google Sheets (adjudication app backend) ---
-  google_sheet_id: "1d2YAsndMxCPK0AQMHw4bgKp3glFg_znGj8Riq5YpfaI"
+  # Set via GOOGLE_SHEETS_ID environment variable or override here
+  google_sheet_id: ""
+
+  # --- Contact email for API polite pools (OpenAlex, CrossRef) ---
+  # Set via PIPELINE_EMAIL env var or override here
+  contact_email: ""
 
   # --- Pipeline ---
   pipeline:
