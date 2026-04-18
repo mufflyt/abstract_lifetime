@@ -47,6 +47,10 @@ abstracts <- abstracts |>
     # Split raw author string into individual names
     # ScienceDirect format: "FI LastName, FI LastName, ..." (e.g., "J Hayden, M Milla")
     # Also handles "... Name" ellipsis format
+    authors_truncated = map_lgl(authors_raw, function(raw) {
+      if (is.na(raw) || raw == "") return(FALSE)
+      str_detect(raw, "\\.{2,}")
+    }),
     authors_list = map(authors_raw, function(raw) {
       if (is.na(raw) || raw == "") return(character(0))
       raw <- str_remove_all(raw, "\\b(MD|DO|PhD|MPH|MS|FACOG|FACS|MSCR|DrPH|MHS|MBA|RN|BSN)\\b")
@@ -63,8 +67,13 @@ abstracts <- abstracts |>
     }),
     author_count = map_int(authors_list, length),
     author_name_first = map_chr(authors_list, ~ if (length(.x) > 0) .x[1] else NA_character_),
-    author_name_last = map_chr(authors_list, ~ if (length(.x) > 1) .x[length(.x)] else
-      if (length(.x) == 1) .x[1] else NA_character_),
+    # When ScienceDirect truncates the list ("Smith, Jones, ..."), the last
+    # visible author is NOT the true last author. Set NA to avoid false
+    # last-author scoring credit for truncated lists.
+    author_name_last = map2_chr(authors_list, authors_truncated, function(nms, trunc) {
+      if (trunc) return(NA_character_)
+      if (length(nms) > 1) nms[length(nms)] else if (length(nms) == 1) nms[1] else NA_character_
+    }),
     first_author_normalized = vapply(author_name_first, normalize_author, character(1)),
     last_author_normalized = vapply(author_name_last, normalize_author, character(1)),
     all_authors_normalized = map(authors_list, normalize_authors)
