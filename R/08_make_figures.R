@@ -98,42 +98,72 @@ tryCatch({
   if (requireNamespace("DiagrammeR", quietly = TRUE)) {
     grViz_code <- sprintf('
     digraph flow {
-      graph [rankdir=TB, fontname="Helvetica", fontsize=11, nodesep=0.3, ranksep=0.4]
-      node [shape=box, style="filled,rounded", fillcolor="#E8F4FD", fontname="Helvetica", fontsize=10, width=3.5]
-      edge [arrowsize=0.7]
+      graph [rankdir=TB, fontname="Arial", fontsize=12, nodesep=0.5, ranksep=0.6,
+             bgcolor=white, splines=ortho]
+      node [shape=box, style="filled", fontname="Arial", fontsize=11,
+            width=3.2, height=0.7, penwidth=1.5, color="#333333"]
+      edge [arrowsize=0.8, color="#333333", penwidth=1.2]
 
-      id [label="Abstracts identified from\\nJMIG supplements\\n(n = %d)", fillcolor="#B3D9FF"]
-      ex [label="Video presentations excluded\\n(n = %d)", fillcolor="#FFD6D6", shape=box]
-      inc [label="Oral abstracts included\\n(n = %d)", fillcolor="#B3D9FF"]
-      search [label="Searched: PubMed, CrossRef,\\nEurope PMC, OpenAlex,\\nSemantic Scholar, DOI-chain"]
-      cand [label="With candidate publications\\n(n = %d)"]
-      nocand [label="No candidates found\\n(n = %d)", fillcolor="#FFD6D6"]
+      // Top: Identification
+      id [label="Abstracts identified from JMIG\\nsupplement issues, 2012-2023\\n(12 congresses)\\nn = %d",
+          fillcolor="white"]
 
-      def [label="Definite match\\n(n = %d)", fillcolor="#C8E6C9"]
-      prob [label="Probable match\\n(n = %d)", fillcolor="#FFF9C4"]
-      poss [label="Possible match\\n(n = %d)", fillcolor="#FFE0B2"]
-      excl [label="Excluded\\n(pre-conference, n = %d)", fillcolor="#FFD6D6"]
-      nomatch [label="No match\\n(n = %d)", fillcolor="#FFCDD2"]
+      // Exclusion (right side)
+      ex [label="Excluded: video presentations\\nn = %d",
+          fillcolor="white"]
 
-      id -> ex [style=dashed]
+      // Included
+      inc [label="Oral presentations included\\nn = %d",
+           fillcolor="white"]
+
+      // Search
+      search [label="Publication search\\n6 databases: PubMed, CrossRef,\\nEurope PMC, OpenAlex,\\nSemantic Scholar, DOI-chain\\nreverse citations",
+              fillcolor="white"]
+
+      // Candidates
+      cand [label="Abstracts with candidate\\npublications identified\\nn = %d",
+            fillcolor="white"]
+      nocand [label="No candidates\\nidentified\\nn = %d",
+              fillcolor="white"]
+
+      // Scoring
+      score [label="Composite scoring\\n(10 components: title, abstract,\\nauthor, journal, date matching)",
+             fillcolor="white"]
+
+      // Classification outcomes
+      def [label="Definite match\\n(score >= 7, text evidence)\\nn = %d",
+           fillcolor="#D5E8D4", color="#82B366"]
+      prob [label="Probable match\\n(score 3-7, text evidence)\\nn = %d",
+            fillcolor="#FFF2CC", color="#D6B656"]
+      poss [label="Possible match\\n(weak evidence or ties)\\nn = %d",
+            fillcolor="#FFE6CC", color="#D79B00"]
+      nomatch [label="No match\\n(score < 3)\\nn = %d",
+               fillcolor="#F8CECC", color="#B85450"]
+      excl [label="Excluded\\n(pre-conference\\npublication)\\nn = %d",
+            fillcolor="#E1D5E7", color="#9673A6"]
+
+      // Layout
       id -> inc
+      id -> ex [style=dashed, constraint=false]
       inc -> search
       search -> cand
-      search -> nocand [style=dashed]
-      cand -> def
-      cand -> prob
-      cand -> poss
-      cand -> excl [style=dashed]
-      cand -> nomatch
+      search -> nocand [style=dashed, constraint=false]
+      cand -> score
+      score -> def
+      score -> prob
+      score -> poss
+      score -> nomatch
+      score -> excl [style=dashed]
 
-      {rank=same; ex}
-      {rank=same; nocand}
-      {rank=same; def; prob; poss; excl; nomatch}
+      // Force left-right arrangement
+      {rank=same; id; ex}
+      {rank=same; cand; nocand}
+      {rank=same; def; prob; poss; nomatch; excl}
     }',
     n_scraped, n_video_excluded, n_total,
     n_with_candidates, n_total - n_with_candidates,
     n_definite_fig, n_probable_fig, n_possible_fig,
-    n_excluded_fig, n_no_match_fig)
+    n_no_match_fig, n_excluded_fig)
 
     g <- DiagrammeR::grViz(grViz_code)
 
@@ -143,12 +173,12 @@ tryCatch({
     if (requireNamespace("webshot2", quietly = TRUE)) {
       webshot2::webshot(html_file,
                         here("output", "figures", "figure1_flow_diagram.png"),
-                        vwidth = 800, vheight = 700, zoom = 2)
+                        vwidth = 1000, vheight = 900, zoom = 3)
       cli_alert_success("Figure 1 flow diagram saved (PNG)")
     } else if (requireNamespace("webshot", quietly = TRUE)) {
       webshot::webshot(html_file,
                         here("output", "figures", "figure1_flow_diagram.png"),
-                        vwidth = 800, vheight = 700, zoom = 2)
+                        vwidth = 1000, vheight = 900, zoom = 3)
       cli_alert_success("Figure 1 flow diagram saved (PNG)")
     } else {
       cli_alert_warning("Install webshot2 for PNG rendering: install.packages('webshot2')")
