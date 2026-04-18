@@ -81,12 +81,14 @@ for (i in seq_len(nrow(remaining))) {
     cli_alert_warning("  No candidates found")
   }
 
-  # Track strategy-level results
+  # Track strategy-level results from the search we already ran (no duplicate
+  # API calls — reuse the candidates tibble which records which strategies
+  # found each PMID).
   strategies <- build_search_strategies(row, cfg)
   for (sname in names(strategies)) {
-    result <- rate_limited_search(strategies[[sname]],
-                                  retmax = cfg$pubmed$max_results_per_query, cfg = cfg)
-    n_hits <- if (!is.null(result)) result$count else 0
+    n_hits <- if (nrow(candidates) > 0 && "strategies" %in% names(candidates)) {
+      sum(grepl(sname, candidates$strategies))
+    } else 0L
     all_strategy_results <- c(all_strategy_results, list(tibble::tibble(
       abstract_id = row$abstract_id,
       strategy = sname,

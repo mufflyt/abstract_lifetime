@@ -141,7 +141,11 @@ gs_ensure_headers <- function(sheet_id) {
 gs_append_decision <- function(sheet_id, new_row) {
   tryCatch({
     header <- names(read_sheet(sheet_id, sheet = "decisions", n_max = 0))
+    # Add cols in header missing from new_row
     for (col in setdiff(header, names(new_row))) new_row[[col]] <- NA_character_
+    # Drop cols in new_row not in header (avoids "undefined columns" error)
+    new_row <- new_row[, intersect(names(new_row), header), drop = FALSE]
+    # Reorder to match header
     new_row <- new_row[, header, drop = FALSE]
     sheet_append(sheet_id, new_row, sheet = "decisions")
     TRUE
@@ -396,7 +400,7 @@ ui <- page_sidebar(
       radioButtons(
         "filter_year",
         tagList("Congress year:",
-                help_icon("Narrow the list to a specific AAGL Global Congress year (2022 = 51st, 2023 = 52nd). 'All' shows both cohorts (198 abstracts).")),
+                help_icon("Narrow the list to a specific AAGL Global Congress year. 'All' shows every congress.")),
         choices = c("All" = "all",
                     "2012" = "2012", "2013" = "2013", "2014" = "2014",
                     "2015" = "2015", "2016" = "2016", "2017" = "2017", "2018" = "2018",
@@ -1041,7 +1045,7 @@ server <- function(input, output, session) {
 
     # Use gregexpr to find header positions, then manually split.
     # strsplit with zero-width lookaheads fragments text incorrectly in R.
-    headers_re <- "Study Objective|Objective|Design|Setting|Patients or Participants|Patients|Participants|Intervention|Measurements|Results|Conclusion|Methods|Background|Purpose"
+    headers_re <- "\\bStudy Objective\\b|\\bObjective\\b|\\bDesign\\b|\\bSetting\\b|\\bPatients or Participants\\b|\\bPatients\\b|\\bParticipants\\b|\\bIntervention\\b|\\bMeasurements\\b|\\bResults\\b|\\bConclusion\\b|\\bMethods\\b|\\bBackground\\b|\\bPurpose\\b"
     m <- gregexpr(headers_re, txt, perl = TRUE)[[1]]
 
     if (m[1] == -1) {

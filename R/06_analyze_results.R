@@ -55,8 +55,15 @@ n_published <- sum(results$final_published, na.rm = TRUE)
 n_pending <- sum(is.na(results$final_published))
 
 # Wilson score interval for proportion
-prop_test <- prop.test(n_published, n_total - n_pending, correct = FALSE)
-pub_rate <- n_published / (n_total - n_pending)
+n_evaluated <- n_total - n_pending
+if (n_evaluated == 0) {
+  cli_alert_warning("All abstracts still pending review — cannot compute publication rate")
+  pub_rate <- NA_real_
+  prop_test <- list(conf.int = c(NA_real_, NA_real_))
+} else {
+  prop_test <- prop.test(n_published, n_evaluated, correct = FALSE)
+  pub_rate <- n_published / n_evaluated
+}
 
 aim1 <- tibble::tibble(
   metric = c("total_abstracts", "published", "not_published", "pending_review",
@@ -161,17 +168,24 @@ if (nrow(published) > 0 && "months_to_pub" %in% names(published)) {
   # Kaplan-Meier analysis
   # Create survival object: event = publication, time = months since conference
   # Censored = not published by end of search window
+  # KM data: published abstracts WITH a date are events at their time.
+  # Published abstracts WITHOUT a date are excluded (not censored, as they
+  # are known events — censoring them would negatively bias estimates).
+  # Unpublished abstracts are censored at end of search window.
   km_data <- results |>
     filter(!is.na(final_published)) |>
     mutate(
-      time = if_else(final_published & !is.na(months_to_pub),
-                     months_to_pub,
-                     as.numeric(difftime(as.Date(cfg$pubmed$date_end, "%Y/%m/%d"),
-                                         conference_date_for(congress_year, cfg),
-                                         units = "days")) / 30.44),
+      censor_time = as.numeric(difftime(as.Date(cfg$pubmed$date_end, "%Y/%m/%d"),
+                                        conference_date_for(congress_year, cfg),
+                                        units = "days")) / 30.44,
+      time = case_when(
+        final_published & !is.na(months_to_pub) ~ months_to_pub,  # event with known time
+        !final_published ~ censor_time,                            # censored
+        TRUE ~ NA_real_                                            # published but no date — exclude
+      ),
       event = as.integer(final_published)
     ) |>
-    filter(time > 0)
+    filter(!is.na(time), time > 0)
 
   if (nrow(km_data) > 0) {
     km_fit <- survfit(Surv(time, event) ~ 1, data = km_data)
@@ -349,12 +363,12 @@ supp_apis <- list(
   list(file = "semantic_scholar_candidates.csv", name = "Semantic Scholar", pmid_col = "pmid", doi_col = "doi")
 )
 
-aim4_supp <- purrr::map_dfr(supp_apis, function(api) {
+aim4_supp <- purrr::map(supp_apis, function(api) {
   fpath <- here("data", "processed", api$file)
   if (!file.exists(fpath)) return(NULL)
   cands <- read_csv(fpath, show_col_types = FALSE)
 
-  n_total <- 98L  # Total abstracts searched
+  n_total <- nrow(results)
   n_abstracts_with_hits <- length(unique(cands$abstract_id))
   n_candidates <- nrow(cands)
 
@@ -379,7 +393,7 @@ aim4_supp <- purrr::map_dfr(supp_apis, function(api) {
     pct_found = if (n_found > 0) round(n_found / nrow(accepted_pmids) * 100, 1) else NA_real_,
     source = "Supplementary"
   )
-})
+}) |> purrr::list_rbind()
 
 aim4 <- bind_rows(aim4_pubmed, aim4_supp)
 write_csv(aim4, here("output", "aim4_strategy_performance.csv"))
