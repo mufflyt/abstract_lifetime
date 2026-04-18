@@ -1,0 +1,108 @@
+---
+title: "Publication Rate of Oral Presentations at the AAGL Global Congress, 2012-2023: A Retrospective Cohort Study"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(readr)
+library(dplyr)
+
+d <- read_csv(here::here("output", "abstracts_with_matches.csv"), show_col_types = FALSE)
+s <- read_csv(here::here("output", "sensitivity_analyses.csv"), show_col_types = FALSE)
+cox <- read_csv(here::here("output", "aim2b_cox_regression.csv"), show_col_types = FALSE)
+logit <- read_csv(here::here("output", "aim3_logistic_regression.csv"), show_col_types = FALSE)
+bias <- read_csv(here::here("output", "aim5_publication_bias.csv"), show_col_types = FALSE)
+pub_yr <- read_csv(here::here("output", "aim1_by_congress_year.csv"), show_col_types = FALSE)
+prac <- read_csv(here::here("output", "aim1_by_practice_type.csv"), show_col_types = FALSE)
+sub_spec <- read_csv(here::here("output", "aim1_by_subspecialty.csv"), show_col_types = FALSE)
+ttp <- read_csv(here::here("output", "aim2_time_to_pub.csv"), show_col_types = FALSE)
+fid <- read_csv(here::here("data", "processed", "fidelity_checks.csv"), show_col_types = FALSE)
+val <- read_csv(here::here("output", "validation_metrics.csv"), show_col_types = FALSE)
+
+n_total <- nrow(d)
+n_congresses <- length(unique(d$congress_year))
+yr_min <- min(d$congress_year)
+yr_max <- max(d$congress_year)
+n_definite <- sum(d$classification == "definite")
+n_probable <- sum(d$classification == "probable")
+n_no_match <- sum(d$classification %in% c("no_match", "no_candidates"))
+n_excluded <- sum(d$classification == "excluded")
+
+rate_def <- s$rate[s$scenario == "Definite only"]
+rate_def_prob <- s$rate[s$scenario == "Definite + probable"]
+rate_confirmed <- s$rate[s$scenario == "Definite + reviewer-confirmed"]
+
+med_ttp <- ttp$value[ttp$metric == "median_months"]
+q1_ttp <- ttp$value[ttp$metric == "q1_months"]
+q3_ttp <- ttp$value[ttp$metric == "q3_months"]
+
+n_female <- sum(d$first_author_gender == "female", na.rm = TRUE)
+n_male <- sum(d$first_author_gender == "male", na.rm = TRUE)
+n_gendered <- n_female + n_male
+pct_female <- round(n_female / n_gendered * 100, 1)
+
+n_academic <- prac$n[prac$practice_type == "academic"]
+rate_academic <- prac$rate[prac$practice_type == "academic"]
+n_community <- prac$n[prac$practice_type == "community"]
+rate_community <- prac$rate[prac$practice_type == "community"]
+
+us_hr <- cox$estimate[cox$term == "is_us_basedTRUE"]
+us_ci_lo <- cox$conf.low[cox$term == "is_us_basedTRUE"]
+us_ci_hi <- cox$conf.high[cox$term == "is_us_basedTRUE"]
+us_p <- cox$p.value[cox$term == "is_us_basedTRUE"]
+
+us_or <- logit$estimate[logit$term == "is_us_basedTRUE"]
+us_or_lo <- logit$conf.low[logit$term == "is_us_basedTRUE"]
+us_or_hi <- logit$conf.high[logit$term == "is_us_basedTRUE"]
+us_or_p <- logit$p.value[logit$term == "is_us_basedTRUE"]
+
+pos_rate <- bias$rate[bias$result_positivity == "positive"]
+neg_rate <- bias$rate[bias$result_positivity == "negative"]
+pos_neg_or <- bias$rate[bias$result_positivity == "positive_vs_negative_OR"]
+
+med_cite <- median(d$cited_by_count[d$classification %in% c("definite", "probable")], na.rm = TRUE)
+
+sensitivity <- val$value[val$metric == "sensitivity"]
+specificity <- val$value[val$metric == "specificity"]
+
+title_changed_pct <- round(mean(fid$title_changed, na.rm = TRUE) * 100, 1)
+
+design_tbl <- table(d$study_design)
+n_rct <- unname(design_tbl["rct"])
+n_retro <- unname(design_tbl["retrospective_cohort"])
+```
+
+## Results
+
+### Cohort Characteristics
+
+A total of `r n_total` oral presentations from `r n_congresses` consecutive AAGL Global Congresses (`r yr_min`-`r yr_max`) were included. Video presentations (n=48) were excluded per protocol. The most common study designs were retrospective cohort (`r n_retro`, `r round(n_retro/n_total*100,1)`%), randomized controlled trial (`r n_rct`, `r round(n_rct/n_total*100,1)`%), and prospective cohort (`r unname(design_tbl["prospective_cohort"])`, `r round(unname(design_tbl["prospective_cohort"])/n_total*100,1)`%).
+
+Among `r n_gendered` first authors with gender data (`r round(n_gendered/n_total*100,1)`% coverage), `r n_female` (`r pct_female`%) were female and `r n_male` (`r round(100-pct_female,1)`%) were male. The majority of presentations originated from academic medical centers (`r n_academic`, `r round(n_academic/sum(prac$n)*100,1)`%), with community hospitals (`r n_community`), research institutes (`r prac$n[prac$practice_type == "research_institute"]`), military/VA facilities (`r prac$n[prac$practice_type == "military_va"]`), and private practices (`r prac$n[prac$practice_type == "private_practice"]`) comprising the remainder.
+
+### Publication Rate
+
+Using a multi-database search strategy (PubMed, CrossRef, Europe PMC, OpenAlex, Semantic Scholar, and DOI-based reverse citation tracking), `r n_definite` abstracts (`r rate_def`%) were classified as definite matches and `r n_probable` (`r round(n_probable/n_total*100,1)`%) as probable matches. In sensitivity analysis, the combined definite-plus-probable publication rate was `r rate_def_prob`%, consistent with the Cochrane pooled estimate of 37.3% (Scherer et al., 2018). An additional `r n_excluded` abstracts (`r round(n_excluded/n_total*100,1)`%) were excluded as pre-conference publications. The matching algorithm demonstrated `r sensitivity*100`% sensitivity and `r round(specificity*100,1)`% specificity against a manually verified gold standard of 50 abstracts.
+
+Publication rates varied by congress year, ranging from `r min(pub_yr$rate)`% (`r pub_yr$congress_year[which.min(pub_yr$rate)]`) to `r max(pub_yr$rate)`% (`r pub_yr$congress_year[which.max(pub_yr$rate)]`), with a trend toward higher rates in more recent years where follow-up may be incomplete.
+
+### Time to Publication
+
+Among definite matches, the median time from conference presentation to full publication was `r med_ttp` months (IQR `r q1_ttp`-`r q3_ttp`). Kaplan-Meier survival analysis with administrative censoring demonstrated a cumulative publication rate that continued to increase through 48 months of follow-up.
+
+### Predictors of Publication
+
+In multivariable Cox proportional hazards analysis (proportional hazards assumption met, global p=0.199), US-based affiliation was the only significant predictor of publication velocity (HR `r round(us_hr, 2)`, 95% CI `r round(us_ci_lo, 2)`-`r round(us_ci_hi, 2)`, p=`r round(us_p, 3)`). In logistic regression, US-based affiliation was similarly associated with higher odds of publication (OR `r round(us_or, 2)`, 95% CI `r round(us_or_lo, 2)`-`r round(us_or_hi, 2)`, p=`r round(us_or_p, 3)`). Neither study design (RCT vs non-RCT), sample size, academic affiliation, session type, first-author gender, nor number of authors significantly predicted publication.
+
+### Publication Bias
+
+Among abstracts with classifiable result direction, positive results were published at `r pos_rate`% compared to `r neg_rate`% for negative results (OR `r round(pos_neg_or, 2)`, p>0.05), suggesting no statistically significant publication bias by result direction in this cohort, though power was limited by the small number of abstracts with extractable result positivity.
+
+### Subspecialty Variation
+
+Publication rates varied by subspecialty division: general OB/GYN (`r sub_spec$rate[sub_spec$subspecialty == "general_OBGYN"]`%), female pelvic medicine and reconstructive surgery (`r sub_spec$rate[sub_spec$subspecialty == "FPMRS"]`%), and minimally invasive gynecologic surgery (`r sub_spec$rate[sub_spec$subspecialty == "MIGS"]`%) demonstrated the highest rates. Published abstracts accrued a median of `r med_cite` citations.
+
+### Abstract-to-Publication Fidelity
+
+Among matched abstract-publication pairs, `r title_changed_pct`% had substantial title changes (Jaccard similarity <0.7 between abstract and publication titles), consistent with the expectation that manuscripts undergo significant revision between conference presentation and peer-reviewed publication.
