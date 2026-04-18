@@ -1,10 +1,10 @@
 ---
-title: "Publication Rate of Oral Presentations at the AAGL Global Congress, 2012-2023: A Retrospective Cohort Study"
+title: "Publication Rate, Time to Publication, and Predictors of Full Publication Among Oral Presentations at the AAGL Global Congress, 2012-2023: A Retrospective Cohort Study"
 output: word_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 library(readr)
 library(dplyr)
 
@@ -82,7 +82,101 @@ n_database <- sum(d$is_database_study, na.rm = TRUE)
 n_industry <- sum(d$has_industry, na.rm = TRUE)
 n_trial_reg <- sum(d$has_trial_registration, na.rm = TRUE)
 n_irb <- sum(d$has_irb_statement, na.rm = TRUE)
+
+# Search strategy data
+strat <- read_csv(here::here("output", "aim4_strategy_performance.csv"), show_col_types = FALSE)
+n_search_strategies <- nrow(strat)
+
+# Follow-up duration
+followup_max <- as.numeric(difftime(as.Date("2026/04/01", "%Y/%m/%d"),
+                                     as.Date("2012-11-06"), units = "days")) / 365.25
+followup_min <- as.numeric(difftime(as.Date("2026/04/01", "%Y/%m/%d"),
+                                     as.Date("2023-11-07"), units = "days")) / 365.25
+
+# Gold standard
+n_gold <- val$value[val$metric == "n"]
+ppv <- val$value[val$metric == "ppv"]
+npv <- val$value[val$metric == "npv"]
+accuracy <- val$value[val$metric == "accuracy"]
+
+# Multicenter
+n_multicenter <- sum(d$is_multicenter, na.rm = TRUE)
+n_funded <- sum(d$has_funding, na.rm = TRUE)
 ```
+
+## Introduction
+
+Scientific conferences serve as a critical mechanism for disseminating preliminary research findings to the medical community. The American Association of Gynecologic Laparoscopists (AAGL) Global Congress on Minimally Invasive Gynecology is the premier international meeting in the field, attracting presentations on surgical innovation, clinical outcomes, and health services research across the spectrum of gynecologic care. However, conference presentations represent only an intermediate step in the evidence pipeline; their contribution to the permanent scientific record depends on whether they progress to full peer-reviewed publication.
+
+The gap between conference presentation and journal publication has been extensively documented across medical specialties. A Cochrane methodological review (Scherer et al., 2018) synthesizing 425 reports covering 307,028 abstracts estimated a pooled full-publication rate of 37.3%, with survival analysis suggesting 46.4% publication by 10 years. Importantly, publication was not random: abstracts reporting positive or statistically significant results were approximately 30% more likely to be published (RR 1.31), raising concerns about publication bias and incomplete representation of the evidence base. Additional predictors of publication included oral (vs poster) presentation (RR 1.46), randomized trial design (RR 1.51), academic affiliation (RR 1.60), and external funding (RR 1.48).
+
+Despite the Cochrane review's comprehensive synthesis, no prior study has examined publication rates specifically for the AAGL Global Congress, and few studies in surgical subspecialties have employed the multi-database, multi-strategy matching approach recommended by the Cochrane authors. Furthermore, the landscape of minimally invasive gynecologic surgery has evolved substantially over the past decade, with shifts in training paradigms, increasing international participation, and changing research priorities that may influence publication patterns.
+
+The objectives of this study were to: (1) determine the full-publication rate for oral presentations at the AAGL Global Congress over a 12-year period; (2) characterize the time from conference presentation to publication; (3) identify scientific, author, and institutional predictors of publication; (4) assess for publication bias by result direction; and (5) evaluate abstract-to-publication fidelity. This study was designed to address the Cochrane review's methodological recommendations, including multi-database search, tiered match classification, survival analysis, and sensitivity analyses across multiple follow-up windows.
+
+## Materials and Methods
+
+### Study Design and Cohort
+
+This was a retrospective cohort study of all oral presentations at the AAGL Global Congress on Minimally Invasive Gynecology from `r yr_min` to `r yr_max` (`r n_congresses` consecutive annual meetings: the 41st through 52nd Global Congress). The study protocol followed the STROBE guidelines for observational cohort studies and incorporated methodological recommendations from the Cochrane review on full publication of results initially presented as abstracts (Scherer et al., 2018).
+
+### Data Source and Abstraction
+
+Conference abstracts were identified from the Journal of Minimally Invasive Gynecology (JMIG) annual supplement issues, which publish the proceedings of each AAGL Global Congress. Abstract metadata (title, authors, structured abstract text, DOI, and page range) were extracted programmatically from the ScienceDirect digital archive. Each abstract was assigned a unique identifier (e.g., AAGL2023_001) and classified by session type (oral or video presentation) based on the Table of Contents section headers. Video presentations (n=48, appearing only in 2022-2023) were excluded, limiting the cohort to oral presentations.
+
+### Variable Extraction
+
+Abstract-level variables were extracted using a combination of structured field parsing and natural language processing applied to the abstract text:
+
+**Study characteristics.** Study design was classified into 11 categories (randomized controlled trial, prospective cohort, retrospective cohort, case-control, case series, cross-sectional, systematic review, cost analysis, simulation/laboratory, validation study, or other) using regex-based text classification. Additional binary indicators captured multicenter status, use of national administrative databases (NSQIP, NIS, SEER, NCDB, HCUP), reported funding, industry involvement (identification of device or pharmaceutical company names), trial registration (NCT or ISRCTN numbers), IRB/ethics committee statements, and presence of numeric results (p-values, odds ratios, confidence intervals, or percentages).
+
+**Result direction.** Abstract conclusions were classified as reporting positive, negative, neutral, or unclear results using a validated regex-based classifier that scanned conclusion text, measurements sections, and full abstract text for directional language (e.g., "significant," "improved," "no difference," "failed to").
+
+**Author and institutional characteristics.** For each abstract's corresponding published paper (when identified), full author names and institutional affiliations were extracted from PubMed XML records via the NCBI E-Utilities API. First-author gender was inferred using US Social Security Administration name-gender data (R `gender` package, 1930-2012 birth cohorts) with genderize.io as a fallback for international names. First-author practice type was classified as academic, community, military/VA, research institute, or private practice by cross-referencing affiliations against 2,754 ACGME-accredited teaching hospital names and applying regex-based institution classification. First-author US state was parsed from affiliations using a multi-strategy approach (spelled-out state names, two-letter codes, institution-to-state lookup, and city-to-state lookup), and mapped to ACOG districts I-XI. Subspecialty was classified from departmental affiliations (MIGS, REI, gynecologic oncology, FPMRS, MFM, or general OB/GYN).
+
+### Publication Search Strategy
+
+A tiered, multi-database search was conducted to identify full peer-reviewed publications corresponding to each conference abstract. The search window extended from the date of each respective congress through April 2026, providing `r round(followup_max, 1)` years of follow-up for the earliest cohort (`r yr_min`) and `r round(followup_min, 1)` years for the most recent (`r yr_max`).
+
+**Primary search (PubMed/MEDLINE).** Six complementary search strategies were applied to each abstract via the NCBI E-Utilities API: (1) title keyword phrase search, (2) first-author search, (3) last-author search, (4) author plus keyword combination, (5) distinctive title fragment search, and (6) broad author search. Each strategy was filtered by publication date and results from the JMIG supplement issues were excluded to prevent self-matching.
+
+**Supplementary searches.** Four additional databases were queried for each abstract: CrossRef (targeted to abstracts with few PubMed hits), Europe PMC (multi-strategy title and author search), OpenAlex (keyword search with PMID resolution), and Semantic Scholar (title-based search). Candidate publications identified from supplementary sources were resolved to PMIDs via Europe PMC and merged into the primary candidate pool.
+
+**DOI-based reverse citation search.** A novel strategy leveraging each abstract's ScienceDirect DOI: for each of the `r n_total` abstract DOIs, OpenAlex was queried to identify papers that cited the conference abstract. Papers explicitly citing a conference abstract in their reference list represent high-confidence matches, particularly when title-based searches fail due to substantial title revision between presentation and publication.
+
+All candidate publications were deduplicated by PMID across search strategies, and detailed PubMed metadata (title, authors, journal, publication date, DOI, keywords, and publication type) were fetched for scoring.
+
+### Abstract-to-Publication Matching
+
+Each candidate publication was scored against its source abstract using a composite matching algorithm incorporating: (1) title similarity (Jaccard index on normalized word sets, weighted at three thresholds), (2) abstract text semantic similarity (TF-IDF cosine similarity), (3) first-author name match (exact or Jaro-Winkler fuzzy match), (4) last-author name match, (5) coauthor overlap (with team bonus), (6) journal relevance (Jaro-Winkler distance to known OB/GYN journals), (7) keyword overlap, and (8) publication date plausibility (with a penalty for pre-conference publication). A text-evidence gate required at least title or abstract similarity above threshold to prevent false matches based solely on author names.
+
+### Match Classification
+
+Matches were classified using a tiered system aligned with Cochrane recommendations: **definite** (composite score $\geq$ 7 with text evidence), **probable** (score 3-7 with text evidence), **possible** (score $\geq$ 3 without text evidence or with tied candidates), **excluded** (best candidate published before the conference date, indicating a pre-existing publication rather than a conference-to-publication conversion), and **no match** (score < 3 or no candidates identified). Tied scores at the definite threshold were downgraded to probable, requiring human adjudication.
+
+### Validation
+
+Algorithm performance was assessed against a manually curated gold standard of `r n_gold` abstracts (25 sampled from definite matches and 25 from no-match classifications). For each sampled abstract, intensive PubMed searches using multiple query strategies with relaxed thresholds were performed to independently verify publication status. Sensitivity, specificity, positive predictive value, negative predictive value, and accuracy were computed.
+
+### Publication Outcome Variables
+
+For matched publications, the following outcome variables were extracted: journal name, publication year, DOI, PMID, publication type (classified as journal article, review, RCT/trial, case report, editorial/letter, or observational study from PubMed PublicationType tags), citation count, and journal impact proxy (2-year mean citedness from OpenAlex). Time to publication was calculated as the interval in months from the conference date to the publication date.
+
+### Statistical Analysis
+
+The primary outcome was full-publication rate, reported as the proportion of abstracts with definite or probable matches with Wilson score 95% confidence intervals. Publication rates were stratified by congress year, study design, practice type, subspecialty, and result direction.
+
+Time to publication was analyzed using Kaplan-Meier survival methods with administrative censoring at the end of the search window for unpublished abstracts. Cox proportional hazards regression was used to model the association between abstract and author characteristics and time to publication, with the proportional hazards assumption tested using Schoenfeld residuals. Multivariable logistic regression modeled the binary publication outcome.
+
+Candidate predictors in both models included: study design (RCT vs non-RCT), log-transformed sample size, academic affiliation, US-based affiliation, number of authors, first-author gender, result positivity, practice type, multicenter status, and reported funding. Variables with >50% missing data or <2 levels were excluded from models.
+
+Publication bias was assessed by comparing publication rates between abstracts reporting positive versus negative results, with an odds ratio and 95% confidence interval.
+
+Sensitivity analyses examined: (1) definite-only versus definite-plus-probable publication rates; (2) publication rates at 12, 24, 36, and 48 months of follow-up; and (3) definite-plus-reviewer-confirmed matches only.
+
+Abstract-to-publication fidelity was assessed by computing the Jaccard similarity between abstract and publication titles, with substantial title change defined as Jaccard similarity <0.7, and by comparing first-author identity.
+
+All analyses were performed in R (version `r paste(R.version$major, R.version$minor, sep=".")`). The matching pipeline, analysis code, and deidentified data are available at https://github.com/mufflyt/abstract_lifetime.
 
 ## Results
 
