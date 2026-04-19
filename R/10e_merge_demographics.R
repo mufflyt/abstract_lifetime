@@ -275,6 +275,55 @@ matches <- matches |>
   left_join(g9, by = "abstract_id") |>
   assert_rows("gender waterfall joins")
 
+# ── Cross-source conflict detection ──────────────────────────────────────────
+# Detect abstracts where multiple sources disagree on gender.
+# This is logged as a warning, not a hard stop — the waterfall priority
+# resolves conflicts deterministically, but disagreements should be auditable.
+gender_cols <- c("gender_npi", "gender_oa", "gender_pubmed", "gender_obgyn",
+                 "gender_oax", "gender_orcid", "gender_opm",
+                 "gender_tri_sr", "gender_tri_2nd", "first_author_gender")
+gender_cols_present <- intersect(gender_cols, names(matches))
+
+conflicts <- matches |>
+  select(abstract_id, all_of(gender_cols_present)) |>
+  rowwise() |>
+  mutate(
+    gender_values = list(unique(na.omit(c_across(all_of(gender_cols_present))))),
+    n_distinct_gender = length(gender_values)
+  ) |>
+  ungroup() |>
+  filter(n_distinct_gender > 1)
+
+if (nrow(conflicts) > 0) {
+  cli_alert_info("Gender cross-source disagreements: {nrow(conflicts)} abstracts")
+  cli_alert_info("  (Expected: SSA initial-based guesses corrected by full-name sources)")
+  conflict_detail <- conflicts |>
+    mutate(values = sapply(gender_values, paste, collapse = " vs ")) |>
+    select(abstract_id, values)
+  write_csv(conflict_detail, here("data", "processed", "gender_conflicts.csv"))
+  cli_alert_info("  Conflict log: data/processed/gender_conflicts.csv")
+} else {
+  cli_alert_success("No gender conflicts across sources")
+}
+
+# Also check state conflicts (NPI state vs PubMed-derived state)
+if ("first_author_state" %in% names(matches) && nrow(npi) > 0) {
+  npi_state_tbl <- npi |>
+    filter(npi_match_confidence == "high", !is.na(npi_state)) |>
+    select(abstract_id, npi_state) |>
+    assert_unique_keys("NPI state check")
+  state_check <- matches |>
+    select(abstract_id, first_author_state) |>
+    inner_join(npi_state_tbl, by = "abstract_id") |>
+    filter(!is.na(first_author_state), !is.na(npi_state),
+           toupper(first_author_state) != toupper(npi_state))
+  if (nrow(state_check) > 0) {
+    cli_alert_warning("State conflicts: {nrow(state_check)} abstracts (PubMed vs NPI)")
+  } else {
+    cli_alert_success("No state conflicts (PubMed vs NPI)")
+  }
+}
+
 # Build unified gender with priority waterfall
 matches <- matches |>
   mutate(
