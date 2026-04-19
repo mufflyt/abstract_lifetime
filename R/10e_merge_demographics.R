@@ -275,38 +275,69 @@ matches <- matches |>
   left_join(g9, by = "abstract_id") |>
   assert_rows("gender waterfall joins")
 
-# ── Cross-source conflict detection ──────────────────────────────────────────
-# Detect abstracts where multiple sources disagree on gender.
-# This is logged as a warning, not a hard stop — the waterfall priority
-# resolves conflicts deterministically, but disagreements should be auditable.
-gender_cols <- c("gender_npi", "gender_oa", "gender_pubmed", "gender_obgyn",
-                 "gender_oax", "gender_orcid", "gender_opm",
-                 "gender_tri_sr", "gender_tri_2nd", "first_author_gender")
-gender_cols_present <- intersect(gender_cols, names(matches))
+# ── Gender resolution policy (explicit, not implicit) ────────────────────────
+# Priority order for gender inference. Higher-ranked sources are preferred.
+# Rationale: sources using full given names are more reliable than those
+# using initials only. NPI is authoritative (board certification records).
+# SSA (tier 10) uses initials only, which are low-resolution — a single
+# initial maps to hundreds of names spanning both genders, leading to
+# higher misclassification risk compared to full-name sources.
+GENDER_PRIORITY <- tibble::tibble(
+  tier = 1:10,
+  source = c("npi", "openalex", "pubmed_fullname", "obgyn_pubs",
+             "openalex_search", "orcid", "open_payments",
+             "senior_triangulation", "second_triangulation", "ssa"),
+  column = c("gender_npi", "gender_oa", "gender_pubmed", "gender_obgyn",
+             "gender_oax", "gender_orcid", "gender_opm",
+             "gender_tri_sr", "gender_tri_2nd", "first_author_gender"),
+  resolution = c("full_name", "full_name", "full_name", "full_name",
+                  "full_name", "full_name", "full_name",
+                  "full_name", "full_name", "initial_only"),
+  description = c(
+    "ABOG board certification records (authoritative identity)",
+    "Full name from abstract DOI via OpenAlex works API",
+    "Full name from PubMed author+affiliation search",
+    "Full name from OB/GYN journal author search",
+    "Full name from OpenAlex works search (journal ISSN filter)",
+    "Full name from ORCID person profile",
+    "Full name from CMS Open Payments physician records",
+    "Full name from PubMed senior coauthor co-publication",
+    "Full name from PubMed second coauthor co-publication",
+    "SSA baby names / genderize.io from first initial (low resolution)"
+  )
+)
+cli_alert_info("Gender priority policy: {nrow(GENDER_PRIORITY)} tiers ({paste(GENDER_PRIORITY$source, collapse=' > ')})")
 
-conflicts <- matches |>
+# Save policy for audit / manuscript appendix
+write_csv(GENDER_PRIORITY, here("data", "processed", "gender_resolution_policy.csv"))
+
+# ── Cross-source conflict detection ──────────────────────────────────────────
+gender_cols_present <- intersect(GENDER_PRIORITY$column, names(matches))
+
+conflict_tbl <- matches |>
   select(abstract_id, all_of(gender_cols_present)) |>
   rowwise() |>
   mutate(
     gender_values = list(unique(na.omit(c_across(all_of(gender_cols_present))))),
     n_distinct_gender = length(gender_values)
   ) |>
-  ungroup() |>
-  filter(n_distinct_gender > 1)
+  ungroup()
+
+conflicts <- conflict_tbl |> filter(n_distinct_gender > 1)
 
 if (nrow(conflicts) > 0) {
   cli_alert_info("Gender cross-source disagreements: {nrow(conflicts)} abstracts")
-  cli_alert_info("  (Expected: SSA initial-based guesses corrected by full-name sources)")
+  cli_alert_info("  (Typically: initial-based SSA corrected by full-name sources)")
   conflict_detail <- conflicts |>
     mutate(values = sapply(gender_values, paste, collapse = " vs ")) |>
-    select(abstract_id, values)
+    select(abstract_id, n_distinct_gender, values)
   write_csv(conflict_detail, here("data", "processed", "gender_conflicts.csv"))
   cli_alert_info("  Conflict log: data/processed/gender_conflicts.csv")
 } else {
   cli_alert_success("No gender conflicts across sources")
 }
 
-# Also check state conflicts (NPI state vs PubMed-derived state)
+# State conflicts (NPI state vs PubMed-derived state)
 if ("first_author_state" %in% names(matches) && nrow(npi) > 0) {
   npi_state_tbl <- npi |>
     filter(npi_match_confidence == "high", !is.na(npi_state)) |>
@@ -324,20 +355,15 @@ if ("first_author_state" %in% names(matches) && nrow(npi) > 0) {
   }
 }
 
-# Build unified gender with priority waterfall
+# ── Resolve gender using explicit priority policy ────────────────────────────
+# coalesce() applies the priority order defined in GENDER_PRIORITY.
+# The first non-NA value wins. This is deterministic and auditable.
 matches <- matches |>
   mutate(
     gender_unified = coalesce(
-      gender_npi,              # 1: NPI
-      gender_oa,               # 2: OpenAlex full name
-      gender_pubmed,           # 3: PubMed full name search
-      gender_obgyn,            # 4: OB/GYN publication search
-      gender_oax,              # 5: OpenAlex author search
-      gender_orcid,            # 6: ORCID
-      gender_opm,              # 7: Open Payments
-      gender_tri_sr,           # 8: Senior author triangulation
-      gender_tri_2nd,          # 9: Second author triangulation
-      first_author_gender      # 10: SSA/genderize from 09c (base)
+      gender_npi, gender_oa, gender_pubmed, gender_obgyn,
+      gender_oax, gender_orcid, gender_opm,
+      gender_tri_sr, gender_tri_2nd, first_author_gender
     ),
     gender_source = case_when(
       !is.na(gender_npi)     ~ "npi",
@@ -352,12 +378,12 @@ matches <- matches |>
       !is.na(first_author_gender) ~ "ssa",
       TRUE ~ NA_character_
     ),
-    # Count how many independent sources contributed a gender value
+    # Number of independent sources that contributed any gender value
     gender_n_sources = rowSums(!is.na(across(all_of(gender_cols_present)))),
-    # Flag abstracts where sources disagreed
-    gender_conflict = gender_n_sources >= 2 & abstract_id %in% conflicts$abstract_id
+    # TRUE if 2+ sources provided different gender values (n_distinct > 1)
+    gender_conflict = abstract_id %in% conflicts$abstract_id
   ) |>
-  # Drop intermediate gender columns — keep unified + source + conflict metadata
+  # Drop intermediate columns — keep unified + source + conflict metadata
   select(-any_of(c("gender_npi", "gender_oa", "gender_pubmed", "gender_obgyn",
                     "gender_oax", "gender_orcid", "gender_opm",
                     "gender_tri_sr", "gender_tri_2nd",
