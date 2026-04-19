@@ -27,6 +27,12 @@ congresses <- cfg$congresses %||% list(list(
   sciencedirect_url = cfg$sources$sciencedirect_url
 ))
 
+#' Scrape session types (Oral/Video) from a ScienceDirect supplement TOC
+#'
+#' @param toc_url Character. ScienceDirect supplement URL for one congress.
+#' @param year Integer. Congress year.
+#' @return Tibble with columns \code{pii}, \code{congress_year}, \code{session_type}.
+#' @keywords internal
 tag_one_congress <- function(toc_url, year) {
   cli_alert_info("Congress {year} -> {toc_url}")
   resp <- httr::GET(toc_url, httr::timeout(30),
@@ -78,11 +84,19 @@ print(table(sessions$session_type, sessions$congress_year, useNA = "ifany"))
 
 # --- Merge into parsed/cleaned/matches CSVs ------------------------------
 
+#' Extract PII from a ScienceDirect article URL
+#' @param u Character. ScienceDirect URL.
+#' @return Character. PII string.
+#' @keywords internal
 pii_from_url <- function(u) {
   m <- str_match(u, "/pii/([A-Za-z0-9]+)")
   m[, 2]
 }
 
+#' Merge session_type tags into a pipeline CSV by PII or abstract_id
+#' @param path Character. Path to the CSV to update.
+#' @return Invisible NULL. Writes updated CSV in place.
+#' @keywords internal
 merge_session <- function(path) {
   if (!file.exists(path)) return(invisible(NULL))
   d <- read_csv(path, show_col_types = FALSE)

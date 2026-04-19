@@ -42,9 +42,12 @@ abstracts <- read_csv(abstracts_path, show_col_types = FALSE)
 matches   <- read_csv(matches_path,   show_col_types = FALSE)
 
 
-# Parse "R.S. Guido" → last="Guido", initials="R.S."
-# For ORCID given-names query we pass all initials (e.g. "R.S.") not just the first,
-# which narrows candidates and reduces false-positive matches.
+#' Parse an AAGL author name into last name and initials for ORCID search
+#'
+#' @param x Character scalar. Author name (e.g., "R.S. Guido").
+#' @return Named list with \code{last} and \code{initial} (full initials
+#'   like "R.S.", not just the first, to narrow ORCID candidates).
+#' @keywords internal
 parse_abstract_author <- function(x) {
   if (is.na(x) || nchar(x) < 2) return(list(last = NA_character_, initial = NA_character_))
   x     <- str_squish(x)
@@ -82,12 +85,21 @@ NON_MEDICAL_TERMS <- c(
   "architect", "musician", "journalist", "agriculture", "dentist"
 )
 
+#' Check if an ORCID role indicates a non-medical profession
+#' @param role Character scalar. ORCID role/title string.
+#' @return Logical. TRUE if non-medical keywords detected.
+#' @keywords internal
 is_non_medical <- function(role) {
   if (is.na(role) || nchar(role) == 0) return(FALSE)
   any(str_detect(tolower(role), fixed(NON_MEDICAL_TERMS)))
 }
 
-# ── Career stage inference ────────────────────────────────────────────────────
+#' Infer career stage from ORCID role and department text
+#' @param role Character. ORCID employment role/title.
+#' @param dept Character. ORCID department name.
+#' @return Character scalar. One of "student", "resident", "fellow",
+#'   "early_faculty", "senior_faculty", "faculty", or \code{NA_character_}.
+#' @keywords internal
 infer_career_stage <- function(role, dept) {
   txt <- tolower(paste(role %||% "", dept %||% ""))
   if (str_detect(txt, "student|medical student|ms[0-9]|ms \\d")) return("student")
@@ -100,7 +112,11 @@ infer_career_stage <- function(role, dept) {
   NA_character_
 }
 
-# ── Subspecialty inference from ORCID role/dept ───────────────────────────────
+#' Infer OB/GYN subspecialty from ORCID role and department text
+#' @param role Character. ORCID employment role/title.
+#' @param dept Character. ORCID department name.
+#' @return Character scalar. Subspecialty code (e.g., "MIGS", "REI") or \code{NA_character_}.
+#' @keywords internal
 infer_subspecialty_orcid <- function(role, dept) {
   txt <- tolower(paste(role %||% "", dept %||% ""))
   if (str_detect(txt, "minimally invasive|migs|laparoscop|robotic gyn")) return("MIGS")
@@ -115,7 +131,16 @@ infer_subspecialty_orcid <- function(role, dept) {
   NA_character_
 }
 
-# ── ORCID search ──────────────────────────────────────────────────────────────
+#' Search the ORCID public API for a researcher by name
+#'
+#' Queries \code{pub.orcid.org} with family-name + given-names filters.
+#' Returns the best-matching ORCID ID or \code{NA_character_}.
+#'
+#' @param last Character. Family name.
+#' @param first_word Character. First word of given names.
+#' @param aff Character. Optional affiliation for disambiguation.
+#' @return Character scalar. ORCID ID (e.g., "0000-0002-1097-0356") or \code{NA_character_}.
+#' @keywords internal
 search_orcid <- function(last, first_word, aff = NA_character_) {
   q <- paste0("family-name:", URLencode(last, repeated = TRUE),
               "+AND+given-names:", URLencode(first_word, repeated = TRUE))
@@ -155,7 +180,11 @@ search_orcid <- function(last, first_word, aff = NA_character_) {
   orcids[1]
 }
 
-# ── Cached ORCID endpoint fetchers ───────────────────────────────────────────
+#' Fetch an ORCID API endpoint with disk caching
+#' @param orcid Character. ORCID ID.
+#' @param endpoint Character. API endpoint ("person", "employments", "works").
+#' @return Parsed JSON list, or NULL on failure. Cached to RDS.
+#' @keywords internal
 .orcid_get <- function(orcid, endpoint) {
   cache_file <- file.path(cache_dir, paste0(orcid, "_", endpoint, ".rds"))
   if (file.exists(cache_file)) return(readRDS(cache_file))

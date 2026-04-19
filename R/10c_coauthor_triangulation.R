@@ -29,7 +29,12 @@ targets <- npi |>
 
 cli_alert_info("Targets for coauthor triangulation: {nrow(targets)}")
 
-# Parse coauthor last names
+#' Parse coauthor last names from a comma-separated authors_raw string
+#'
+#' @param authors_raw Character scalar. Comma-separated author list.
+#' @param skip_first Logical. If TRUE (default), omits the first author.
+#' @return Character vector of lowercase last names.
+#' @keywords internal
 parse_coauthor_lastnames <- function(authors_raw, skip_first = TRUE) {
   parts <- str_split(authors_raw, ",\\s*")[[1]]
   parts <- str_squish(parts[!str_detect(parts, "\\.\\.\\.")])

@@ -83,6 +83,11 @@ delay   <- if (has_key) 1 / cfg$pubmed$rate_limit_with_key else 1 / cfg$pubmed$r
 
 source(here("R", "utils_states.R"))
 
+#' Parse a PubMed affiliation string into city, state, and country
+#'
+#' @param aff Character scalar. Raw affiliation text from PubMed XML.
+#' @return Named list with \code{city}, \code{state}, \code{country}.
+#' @keywords internal
 parse_affiliation <- function(aff) {
   if (is.na(aff) || nchar(aff) == 0) {
     return(list(city = NA_character_, state = NA_character_, country = NA_character_))
@@ -97,6 +102,19 @@ parse_affiliation <- function(aff) {
   list(city = city, state = state, country = country)
 }
 
+#' Parse author list from a PubMed XML record
+#'
+#' Extracts all authors with names, positions, initials, and parsed
+#' affiliations (city, state, country) from a PubmedArticle XML string.
+#'
+#' @param xml_text Character. Raw PubMed XML.
+#' @param pmid Character. PubMed ID for tagging.
+#' @param abstract_id Character. Abstract ID for joining.
+#' @return Tibble with one row per author: \code{abstract_id}, \code{pmid},
+#'   \code{position}, \code{last_name}, \code{first_name}, \code{initials},
+#'   \code{affiliation}, \code{affiliation_city}, \code{affiliation_state},
+#'   \code{affiliation_country}.
+#' @keywords internal
 parse_authors <- function(xml_text, pmid, abstract_id) {
   if (is.na(xml_text) || nchar(xml_text) < 100) return(tibble())
   doc <- tryCatch(read_xml(xml_text), error = function(e) NULL)

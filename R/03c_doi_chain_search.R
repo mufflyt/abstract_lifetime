@@ -48,7 +48,11 @@ cli_alert_info("{nrow(remaining)} remaining to search")
 
 ua_email <- Sys.getenv("PIPELINE_EMAIL", cfg$contact_email %||% "abstract.lifetime@example.com")
 
-#' Rate-limited OpenAlex GET
+#' Rate-limited OpenAlex GET request
+#'
+#' @param url Character. OpenAlex API URL (mailto appended automatically).
+#' @return Parsed JSON list, or NULL on failure.
+#' @keywords internal
 oa_get <- function(url) {
   Sys.sleep(0.15)
   full_url <- paste0(url, if (grepl("\\?", url)) "&" else "?",
@@ -63,7 +67,12 @@ oa_get <- function(url) {
            error = function(e) NULL)
 }
 
-#' Strategy 1: reverse citations — who cites this abstract DOI?
+#' Find papers that cite a given DOI via OpenAlex reverse citation search
+#'
+#' @param doi_bare Character. DOI without URL prefix.
+#' @return Tibble with \code{pub_title}, \code{pub_doi}, \code{pub_year},
+#'   \code{strategy}. Empty tibble if no citations found.
+#' @keywords internal
 find_citing_papers <- function(doi_bare) {
   d1 <- oa_get(paste0("https://api.openalex.org/works/doi:", doi_bare,
                        "?select=id,cited_by_count"))
@@ -83,7 +92,11 @@ find_citing_papers <- function(doi_bare) {
     )
 }
 
-#' Resolve a single DOI to a PMID via OpenAlex IDs field (fallback)
+#' Resolve a single DOI to a PMID via OpenAlex
+#'
+#' @param doi_bare Character. DOI without URL prefix.
+#' @return Character scalar. PMID or \code{NA_character_}.
+#' @keywords internal
 doi_to_pmid <- function(doi_bare) {
   d <- oa_get(paste0("https://api.openalex.org/works/doi:", doi_bare,
                       "?select=ids"))
@@ -91,9 +104,13 @@ doi_to_pmid <- function(doi_bare) {
   gsub("https://pubmed.ncbi.nlm.nih.gov/", "", d$ids$pmid)
 }
 
-#' Batch-resolve a character vector of DOIs to PMIDs via a single OpenAlex
-#' filter query (up to 50 DOIs per request — OpenAlex pipe-filter limit).
-#' Returns a named character vector (DOI → PMID or NA).
+#' Batch-resolve DOIs to PMIDs via OpenAlex
+#'
+#' Uses OpenAlex pipe-filter queries (up to 50 DOIs per request).
+#'
+#' @param dois Character vector. DOIs to resolve.
+#' @return Named character vector (DOI -> PMID or NA).
+#' @keywords internal
 dois_to_pmids_batch <- function(dois) {
   dois <- dois[!is.na(dois) & nchar(dois) > 0]
   if (length(dois) == 0) return(setNames(character(0), character(0)))

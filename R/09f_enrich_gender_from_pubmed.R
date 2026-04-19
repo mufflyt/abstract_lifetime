@@ -189,7 +189,10 @@ name_tbl <- bind_rows(results) |>
 
 cli_alert_success("Full first names recovered: {nrow(name_tbl)} / {n} ({round(nrow(name_tbl)/n*100,1)}%)")
 
-# ── Gender inference on recovered full names ───────────────────────────────────
+#' Title-case a first name for gender lookup
+#' @param n Character scalar. First name.
+#' @return Character scalar. Title-cased name or \code{NA_character_}.
+#' @keywords internal
 clean_first <- function(n) {
   if (is.na(n) || nchar(n) < 2) return(NA_character_)
   paste0(toupper(substr(n, 1, 1)), tolower(substr(n, 2, nchar(n))))

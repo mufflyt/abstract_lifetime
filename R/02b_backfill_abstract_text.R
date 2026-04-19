@@ -37,6 +37,10 @@ has_key <- nchar(Sys.getenv("ENTREZ_KEY", "")) > 0
 delay   <- if (has_key) 1 / cfg$pubmed$rate_limit_with_key else 1 / cfg$pubmed$rate_limit_per_sec
 
 #' Fetch PubMed XML for a DOI via esearch + efetch, using file cache
+#'
+#' @param doi_raw Character. DOI (with or without URL prefix).
+#' @return Character scalar. PubMed XML string, or \code{NA_character_}.
+#' @keywords internal
 fetch_pubmed_by_doi <- function(doi_raw) {
   doi_bare <- str_replace(doi_raw, "^https?://doi\\.org/", "")
   cache_key <- str_replace_all(doi_bare, "[/:]", "_")
@@ -64,6 +68,10 @@ fetch_pubmed_by_doi <- function(doi_raw) {
 }
 
 #' Parse abstract text from PubMed XML string
+#'
+#' @param xml_str Character. Raw PubMed XML.
+#' @return Character scalar. Concatenated abstract text, or \code{NA_character_}.
+#' @keywords internal
 parse_abstract_from_xml <- function(xml_str) {
   if (is.na(xml_str) || nchar(xml_str) < 100) return(NA_character_)
   doc <- tryCatch(read_xml(xml_str), error = function(e) NULL)
