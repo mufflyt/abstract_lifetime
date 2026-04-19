@@ -27,7 +27,7 @@ cli_alert_info("{nrow(missing)} abstracts need backfill")
 
 if (nrow(missing) == 0) {
   cli_alert_success("Nothing to backfill")
-  quit(save = "no")
+  invisible(NULL)
 }
 
 cache_dir <- here("data", "cache", "pubmed_xml")
@@ -94,9 +94,9 @@ backfill <- bind_rows(results) |>
 cli_alert_success("Retrieved abstract text for {nrow(backfill)} / {nrow(missing)} abstracts")
 
 if (nrow(backfill) == 0) {
-  cli_alert_warning("No abstract text retrieved — check DOIs or ENTREZ_KEY")
-  quit(save = "no")
-}
+  cli_alert_warning("No abstract text retrieved — JMIG supplement DOIs are not indexed in PubMed. Abstract text backfill from PubMed is not applicable for conference supplement abstracts. Use Step 2c (ScienceDirect snippets) instead.")
+  invisible(NULL)
+} else {
 
 # Patch abstracts_cleaned.csv
 abstracts_patched <- abstracts |>
@@ -118,3 +118,4 @@ coverage <- abstracts_patched |>
   summarise(n = n(), has_text = sum(!is.na(abstract_text) & nchar(abstract_text) > 10),
             pct = round(has_text / n * 100, 1), .groups = "drop")
 print(coverage)
+}

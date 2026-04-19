@@ -27,7 +27,7 @@ confirmed <- matches |>
 cli_alert_info("{nrow(confirmed)} matched pairs to check")
 if (nrow(confirmed) == 0) {
   cli_alert_warning("No matched pairs — skipping fidelity checks")
-  quit(save = "no")
+  invisible(NULL)
 }
 
 fidelity <- confirmed |>

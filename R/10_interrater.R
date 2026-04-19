@@ -14,15 +14,17 @@ cli_h2("Interrater Agreement")
 decisions_path <- here("output", "manual_review_decisions.csv")
 if (!file.exists(decisions_path)) {
   cli_alert_warning("No manual_review_decisions.csv found — skipping interrater")
-  quit(save = "no")
-}
+  write_csv(tibble(metric = "n_multi_reviewed", value = 0),
+            here("output", "interrater_agreement.csv"))
+} else {
 
 decisions <- read_csv(decisions_path, show_col_types = FALSE)
 
 if (!"reviewer" %in% names(decisions) || !"manual_decision" %in% names(decisions)) {
   cli_alert_warning("Decisions file missing reviewer or manual_decision columns")
-  quit(save = "no")
-}
+  write_csv(tibble(metric = "n_multi_reviewed", value = 0),
+            here("output", "interrater_agreement.csv"))
+} else {
 
 # Deduplicate: latest decision per (abstract_id, reviewer)
 deduped <- decisions |>
@@ -42,8 +44,7 @@ if (nrow(multi) == 0) {
   cli_alert_warning("No abstracts with 2+ human reviewers — cannot compute kappa")
   write_csv(tibble(metric = "n_multi_reviewed", value = 0),
             here("output", "interrater_agreement.csv"))
-  quit(save = "no")
-}
+} else {
 
 n_abstracts <- length(unique(multi$abstract_id))
 cli_alert_info("{n_abstracts} abstracts reviewed by 2+ reviewers")
@@ -64,8 +65,6 @@ cli_alert_info("Raw agreement: {pct_agree}%")
 # Cohen's kappa (requires irr package)
 kappa_val <- NA_real_
 if (requireNamespace("irr", quietly = TRUE) && n_abstracts >= 5) {
-  # Build a rating matrix: columns = reviewers, rows = abstracts
-  # Take the first two reviewers per abstract for a 2-rater kappa
   reviewer_pairs <- multi |>
     group_by(abstract_id) |>
     arrange(reviewer) |>
@@ -97,3 +96,7 @@ result <- tibble(
 write_csv(result, here("output", "interrater_agreement.csv"))
 cli_alert_success("Interrater agreement saved")
 print(result)
+
+} # end nrow(multi) > 0
+} # end column check
+} # end file exists

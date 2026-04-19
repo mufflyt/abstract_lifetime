@@ -1,9 +1,10 @@
 abstract_id,pub_doi,cited_by_count,journal_impact_proxy,journal_name_oa
 AAGL2012_003,10.1016/j.jmig.2024.12.011,0,0.4699512723335138,Journal of Minimally Invasive Gynecology
 AAGL2012_007,10.1097/SPV.0000000000000049,10,0,Female Pelvic Medicine & Reconstructive Surgery
-AAGL2012_014,10.1007/s00404-014-3420-4,9,2.5037383177570094,Archives of Gynecology and Obstetrics
 AAGL2012_018,10.1155/2014/618964,16,0.8819577735124761,BioMed Research International
+AAGL2012_020,10.1093/humrep/deae125,11,1.2407732864674867,Human Reproduction
 AAGL2012_041,10.1111/ajo.12190,13,1.157556270096463,Australian and New Zealand Journal of Obstetrics and Gynaecology
+AAGL2012_042,10.4293/JSLS.2014.00293,9,0.935251798561151,JSLS Journal of the Society of Laparoscopic & Robotic Surgeons
 AAGL2012_043,10.1016/j.fertnstert.2012.08.055,32,0.9084814922763043,Fertility and Sterility
 AAGL2012_048,10.1016/j.ejogrb.2012.12.042,46,1.213297634984382,European Journal of Obstetrics & Gynecology and Reproductive Biology
 AAGL2012_055,10.2147/IJWH.S56364,43,1.308695652173913,International Journal of Women s Health
@@ -18,16 +19,21 @@ AAGL2013_006,10.1016/j.ajog.2014.07.049,61,1.5137852740836848,American Journal o
 AAGL2013_009,10.1007/s11701-013-0406-3,15,2.7398879900435595,Journal of Robotic Surgery
 AAGL2013_015,10.4293/JSLS.2014.00094,60,0.935251798561151,JSLS Journal of the Society of Laparoscopic & Robotic Surgeons
 AAGL2013_020,10.1016/j.fertnstert.2014.12.101,123,0.9084814922763043,Fertility and Sterility
+AAGL2013_022,10.1111/jsm.12349,57,0.36353111432706225,The Journal of Sexual Medicine
 AAGL2013_031,10.1097/AOG.0000000000000121,38,1.301969365426696,Obstetrics and Gynecology
 AAGL2013_037,10.1007/s11701-013-0422-3,4,2.7398879900435595,Journal of Robotic Surgery
 AAGL2013_040,10.1016/j.ejogrb.2015.06.027,9,1.213297634984382,European Journal of Obstetrics & Gynecology and Reproductive Biology
+AAGL2013_045,10.1016/j.fertnstert.2015.08.004,63,0.9084814922763043,Fertility and Sterility
 AAGL2013_047,10.1016/j.ygyno.2013.12.019,65,1.4211281070745698,Gynecologic Oncology
+AAGL2013_050,10.1016/j.ajog.2015.03.055,48,1.5137852740836848,American Journal of Obstetrics and Gynecology
 AAGL2013_053,10.1007/s00464-014-3635-2,39,2.5640186915887853,Surgical Endoscopy
 AAGL2013_063,10.1016/j.ajog.2014.09.007,9,1.5137852740836848,American Journal of Obstetrics and Gynecology
 AAGL2013_074,10.1007/s00464-016-4782-4,46,2.5640186915887853,Surgical Endoscopy
+AAGL2013_078,10.5116/ijme.55a2.218b,36,1.3076923076923077,International Journal of Medical Education
 AAGL2013_090,10.23736/S2724-606X.21.04864-8,10,1.0687022900763359,Minerva Obstetrics and Gynecology
 AAGL2014_003,10.1097/AOG.0000000000000642,94,1.301969365426696,Obstetrics and Gynecology
 AAGL2014_013,10.1007/s11701-017-0699-8,13,2.7398879900435595,Journal of Robotic Surgery
+AAGL2014_014,10.1016/j.ajog.2014.08.010,79,1.5137852740836848,American Journal of Obstetrics and Gynecology
 AAGL2014_017,10.1016/j.ygyno.2014.12.033,23,1.4211281070745698,Gynecologic Oncology
 AAGL2014_020,10.1016/j.ijgo.2015.04.035,10,1.641981885988279,International Journal of Gynecology & Obstetrics
 AAGL2014_021,10.1016/j.ygyno.2016.02.018,127,1.4211281070745698,Gynecologic Oncology
@@ -47,9 +53,11 @@ AAGL2015_010,10.1186/s12885-015-1818-4,227,3.265813788201848,BMC Cancer
 AAGL2015_017,10.1016/j.fertnstert.2017.03.027,12,0.9084814922763043,Fertility and Sterility
 AAGL2015_020,10.1002/ijgo.12001,43,1.641981885988279,International Journal of Gynecology & Obstetrics
 AAGL2015_021,10.1371/journal.pone.0220214,15,2.5095032144944476,PLoS ONE
+AAGL2015_029,10.1097/AOG.0000000000001346,6,1.301969365426696,Obstetrics and Gynecology
 AAGL2015_034,10.1016/j.jmig.2017.06.009,11,0.4699512723335138,Journal of Minimally Invasive Gynecology
 AAGL2015_035,10.1111/jog.13588,13,1.1684848484848485,Journal of obstetrics and gynaecology research
 AAGL2015_047,10.1007/s00464-016-5249-3,24,2.5640186915887853,Surgical Endoscopy
+AAGL2015_048,10.4300/JGME-D-16-00238.1,5,1.1986455981941309,Journal of Graduate Medical Education
 AAGL2015_052,10.1016/j.ajog.2016.06.033,63,1.5137852740836848,American Journal of Obstetrics and Gynecology
 AAGL2015_053,10.1007/s00464-016-5359-y,24,2.5640186915887853,Surgical Endoscopy
 AAGL2015_067,10.1002/ajum.12186,4,0.9081632653061225,Australasian Journal of Ultrasound in Medicine
@@ -58,10 +66,13 @@ AAGL2015_077,10.1016/j.jgyn.2015.04.009,2,0,"Journal de gynécologie, obstétriq
 AAGL2015_079,10.5152/jtgga.2016.16053,18,0.680672268907563,Journal of the Turkish-German Gynecological Association
 AAGL2015_084,10.4293/JSLS.2017.00037,43,0.935251798561151,JSLS Journal of the Society of Laparoscopic & Robotic Surgeons
 AAGL2015_087,10.1016/j.fertnstert.2016.06.012,24,0.9084814922763043,Fertility and Sterility
+AAGL2015_089,10.1007/s00464-019-06886-9,18,2.5640186915887853,Surgical Endoscopy
 AAGL2015_090,10.4293/JSLS.2017.00009,6,0.935251798561151,JSLS Journal of the Society of Laparoscopic & Robotic Surgeons
 AAGL2016_004,10.1016/j.jmig.2017.02.025,26,0.4699512723335138,Journal of Minimally Invasive Gynecology
+AAGL2016_009,10.1097/AOG.0000000000002289,11,1.301969365426696,Obstetrics and Gynecology
 AAGL2016_010,10.1016/j.ajog.2016.11.1039,56,1.5137852740836848,American Journal of Obstetrics and Gynecology
 AAGL2016_012,10.3892/ol.2017.7219,6,1.8366906474820144,Oncology Letters
+AAGL2016_020,10.1016/j.jmig.2017.04.025,11,0.4699512723335138,Journal of Minimally Invasive Gynecology
 AAGL2016_024,10.1016/j.ygyno.2020.01.028,16,1.4211281070745698,Gynecologic Oncology
 AAGL2016_028,10.1007/s00192-017-3379-3,10,1.2894736842105263,International Urogynecology Journal
 AAGL2016_031,10.1016/j.jmig.2017.01.025,23,0.4699512723335138,Journal of Minimally Invasive Gynecology

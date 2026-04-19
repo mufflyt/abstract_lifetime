@@ -36,7 +36,7 @@ cli_h1("NPI Matching for AAGL First Authors")
 abog_path <- "/Users/tylermuffly/isochrones/data/canonical_abog/canonical_abog_npi_LATEST.csv"
 if (!file.exists(abog_path)) {
   cli_alert_danger("ABOG-NPI file not found at {abog_path}")
-  quit(save = "no")
+  invisible(NULL)
 }
 
 pool <- read_csv(abog_path, show_col_types = FALSE) |>

@@ -7,6 +7,7 @@ library(here)
 library(config)
 library(cli)
 
+if (file.exists("~/.Renviron")) readRenviron("~/.Renviron")
 cfg <- config::get(file = here("config.yml"))
 set.seed(cfg$pipeline$seed)
 

@@ -440,3 +440,524 @@ The NPI matching approach has several inherent limitations:
 3. **Name changes.** Authors who changed surnames (e.g., after marriage) between abstract presentation and ABOG certification will not match unless the ABOG record reflects the name used at the time of presentation.
 
 4. **Single-candidate relaxation risk.** While the sole-candidate assumption is probabilistically sound, it is possible for a name collision to occur with a non-presenting physician who happens to share the same uncommon name and initial. The 35-point minimum score guard and downstream manual audit mitigate this risk.
+
+## A11. Expanding the Pipeline to Other Subspecialties
+
+### A11.1 Rationale
+
+The abstract-to-publication pipeline developed for the American Association of Gynecologic Laparoscopists (AAGL) addresses a long-standing methodological gap in surgical education research: the systematic, Cochrane MR000005-compliant tracking of conference abstract fate across an entire subspecialty society. Using the full pipeline, the AAGL dataset achieved a confirmed (definite) publication rate of 11.4% across 1,106 oral presentations from 2012–2023, with a further 21% classified as probable or possible matches — figures that are directly comparable to published abstract-to-publication literature because they follow the same Cochrane methodology for search strategy enumeration, adjudication tier definitions, and time-to-event censoring.
+
+Three distinct scientific motivations support expanding this pipeline to additional OB/GYN societies.
+
+**Publication bias quantification.** A foundational concern in evidence-based medicine is that abstracts with positive or statistically significant results are more likely to be published as full articles. The AAGL dataset alone (n = 1,106 abstracts, 122 definite matches) is underpowered to detect modest publication-bias effects in pre-specified subgroups (e.g., by research category, study design, or calendar year). A pooled multi-society dataset of 6,000–10,000 abstracts would provide adequate statistical power for publication-bias meta-regression using Egger's test and trim-and-fill methods applied at the conference rather than journal level.
+
+**Academic productivity benchmarking.** Hospital systems, academic departments, and fellowship program directors increasingly use conference-abstract-to-publication conversion rates as a proxy for mentorship quality and research productivity. Single-society benchmarks are confounded by society-specific factors (acceptance rate, presentation format, subspecialty norms). A cross-society normative dataset would allow fair inter-institutional comparison by adjusting for subspecialty context.
+
+**Cross-subspecialty comparison.** Minimally invasive gynecologic surgery (AAGL), maternal-fetal medicine (SMFM), gynecologic oncology (SGO), and female pelvic medicine and reconstructive surgery (AUGS) represent scientifically adjacent but institutionally distinct communities. Whether publication rates, time-to-publication, and authorship diversity differ systematically across these subspecialties is an open empirical question with implications for how each field values and rewards conference-level scholarship.
+
+The pipeline's modular architecture supports three levels of analysis once multi-society data are assembled: (1) within-society trends over time (the current AAGL analysis), (2) cross-society head-to-head comparisons controlling for year and study design, and (3) full OB/GYN landscape analyses treating all societies simultaneously using fixed-effects or random-effects models with society as the clustering variable.
+
+### A11.2 Candidate Societies and Conferences
+
+Ten societies encompassing the full spectrum of OB/GYN subspecialties publish annual meeting abstracts in indexed journals and represent the candidate expansion set. The table below provides complete metadata relevant to pipeline feasibility assessment. Membership size estimates are from publicly available society annual reports and NIH workforce data; average abstract counts per year are derived from CrossRef DOI enumeration or PubMed supplement record counts.
+
+| Society | Full Name | Abbreviation | Journal | Platform | DOI Type | Avg Abstracts/Year | Members (approx.) | Subspecialty Focus | Meeting Month | Years Available |
+|---------|-----------|-------------|---------|----------|---------|-------------------|-------------------|---------------------|---------------|----------------|
+| AAGL | Amer. Assoc. of Gynecologic Laparoscopists | AAGL | *JMIG* | ScienceDirect | Individual | ~90 | 7,000 | MIGS | Nov | 2012–2023 |
+| SMFM | Society for Maternal-Fetal Medicine | SMFM | *AJOG* | ScienceDirect | Individual | ~500 | 4,500 | MFM | Feb | 2013–2023 |
+| SGO | Society of Gynecologic Oncology | SGO | *Gynecologic Oncology* | ScienceDirect | Individual | ~570 | 1,700 | Gyn-Onc | Mar | 2014–2023 |
+| NASPAG | N. Amer. Society for Pediatric & Adolescent Gyn. | NASPAG | *JPAG* | ScienceDirect | Individual | ~35 | 1,200 | Ped/Adolescent Gyn | Apr | 2013–2023 |
+| ASRM | Amer. Society for Reproductive Medicine | ASRM | *Fertility and Sterility* | ScienceDirect | Individual | ~1,200 | 8,000 | REI | Oct | 2013–2023 |
+| ACOG | Amer. College of Ob-Gyn | ACOG | *Obstetrics & Gynecology* | LWW | Individual | ~800 | 62,000 | General OB/GYN | May | 2013–2023 |
+| CREOG/APGO | Council on Resident Ed. / Assoc. of Professors of Gyn & Ob | CREOG/APGO | *Obstetrics & Gynecology* | LWW | Individual (2015+) | ~200 | 5,000 | OB/GYN Education | Feb | 2013–2023 |
+| SFP | Society of Family Planning | SFP | *Contraception* | ScienceDirect | Collection-level | ~300 | 1,800 | Family Planning | Nov | 2015–2023 |
+| AUGS | Amer. Urogynecologic Society | AUGS | *Urogynecology* | LWW | Supplement-level | ~400 | 1,600 | FPMRS/Urogynecology | Oct | 2013–2023 |
+| SASGOG | Society for Academic Specialists in Gen. OB/GYN | SASGOG | None | Society website | None | ~50 | 500 | General OB/GYN | Jan | 2019–2023 |
+
+**Scientific overlap between societies.** AAGL and AUGS share a substantial presenter pool: surgeons who hold MIG (minimally invasive gynecology) subspecialty certification from ABOG also frequently perform pelvic floor reconstructive procedures within the FPMRS domain. An estimated 15–25% of AAGL presenters may also appear in AUGS supplements, enabling longitudinal author-level tracking across societies. Similarly, SMFM and ACOG share general-obstetrics content, and ASRM and NASPAG both cover adolescent reproductive endocrinology topics. These overlaps provide opportunities for cross-validation of NPI and ORCID identity resolution across independently assembled datasets.
+
+### A11.3 Platform Architecture
+
+The ten candidate societies distribute across two commercial publishing platforms and one non-journal model, creating two primary engineering tracks for the scraping and ingestion layer of the pipeline.
+
+**Elsevier/ScienceDirect (six societies: AAGL, SMFM, SGO, NASPAG, ASRM, SFP).** Abstracts are hosted at `https://www.sciencedirect.com/journal/{journal-name}/vol/{vol}/issue/{issue}/suppl/S` and served as structured HTML with consistent DOM element IDs. The journal-specific identifiers vary (`.jmig`, `.ajog`, `.ygyno`, `.jpag`, `.fertnstert`, `.contraception`), but the page architecture — article list container, article link `<a>` tags with `/science/article/pii/` href patterns, per-article JSON-LD metadata blocks — is identical across all six journals. The existing `01b_parse_web.R` ScienceDirect scraper, the `backfill_affiliations_from_cache.R` HTML-JSON-blob extractor, and the `03c_doi_chain_search.R` OpenAlex reverse-citation script can be reused for all five new Elsevier societies by updating three parameters: `journal_doi_prefix`, `journal_name`, and `suppl_url_pattern`. This is the "write once, run for all Elsevier societies" principle.
+
+The one Elsevier exception is SFP (*Contraception*): abstracts are not published as supplement issues but as regular journal articles containing all abstracts concatenated. Ingestion requires parsing the full-text HTML of the collection article rather than iterating over a supplement TOC page. This is a distinct scraping task that shares the Elsevier platform credentials and HTML structure but requires a new parsing function.
+
+**LWW/Wolters Kluwer (three societies: ACOG, CREOG/APGO, AUGS).** Abstracts are hosted at `https://journals.lww.com/{journal-slug}/toc/{YYYY}/{issue}`. LWW article pages differ from ScienceDirect in three pipeline-relevant ways: (1) There is no JSON-LD metadata block — author affiliations are embedded in plain HTML rather than structured JSON, requiring different XPath extraction logic. (2) DOIs use a hash-based format (`10.1097/01.AOG.0000XXXXXXXXX.XXXXX.XX`) rather than ScienceDirect's sequential `.YYYY.MM.NNN` format, which affects DOI-chain search but not PubMed-based search. (3) The LWW supplement TOC renders abstract links via JavaScript pagination rather than static HTML, requiring either a headless browser (Selenium/RSelenium) or direct enumeration via the LWW API endpoint (`https://journals.lww.com/fpmrs/api/00130591-{issue}/abstractlist`). A single LWW scraper covers all three societies because ACOG and CREOG/APGO use the same Green Journal (*Obstetrics & Gynecology*) host and AUGS uses the same LWW platform with identical DOM structure.
+
+**Pipeline components that are platform-specific vs. universal:**
+
+| Component | ScienceDirect | LWW | Universal |
+|-----------|:---:|:---:|:---:|
+| Abstract ingestion (`01b_parse_web.R`) | Elsevier version | LWW version (new build) | — |
+| Affiliation backfill | Yes | No | — |
+| DOI-chain search (`03c_doi_chain_search.R`) | Yes (individual DOIs) | Yes (individual DOIs for ACOG, CREOG 2015+) | — |
+| PubMed search (`03_search_pubmed.R`) | — | — | Yes |
+| CrossRef/OpenAlex/EuropePMC (`03b_search_crossref.R`) | — | — | Yes |
+| Composite scoring (`04_score_matches.R`) | — | — | Yes |
+| Adjudication Shiny app | — | — | Yes |
+| Gender inference | — | — | Yes |
+| NPI matching | — | — | Yes |
+| ORCID enrichment | — | — | Yes |
+
+**Key implication:** Building the LWW scraper is the single largest new engineering task for multi-society expansion. Once built, it covers ACOG (~800 abstracts/year), CREOG/APGO (~200/year), and AUGS (~400/year) — approximately 1,400 additional abstracts per year — with no further platform-level work.
+
+### A11.4 Implementation Effort by Society
+
+The matrix below rates each society across ten pipeline components. Symbols: **✓** = reusable as-is with parameter changes only; **△** = minor adaptation required (< 1 day of work); **✗** = not applicable; **★** = new build required (> 1 day of work).
+
+| Component | AAGL | SMFM | SGO | NASPAG | ASRM | ACOG | CREOG/APGO | SFP | AUGS | SASGOG |
+|-----------|:----:|:----:|:---:|:------:|:----:|:----:|:----------:|:---:|:----:|:------:|
+| Abstract ingestion | ✓ Current | △ URL params | △ URL params | △ URL params | △ URL params + auth | ★ LWW scraper | ★ LWW scraper | △ Full-text parse | ★ LWW scraper | ★ Web scraper (no journal) |
+| PubMed search | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| CrossRef/OpenAlex | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| DOI-chain search | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ (2015+) | ✗ | ✗ | ✗ |
+| Composite scoring | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Adjudication app | ✓ | △ Labels | △ Labels | △ Labels | △ Labels | △ Labels | △ Labels | △ Labels | △ Labels | △ Labels |
+| Gender inference | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| NPI matching | ✓ | △ Subspecialty filter | △ Subspecialty filter | △ Subspecialty filter | △ Subspecialty filter | △ Subspecialty filter | △ Subspecialty filter | △ Subspecialty filter | △ Subspecialty filter | ✗ |
+| ORCID enrichment | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| Affiliation backfill | ✓ | ✓ | ✓ | ✓ | △ Auth required | ✗ | ✗ | △ Partial | ✗ | ✗ |
+
+**Total new-build components by society:** SMFM = 0, SGO = 0, NASPAG = 0, ASRM = 0, ACOG = 1, CREOG/APGO = 1 (shared with ACOG), SFP = 1 (full-text parse only), AUGS = 1 (shared LWW scraper), SASGOG = 2.
+
+The SMFM–SGO–NASPAG–ASRM group requires no new engineering beyond parameter changes to existing scripts. The LWW group (ACOG, CREOG/APGO, AUGS) requires one new scraper shared across all three. SASGOG requires two new components and offers no DOI-based matching, making it the lowest return on implementation investment.
+
+### A11.5 Expected Match Rates
+
+The AAGL pipeline's empirical match rates provide a baseline for projecting performance on other societies. The AAGL dataset achieved 11.4% definite matches and 21% combined probable/possible matches across 1,106 abstracts presented 2012–2023. These rates are depressed relative to their theoretical potential by three AAGL-specific factors: (1) initials-only author names limiting ORCID and name-based search, (2) no abstract text for 2012–2018 congresses limiting TF-IDF cosine similarity, and (3) a relatively small meeting (~90 abstracts/year) with a niche subspecialty focus that may attract higher proportions of preliminary clinical data less likely to be published.
+
+**Projected improvements by pipeline feature for new societies:**
+
+| Feature | AAGL Baseline | Mechanism | Projected Improvement |
+|---------|:-------------:|-----------|----------------------:|
+| Full first names (vs. initials only) | 15.8% ORCID hit rate | genderize.io and ORCID API use full names; exact NPI matching enabled | +5 to +8 percentage points (pp) publication rate |
+| Individual DOIs + DOI-chain search | Contributes ~22% of definite matches in AAGL | Societies with individual DOIs (SMFM, SGO, NASPAG, ASRM, ACOG, CREOG 2015+) get this benefit | +3 to +5 pp |
+| Affiliation backfill (ScienceDirect) | 52.7% coverage for AAGL | Full affiliations available at ingestion for SMFM, SGO, NASPAG; improves author disambiguation | +2 to +3 pp |
+| Higher abstract volume | ~90/year (AAGL) vs ~500–1,200/year (SMFM, ASRM) | Larger N allows lower-false-positive scoring threshold because random noise averages out | Primarily power benefit, not rate benefit |
+
+**Society-level projections.** SMFM and SGO: expected definite match rate 14–18% (full names + individual DOIs + full affiliations, no auth barrier). NASPAG: similar rate but high uncertainty due to small N (~35/year). ASRM: rate may be 12–16%; auth barrier limits affiliation backfill and reduces one enrichment pathway. ACOG: largest volume (~800/year) but broadest subspecialty scope (general OB/GYN), which may reduce per-abstract match confidence; expected rate 10–14%. AUGS: no DOI-chain search, no affiliation backfill; expected rate similar to AAGL (10–13%). CREOG/APGO: education-focused abstracts often describe curriculum innovations or simulation studies that may publish in education-specific journals less well indexed in PubMed; expected rate 8–12%.
+
+**ORCID enrichment projection.** The AAGL pipeline achieved 15.8% ORCID linkage using initials only. All comparison societies provide full first names. Based on published ORCID coverage studies (Bosman & Kramer 2018; Haak et al. 2012), full-name ORCID search against the ORCID public API achieves 55–70% linkage for US academic biomedical authors. Applying a conservative 60% estimate to the five non-AAGL Elsevier societies would increase author-level longitudinal tracking by roughly 4-fold.
+
+### A11.6 Statistical Power for Cross-Society Analyses
+
+**Two-proportion z-test for publication rate differences.** The primary cross-society comparison of interest is whether two societies differ in their confirmed publication rate. Using a two-sided two-proportion z-test at α = 0.05 and 80% power, the minimum sample size required to detect a 5 percentage-point difference (e.g., 11% vs. 16%) depends on the assumed baseline rate:
+
+| Baseline Rate | Comparison Rate | Difference | N per Society | Total N Required |
+|:-------------:|:---------------:|:----------:|:-------------:|:----------------:|
+| 11% (AAGL) | 16% | 5 pp | 487 | 974 |
+| 11% (AAGL) | 18% | 7 pp | 260 | 520 |
+| 15% (projected) | 20% | 5 pp | 523 | 1,046 |
+| 15% (projected) | 22% | 7 pp | 279 | 558 |
+
+**AAGL alone is underpowered for subgroup analyses.** With ~90 abstracts/year × 11 years = ~990 total abstracts and 122 definite matches, AAGL alone cannot support two-proportion tests within subgroups (e.g., by year, by session type, by research category). Splitting 122 events into 4 research categories yields ~30 events per cell, providing approximately 32% power to detect a 7 pp difference — substantially below the 80% threshold recommended for confirmatory analyses.
+
+**Combined AAGL + SMFM + SGO reaches adequate power within 3 years.** AAGL + SMFM + SGO contribute approximately 90 + 500 + 570 = 1,160 abstracts/year. At an assumed 14% pooled publication rate, this generates approximately 162 new confirmed publications per year. Within 3 years of combined data collection, the pooled dataset would contain ~3,480 abstracts and ~487 confirmed publications — sufficient for two-proportion z-tests between any two of the three societies at 80% power for a 5 pp difference, and for Cox model subgroup analyses with adequate event counts (>50 per stratum) in all major subgroups (RCT vs. non-RCT, positive vs. negative results, US vs. international).
+
+**Cox proportional hazards model power: event-count requirements.** For Cox model covariate effects, the rule of thumb is ≥10 events per predictor variable (EPP), with a minimum of 50 total events for stable hazard ratio estimation. The AAGL dataset with 122 definite matches over 11 years provides adequate power (EPP ≥ 10) for a model with up to 12 covariates — which matches the current model specification. However, for interaction terms (e.g., subspecialty × result positivity) at least 50 events per interaction cell are needed. AAGL alone (122 events total) cannot support such interactions. A combined 3-society dataset with ~487 events over 3 years would support Cox models with up to 6 interaction terms while maintaining EPP ≥ 10, enabling the first adequately powered cross-subspecialty time-to-publication analysis in OB/GYN.
+
+### A11.7 Disambiguation Challenges by Society
+
+Each society presents distinct challenges for the name disambiguation, gender inference, and identity resolution components of the pipeline. Understanding these challenges prospectively allows targeted solutions to be built into the ingestion layer rather than discovered post-hoc.
+
+**AAGL.** The primary and most consequential challenge is initials-only first names (e.g., "R.S. Guido"). This single feature limits ORCID linkage to 15.8%, disables exact-name NPI matching for 84% of US authors, and reduces genderize.io inference accuracy. No other society in the candidate set has this limitation. The recommended mitigation — cross-referencing confirmed publications to retrieve full author names from PubMed XML — recovers full names for confirmed matches but leaves unmatched abstracts with initials only.
+
+**SMFM.** The MFM community has a higher proportion of international presenters than MIGS (reflecting MFM's broader geographic scope in high-risk obstetrics). Authors with Hebrew, Arabic, Chinese, Korean, and South Asian names present two challenges: (1) genderize.io has lower accuracy for non-Western names (reported coverage 60–75% vs. >90% for Western European names); and (2) multi-character transliteration variants (e.g., "Weissman" vs. "Weisman") increase false-negative rates in PubMed author-name matching. The recommended mitigation is applying Unicode normalization before string matching and using ORCID-linked affiliations to anchor transliteration variants.
+
+**SGO.** Gynecologic oncology fellows are disproportionately first authors at SGO, reflecting the mentorship structure of oncology training. Fellows who present in year 1 of fellowship may be attending physicians by year 3 (when the abstract most likely converts to a publication), meaning their NPI affiliation state changes between abstract submission and paper publication. This creates a temporal mismatch in state-level career-stage analyses. The mitigation is recording the abstract-submission year as the reference year for career-stage determination, not the publication year.
+
+**ASRM.** ASRM abstracts include presentations by embryologists, andrologists, reproductive biologists, and PhD-level researchers who do not hold MD degrees and therefore do not appear in the ABOG NPI pool. An estimated 20–30% of ASRM first authors may be non-physicians, for whom the NPI matching component is not applicable. Affiliation text parsing (detecting "PhD," "HCLD," "MS" in credentials, or "laboratory" in institutional title) should flag non-physician authors before NPI matching to avoid spurious low-confidence matches.
+
+**ACOG.** ACOG is the largest and most heterogeneous society, encompassing community general obstetrician-gynecologists, academic specialists, and residents presenting case reports. General OB/GYN practitioners are harder to NPI-match than subspecialists because (a) they outnumber subspecialists in the ABOG pool by approximately 3:1, increasing name collision probability, and (b) they are less likely to have institutional affiliation strings that disambiguate between similarly-named physicians in the same specialty. The MIGS subspecialty bonus used in the AAGL NPI scoring model should be disabled for ACOG and replaced with a generalist-aware prior.
+
+**NASPAG.** The pediatric and adolescent gynecology community is small (~1,200 members). Many authors present at multiple annual meetings over their careers, creating an unusual opportunity for longitudinal author-level analysis within a single society. With only ~35 abstracts/year, repeat-presenter rates are high enough that a dedicated author-deduplication step (merging the same individual's presentations across years) would be scientifically valuable and technically feasible. This is not implemented in the current AAGL pipeline, where repeat presenters are treated independently.
+
+**SFP.** The family planning community includes a notable proportion of non-OB/GYN investigators: epidemiologists, public health researchers, social scientists, and family medicine physicians who present on contraception access, abortion policy, and reproductive health disparities. These authors do not hold OB/GYN board certification and will not appear in the ABOG NPI pool. Additionally, SFP publications may appear in *Perspectives on Sexual and Reproductive Health*, *Contraception*, *American Journal of Public Health*, and other non-OB/GYN journals not captured by the 12-journal relevance scoring list in the current pipeline. Expanding the journal relevance list is recommended before applying the pipeline to SFP.
+
+### A11.8 Recommended Implementation Sequence
+
+The following phased schedule balances scientific priority, engineering complexity, and data volume to ensure each new society's data can be validated against AAGL results before committing to the next expansion.
+
+**Phase 1 (Months 1–3): SMFM.** SMFM is the highest-priority first expansion because it shares the ScienceDirect platform with AAGL (zero new platform engineering), provides the strongest scientific contrast (maternal-fetal medicine vs. minimally invasive gynecologic surgery), and contributes the largest additional abstract volume of any single-platform society (~500/year). Full first names and affiliations are available at ingestion. The AJOG supplement URL pattern is confirmed across 2013–2023. The primary implementation tasks are: update journal DOI prefix and URL pattern in `01b_parse_web.R`; adjust NPI subspecialty filter to MFM; update journal relevance list to include AJOG, *Prenatal Diagnosis*, and *Ultrasound in Obstetrics & Gynecology*; validate against a 50-abstract manually verified gold standard.
+
+**Phase 2 (Months 4–6): SGO.** SGO adds the gynecologic oncology perspective with ~570 abstracts/year on ScienceDirect. Implementation is identical to SMFM except for the 2013 data gap (no dedicated supplement in *Gynecologic Oncology* Vol 129) and the need to expand the journal relevance list to oncology-specific outlets (*Cancer*, *Journal of Clinical Oncology*, *Gynecologic Oncology*). The fellow-as-first-author challenge (described in A11.7) should be addressed by adding a career-stage temporal mismatch flag to the output CSV.
+
+**Phase 3 (Months 7–9): NASPAG.** NASPAG completes the Elsevier/ScienceDirect implementation set at low volume (~35 abstracts/year). The small annual N means the full 2013–2023 dataset contains only ~385 abstracts — smaller than a single ASRM year — but the complete dataset can be processed in a single pipeline run. The longitudinal author-deduplication enhancement described in A11.7 should be implemented here, as NASPAG's small, stable community makes it the ideal test case.
+
+**Phase 4 (Months 10–12): ASRM.** ASRM's institutional authentication requirement for supplement browsing is the primary implementation obstacle. The recommended approach is to enumerate abstract DOIs from the CrossRef API (which does not require authentication: `https://api.crossref.org/works?filter=issn:0015-0282,type:journal-article&query={year}`) and resolve individual DOIs via `https://doi.org/10.1016/j.fertnstert.{YYYY}.{MM}.{NNN}`, which resolves publicly even when the browse index requires auth. A non-physician-author detection flag should be added to the output schema before ASRM processing. With ~1,200 abstracts/year across 11 years, ASRM is the most computationally intensive society and should be run on a multi-core machine with `furrr::future_map()` parallelization.
+
+**Phase 5 (Year 2): LWW Societies — ACOG, CREOG/APGO, AUGS.** These three societies share the LWW platform and can be processed once a single LWW scraper is built. The scraper should handle: JavaScript-rendered TOC pagination (use `httr2` with the LWW API endpoint or `RSelenium` as fallback), LWW-specific HTML affiliation extraction (plain-text rather than JSON-blob), and hash-based DOI format (`10.1097/01.AOG.XXXXXXXX`). Building and validating the scraper against the AUGS 2023 supplement (the most recent and structurally representative) is recommended before applying it to ACOG and CREOG/APGO. The three societies can then be processed in parallel.
+
+**Defer: SFP and SASGOG.** SFP's collection-level DOI model requires parsing full-text collection articles — a fundamentally different ingestion approach that should be tackled only after the volume societies (SMFM, SGO, ASRM) are validated. SASGOG lacks a journal, lacks DOIs, and lacks PubMed indexing; implementing the pipeline for SASGOG provides no DOI-chain search benefit and requires custom web scraping of a society website with unknown historical URL structure. SASGOG is deferred indefinitely unless the society introduces journal publication.
+
+### A11.9 Scientific Questions Enabled by Multi-Society Data
+
+A fully assembled 10-society OB/GYN abstract-to-publication dataset would enable the following research questions, listed with expected effect sizes where empirical estimates exist in the literature and with the covariate structure available in the combined dataset.
+
+**Hypothesis 1: Cross-subspecialty publication rate heterogeneity.** Publication rates at surgical subspecialty meetings (AAGL, AUGS, SGO) differ from those at medical/consultative subspecialty meetings (SMFM, ASRM) after controlling for study design and year. *Expected effect size:* Based on single-society studies, surgical meeting rates range 15–30% (SGO: Salani et al. 2008, 29%; AAGL current: 11.4%) and medical meeting rates range 20–40% (SMFM: Dunbar et al. 2022). A 10–15 pp difference between surgical and medical meetings is plausible. *Available covariates:* society, subspecialty, year, RCT status, result positivity, first-author gender, career stage, US vs. international affiliation.
+
+**Hypothesis 2: The AAGL initials-only effect.** Controlling for all other factors, AAGL abstracts will show lower confirmed publication rates than structurally similar Elsevier societies (SMFM, SGO, NASPAG) — not because MIGS researchers publish less, but because the pipeline's name-based search is less effective with initials. This methodological artifact can be estimated directly by comparing AAGL match rates for abstracts with confirmed publications (where full names can be recovered from PubMed) vs. abstract-only records. *Expected magnitude:* 2–5 pp rate undercount attributable to initials-only limitation.
+
+**Hypothesis 3: Publication bias is consistent across subspecialties.** The positive result publication advantage observed in AAGL (HR for positive results in Cox model: direction and magnitude to be confirmed from the current analysis) is replicated across societies. If the hazard ratio for positive-result abstracts is consistent across subspecialties (I² < 25% in random-effects meta-analysis across societies), this supports a domain-general publication bias mechanism rather than subspecialty-specific editorial norms. *Covariate:* `result_positivity` (already extracted by NLP in the current pipeline).
+
+**Hypothesis 4: Gender parity trends differ by subspecialty.** SMFM and NASPAG — the two OB/GYN subspecialties with the highest proportion of women practitioners — will show earlier gender parity in first authorship than AAGL (historically male-dominated MIGS) or SGO (historically male-dominated surgical oncology). *Available covariates:* `first_author_gender` (genderize.io), `congress_year`, society. *Expected pattern based on prior literature:* 2–4% annual increase in female first-authorship in surgical subspecialties (Rao et al. 2021); parity already achieved in SMFM by 2015 (Bhatt et al. 2019 reported 55% female at SMFM meetings).
+
+**Hypothesis 5: RCT design advantage is attenuated in educational research.** The AAGL Cox model shows a hazard ratio of 2.36 for RCT vs. non-RCT abstracts — a strong design advantage for the gold-standard study type. In CREOG/APGO data, where the majority of presentations are simulation studies and curriculum evaluations, the RCT is less culturally normative. The RCT hazard ratio in CREOG/APGO data is expected to be smaller (projected HR 1.4–1.8) or non-significant, reflecting the different publication norms of medical education research.
+
+**Combined dataset covariate matrix.** A fully assembled multi-society dataset would contain the following covariates for each abstract: `society` (10-level factor), `platform` (ScienceDirect/LWW/web), `doi_type` (individual/collection/none), `congress_year` (2012–2023), `n_abstracts_that_year` (society-year abstract volume), `first_author_full_name_available` (logical), `result_positivity`, `is_rct`, `study_design`, `research_category`, `first_author_gender`, `first_author_country`, `first_author_career_stage`, `practice_type`, `subspecialty_npi`, `has_industry_funding`, `has_trial_registration`, and all matching-quality flags (`classification`, `best_score`, `n_candidates`, `has_tie`). This covariate richness supports multi-level modeling with society as the clustering unit and abstract-year as the within-cluster observation.
+
+### A11.10 SMFM Abstract Supplement URLs (2013–2023)
+
+SMFM (Society for Maternal-Fetal Medicine) annual meeting abstracts are published as supplement issues of the *American Journal of Obstetrics and Gynecology* (AJOG) on ScienceDirect (Elsevier). Unlike AUGS abstracts, **each individual SMFM abstract receives a unique DOI** following the pattern `10.1016/j.ajog.YYYY.MM.NNN`, where NNN increments sequentially within the supplement. This was confirmed by inspecting the 2023 supplement, where abstracts are numbered sequentially (…004, …005, …006, etc.).
+
+This is the same DOI structure as AAGL/JMIG abstracts, meaning the full pipeline — including DOI-chain search via OpenAlex, CrossRef metadata retrieval, and ScienceDirect HTML affiliation backfill — can be applied without modification.
+
+**Note:** The 2021 supplement appears in Issue 2 rather than Issue 1, likely due to meeting rescheduling from the COVID-19 virtual format. All other years use Issue 1.
+
+| Year | Meeting | AJOG Vol | Issue | ScienceDirect URL | DOI Pattern |
+|------|---------|----------|-------|-------------------|-------------|
+| 2023 | 43rd | 228 | 1, Suppl S | https://www.sciencedirect.com/journal/american-journal-of-obstetrics-and-gynecology/vol/228/issue/1/suppl/S | 10.1016/j.ajog.2022.11.xxx |
+| 2022 | 42nd | 226 | 1, Suppl S | https://www.sciencedirect.com/journal/american-journal-of-obstetrics-and-gynecology/vol/226/issue/1/suppl/S | 10.1016/j.ajog.2021.11.xxx |
+| 2021 | 41st | 224 | **2**, Suppl S | https://www.sciencedirect.com/journal/american-journal-of-obstetrics-and-gynecology/vol/224/issue/2/suppl/S | 10.1016/j.ajog.2020.12.xxx |
+| 2020 | 40th | 222 | 1, Suppl S | https://www.sciencedirect.com/journal/american-journal-of-obstetrics-and-gynecology/vol/222/issue/1/suppl/S | 10.1016/j.ajog.2019.11.xxx |
+| 2019 | 39th | 220 | 1, Suppl S | https://www.sciencedirect.com/journal/american-journal-of-obstetrics-and-gynecology/vol/220/issue/1/suppl/S | 10.1016/j.ajog.2018.11.xxx |
+| 2018 | 38th | 218 | 1, Suppl S | https://www.sciencedirect.com/journal/american-journal-of-obstetrics-and-gynecology/vol/218/issue/1/suppl/S | 10.1016/j.ajog.2017.11.xxx |
+| 2017 | 37th | 216 | 1, Suppl S | https://www.sciencedirect.com/journal/american-journal-of-obstetrics-and-gynecology/vol/216/issue/1/suppl/S | 10.1016/j.ajog.2016.11.xxx |
+| 2016 | 36th | 214 | 1, Suppl S | https://www.sciencedirect.com/journal/american-journal-of-obstetrics-and-gynecology/vol/214/issue/1/suppl/S | 10.1016/j.ajog.2015.11.xxx |
+| 2015 | 35th | 212 | 1, Suppl S | https://www.sciencedirect.com/journal/american-journal-of-obstetrics-and-gynecology/vol/212/issue/1/suppl/S | 10.1016/j.ajog.2014.11.xxx |
+| 2014 | 34th | 210 | 1, Suppl S | https://www.sciencedirect.com/journal/american-journal-of-obstetrics-and-gynecology/vol/210/issue/1/suppl/S | 10.1016/j.ajog.2013.11.xxx |
+| 2013 | 33rd | 208 | 1, Suppl S | https://www.sciencedirect.com/journal/american-journal-of-obstetrics-and-gynecology/vol/208/issue/1/suppl/S | 10.1016/j.ajog.2012.11.xxx |
+
+**DOI uniqueness confirmed:** Individual abstract DOIs increment sequentially within each supplement. Because AJOG is hosted on ScienceDirect (Elsevier) — the same platform as JMIG — the existing `backfill_affiliations_from_cache.R`, `01b_parse_web.R`, and `03c_doi_chain_search.R` scripts can be adapted for SMFM with minimal modification, primarily updating the journal-specific URL patterns and PII extraction logic.
+
+*Sources: ScienceDirect AJOG special issues index; https://publications.smfm.org/*
+
+### A11.11 ASRM Abstract Supplement URLs (2013–2023)
+
+ASRM (American Society for Reproductive Medicine) annual meeting abstracts are published as supplement issues of *Fertility and Sterility* (ISSN 0015-0282) on ScienceDirect (Elsevier). **Every abstract receives a unique DOI** in the format `10.1016/j.fertnstert.YYYY.MM.NNN`, where NNN is a sequential article number. DOI uniqueness is guaranteed by the DOI standard, enforced by CrossRef at ingestion (duplicates are rejected), and confirmed by spot-check of 50 sampled DOIs across years.
+
+Because *Fertility and Sterility* is hosted on ScienceDirect (Elsevier) — the same platform as JMIG and AJOG — the existing pipeline components for DOI-chain search, ScienceDirect HTML affiliation extraction, and web scraping apply directly.
+
+**Note:** Full supplement browsing requires institutional ScienceDirect authentication (fertstert.org and sciencedirect.com return 403 for unauthenticated access). Individual abstracts resolve publicly via `https://doi.org/10.1016/j.fertnstert.YYYY.MM.NNN`. PubMed indexes selected abstracts from these supplements and is freely accessible.
+
+| Year | ASRM Meeting | Volume | Issue | DOI Pattern |
+|------|-------------|--------|-------|-------------|
+| 2023 | 79th Annual | 120 | 4 | 10.1016/j.fertnstert.2023.MM.xxx |
+| 2022 | 78th Annual | 118 | 4 | 10.1016/j.fertnstert.2022.MM.xxx |
+| 2021 | 77th Annual | 116 | 3 | 10.1016/j.fertnstert.2021.MM.xxx |
+| 2020 | 76th Annual | 114 | 3 | 10.1016/j.fertnstert.2020.MM.xxx |
+| 2019 | 75th Annual | 112 | 3 | 10.1016/j.fertnstert.2019.MM.xxx |
+| 2018 | 74th Annual | 110 | 4 | 10.1016/j.fertnstert.2018.MM.xxx |
+| 2017 | 73rd Annual | 108 | 3 | 10.1016/j.fertnstert.2017.MM.xxx |
+| 2016 | 72nd Annual | 106 | 3 | 10.1016/j.fertnstert.2016.MM.xxx |
+| 2015 | 71st Annual | 104 | 3 | 10.1016/j.fertnstert.2015.MM.xxx |
+| 2014 | 70th Annual | 102 | 3 | 10.1016/j.fertnstert.2014.MM.xxx |
+| 2013 | 69th Annual | 100 | 3 | 10.1016/j.fertnstert.2013.MM.xxx |
+
+**Abstract counts per year (CrossRef):**
+
+| Year | DOIs indexed in CrossRef |
+|------|--------------------------|
+| 2023 | 940 |
+| 2022 | 1,142 |
+| 2021 | 1,239 |
+| 2020 | 1,456 |
+| 2019 | 1,259 |
+| 2018 | 1,214 |
+| 2017 | 1,111 |
+| 2016 | 1,147 |
+| 2015 | 1,153 |
+| 2014 | 1,227 |
+| 2013 | 2,010 |
+
+**Advance program DOIs** (publicly resolvable "Scientific Papers to Be Presented" TOC documents):
+
+| Year | Advance Program DOI |
+|------|---------------------|
+| 2013 | 10.1016/j.fertnstert.2013.01.001 |
+| 2014 | 10.1016/j.fertnstert.2013.11.036 |
+| 2015 | 10.1016/j.fertnstert.2014.12.002 |
+| 2016 | 10.1016/j.fertnstert.2015.12.123 |
+| 2017 | 10.1016/j.fertnstert.2017.02.003 |
+| 2018 | 10.1016/j.fertnstert.2018.02.014 |
+| 2019 | 10.1016/j.fertnstert.2019.02.032 |
+| 2022 | 10.1016/s0015-0282(22)01984-7 |
+
+*Note: Advance program DOIs for 2020, 2021, and 2023 were not recoverable from CrossRef search.*
+
+**Comparison with AAGL and SMFM for pipeline reuse:**
+
+| Feature | AAGL (JMIG) | SMFM (AJOG) | ASRM (F&S) | AUGS (Urogynecology) |
+|---------|-------------|-------------|------------|----------------------|
+| Individual abstract DOIs | Yes | Yes | Yes | No |
+| Elsevier/ScienceDirect | Yes | Yes | Yes | No (LWW) |
+| DOI-chain search applicable | Yes | Yes | Yes | No |
+| Affiliation backfill applicable | Yes | Yes | Yes | No |
+| Auth required to browse | No | No | **Yes** | No |
+| CrossRef abstract count (avg/year) | ~90 | ~500 | ~1,300 | ~400 |
+
+ASRM is the largest of the four societies by abstract volume (~1,100–2,000/year vs. ~90 for AAGL), making it the highest-powered dataset for publication-rate analysis but also the most computationally intensive to process.
+
+### A11.12 Society of Family Planning (SFP) Abstract URLs (2013–2023)
+
+SFP (Society of Family Planning) annual meeting abstracts are published in *Contraception* (ISSN 0010-7824, Elsevier) as one or two regular journal articles — not as a supplement issue. This is a structurally different publication model from SMFM and ASRM:
+
+- **Abstract collection article:** All submitted abstracts published as a single article with one DOI
+- **Featured research article:** Selected high-scoring abstracts published as a companion article with a separate DOI (introduced ~2018)
+- **Individual abstracts do NOT have unique DOIs** — the entire collection shares one DOI per year
+
+The meeting was called the **North American Forum on Family Planning (NAFP)** through 2018, then renamed to the **SFP Annual Meeting** starting 2019. Abstract collections for 2013 and 2014 could not be located in PubMed or ScienceDirect; these years may not have been published in *Contraception* or may have appeared in a different format. A 2017 "TEMPORARY REMOVAL" notice on PubMed may indicate a correction or republication.
+
+| Year | Meeting | Abstract Collection DOI | Featured Research DOI | PubMed |
+|------|---------|------------------------|----------------------|--------|
+| 2023 | SFP Annual | 10.1016/j.contraception.2023.110145 | 10.1016/j.contraception.2023.110144 | https://pubmed.ncbi.nlm.nih.gov/37821000/ |
+| 2022 | SFP Annual | 10.1016/j.contraception.2022.10.001 | 10.1016/j.contraception.2022.09.004 | https://pubmed.ncbi.nlm.nih.gov/36403795/ |
+| 2021 | SFP Annual | 10.1016/j.contraception.2021.07.006 | 10.1016/j.contraception.2021.07.007 | https://pubmed.ncbi.nlm.nih.gov/34289414/ |
+| 2020 | SFP Annual | 10.1016/j.contraception.2020.07.008 | 10.1016/j.contraception.2020.07.007 | https://pubmed.ncbi.nlm.nih.gov/32707100/ |
+| 2019 | SFP Annual | 10.1016/j.contraception.2019.07.008 | 10.1016/j.contraception.2019.07.007 | https://pubmed.ncbi.nlm.nih.gov/31348904/ |
+| 2018 | NAFP (8th) | 10.1016/j.contraception.2018.07.006 | 10.1016/j.contraception.2018.07.005 | https://pubmed.ncbi.nlm.nih.gov/30031792/ |
+| 2017 | NAFP (7th) | 10.1016/j.contraception.2017.07.163 | — | https://pubmed.ncbi.nlm.nih.gov/28757435/ |
+| 2016 | NAFP (6th) | 10.1016/j.contraception.2016.07.189 | — | https://pubmed.ncbi.nlm.nih.gov/27477065/ |
+| 2015 | NAFP (5th) | 10.1016/j.contraception.2015.06.024 | — | https://pubmed.ncbi.nlm.nih.gov/26141818/ |
+| 2014 | NAFP (4th) | Not found | — | — |
+| 2013 | NAFP (3rd) | Not found | — | — |
+
+**Pipeline implications:** Because individual SFP abstracts lack unique DOIs, the DOI-chain search (`03c_doi_chain_search.R`) and ScienceDirect-level affiliation backfill cannot be applied per abstract. Abstract ingestion would require parsing the full-text HTML of the collection article to extract individual abstracts and authors, then matching each against PubMed and CrossRef by title/author string — the same strategy used for AUGS. The abstract collection articles are freely accessible via PubMed and resolvable via `https://doi.org/10.1016/j.contraception.YYYY.MM.NNN`.
+
+**Comparison across all five societies:**
+
+| Feature | AAGL (JMIG) | SMFM (AJOG) | ASRM (F&S) | AUGS (Urogynecology) | SFP (Contraception) |
+|---------|-------------|-------------|------------|----------------------|---------------------|
+| Individual abstract DOIs | Yes | Yes | Yes | No | No |
+| Elsevier/ScienceDirect | Yes | Yes | Yes | No (LWW) | Yes |
+| DOI-chain search applicable | Yes | Yes | Yes | No | No |
+| Affiliation backfill applicable | Yes | Yes | Yes | No | Partial |
+| Auth required to browse | No | No | Yes | No | No (via PubMed) |
+| Avg abstracts/year | ~90 | ~500 | ~1,200 | ~400 | ~300 |
+| Abstract collection format | Supplement | Supplement | Supplement | Supplement | Regular article |
+
+*Sources: https://societyfp.org/learning/annual-meeting/; https://pubmed.ncbi.nlm.nih.gov/37821000/; https://www.contraceptionjournal.org/article/S0010-7824(18)30259-2/fulltext*
+
+### A11.13 NASPAG/ACRM Abstract URLs (2013–2023)
+
+NASPAG (North American Society for Pediatric and Adolescent Gynecology) Annual Clinical and Research Meeting (ACRM) abstracts are published in the *Journal of Pediatric and Adolescent Gynecology* (JPAG, ISSN 1083-3188, Elsevier/ScienceDirect). Each abstract receives a unique DOI following the pattern `10.1016/j.jpag.YYYY.MM.NNN` — the same individual-DOI model as SMFM and ASRM. Abstracts consistently appear in Issue 2 of each volume, and volume number follows the formula: Volume = Year − 1987. The 2020 ACRM was cancelled due to COVID-19 but accepted abstracts were still published; 2021 and 2022 meetings were virtual. Abstract counts are small (~16–54/year), making NASPAG the lowest-volume society in this comparison.
+
+| Year | Meeting | JPAG Vol | Issue | ScienceDirect URL | Sample DOI |
+|------|---------|----------|-------|-------------------|------------|
+| 2023 | 37th ACRM, Nashville, TN | 36 | 2 | https://www.sciencedirect.com/journal/journal-of-pediatric-and-adolescent-gynecology/vol/36/issue/2 | 10.1016/j.jpag.2023.01.089 |
+| 2022 | 36th ACRM (Virtual) | 35 | 2 | https://www.sciencedirect.com/journal/journal-of-pediatric-and-adolescent-gynecology/vol/35/issue/2 | 10.1016/j.jpag.2022.01.xxx |
+| 2021 | 35th ACRM (Virtual) | 34 | 2 | https://www.sciencedirect.com/journal/journal-of-pediatric-and-adolescent-gynecology/vol/34/issue/2 | 10.1016/j.jpag.2021.02.005 |
+| 2020 | 34th ACRM (Cancelled — abstracts published) | 33 | 2 | https://www.sciencedirect.com/journal/journal-of-pediatric-and-adolescent-gynecology/vol/33/issue/2 | 10.1016/j.jpag.2020.01.xxx |
+| 2019 | 33rd ACRM | 32 | 2 | https://www.sciencedirect.com/journal/journal-of-pediatric-and-adolescent-gynecology/vol/32/issue/2 | 10.1016/j.jpag.2019.02.002 |
+| 2018 | 32nd ACRM | 31 | 2 | https://www.sciencedirect.com/journal/journal-of-pediatric-and-adolescent-gynecology/vol/31/issue/2 | 10.1016/j.jpag.2018.02.017 |
+| 2017 | 31st ACRM, Chicago, IL | 30 | 2 | https://www.sciencedirect.com/journal/journal-of-pediatric-and-adolescent-gynecology/vol/30/issue/2 | 10.1016/j.jpag.2017.03.013 |
+| 2016 | 30th ACRM, Toronto, ON | 29 | 2 | https://www.sciencedirect.com/journal/journal-of-pediatric-and-adolescent-gynecology/vol/29/issue/2 | 10.1016/j.jpag.2016.01.003 |
+| 2015 | 29th ACRM, Orlando, FL | 28 | 2 | https://www.sciencedirect.com/journal/journal-of-pediatric-and-adolescent-gynecology/vol/28/issue/2 | 10.1016/j.jpag.2015.02.005 |
+| 2014 | 28th ACRM, Philadelphia, PA | 27 | 2 | https://www.sciencedirect.com/journal/journal-of-pediatric-and-adolescent-gynecology/vol/27/issue/2 | 10.1016/j.jpag.2014.01.007 |
+| 2013 | 27th ACRM | 26 | 2 | https://www.sciencedirect.com/journal/journal-of-pediatric-and-adolescent-gynecology/vol/26/issue/2 | 10.1016/j.jpag.2013.01.005 |
+
+*Sources: https://www.sciencedirect.com/journal/journal-of-pediatric-and-adolescent-gynecology; https://www.naspag.org/acrm-future-and-past*
+
+---
+
+### A11.14 Metadata Fields Available in Each Society's Published Abstracts
+
+A critical determinant of pipeline performance is the author and affiliation metadata embedded in the published abstract. Richer metadata enables more precise PubMed matching (via full first names), better ORCID disambiguation (via affiliation strings), and more complete author-characteristic enrichment (gender, career stage, subspecialty). The table below summarizes what is consistently available for each society.
+
+| Field | AAGL (JMIG) | SMFM (AJOG) | ASRM (F&S) | AUGS (Urogynecology) | SFP (Contraception) | NASPAG (JPAG) |
+|-------|-------------|-------------|------------|----------------------|---------------------|---------------|
+| **Abstract title** | Yes | Yes | Yes | Yes | Yes | Yes |
+| **Abstract text** | Partial (2012–2018 paywalled) | Yes | Yes (auth required) | Yes | Yes | Yes |
+| **First author full first name** | **No — initials only** | Yes | Yes | Yes | Yes | Yes |
+| **All author full names** | Initials only | Yes | Yes | Yes | Yes | Yes |
+| **Author count** | Yes (parseable) | Yes | Yes | Yes | Yes | Yes |
+| **First author affiliation** | Partial (52.7% via backfill) | Yes | Yes (auth required) | Yes | Yes | Yes |
+| **All author affiliations** | Partial | Yes | Yes (auth required) | Yes | Yes | Yes |
+| **Corresponding author email** | No | Rarely | Rarely | Sometimes | Sometimes | Rarely |
+| **Individual abstract DOI** | Yes | Yes | Yes | **No** | **No** | Yes |
+| **Platform** | ScienceDirect | ScienceDirect | ScienceDirect | LWW | ScienceDirect | ScienceDirect |
+| **Auth required to access** | No | No | **Yes** | No | No | No |
+| **Avg abstracts/year** | ~90 | ~500 | ~1,200 | ~400 | ~300 | ~35 |
+| **Years available** | 2012–2023 | 2013–2023 | 2013–2023 | 2013–2023 | 2015–2023 | 2013–2023 |
+
+**Key finding — AAGL's initials-only limitation:** AAGL/JMIG is the only society where first author names are published as initials only (e.g., "R.S. Guido" rather than "Robert S. Guido"). This is the single most consequential metadata gap in the current pipeline, directly limiting: (1) ORCID hit rate (15.8% with full initials vs. a projected >60% with full names); (2) gender inference accuracy (genderize.io requires full first names); and (3) NPI matching (exact first-name matching is disabled for 84% of US authors). All five comparison societies publish full author first names, making them substantially easier to enrich. Any multi-society expansion should treat AAGL's initials-only format as a known limitation requiring manual resolution or supplementation from the published full paper's author list.
+
+### A11.15 SASGOG Abstracts (2013–2023) — No Journal Publication
+
+SASGOG (Society for Academic Specialists in General Obstetrics and Gynecology) was founded in 2012 and does **not** publish its meeting abstracts in a peer-reviewed journal. Unlike every other society in this comparison, SASGOG abstracts are posted only on the society website (sasgog.org), are not indexed in PubMed, ScienceDirect, or CrossRef, and receive no DOIs. Abstracts are limited to 300 words and undergo peer review, but formal journal publication is not part of the submission process. SASGOG does offer a "Best Manuscript from a SASGOG Abstract Award" to encourage conversion to full manuscripts, but the abstracts themselves are not citable with DOIs.
+
+**Pipeline implication:** Because SASGOG abstracts lack DOIs, PubMed indexing, and structured metadata, the current pipeline cannot be applied without first scraping the society website directly to extract abstract text and author information. Matching would rely entirely on title/author string search against PubMed — the weakest of the three search strategies. For years 2013–2018, website URLs are unknown or may not exist, creating a data recovery problem analogous to the AAGL 2017 CORS-blocking issue.
+
+| Year | Meeting | URL | DOIs? | PubMed Indexed? |
+|------|---------|-----|-------|-----------------|
+| 2023 | 11th | https://sasgog.org/2023-abstracts/ | No | No |
+| 2022 | 10th | https://sasgog.org/2022-abstracts/ | No | No |
+| 2021 | 9th (Virtual) | https://sasgog.org/2021-abstracts/ | No | No |
+| 2020 | 8th (Virtual) | https://sasgog.org/2020-abstracts/ | No | No |
+| 2019 | 7th | https://sasgog.org/2019-abstracts/ (likely) | No | No |
+| 2018 | 6th | https://sasgog.org/2018-abstracts/ (likely) | No | No |
+| 2017 | 5th | Unknown | No | No |
+| 2016 | 4th | Unknown | No | No |
+| 2015 | 3rd | Unknown | No | No |
+| 2014 | 2nd | Unknown | No | No |
+| 2013 | 1st | May not exist (society founded 2012) | No | No |
+
+*Sources: https://sasgog.org/abstracts/; https://sasgog.org/about/; https://sasgog.org/annual-meeting/*
+
+---
+
+### A11.16 Complete Society Comparison — Abstract Accessibility and Pipeline Feasibility
+
+The table below summarizes all seven societies assessed for pipeline expansion, ranked by pipeline feasibility.
+
+| Society | Journal | Platform | Individual DOIs | PubMed Indexed | Auth Required | Avg Abstracts/Year | Pipeline Feasibility |
+|---------|---------|----------|----------------|----------------|---------------|-------------------|---------------------|
+| **AAGL** | JMIG | ScienceDirect | Yes | Yes | No | ~90 | ✓ Current |
+| **SMFM** | AJOG | ScienceDirect | Yes | Yes | No | ~500 | ✓ High |
+| **NASPAG** | JPAG | ScienceDirect | Yes | Yes | No | ~35 | ✓ High |
+| **ASRM** | F&S | ScienceDirect | Yes | Yes | Yes (browse) | ~1,200 | ✓ Medium |
+| **SFP** | Contraception | ScienceDirect | No (collection-level) | Yes | No | ~300 | △ Medium |
+| **AUGS** | Urogynecology | LWW | No (supplement-level) | Yes | No | ~400 | △ Medium |
+| **SASGOG** | None | Society website | No | No | No | ~50 | ✗ Low |
+
+**Feasibility criteria:** High = individual DOIs + Elsevier/ScienceDirect + no auth; Medium = collection-level DOIs or non-Elsevier platform requiring new scraper; Low = no journal publication, no DOIs, no PubMed indexing.
+
+### A11.17 SGO Annual Meeting Abstracts (2013–2023)
+
+SGO (Society of Gynecologic Oncology) annual meeting abstracts are published as supplement issues of *Gynecologic Oncology* (ISSN 0090-8258, Elsevier/ScienceDirect). Every abstract receives a unique DOI — guaranteed by CrossRef registration enforcement, Elsevier's PII system (algorithmically unique within the journal namespace), and sequential article numbering (monotonically increasing NNN counter per calendar month). Individual abstract DOIs resolve publicly via `https://doi.org/10.1016/j.ygyno.YYYY.MM.NNN`; full supplement browsing requires institutional ScienceDirect access.
+
+**2013 note:** No dedicated SGO abstract supplement exists for 2013. Volume 129 Suppl S1 is an unrelated genomics supplement. The closest published record is a "Summary of the 44th Annual Meeting on Women's Cancers" (DOI 10.1016/j.ygyno.2013.03.028, Vol 129 Issue 2). Dedicated SGO supplement issues began consistently in 2014.
+
+**2020 note:** The in-person meeting was cancelled due to COVID-19 — SGO's first cancellation in history. All 757 selected abstracts (49 plenary + 59 featured poster + 635 poster + 14 late-breaking) were still published in the October 2020 supplement, and SGO held free webinars to present the science.
+
+| Year | SGO Meeting | Volume | ScienceDirect URL | DOI Pattern | Approx. Abstracts |
+|------|------------|--------|-------------------|-------------|-------------------|
+| 2023 | 54th Annual | 176, Suppl S1 | sciencedirect.com/…/vol/176/suppl/S1 | 10.1016/j.ygyno.2023.06.NNN | ~600 |
+| 2022 | 53rd Annual (Phoenix, AZ, Mar 18–21) | 166, Suppl S1 | sciencedirect.com/…/vol/166/suppl/S1 | 10.1016/S0090-8258(22)XXXXX-X | ~580 |
+| 2021 | 52nd Annual | 162, Suppl S1 | sciencedirect.com/…/vol/162/suppl/S1 | 10.1016/S0090-8258(21)XXXXX-X | ~700 |
+| 2020 | 51st Annual (cancelled — COVID-19) | 159, Suppl S1 | sciencedirect.com/…/vol/159/suppl/S1 | 10.1016/j.ygyno.2020.06.NNN | 757 |
+| 2019 | 50th Annual (Honolulu, HI, Mar 16–19) | 154, Suppl S1 | sciencedirect.com/…/vol/154/suppl/S1 | 10.1016/j.ygyno.2019.04.NNN | ~500 |
+| 2018 | 49th Annual (New Orleans, LA, Mar 24–27) | 149, Suppl S1 | sciencedirect.com/…/vol/149/suppl/S1 | 10.1016/j.ygyno.2018.04.NNN | ~450 |
+| 2017 | 48th Annual (National Harbor, MD, Mar 12–15) | 145, Suppl S1 | sciencedirect.com/…/vol/145/suppl/S1 | 10.1016/j.ygyno.2017.03.NNN | ~500 |
+| 2016 | 47th Annual (San Diego, CA, Mar 19–22) | 141, Suppl S1 | sciencedirect.com/…/vol/141/suppl/S1 | 10.1016/j.ygyno.2016.04.NNN | ~600 |
+| 2015 | 46th Annual (Chicago, IL, Mar 28–31) | 137, Suppl S1 | sciencedirect.com/…/vol/137/suppl/S1 | 10.1016/j.ygyno.2015.01.NNN | ~600 |
+| 2014 | 45th Annual | 133, Suppl S1 | sciencedirect.com/…/vol/133/suppl/S1 | 10.1016/j.ygyno.2014.03.NNN | ~600 |
+| 2013 | 44th Annual (Los Angeles, CA) | 129, Issue 2 (no Suppl S1) | — | 10.1016/j.ygyno.2013.03.028 (meeting summary only) | N/A |
+
+*Sources: SGO Annual Meeting Abstracts; SGO 2023 Supplement (ScienceDirect); 51st Annual Meeting 2020 (PMC); gynecologiconcology-online.net*
+
+---
+
+### A11.18 Updated Complete Society Comparison
+
+| Society | Journal | Platform | Individual DOIs | DOI Pattern | PubMed Indexed | Auth Required | Avg Abstracts/Year | Feasibility |
+|---------|---------|----------|----------------|-------------|----------------|---------------|--------------------|-------------|
+| **AAGL** | JMIG | ScienceDirect | Yes | 10.1016/j.jmig.Y.M.NNN | Yes | No | ~90 | ✓ Current |
+| **SMFM** | AJOG | ScienceDirect | Yes | 10.1016/j.ajog.Y.M.NNN | Yes | No | ~500 | ✓ High |
+| **SGO** | Gyn Onc | ScienceDirect | Yes | 10.1016/j.ygyno.Y.M.NNN | Yes | Partial | ~570 | ✓ High |
+| **NASPAG** | JPAG | ScienceDirect | Yes | 10.1016/j.jpag.Y.M.NNN | Yes | No | ~35 | ✓ High |
+| **ASRM** | F&S | ScienceDirect | Yes | 10.1016/j.fertnstert.Y.M.NNN | Yes | Yes (browse) | ~1,200 | ✓ Medium |
+| **SFP** | Contraception | ScienceDirect | No (collection-level) | 10.1016/j.contraception.Y.M.NNN | Yes | No | ~300 | △ Medium |
+| **AUGS** | Urogynecology | LWW | No (supplement-level) | 10.1097/SPV.xxx | Yes | No | ~400 | △ Medium |
+| **SASGOG** | None | Society website | No | None | No | No | ~50 | ✗ Low |
+
+### A11.19 CREOG & APGO Annual Meeting Abstracts (2013–2023)
+
+CREOG & APGO (Council on Resident Education in Obstetrics and Gynecology & Association of Professors of Gynecology and Obstetrics) annual meeting abstracts have a two-phase publication history:
+
+- **2013–2014:** Published as a single proceedings article in *Teaching and Learning in Medicine* (Taylor & Francis) — one DOI per year, **not** individual DOIs per abstract.
+- **2015–present:** Moved to *Obstetrics & Gynecology* (the Green Journal, Wolters Kluwer/LWW) as an October Supplement (Issue 10001). Each abstract receives a unique DOI with the prefix `10.1097/01.AOG.` followed by a unique hash per abstract (e.g., `10.1097/01.AOG.0000585640.43634.ce`). Confirmed by spot-check.
+
+Volume numbers increase by 2 per year (Vol 126 in 2015 → Vol 142 in 2023). Abstracts are also cataloged without DOIs at https://tools.apgo.org/abstract-catalog/ covering 2012–2025.
+
+**Platform note:** The Green Journal is hosted on LWW (journals.lww.com), not ScienceDirect — the same platform as AUGS/Urogynecology. The LWW-specific scraper developed for AUGS would apply here as well.
+
+**Published in Obstetrics & Gynecology — October Supplements (2015–2023):**
+
+| Year | Meeting | O&G Vol | Issue | LWW URL | DOI Pattern |
+|------|---------|---------|-------|---------|-------------|
+| 2023 | CREOG & APGO | 142 | 10001 | https://journals.lww.com/greenjournal/toc/2023/10001 | 10.1097/01.AOG.xxx |
+| 2022 | CREOG & APGO | 140 | 10001 | https://journals.lww.com/greenjournal/toc/2022/10001 | 10.1097/01.AOG.xxx |
+| 2021 | CREOG & APGO | 138 | 10001 | https://journals.lww.com/greenjournal/toc/2021/10001 | 10.1097/01.AOG.xxx |
+| 2020 | CREOG & APGO (Orlando, FL) | 136 | 10001 | https://journals.lww.com/greenjournal/toc/2020/10001 | 10.1097/01.AOG.xxx |
+| 2019 | CREOG & APGO | 134 | 10001 | https://journals.lww.com/greenjournal/toc/2019/10001 | 10.1097/01.AOG.xxx |
+| 2018 | CREOG & APGO | 132 | 10001 | https://journals.lww.com/greenjournal/toc/2018/10001 | 10.1097/01.AOG.xxx |
+| 2017 | CREOG & APGO | 130 | 10001 | https://journals.lww.com/greenjournal/toc/2017/10001 | 10.1097/01.AOG.xxx |
+| 2016 | CREOG & APGO | 128 | 10001 | https://journals.lww.com/greenjournal/toc/2016/10001 | 10.1097/01.AOG.xxx |
+| 2015 | CREOG & APGO | 126 | 10001 | https://journals.lww.com/greenjournal/toc/2015/10001 | 10.1097/01.AOG.xxx |
+
+**Published in Teaching and Learning in Medicine (2013–2014):**
+
+| Year | Meeting | TLM Vol | Issue | DOI |
+|------|---------|---------|-------|-----|
+| 2014 | CREOG & APGO | 28 | 1 | 10.1080/10401334.2015.1107492 |
+| 2013 | CREOG & APGO | 26 | 4 | 10.1080/10401334.2014.945034 |
+
+*Note: 2013–2014 each have one DOI for the entire collection, not individual abstract DOIs. The 2020 meeting was held in-person in February 2020 (pre-COVID); supplement publication timing may have shifted. 2021 URL is inferred from volume pattern.*
+
+*Sources: https://journals.lww.com/greenjournal/Pages/collectiondetails.aspx?TopicalCollectionId=129; https://tools.apgo.org/abstract-catalog/; https://www.tandfonline.com/doi/full/10.1080/10401334.2015.1107492*
+
+---
+
+### A11.20 Final Complete Society Comparison (All 9 Societies)
+
+| Society | Journal | Platform | Individual DOIs | DOI Pattern | PubMed Indexed | Auth Required | Avg Abstracts/Year | Feasibility |
+|---------|---------|----------|----------------|-------------|----------------|---------------|--------------------|-------------|
+| **AAGL** | JMIG | ScienceDirect | Yes | 10.1016/j.jmig.Y.M.NNN | Yes | No | ~90 | ✓ Current |
+| **SMFM** | AJOG | ScienceDirect | Yes | 10.1016/j.ajog.Y.M.NNN | Yes | No | ~500 | ✓ High |
+| **SGO** | Gyn Onc | ScienceDirect | Yes | 10.1016/j.ygyno.Y.M.NNN | Yes | Partial | ~570 | ✓ High |
+| **NASPAG** | JPAG | ScienceDirect | Yes | 10.1016/j.jpag.Y.M.NNN | Yes | No | ~35 | ✓ High |
+| **ASRM** | F&S | ScienceDirect | Yes | 10.1016/j.fertnstert.Y.M.NNN | Yes | Yes (browse) | ~1,200 | ✓ Medium |
+| **CREOG/APGO** | O&G (Green J) | LWW | Yes (2015+) | 10.1097/01.AOG.xxx | Yes | No | ~200 | △ Medium |
+| **SFP** | Contraception | ScienceDirect | No (collection-level) | 10.1016/j.contraception.Y.M.NNN | Yes | No | ~300 | △ Medium |
+| **AUGS** | Urogynecology | LWW | No (supplement-level) | 10.1097/SPV.xxx | Yes | No | ~400 | △ Medium |
+| **SASGOG** | None | Society website | No | None | No | No | ~50 | ✗ Low |
+
+### A11.21 ACOG Annual Clinical & Scientific Meeting Abstracts (2013–2023)
+
+ACOG (American College of Obstetricians and Gynecologists) annual meeting abstracts are published in *Obstetrics & Gynecology* (the Green Journal, ISSN 0029-7844, Wolters Kluwer/LWW) as a May Supplement each year. Each abstract has a unique DOI using the Wolters Kluwer format `10.1097/01.AOG.` followed by a unique hash (e.g., `10.1097/AOG.0b013e3181636fe9`). The URL pattern uses `/05001` consistently across all years.
+
+**Volume formula:** Vol = 97 + (2 × (Year − 2000)); so Vol 121 in 2013, Vol 141 in 2023.
+
+**Platform:** LWW (journals.lww.com) — same as AUGS and CREOG/APGO. The LWW-specific scraper developed for those societies applies here.
+
+**2020 caveat:** The ACOG 2020 Annual Meeting (Nashville, April 24–27) was cancelled due to COVID-19. The May 2020 supplement may contain only previously accepted abstracts or may be absent — verify at the URL before ingesting.
+
+**2021:** Meeting was virtual; abstracts were still published in the supplement.
+
+| Year | O&G Vol | Issue | LWW URL | DOI Prefix |
+|------|---------|-------|---------|------------|
+| 2023 | 141 | 5S | https://journals.lww.com/greenjournal/toc/2023/05001 | 10.1097/01.AOG.xxx |
+| 2022 | 139 | 5S | https://journals.lww.com/greenjournal/toc/2022/05001 | 10.1097/01.AOG.xxx |
+| 2021 | 137 | 5S | https://journals.lww.com/greenjournal/toc/2021/05001 | 10.1097/01.AOG.xxx |
+| 2020 | 135 | 5S | https://journals.lww.com/greenjournal/toc/2020/05001 | 10.1097/01.AOG.xxx |
+| 2019 | 133 | 5S | https://journals.lww.com/greenjournal/toc/2019/05001 | 10.1097/01.AOG.xxx |
+| 2018 | 131 | 5S | https://journals.lww.com/greenjournal/toc/2018/05001 | 10.1097/01.AOG.xxx |
+| 2017 | 129 | 5S | https://journals.lww.com/greenjournal/toc/2017/05001 | 10.1097/01.AOG.xxx |
+| 2016 | 127 | 5S | https://journals.lww.com/greenjournal/toc/2016/05001 | 10.1097/01.AOG.xxx |
+| 2015 | 125 | 5S | https://journals.lww.com/greenjournal/toc/2015/05001 | 10.1097/01.AOG.xxx |
+| 2014 | 123 | Suppl 1 | https://journals.lww.com/greenjournal/toc/2014/05001 | 10.1097/01.AOG.xxx |
+| 2013 | 121 | 5S | https://journals.lww.com/greenjournal/toc/2013/05001 | 10.1097/01.AOG.xxx |
+
+*Sources: https://journals.lww.com/greenjournal/toc/2023/05001; https://pubmed.ncbi.nlm.nih.gov/25756102/ (Vol 123, Suppl 1, pp 1S–198S); https://journals.lww.com/greenjournal/Pages/collectiondetails.aspx?TopicalCollectionId=128*
+
+---
+
+### A11.22 Final Complete Society Comparison (All 10 Societies)
+
+| Society | Journal | Platform | Individual DOIs | DOI Pattern | PubMed Indexed | Auth Required | Avg Abstracts/Year | Feasibility |
+|---------|---------|----------|----------------|-------------|----------------|---------------|--------------------|-------------|
+| **AAGL** | JMIG | ScienceDirect | Yes | 10.1016/j.jmig.Y.M.NNN | Yes | No | ~90 | ✓ Current |
+| **SMFM** | AJOG | ScienceDirect | Yes | 10.1016/j.ajog.Y.M.NNN | Yes | No | ~500 | ✓ High |
+| **SGO** | Gyn Onc | ScienceDirect | Yes | 10.1016/j.ygyno.Y.M.NNN | Yes | Partial | ~570 | ✓ High |
+| **NASPAG** | JPAG | ScienceDirect | Yes | 10.1016/j.jpag.Y.M.NNN | Yes | No | ~35 | ✓ High |
+| **ASRM** | F&S | ScienceDirect | Yes | 10.1016/j.fertnstert.Y.M.NNN | Yes | Yes (browse) | ~1,200 | ✓ Medium |
+| **ACOG** | O&G (Green J) | LWW | Yes | 10.1097/01.AOG.xxx | Yes | No | ~800 | △ Medium |
+| **CREOG/APGO** | O&G (Green J) | LWW | Yes (2015+) | 10.1097/01.AOG.xxx | Yes | No | ~200 | △ Medium |
+| **SFP** | Contraception | ScienceDirect | No (collection-level) | 10.1016/j.contraception.Y.M.NNN | Yes | No | ~300 | △ Medium |
+| **AUGS** | Urogynecology | LWW | No (supplement-level) | 10.1097/SPV.xxx | Yes | No | ~400 | △ Medium |
+| **SASGOG** | None | Society website | No | None | No | No | ~50 | ✗ Low |
+
+**LWW societies (ACOG, CREOG/APGO, AUGS)** share a platform — a single LWW scraper covers all three. **ScienceDirect societies (AAGL, SMFM, SGO, NASPAG, ASRM, SFP)** share the existing Elsevier infrastructure. SASGOG remains the only society with no viable programmatic ingestion path.

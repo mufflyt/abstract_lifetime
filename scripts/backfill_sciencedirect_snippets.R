@@ -29,7 +29,7 @@ missing <- abstracts |>
 
 cli_h2("ScienceDirect Section-Snippet Backfill")
 cli_alert_info("{nrow(missing)} abstracts need backfill")
-if (nrow(missing) == 0) { cli_alert_success("Nothing to do"); quit(save = "no") }
+if (nrow(missing) == 0) { cli_alert_success("Nothing to do"); invisible(NULL) }
 
 # ── Step 1: Resolve DOI → PII via CrossRef ────────────────────────────────────
 get_pii_from_crossref <- function(doi) {
@@ -175,7 +175,7 @@ cli_alert_success("Retrieved text for {nrow(backfill)} / {n_total} abstracts")
 
 if (nrow(backfill) == 0) {
   cli_alert_warning("No text retrieved — ScienceDirect may be blocking; try again later")
-  quit(save = "no")
+  invisible(NULL)
 }
 
 # ── Patch abstracts_cleaned.csv ───────────────────────────────────────────────
