@@ -53,10 +53,28 @@ read_sidecar <- function(path, label) {
   }
 }
 
+#' Assert that a tibble has exactly the expected number of rows
+#'
+#' Stops with an informative error if a left join introduced row
+#' multiplication (duplicate keys in the sidecar).
+#'
+#' @param tbl Tibble. The table to check.
+#' @param source_label Character. Name of the merge source for the error message.
+#' @return The input tibble (invisible), for pipe chaining.
+#' @keywords internal
+assert_rows <- function(tbl, source_label) {
+  if (nrow(tbl) != base_n) {
+    stop(sprintf("Row count changed after merging %s: expected %d, got %d",
+                 source_label, base_n, nrow(tbl)))
+  }
+  invisible(tbl)
+}
+
 # ── Load base: abstracts_with_matches (without demographics) ─────────────────
 matches_path <- here("output", "abstracts_with_matches.csv")
 matches <- read_csv(matches_path, show_col_types = FALSE)
-cli_alert_info("Base: {nrow(matches)} abstracts, {ncol(matches)} columns")
+base_n <- nrow(matches)
+cli_alert_info("Base: {base_n} abstracts, {ncol(matches)} columns — row count locked")
 
 # Strip all demographic columns — we rebuild them fresh each run
 demo_cols_to_drop <- c(
@@ -109,8 +127,10 @@ if (nrow(char) > 0) {
                  "first_author_acog_district",
                  "first_author_gender", "first_author_gender_p",
                  "practice_type", "subspecialty", "career_stage")
-  char_slim <- char |> select(any_of(char_cols))
-  matches <- matches |> left_join(char_slim, by = "abstract_id")
+  char_slim <- char |> select(any_of(char_cols)) |> distinct(abstract_id, .keep_all = TRUE)
+  matches <- matches |>
+    left_join(char_slim, by = "abstract_id") |>
+    assert_rows("09c author_characteristics")
 
   # Reversible blanking: flag rows where demographics came from wrong match
   matches <- matches |>
@@ -222,7 +242,7 @@ g7 <- extract_gender(g_opm, "op_gender", "gender_opm")
 g8 <- extract_gender(tri_sr, "tri_gender", "gender_tri_sr")
 g9 <- extract_gender(tri_2nd, "tri_gender", "gender_tri_2nd")
 
-# Join all gender sources
+# Join all gender sources (extract_gender already deduplicates by abstract_id)
 matches <- matches |>
   left_join(npi_gender_tbl, by = "abstract_id") |>
   left_join(oa_gender_tbl, by = "abstract_id") |>
@@ -232,7 +252,8 @@ matches <- matches |>
   left_join(g6, by = "abstract_id") |>
   left_join(g7, by = "abstract_id") |>
   left_join(g8, by = "abstract_id") |>
-  left_join(g9, by = "abstract_id")
+  left_join(g9, by = "abstract_id") |>
+  assert_rows("gender waterfall joins")
 
 # Build unified gender with priority waterfall
 matches <- matches |>
@@ -282,8 +303,11 @@ if (nrow(npi) > 0) {
   npi_cols <- npi |>
     select(abstract_id, npi_number, npi_gender, npi_state, npi_subspecialty,
            npi_match_score, npi_match_confidence, npi_match_strategy,
-           npi_full_name, npi_acog_district)
-  matches <- matches |> left_join(npi_cols, by = "abstract_id")
+           npi_full_name, npi_acog_district) |>
+    distinct(abstract_id, .keep_all = TRUE)
+  matches <- matches |>
+    left_join(npi_cols, by = "abstract_id") |>
+    assert_rows("NPI columns")
   cli_alert_info("NPI by confidence:")
   print(table(matches$npi_match_confidence, useNA = "ifany"))
 }
@@ -292,8 +316,11 @@ if (nrow(npi) > 0) {
 cli_h2("4. ORCID columns")
 if (nrow(orcid) > 0 && "orcid_country" %in% names(orcid)) {
   orcid_slim <- orcid |>
-    select(abstract_id, any_of(c("orcid_country", "orcid_institution")))
-  matches <- matches |> left_join(orcid_slim, by = "abstract_id")
+    select(abstract_id, any_of(c("orcid_country", "orcid_institution"))) |>
+    distinct(abstract_id, .keep_all = TRUE)
+  matches <- matches |>
+    left_join(orcid_slim, by = "abstract_id") |>
+    assert_rows("ORCID columns")
   cli_alert_info("ORCID country: {sum(!is.na(matches$orcid_country))}")
 }
 
