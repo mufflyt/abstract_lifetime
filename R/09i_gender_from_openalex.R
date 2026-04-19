@@ -146,9 +146,19 @@ fetch_openalex_first_name <- function(last, init) {
 }
 
 # ── Build target list: abstracts still missing gender ─────────────────────────
-gender_col <- if ("gender_unified" %in% names(matches)) "gender_unified" else "first_author_gender"
-no_gender <- matches |>
-  filter(is.na(.data[[gender_col]])) |>
+gender_col <- if ("gender_unified" %in% names(matches)) {
+  "gender_unified"
+} else if ("first_author_gender" %in% names(matches)) {
+  "first_author_gender"
+} else {
+  NULL
+}
+no_gender <- if (!is.null(gender_col)) {
+  matches |> filter(is.na(.data[[gender_col]]))
+} else {
+  matches
+}
+no_gender <- no_gender |>
   left_join(abstracts |> select(abstract_id, author_name_first), by = "abstract_id") |>
   filter(!is.na(author_name_first), nchar(author_name_first) > 2) |>
   mutate(

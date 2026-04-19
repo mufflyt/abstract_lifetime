@@ -25,8 +25,18 @@ d <- read_csv(here("output", "abstracts_with_matches.csv"), show_col_types = FAL
 abs <- read_csv(here("data", "processed", "abstracts_cleaned.csv"), show_col_types = FALSE)
 
 # Target: missing gender with parseable second author
-gender_col <- if ("gender_unified" %in% names(d)) "gender_unified" else "first_author_gender"
-missing <- d |> filter(is.na(.data[[gender_col]]))
+gender_col <- if ("gender_unified" %in% names(d)) {
+  "gender_unified"
+} else if ("first_author_gender" %in% names(d)) {
+  "first_author_gender"
+} else {
+  NULL
+}
+missing <- if (!is.null(gender_col)) {
+  d |> filter(is.na(.data[[gender_col]]))
+} else {
+  d  # no gender column yet — process all
+}
 missing_abs <- abs |>
   filter(abstract_id %in% missing$abstract_id,
          !is.na(authors_raw), str_count(authors_raw, ",") >= 1) |>
