@@ -351,20 +351,31 @@ matches <- matches |>
       !is.na(gender_tri_2nd) ~ "second_triangulation",
       !is.na(first_author_gender) ~ "ssa",
       TRUE ~ NA_character_
-    )
+    ),
+    # Count how many independent sources contributed a gender value
+    gender_n_sources = rowSums(!is.na(across(all_of(gender_cols_present)))),
+    # Flag abstracts where sources disagreed
+    gender_conflict = gender_n_sources >= 2 & abstract_id %in% conflicts$abstract_id
   ) |>
-  # Drop intermediate gender columns — only keep gender_unified + gender_source
+  # Drop intermediate gender columns — keep unified + source + conflict metadata
   select(-any_of(c("gender_npi", "gender_oa", "gender_pubmed", "gender_obgyn",
                     "gender_oax", "gender_orcid", "gender_opm",
                     "gender_tri_sr", "gender_tri_2nd",
                     "first_author_gender", "first_author_gender_p")))
 
 n_gender <- sum(!is.na(matches$gender_unified))
+n_conflict <- sum(matches$gender_conflict, na.rm = TRUE)
+n_concordant <- n_gender - n_conflict
+pct_concordant <- round(n_concordant / n_gender * 100, 1)
 cli_alert_success("Unified gender: {n_gender} / {nrow(matches)} ({round(n_gender/nrow(matches)*100,1)}%)")
+cli_alert_info("  Concordant (all sources agree): {n_concordant} ({pct_concordant}%)")
+cli_alert_info("  Conflicts resolved by priority: {n_conflict} ({round(n_conflict/n_gender*100,1)}%)")
 cat("By source:\n")
 print(table(matches$gender_source, useNA = "ifany"))
 cat("\nDistribution:\n")
 print(table(matches$gender_unified, useNA = "ifany"))
+cat("\nSources per abstract:\n")
+print(table(matches$gender_n_sources, useNA = "ifany"))
 
 # ── 3. Merge NPI columns ────────────────────────────────────────────────────
 cli_h2("3. NPI columns")
