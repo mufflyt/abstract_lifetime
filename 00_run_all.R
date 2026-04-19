@@ -96,6 +96,10 @@ source(here("R", "10_npi_matching.R"))
 cli_h2("Step 5h2: Gender from PubMed Author Search")
 source(here("R", "09f_enrich_gender_from_pubmed.R"))
 
+# Step 5h3: Gender enrichment from ORCID person records (cached given-names)
+cli_h2("Step 5h3: Gender from ORCID Person Records")
+source(here("R", "09g_gender_from_orcid.R"))
+
 # Step 5i: Fidelity checks (abstract vs published paper comparison)
 cli_h2("Step 5i: Fidelity Checks")
 source(here("R", "09e_fidelity_checks.R"))
