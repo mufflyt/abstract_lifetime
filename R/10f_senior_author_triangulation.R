@@ -106,7 +106,8 @@ resolved <- bind_rows(results)
 cli_alert_success("Resolved {nrow(resolved)} first names via senior author triangulation")
 
 if (nrow(resolved) > 0) {
-  # Run gender inference on resolved names
+  #' @describeIn clean_first_name Strip trailing initials and title-case
+  #' @keywords internal
   clean_first_name <- function(n) {
     n <- trimws(n)
     n <- sub("\\s+[A-Z]$", "", n)

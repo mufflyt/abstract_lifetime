@@ -56,7 +56,10 @@ OBGYN_JOURNALS <- paste(
 )
 JOURNAL_FILTER <- paste0("(", OBGYN_JOURNALS, ")")
 
-# ── Parse "R.S. Guido" → last="Guido", init="RS" ──────────────────────────────
+#' Parse an AAGL author string into last name and initials
+#' @param x Character scalar. Author string (e.g., "R.S. Guido").
+#' @return Named list with \code{last} and \code{init}.
+#' @keywords internal
 parse_name <- function(x) {
   if (is.na(x) || nchar(x) < 2) return(list(last = NA_character_, init = NA_character_))
   parts <- str_squish(x) |> str_split("\\s+") |> _[[1]]
@@ -64,7 +67,16 @@ parse_name <- function(x) {
   list(last = tail(parts, 1), init = init)
 }
 
-# ── PubMed search: author + OB/GYN journals → extract ForeName ────────────────
+#' Search PubMed OB/GYN journals for an author's full first name
+#'
+#' Queries PubMed with \code{"LastName Initials"[Author]} filtered to a
+#' curated list of OB/GYN journals. Extracts the ForeName from the XML.
+#' Results are cached per (last, init) pair.
+#'
+#' @param last Character. Author last name.
+#' @param init Character. Author initials (e.g., "RS").
+#' @return Character scalar. Full first name or \code{NA_character_}.
+#' @keywords internal
 fetch_obgyn_first_name <- function(last, init) {
   cache_key  <- paste0(tolower(last), "_", tolower(init))
   cache_file <- file.path(cache_dir, paste0(cache_key, ".rds"))

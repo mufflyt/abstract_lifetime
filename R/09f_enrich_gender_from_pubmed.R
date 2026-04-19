@@ -39,7 +39,12 @@ delay   <- if (has_key) 0.11 else 0.34   # ~9/sec with key, ~3/sec without
 
 cli_h1("Gender enrichment via PubMed author search")
 
-# ── Parse "R.S. Guido" → last="Guido", initials="RS" ──────────────────────────
+#' Parse an AAGL author string into last name and initials
+#'
+#' @param x Character scalar. Author string (e.g., "R.S. Guido").
+#' @return Named list with \code{last} (character) and \code{init} (character,
+#'   periods stripped, e.g., "RS").
+#' @keywords internal
 parse_name <- function(x) {
   if (is.na(x) || nchar(x) < 2) return(list(last = NA_character_, init = NA_character_))
   parts <- str_squish(x) |> str_split("\\s+") |> _[[1]]
@@ -49,9 +54,15 @@ parse_name <- function(x) {
   list(last = last, init = init)
 }
 
-# ── Extract institution keyword from affiliation_raw ───────────────────────────
-# Splits on "|" (first affiliation only), then ",", skips department/division
-# prefixes, and returns the first institution-looking token.
+#' Extract an institution keyword from a raw affiliation string
+#'
+#' Splits on "|" (first affiliation), then by comma. Skips department/
+#' division prefixes and returns the first institution-looking token.
+#' Used to build PubMed affiliation queries for name disambiguation.
+#'
+#' @param aff Character scalar. Raw affiliation string (pipe-delimited).
+#' @return Character scalar. Institution name, or \code{NA_character_}.
+#' @keywords internal
 SKIP_PREFIXES <- paste0(
   "^(department|division|section|program|institute of|center for|",
   "obstetrics|gynecology|ob|gyn|medicine|surgery|women)"
@@ -74,7 +85,18 @@ extract_institution <- function(aff) {
   if (n >= 2) tokens[max(1, n - 1)] else NA_character_
 }
 
-# ── PubMed search + full name extraction ──────────────────────────────────────
+#' Fetch an author's full first name from PubMed
+#'
+#' Searches PubMed for \code{"LastName Initials"[Author]} with optional
+#' institution affiliation filter. Extracts the full ForeName from the
+#' first matching PubMed record's XML. Results are cached to disk.
+#'
+#' @param last Character. Author's last name.
+#' @param init Character. Author's initials (e.g., "RS").
+#' @param institution Character. Institution keyword for affiliation filter.
+#' @return Character scalar. Full first name (e.g., "Richard"), or
+#'   \code{NA_character_} if not found.
+#' @keywords internal
 fetch_full_name <- function(last, init, institution) {
   cache_key  <- paste0(tolower(last), "_", tolower(init))
   cache_file <- file.path(cache_dir, paste0(cache_key, ".rds"))

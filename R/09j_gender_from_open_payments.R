@@ -63,7 +63,16 @@ aagl_dates <- data.frame(
   stringsAsFactors = FALSE
 )
 
-# ── Build SQL for one author + conference year ─────────────────────────────────
+#' Build a SQL query for Open Payments physician lookup
+#'
+#' @param last Character. Uppercase last name.
+#' @param init1 Character. Uppercase first initial.
+#' @param win_start Character. Date window start (YYYY-MM-DD).
+#' @param win_end Character. Date window end (YYYY-MM-DD).
+#' @param table Character. DuckDB table name.
+#' @param schema Character. Column naming scheme ("physician" or "covered_recipient").
+#' @return Character. SQL query string.
+#' @keywords internal
 make_sql <- function(last, init1, win_start, win_end, table, schema) {
   obgyn_filter <- "('%Obstetrics%', '%Gynecology%')"
 
@@ -108,7 +117,19 @@ make_sql <- function(last, init1, win_start, win_end, table, schema) {
   }
 }
 
-# ── Query Open Payments for one author, with file cache ───────────────────────
+#' Query Open Payments for an author's full first name
+#'
+#' Searches across multiple Open Payments tables (2013-2023) for a
+#' physician matching last name + first initial + OB/GYN specialty,
+#' within a date window around the congress year. Results cached to disk.
+#'
+#' @param last Character. Author last name.
+#' @param init1 Character. First initial.
+#' @param congress_year Integer. AAGL congress year.
+#' @param conf_row Tibble row. Conference config with \code{date}.
+#' @param con DuckDB connection.
+#' @return Character scalar. Full first name or \code{NA_character_}.
+#' @keywords internal
 fetch_op_first_name <- function(last, init1, congress_year, conf_row, con) {
   cache_key  <- paste0(tolower(last), "_", tolower(init1), "_", congress_year)
   cache_file <- file.path(cache_dir, paste0(cache_key, ".rds"))

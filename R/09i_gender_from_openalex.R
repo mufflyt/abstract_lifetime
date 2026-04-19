@@ -53,7 +53,8 @@ JOURNAL_ISSNS <- paste(c(
   "1086-8089"   # JSLS
 ), collapse = "|")
 
-# ── Parse "R.S. Guido" → last="Guido", init="RS" ──────────────────────────────
+#' @rdname parse_name
+#' @keywords internal
 parse_name <- function(x) {
   if (is.na(x) || nchar(x) < 2) return(list(last = NA_character_, init = NA_character_))
   parts <- str_squish(x) |> str_split("\\s+") |> _[[1]]
@@ -61,8 +62,14 @@ parse_name <- function(x) {
   list(last = tail(parts, 1), init = init)
 }
 
-# ── Extract first character of initials from a display_name ───────────────────
-# "Richard S. Guido" → first non-last parts → "RS" → first char "R"
+#' Extract first initial from an OpenAlex display name
+#'
+#' Given "Richard S. Guido" and last = "Guido", returns "R".
+#'
+#' @param display_name Character. OpenAlex author display name.
+#' @param last Character. Known last name to strip.
+#' @return Character scalar. First initial (uppercase), or \code{NA_character_}.
+#' @keywords internal
 display_to_first_init <- function(display_name, last) {
   parts <- str_squish(display_name) |> str_split("\\s+") |> _[[1]]
   # Remove the last name token(s) — take everything before last word matching <last>
@@ -73,7 +80,16 @@ display_to_first_init <- function(display_name, last) {
   toupper(substr(str_remove_all(prefix[1], "\\."), 1, 1))
 }
 
-# ── OpenAlex works search ──────────────────────────────────────────────────────
+#' Search OpenAlex for an author's full first name
+#'
+#' Queries the OpenAlex works API filtered by OB/GYN journal ISSNs and
+#' author last name. Matches initials against display names to extract
+#' the full first name. Results are cached per (last, init) pair.
+#'
+#' @param last Character. Author last name.
+#' @param init Character. Author initials (e.g., "RS").
+#' @return Character scalar. Full first name or \code{NA_character_}.
+#' @keywords internal
 fetch_openalex_first_name <- function(last, init) {
   cache_key  <- paste0(tolower(last), "_", tolower(init))
   cache_file <- file.path(cache_dir, paste0(cache_key, ".rds"))

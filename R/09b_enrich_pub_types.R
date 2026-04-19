@@ -37,6 +37,12 @@ cli_alert_info("Unique PMIDs to type: {length(target_pmids)}")
 has_key <- nchar(Sys.getenv("ENTREZ_KEY", "")) > 0
 delay <- if (has_key) 1 / cfg$pubmed$rate_limit_with_key else 1 / cfg$pubmed$rate_limit_per_sec
 
+#' Extract PublicationType values from PubMed XML for a given PMID
+#'
+#' @param pmid Character. PubMed ID.
+#' @return Character scalar. Semicolon-separated publication types,
+#'   or \code{NA_character_} if unavailable.
+#' @keywords internal
 extract_types <- function(pmid) {
   xt <- fetch_pubmed_xml(pmid, cache_dir, delay)
   if (is.na(xt) || nchar(xt) < 100) return(NA_character_)

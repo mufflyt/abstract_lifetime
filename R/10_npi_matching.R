@@ -22,8 +22,15 @@ source(here("R", "utils_text.R"))
 source(here("R", "utils_states.R"))
 source(here("R", "utils_acog.R"))
 
-# Normalize Unicode dashes/hyphens to ASCII (U+2010, U+2011, U+2012, U+2013,
-# U+2014, U+2015, U+FE58, U+FE63, U+FF0D all → plain hyphen U+002D)
+#' Normalize Unicode dashes/hyphens to ASCII
+#'
+#' Replaces Unicode dash variants (U+2010 through U+FF0D) with the standard
+#' ASCII hyphen-minus (U+002D). Critical for matching author names like
+#' "Al\u2010Hendy" against ABOG pool entries stored with ASCII hyphens.
+#'
+#' @param x Character vector to normalize.
+#' @return Character vector with all Unicode dashes replaced by ASCII hyphen.
+#' @keywords internal
 normalize_dashes <- function(x) {
   gsub("[\u2010\u2011\u2012\u2013\u2014\u2015\uFE58\uFE63\uFF0D]", "-", x)
 }
@@ -209,6 +216,27 @@ cli_alert_info("  With initial only: {n_us - n_full}")
 # ---- Match against ABOG pool ----
 cli_h2("Matching against ABOG-NPI pool")
 
+#' Score an author against the ABOG-NPI candidate pool
+#'
+#' Matches a single AAGL abstract author against all ABOG-NPI pool entries
+#' sharing the same last name (and first name or initial). Returns the best
+#' candidate with a confidence classification (high/ambiguous/low).
+#'
+#' @param author_row A single-row tibble from the lookup table with columns:
+#'   \code{abstract_id}, \code{congress_year}, \code{has_full_name},
+#'   \code{full_first_name}, \code{last_name_upper}, \code{first_initial},
+#'   \code{middle_initial}, \code{state_hint}, \code{city_hint},
+#'   \code{first_author_gender}, \code{primary_procedure}.
+#' @return A single-row tibble with NPI match result columns:
+#'   \code{npi_number}, \code{npi_match_score}, \code{npi_n_candidates},
+#'   \code{npi_match_strategy}, \code{npi_match_confidence},
+#'   \code{npi_gender}, \code{npi_state}, \code{npi_subspecialty},
+#'   \code{npi_full_name}.
+#' @details Scoring components: exact name (50 pts) or initial (15 pts),
+#'   state match (20 pts), gender match (10 pts), MIGS bonus (25 pts),
+#'   middle initial (5 pts), name rarity (10 pts). Single-candidate
+#'   relaxation accepts sole candidates at >= 35 pts.
+#' @keywords internal
 score_author <- function(author_row) {
   abs_id <- author_row$abstract_id
   congress_yr <- author_row$congress_year

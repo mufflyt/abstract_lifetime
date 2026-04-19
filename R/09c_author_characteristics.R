@@ -37,10 +37,14 @@ cli_h1("Author characteristics")
 
 # --- Gender inference: two-pass strategy ---
 # Pass 1: SSA (US names, high accuracy)
-# Pass 2: genderize.io (international names, broader coverage)
-# Name cleaning: strip middle initials ("Donald I" → "Donald"),
-# take first word of compound names ("Jong Woon" → "Jong").
-
+#' Clean a given name for gender inference
+#'
+#' Strips trailing middle initials ("Donald I" -> "Donald"), takes the
+#' first token of compound names ("Jong Woon" -> "Jong"), and title-cases.
+#'
+#' @param n Character scalar. Raw first name.
+#' @return Character scalar. Cleaned name or \code{NA_character_}.
+#' @keywords internal
 clean_first_name <- function(n) {
   if (is.na(n) || nchar(n) < 2) return(NA_character_)
   n <- trimws(n)

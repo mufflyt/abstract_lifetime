@@ -36,7 +36,12 @@ suppressPackageStartupMessages({
 
 cli_h1("Merging all demographic sources (sole merge point)")
 
-# ── Helper: safe CSV reader ──────────────────────────────────────────────────
+#' Read a sidecar CSV with graceful fallback
+#'
+#' @param path Character. File path to the sidecar CSV.
+#' @param label Character. Human-readable label for CLI messages.
+#' @return A tibble (empty if file not found).
+#' @keywords internal
 read_sidecar <- function(path, label) {
   if (file.exists(path)) {
     d <- read_csv(path, show_col_types = FALSE)
@@ -144,7 +149,15 @@ npi_gender_tbl <- if (nrow(npi) > 0) {
     distinct(abstract_id, .keep_all = TRUE)
 } else tibble(abstract_id = character(), gender_npi = character())
 
-# Tier 2: OpenAlex full name from abstract DOI
+#' Clean a first name for gender lookup
+#'
+#' Strips trailing middle initials, extracts the first token, and
+#' title-cases the result (e.g., "Hsiang-Ying A" -> "Hsiang-ying").
+#'
+#' @param n Character scalar. Raw first name string.
+#' @return Character scalar. Cleaned first name, or \code{NA_character_}
+#'   if the name is too short or missing.
+#' @keywords internal
 clean_first_name <- function(n) {
   if (is.na(n) || nchar(n) < 2) return(NA_character_)
   n <- trimws(sub("\\s+[A-Z]\\.?$", "", n))
@@ -183,7 +196,14 @@ oa_gender_tbl <- if (nrow(oa) > 0) {
     distinct(abstract_id, .keep_all = TRUE)
 } else tibble(abstract_id = character(), gender_oa = character())
 
-# Tiers 3-9: extract gender from each sidecar (simple column rename + select)
+#' Extract gender from a sidecar tibble into a standard format
+#'
+#' @param tbl Tibble. A sidecar CSV with \code{abstract_id} and a gender column.
+#' @param gender_col Character. Name of the gender column in \code{tbl}.
+#' @param new_name Character. Name for the output gender column.
+#' @return Tibble with columns \code{abstract_id} and \code{new_name},
+#'   one row per abstract (deduplicated), NAs removed.
+#' @keywords internal
 extract_gender <- function(tbl, gender_col, new_name) {
   if (nrow(tbl) == 0 || !gender_col %in% names(tbl)) {
     return(tibble(abstract_id = character(), !!new_name := character()))

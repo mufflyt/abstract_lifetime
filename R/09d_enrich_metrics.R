@@ -25,6 +25,11 @@ target_dois <- matches |>
 
 cli_alert_info("DOIs to query: {nrow(target_dois)}")
 
+#' GET request to OpenAlex API with polite pool email
+#'
+#' @param url Character. OpenAlex API URL (mailto appended automatically).
+#' @return Parsed JSON list, or \code{NULL} on failure.
+#' @keywords internal
 oa_get <- function(url) {
   Sys.sleep(0.12)
   full <- paste0(url, if (grepl("\\?", url)) "&" else "?", "mailto=", ua_email)

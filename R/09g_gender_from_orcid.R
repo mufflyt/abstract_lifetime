@@ -30,7 +30,14 @@ matches   <- read_csv(matches_path, show_col_types = FALSE)
 
 cli_h1("Gender enrichment from ORCID person records")
 
-# ── Extract first name from cached person RDS ──────────────────────────────────
+#' Extract first name from a cached ORCID person record
+#'
+#' Reads the cached RDS file for the given ORCID ID and extracts the
+#' given-names field. Returns the first word only (strips middle names).
+#'
+#' @param orcid_id Character. ORCID identifier (e.g., "0000-0002-1097-0356").
+#' @return Character scalar. First name or \code{NA_character_}.
+#' @keywords internal
 extract_first_name <- function(orcid_id) {
   if (is.na(orcid_id)) return(NA_character_)
   cache_file <- file.path(cache_dir, paste0(orcid_id, "_person.rds"))
