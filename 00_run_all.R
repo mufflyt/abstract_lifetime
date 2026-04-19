@@ -100,6 +100,10 @@ source(here("R", "09f_enrich_gender_from_pubmed.R"))
 cli_h2("Step 5h3: Gender from ORCID Person Records")
 source(here("R", "09g_gender_from_orcid.R"))
 
+# Step 5h4: Gender from any OB/GYN publication by the author (PubMed journal filter)
+cli_h2("Step 5h4: Gender from OB/GYN Publications")
+source(here("R", "09h_gender_from_obgyn_pubs.R"))
+
 # Step 5i: Fidelity checks (abstract vs published paper comparison)
 cli_h2("Step 5i: Fidelity Checks")
 source(here("R", "09e_fidelity_checks.R"))
