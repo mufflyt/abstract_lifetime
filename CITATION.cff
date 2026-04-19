@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Abstract Lifetime: Publication Rate, Time to Publication, and Predictors of Full Publication Among Oral Presentations at the AAGL Global Congress, 2012-2023"
+type: software
+authors:
+  - family-names: Muffly
+    given-names: Tyler M.
+    email: tyler.muffly@dhha.org
+    orcid: "https://orcid.org/0000-0002-1097-0356"
+    affiliation: "Denver Health and Hospital Authority, Department of Obstetrics and Gynecology"
+repository-code: "https://github.com/mufflyt/abstract_lifetime"
+url: "https://mufflyt.shinyapps.io/aagl-adjudication/"
+license: MIT
+date-released: "2026-04-19"
+version: "1.0.0"
+keywords:
+  - abstract-to-publication
+  - conference abstracts
+  - publication bias
+  - AAGL
+  - minimally invasive gynecology
+  - Cochrane MR000005
+  - NPI matching
+  - R
+references:
+  - type: article
+    title: "Full publication of results initially presented in abstracts"
+    authors:
+      - family-names: Scherer
+        given-names: Roberta W.
+      - family-names: Meerpohl
+        given-names: Joerg J.
+      - family-names: Stump
+        given-names: Nicholas
+      - family-names: Antes
+        given-names: Gerd
+      - family-names: von Elm
+        given-names: Erik
+    journal: "Cochrane Database of Systematic Reviews"
+    year: 2018
+    doi: "10.1002/14651858.MR000005.pub4"

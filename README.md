@@ -53,7 +53,10 @@ rmarkdown::render("docs/technical_appendix.Rmd")
 testthat::test_dir("tests/testthat")
 
 # Deploy Shiny adjudication app
-Rscript deploy_shiny.R aagl-adjudication
+Rscript shiny/adjudication_app/deploy.R
+
+# Run demographics pipeline only (skip scraping + search)
+Rscript R/run_demographics.R
 ```
 
 ## Pipeline Architecture
@@ -73,7 +76,19 @@ R/
   09_enrich_authors.R                # Step 5c: Author names + affiliations from PubMed XML
   09c_author_characteristics.R       # Step 5d: Gender, ACOG district, practice type
   09d_enrich_metrics.R               # Step 5e: Citation counts + journal impact from OpenAlex
-  06_analyze_results.R               # Step 6: KM, Cox PH, logistic regression, sensitivity
+  09f_enrich_gender_from_pubmed.R    # Step 5f: Gender from PubMed full-name search
+  09g_gender_from_orcid.R            # Step 5g: Gender from ORCID person records
+  09h_gender_from_obgyn_pubs.R       # Step 5h: Gender from OB/GYN publication search
+  09i_gender_from_openalex.R         # Step 5i: Gender from OpenAlex author search
+  09j_gender_from_open_payments.R    # Step 5j: Gender from CMS Open Payments
+  10_npi_matching.R                  # Step 6a: NPI identity resolution (ABOG + NPPES)
+  10b_resolve_names_openalex.R       # Step 6b: Full name resolution via OpenAlex DOIs
+  10d_orcid_demographics.R           # Step 6c: ORCID demographics enrichment
+  10e_merge_demographics.R           # Step 6d: SOLE MERGE — unified demographics waterfall
+  10f_senior_author_triangulation.R  # Step 6e: Name resolution via senior coauthor
+  10g_second_author_triangulation.R  # Step 6f: Name resolution via second coauthor
+  run_demographics.R                 # Demographics orchestrator (runs 09c-10e in order)
+  06_analyze_results.R               # Step 7: KM, Cox PH, logistic regression, sensitivity
   07_make_tables.R                   # Step 7: 4 publication-quality tables
   08_make_figures.R                  # Step 8: 6 main + 4 supplementary figures
   utils_acog.R                       # US state -> ACOG district mapping
@@ -94,7 +109,7 @@ scripts/
   backfill_*.R                       # Backfill new columns onto existing sheet rows
   cleanup_no_match_rows.R            # Blank matched-pub fields on no_match decisions
   rescue_2016.R                      # Recovery script for rate-limited congress years
-deploy_shiny.R                       # Build bundle + deploy to shinyapps.io
+shiny/adjudication_app/deploy.R      # Build bundle + slim data + deploy to shinyapps.io
 ```
 
 ## Search Strategy
@@ -142,7 +157,8 @@ Web-based tool for blinded manual review of probable/possible matches:
 |----------|-----------|
 | Study characteristics | study_design (12 categories), research_category, primary_procedure, is_rct, sample_size, is_multicenter |
 | Cochrane variables | has_funding, has_industry, has_trial_registration, has_irb_statement, has_numeric_results, is_database_study |
-| Author demographics | first_author_gender (75% coverage), practice_type (87%), subspecialty (54%), ACOG district (92% of US), n_authors |
+| Author demographics | gender_unified (99% coverage), practice_type (18%), subspecialty_unified (36%), state_unified (31%), ACOG district, n_authors |
+| NPI identity resolution | npi_number, npi_match_confidence, npi_subspecialty, npi_state (278 high-confidence matches, 40% of US authors) |
 | Publication outcomes | pub_type_canonical, cited_by_count, journal_impact_proxy, months_to_pub |
 | Match quality | classification, best_score, 10 score components, has_tie |
 
