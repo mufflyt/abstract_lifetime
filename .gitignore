@@ -30,6 +30,8 @@ Thumbs.db
 # Output (regenerable)
 output/tables/
 output/figures/
+# Exception: flow diagram for README
+!output/figures/figure1_flow_diagram.png
 
 # Google Sheets service account credentials
 google_credentials.json
