@@ -29,10 +29,10 @@ cache_dir <- here("data", "cache", "pubmed_author")
 dir.create(cache_dir, showWarnings = FALSE, recursive = TRUE)
 
 abstracts_path <- here("data", "processed", "abstracts_cleaned.csv")
-matches_path   <- here("output", "abstracts_with_matches.csv")
-
 abstracts <- read_csv(abstracts_path, show_col_types = FALSE)
-matches   <- read_csv(matches_path,   show_col_types = FALSE)
+# NOTE: This script is a pure sidecar producer. It reads abstracts_cleaned.csv
+# (not abstracts_with_matches.csv) and writes gender_from_pubmed.csv.
+# 10e_merge_demographics.R handles the merge.
 
 has_key <- nchar(Sys.getenv("ENTREZ_KEY", "")) > 0
 delay   <- if (has_key) 0.11 else 0.34   # ~9/sec with key, ~3/sec without

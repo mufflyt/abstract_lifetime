@@ -22,11 +22,11 @@ suppressPackageStartupMessages({
 
 cache_dir    <- here("data", "cache", "orcid")
 orcid_path   <- here("data", "processed", "orcid_enrichment.csv")
-matches_path <- here("output", "abstracts_with_matches.csv")
 out_path     <- here("data", "processed", "gender_from_orcid.csv")
 
-orcid_tbl <- read_csv(orcid_path,   show_col_types = FALSE)
-matches   <- read_csv(matches_path, show_col_types = FALSE)
+orcid_tbl <- read_csv(orcid_path, show_col_types = FALSE)
+# NOTE: Pure sidecar producer — reads orcid_enrichment.csv, writes gender_from_orcid.csv.
+# Does NOT read abstracts_with_matches.csv.
 
 cli_h1("Gender enrichment from ORCID person records")
 

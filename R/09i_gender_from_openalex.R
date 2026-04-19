@@ -21,13 +21,12 @@ suppressPackageStartupMessages({
 
 `%||%` <- function(a, b) if (is.null(a) || length(a) == 0 || (length(a) == 1 && is.na(a))) b else a
 
-cache_dir    <- here("data", "cache", "openalex_author")
-matches_path <- here("output", "abstracts_with_matches.csv")
-out_path     <- here("data", "processed", "gender_from_openalex.csv")
+cache_dir <- here("data", "cache", "openalex_author")
+out_path  <- here("data", "processed", "gender_from_openalex.csv")
 
 dir.create(cache_dir, showWarnings = FALSE, recursive = TRUE)
 
-matches   <- read_csv(matches_path, show_col_types = FALSE)
+# NOTE: Pure sidecar producer — reads abstracts_cleaned.csv only.
 abstracts <- read_csv(here("data", "processed", "abstracts_cleaned.csv"),
                       show_col_types = FALSE)
 
@@ -145,21 +144,14 @@ fetch_openalex_first_name <- function(last, init) {
   fore
 }
 
-# ── Build target list: abstracts still missing gender ─────────────────────────
-gender_col <- if ("gender_unified" %in% names(matches)) {
-  "gender_unified"
-} else if ("first_author_gender" %in% names(matches)) {
-  "first_author_gender"
-} else {
-  NULL
-}
-no_gender <- if (!is.null(gender_col)) {
-  matches |> filter(is.na(.data[[gender_col]]))
-} else {
-  matches
-}
-no_gender <- no_gender |>
-  left_join(abstracts |> select(abstract_id, author_name_first), by = "abstract_id") |>
+# ── Build target list: all abstracts with parseable author names ──────────────
+already_done <- if (file.exists(out_path)) {
+  read_csv(out_path, show_col_types = FALSE) |> pull(abstract_id)
+} else character(0)
+
+no_gender <- abstracts |>
+  filter(!abstract_id %in% already_done) |>
+  select(abstract_id, author_name_first) |>
   filter(!is.na(author_name_first), nchar(author_name_first) > 2) |>
   mutate(
     fa_last = map_chr(author_name_first, ~ parse_name(.x)$last),

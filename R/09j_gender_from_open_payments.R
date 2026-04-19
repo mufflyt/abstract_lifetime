@@ -30,10 +30,10 @@ suppressPackageStartupMessages({
 
 `%||%` <- function(a, b) if (is.null(a) || length(a) == 0 || (length(a) == 1 && is.na(a))) b else a
 
-DUCKDB_PATH  <- "/Volumes/MufflySamsung/DuckDB/nber_my_duckdb.duckdb"
-cache_dir    <- here("data", "cache", "open_payments")
-matches_path <- here("output", "abstracts_with_matches.csv")
-out_path     <- here("data", "processed", "gender_from_open_payments.csv")
+DUCKDB_PATH <- "/Volumes/MufflySamsung/DuckDB/nber_my_duckdb.duckdb"
+cache_dir   <- here("data", "cache", "open_payments")
+out_path    <- here("data", "processed", "gender_from_open_payments.csv")
+# NOTE: Pure sidecar producer — reads abstracts_cleaned.csv only.
 
 dir.create(cache_dir, showWarnings = FALSE, recursive = TRUE)
 
@@ -164,25 +164,16 @@ fetch_op_first_name <- function(last, init1, congress_year, conf_row, con) {
 }
 
 # ── Load targets ───────────────────────────────────────────────────────────────
-matches   <- read_csv(matches_path, show_col_types = FALSE)
 abstracts <- read_csv(here("data", "processed", "abstracts_cleaned.csv"),
                       show_col_types = FALSE)
 
-gender_col <- if ("gender_unified" %in% names(matches)) {
-  "gender_unified"
-} else if ("first_author_gender" %in% names(matches)) {
-  "first_author_gender"
-} else {
-  NULL
-}
-no_gender <- if (!is.null(gender_col)) {
-  matches |> filter(is.na(.data[[gender_col]]))
-} else {
-  matches
-}
-no_gender <- no_gender |>
-  select(abstract_id, congress_year) |>
-  left_join(abstracts |> select(abstract_id, author_name_first), by = "abstract_id") |>
+already_done <- if (file.exists(out_path)) {
+  read_csv(out_path, show_col_types = FALSE) |> pull(abstract_id)
+} else character(0)
+
+no_gender <- abstracts |>
+  filter(!abstract_id %in% already_done) |>
+  select(abstract_id, congress_year, author_name_first) |>
   filter(!is.na(author_name_first), nchar(author_name_first) > 2) |>
   mutate(
     fa_last  = str_extract(author_name_first, "[A-Za-z]+$"),

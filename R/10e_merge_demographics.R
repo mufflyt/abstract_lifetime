@@ -53,6 +53,26 @@ read_sidecar <- function(path, label) {
   }
 }
 
+#' Assert that a sidecar has no duplicate abstract_id keys
+#'
+#' Stops with an error if duplicates are found, preventing silent data loss
+#' from \code{distinct()}. If duplicates exist, they indicate an upstream bug.
+#'
+#' @param tbl Tibble with an \code{abstract_id} column.
+#' @param source_label Character. Name of the sidecar for the error message.
+#' @return The input tibble (invisible), for pipe chaining.
+#' @keywords internal
+assert_unique_keys <- function(tbl, source_label) {
+  if (nrow(tbl) == 0) return(invisible(tbl))
+  dupes <- sum(duplicated(tbl$abstract_id))
+  if (dupes > 0) {
+    dup_ids <- tbl$abstract_id[duplicated(tbl$abstract_id)] |> unique() |> head(5)
+    stop(sprintf("Duplicate abstract_id in %s: %d duplicates (e.g., %s)",
+                 source_label, dupes, paste(dup_ids, collapse = ", ")))
+  }
+  invisible(tbl)
+}
+
 #' Assert that a tibble has exactly the expected number of rows
 #'
 #' Stops with an informative error if a left join introduced row
@@ -127,7 +147,7 @@ if (nrow(char) > 0) {
                  "first_author_acog_district",
                  "first_author_gender", "first_author_gender_p",
                  "practice_type", "subspecialty", "career_stage")
-  char_slim <- char |> select(any_of(char_cols)) |> distinct(abstract_id, .keep_all = TRUE)
+  char_slim <- char |> select(any_of(char_cols)) |> assert_unique_keys("09c author_characteristics")
   matches <- matches |>
     left_join(char_slim, by = "abstract_id") |>
     assert_rows("09c author_characteristics")
@@ -304,7 +324,7 @@ if (nrow(npi) > 0) {
     select(abstract_id, npi_number, npi_gender, npi_state, npi_subspecialty,
            npi_match_score, npi_match_confidence, npi_match_strategy,
            npi_full_name, npi_acog_district) |>
-    distinct(abstract_id, .keep_all = TRUE)
+    assert_unique_keys("NPI sidecar")
   matches <- matches |>
     left_join(npi_cols, by = "abstract_id") |>
     assert_rows("NPI columns")
@@ -317,7 +337,7 @@ cli_h2("4. ORCID columns")
 if (nrow(orcid) > 0 && "orcid_country" %in% names(orcid)) {
   orcid_slim <- orcid |>
     select(abstract_id, any_of(c("orcid_country", "orcid_institution"))) |>
-    distinct(abstract_id, .keep_all = TRUE)
+    assert_unique_keys("ORCID sidecar")
   matches <- matches |>
     left_join(orcid_slim, by = "abstract_id") |>
     assert_rows("ORCID columns")
