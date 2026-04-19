@@ -168,8 +168,9 @@ matches   <- read_csv(matches_path, show_col_types = FALSE)
 abstracts <- read_csv(here("data", "processed", "abstracts_cleaned.csv"),
                       show_col_types = FALSE)
 
+gender_col <- if ("gender_unified" %in% names(matches)) "gender_unified" else "first_author_gender"
 no_gender <- matches |>
-  filter(is.na(first_author_gender)) |>
+  filter(is.na(.data[[gender_col]])) |>
   select(abstract_id, congress_year) |>
   left_join(abstracts |> select(abstract_id, author_name_first), by = "abstract_id") |>
   filter(!is.na(author_name_first), nchar(author_name_first) > 2) |>

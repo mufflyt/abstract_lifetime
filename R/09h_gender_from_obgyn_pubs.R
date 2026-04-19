@@ -121,8 +121,10 @@ fetch_obgyn_first_name <- function(last, init) {
 }
 
 # ── Build target list: abstracts still missing gender ─────────────────────────
+# Handle both column names (first_author_gender or gender_unified)
+gender_col <- if ("gender_unified" %in% names(matches)) "gender_unified" else "first_author_gender"
 no_gender <- matches |>
-  filter(is.na(first_author_gender)) |>
+  filter(is.na(.data[[gender_col]])) |>
   left_join(abstracts |> select(abstract_id, author_name_first), by = "abstract_id") |>
   filter(!is.na(author_name_first), nchar(author_name_first) > 2) |>
   mutate(
