@@ -205,7 +205,7 @@ if (nrow(published) > 0 && "months_to_pub" %in% names(published)) {
     # Cox proportional hazards model (Cochrane MR000005 requirement)
     cox_vars <- intersect(
       c("is_rct", "log_sample_size", "is_academic", "is_us_based",
-        "session_type", "n_authors", "first_author_gender",
+        "session_type", "n_authors", "gender_unified",
         "practice_type", "is_multicenter", "has_funding"),
       names(km_data)
     )
@@ -276,7 +276,7 @@ if (nrow(model_data) >= 20 && length(unique(model_data$published_int)) >= 2) {
   # Expanded logistic regression (Cochrane MR000005: include presentation type,
   # author demographics, result direction, and temporal effects)
   extra_vars <- intersect(
-    c("session_type", "n_authors", "first_author_gender",
+    c("session_type", "n_authors", "gender_unified",
       "practice_type", "is_multicenter", "has_funding", "subspecialty"),
     names(model_data)
   )

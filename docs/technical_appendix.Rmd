@@ -147,7 +147,7 @@ Abstract conclusions were classified as positive, negative, neutral, or unclear 
 
 For each matched publication, author metadata was extracted from PubMed XML records via NCBI EFetch:
 
-- **Gender**: Two-pass inference. Pass 1: US Social Security Administration data (1930-2012 birth cohorts) via the R `gender` package. Pass 2: genderize.io API for international names not covered by SSA. Middle initials were stripped before lookup. Coverage: `r round(mean(!is.na(d$first_author_gender))*100,1)`%.
+- **Gender**: Two-pass inference. Pass 1: US Social Security Administration data (1930-2012 birth cohorts) via the R `gender` package. Pass 2: genderize.io API for international names not covered by SSA. Middle initials were stripped before lookup. Coverage: `r round(mean(!is.na(d$gender_unified))*100,1)`%.
 
 - **Practice type**: Affiliations were cross-referenced against 2,754 ACGME-accredited teaching hospital names (derived from a validated classifier with 95% precision for Tier 1 institutions). Regex fallback identified university/medical school signals. Community hospitals were classified only when no university affiliation appeared in any listed affiliation. Coverage: `r round(mean(!is.na(d$practice_type))*100,1)`%.
 
@@ -296,7 +296,7 @@ The primary output file (`output/abstracts_with_matches.csv`) contains `r ncol(d
 | Cochrane variables | is_multicenter, has_funding, stat_sig_reported, has_numeric_results, is_database_study, has_industry, has_trial_registration, has_irb_statement, result_positivity | NLP extraction |
 | Matching | best_pmid, best_score, classification, has_tie, n_candidates, 10 score components | Pipeline scoring |
 | Publication | pub_title, pub_journal, pub_year, pub_doi, pub_first_author, months_to_pub, pub_type_canonical | PubMed |
-| Author demographics | first_author_gender, first_author_state, first_author_acog_district, practice_type, subspecialty, career_stage, n_unique_affiliations | PubMed XML + SSA + ACGME |
+| Author demographics | gender_unified, first_author_state, first_author_acog_district, practice_type, subspecialty, career_stage, n_unique_affiliations | PubMed XML + SSA + ACGME |
 
 ### A9.3 Stress Testing
 
@@ -440,6 +440,97 @@ The NPI matching approach has several inherent limitations:
 3. **Name changes.** Authors who changed surnames (e.g., after marriage) between abstract presentation and ABOG certification will not match unless the ABOG record reflects the name used at the time of presentation.
 
 4. **Single-candidate relaxation risk.** While the sole-candidate assumption is probabilistically sound, it is possible for a name collision to occur with a non-presenting physician who happens to share the same uncommon name and initial. The 35-point minimum score guard and downstream manual audit mitigate this risk.
+
+### A10.11 Coauthor Triangulation for Name Disambiguation
+
+To resolve initials-only first names (e.g., "Y.S. Lee") into full given names amenable to gender inference, we attempted coauthor triangulation via PubMed co-publication search. The approach exploits the observation that coauthors who appear together on an AAGL abstract may also have co-published a PubMed-indexed article where the first author's full given name is recorded in the MEDLINE XML `<ForeName>` field.
+
+**Method.** For each author missing gender whose `authors_raw` field listed at least two coauthors, we constructed a PubMed query pairing the first author's surname with a coauthor's surname using the `[AU]` field tag (e.g., `"lee"[AU] AND "park"[AU]`). We attempted two coauthor strategies sequentially:
+
+1. **Senior author triangulation** (`R/10f`): paired the first author with the last-listed (senior) author.
+2. **Second author triangulation** (`R/10g`): paired the first author with the second-listed author, hypothesizing that immediate collaborators (co-residents, research partners) would share more co-publications than a senior author who may be a department chair.
+
+For queries returning 1–10 PubMed results, we fetched the first article's XML and extracted the `<ForeName>` of the author whose `<LastName>` matched the first author. Pairs sharing the same surname were excluded to prevent false matches. Resolved names underwent gender inference via SSA baby-name data and an international gender lookup table (n = 300+ curated names).
+
+**Results.** Senior author triangulation resolved 2 of 300 target names; second author triangulation resolved 0 of 789 targets (after excluding same-surname pairs). The near-zero yield reflects two features of the target population: (1) authors still missing gender at this pipeline stage are predominantly international researchers (East Asian, South Asian, Middle Eastern) whose AAGL collaborators rarely co-publish together in PubMed-indexed journals, and (2) common East Asian surnames (Chen, Kim, Lee, Li, Wang) produce non-specific PubMed queries even when paired with a coauthor, necessitating the same-surname exclusion filter.
+
+**Conclusion.** Coauthor triangulation via PubMed is not effective for this population. Three supplementary strategies were implemented to recover full first names and assign gender for the remaining authors, described below.
+
+### A10.12 Strategy 2: PubMed Author Search with Institutional Anchor (Script `09f`)
+
+For each author still lacking gender whose `affiliation_raw` was non-empty, we constructed a PubMed query combining the author's last name and initials with an institution keyword extracted from the affiliation string. The affiliation was split on `|` (taking the first listed institution), tokenized on commas, and the first non-departmental, non-geographic token was used as the anchor (e.g., "Department of Obstetrics, University of Pittsburgh, Pittsburgh, PA" → "University of Pittsburgh").
+
+The PubMed query took the form:
+
+```
+"Guido RS"[Author] AND "University of Pittsburgh"[Affiliation]
+```
+
+The returned XML was parsed with `xml2`; the `<ForeName>` of the author whose `<LastName>` and `<Initials>` matched the query was extracted and taken as the full first name. Results were cached at `data/cache/pubmed_author/<last>_<init>.rds`. This strategy recovered full first names for 132 of 225 targets (58.7%), resolving gender for 109 authors, with a net gain of 14 new gender values after coalescing with previously assigned values.
+
+### A10.13 Strategy 3: ORCID Person Record Lookup (Script `09g`)
+
+For abstracts where a valid ORCID iD had been assigned during the Step 5g enrichment (`09e_enrich_orcid.R`), the corresponding cached person record (`data/cache/orcid/<orcid_id>_person.rds`) was read locally — no additional API calls were made. The `given-names` value from the ORCID name object was extracted and the first word taken as the first name (e.g., "Deborah A" → "Deborah"). Of 174 ORCID-matched abstracts processed, 55 had a publicly listed given name in their ORCID profile. Gender inference via SSA and genderize.io resolved 38 of those, with a net gain of 27 new gender values.
+
+### A10.14 Strategy 4: OB/GYN Journal Publication Search (Script `09h`)
+
+The most productive supplementary strategy searched PubMed for any paper by the first author in a curated list of 17 major OB/GYN and minimally invasive surgery journals, without requiring that the paper be the AAGL abstract itself. The premise is that many AAGL presenters, even if they never published the presented abstract, have published other work in the OB/GYN literature — and those indexed articles contain the full `<ForeName>` in MEDLINE XML.
+
+**Query construction.** For each author with last name `last` and initials `init`, the query was:
+
+```
+"<last> <init>"[Author] AND (<journal_filter>)
+```
+
+where `<journal_filter>` was a disjunction of 16 journal title abbreviations using the `[ta]` field tag:
+
+```
+("Am J Obstet Gynecol"[ta] OR "Obstet Gynecol"[ta] OR
+ "J Minim Invasive Gynecol"[ta] OR "Fertil Steril"[ta] OR
+ "Gynecol Oncol"[ta] OR "Female Pelvic Med Reconstr Surg"[ta] OR
+ "Int J Gynaecol Obstet"[ta] OR "BJOG"[ta] OR
+ "Eur J Obstet Gynecol Reprod Biol"[ta] OR "J Gynecol Oncol"[ta] OR
+ "Reprod Sci"[ta] OR "Contraception"[ta] OR "Hum Reprod"[ta] OR
+ "Menopause"[ta] OR "Ultrasound Obstet Gynecol"[ta] OR "JSLS"[ta])
+```
+
+Up to 5 PubMed records were fetched for each query. The XML was scanned for an `<Author>` node whose `<LastName>` and `<Initials>` matched the query terms; when found, the `<ForeName>` was extracted and its first word retained.
+
+**Illustrative examples.** The table below shows representative author-name recoveries:
+
+| AAGL recorded name | PubMed query | Full first name recovered | Gender | Probability |
+|---|---|---|---|---|
+| R.S. Guido | `"Guido RS"[Author] AND (JMIG[ta] OR AJOG[ta] OR ...)` | Richard | male | 99.6% |
+| E. Banks | `"Banks E"[Author] AND (...)` | Erika | female | 99.6% |
+| K.N. Wright | `"Wright KN"[Author] AND (...)` | Kelly | female | 86.3% |
+| P. Messori | `"Messori P"[Author] AND (...)` | Pietro | male | 100% |
+| D. Lum | `"Lum D"[Author] AND (...)` | Deirdre | female | 100% |
+| T. Singer | `"Singer T"[Author] AND (...)` | Tomer | male | 100% |
+
+Results were cached at `data/cache/pubmed_obgyn/<last>_<init>.rds` to allow instant re-runs.
+
+**Results.** Of 684 unique author last-name/initial pairs without gender, 446 (65.2%) yielded a full first name. Gender was inferred for 380 of those via SSA (Pass 1) and genderize.io (Pass 2), comprising 208 female and 172 male authors. The combined four-strategy cascade brought total first-author gender coverage from 202/1,067 (18.9%) after Step 09c to **609/1,067 (57.1%)** — crossing the 50% threshold used as the inclusion criterion for logistic regression in the primary analysis.
+
+### A10.15 Strategy 5: OpenAlex Works Search (Script `09i`)
+
+As a complement to the PubMed-based search in Strategy 4, the same journal-restricted approach was applied to the OpenAlex works API. OpenAlex indexes approximately 250 million works across all fields and may include papers absent from MEDLINE — older articles not backfilled into PubMed, papers from journals with incomplete MEDLINE indexing, and some author-manuscript deposits — making it a non-redundant second source.
+
+**Query construction.** For each author still missing gender, an HTTP GET request was issued to the OpenAlex works endpoint filtered by journal ISSN and author last name:
+
+```
+GET https://api.openalex.org/works
+  ?filter=primary_location.source.issn:<ISSN1>|<ISSN2>|...,
+          raw_author_name.search:<last>
+  &select=id,authorships
+  &per_page=10
+  &mailto=tyler.muffly@dhha.org
+```
+
+The `raw_author_name.search` filter performs a full-text search over the raw author string as it appears in the original paper (e.g., "Richard S. Guido"), allowing retrieval even when the author has not been disambiguated to an OpenAlex author ID. The same 17 journal ISSNs used in Strategy 4 were supplied as a pipe-delimited OR filter.
+
+**Match logic.** For each returned authorship, two conditions were required: (1) the raw author name ends with the queried last name (case-insensitive), and (2) the first character of the OpenAlex `display_name` matches the first character of our recorded initials. When both conditions held, the first word of `display_name` was taken as the full first name. Results were cached at `data/cache/openalex_author/<last>_<init>.rds`.
+
+**Gender inference.** Recovered first names were classified by SSA (Pass 1) and genderize.io (Pass 2), identical to Strategies 2–4. Gender values were coalesced with the existing `gender_unified` column — existing assignments were never overwritten.
 
 ## A11. Expanding the Pipeline to Other Subspecialties
 
@@ -602,11 +693,11 @@ A fully assembled 10-society OB/GYN abstract-to-publication dataset would enable
 
 **Hypothesis 3: Publication bias is consistent across subspecialties.** The positive result publication advantage observed in AAGL (HR for positive results in Cox model: direction and magnitude to be confirmed from the current analysis) is replicated across societies. If the hazard ratio for positive-result abstracts is consistent across subspecialties (I² < 25% in random-effects meta-analysis across societies), this supports a domain-general publication bias mechanism rather than subspecialty-specific editorial norms. *Covariate:* `result_positivity` (already extracted by NLP in the current pipeline).
 
-**Hypothesis 4: Gender parity trends differ by subspecialty.** SMFM and NASPAG — the two OB/GYN subspecialties with the highest proportion of women practitioners — will show earlier gender parity in first authorship than AAGL (historically male-dominated MIGS) or SGO (historically male-dominated surgical oncology). *Available covariates:* `first_author_gender` (genderize.io), `congress_year`, society. *Expected pattern based on prior literature:* 2–4% annual increase in female first-authorship in surgical subspecialties (Rao et al. 2021); parity already achieved in SMFM by 2015 (Bhatt et al. 2019 reported 55% female at SMFM meetings).
+**Hypothesis 4: Gender parity trends differ by subspecialty.** SMFM and NASPAG — the two OB/GYN subspecialties with the highest proportion of women practitioners — will show earlier gender parity in first authorship than AAGL (historically male-dominated MIGS) or SGO (historically male-dominated surgical oncology). *Available covariates:* `gender_unified` (genderize.io), `congress_year`, society. *Expected pattern based on prior literature:* 2–4% annual increase in female first-authorship in surgical subspecialties (Rao et al. 2021); parity already achieved in SMFM by 2015 (Bhatt et al. 2019 reported 55% female at SMFM meetings).
 
 **Hypothesis 5: RCT design advantage is attenuated in educational research.** The AAGL Cox model shows a hazard ratio of 2.36 for RCT vs. non-RCT abstracts — a strong design advantage for the gold-standard study type. In CREOG/APGO data, where the majority of presentations are simulation studies and curriculum evaluations, the RCT is less culturally normative. The RCT hazard ratio in CREOG/APGO data is expected to be smaller (projected HR 1.4–1.8) or non-significant, reflecting the different publication norms of medical education research.
 
-**Combined dataset covariate matrix.** A fully assembled multi-society dataset would contain the following covariates for each abstract: `society` (10-level factor), `platform` (ScienceDirect/LWW/web), `doi_type` (individual/collection/none), `congress_year` (2012–2023), `n_abstracts_that_year` (society-year abstract volume), `first_author_full_name_available` (logical), `result_positivity`, `is_rct`, `study_design`, `research_category`, `first_author_gender`, `first_author_country`, `first_author_career_stage`, `practice_type`, `subspecialty_npi`, `has_industry_funding`, `has_trial_registration`, and all matching-quality flags (`classification`, `best_score`, `n_candidates`, `has_tie`). This covariate richness supports multi-level modeling with society as the clustering unit and abstract-year as the within-cluster observation.
+**Combined dataset covariate matrix.** A fully assembled multi-society dataset would contain the following covariates for each abstract: `society` (10-level factor), `platform` (ScienceDirect/LWW/web), `doi_type` (individual/collection/none), `congress_year` (2012–2023), `n_abstracts_that_year` (society-year abstract volume), `first_author_full_name_available` (logical), `result_positivity`, `is_rct`, `study_design`, `research_category`, `gender_unified`, `first_author_country`, `first_author_career_stage`, `practice_type`, `subspecialty_npi`, `has_industry_funding`, `has_trial_registration`, and all matching-quality flags (`classification`, `best_score`, `n_candidates`, `has_tie`). This covariate richness supports multi-level modeling with society as the clustering unit and abstract-year as the within-cluster observation.
 
 ### A11.10 SMFM Abstract Supplement URLs (2013–2023)
 

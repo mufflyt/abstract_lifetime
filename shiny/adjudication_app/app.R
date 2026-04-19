@@ -184,10 +184,12 @@ load_data <- function(use_gs = FALSE, sheet_id = NULL) {
   } else tibble(abstract_id = character(), abstract_text = character(),
                  authors_raw = character())
 
-  # Load decisions: Google Sheets first, then CSV fallback
+  # Load decisions: Google Sheets first, then CSV fallback.
+  # dedup_decisions() runs immediately so AUTO rows are dropped for any
+  # abstract that already has a human decision in the sheet.
   decisions <- NULL
   if (use_gs && !is.null(sheet_id)) {
-    decisions <- gs_read_decisions(sheet_id)
+    decisions <- dedup_decisions(gs_read_decisions(sheet_id))
   }
   if (is.null(decisions)) {
     decisions <- if (file.exists(decisions_path)) {
@@ -196,7 +198,8 @@ load_data <- function(use_gs = FALSE, sheet_id = NULL) {
         if (!col %in% names(d)) d[[col]] <- NA_character_
       }
       d |> mutate(across(everything(), as.character),
-                  reviewer = if_else(is.na(reviewer) | reviewer == "NA", "AUTO", reviewer))
+                  reviewer = if_else(is.na(reviewer) | reviewer == "NA", "AUTO", reviewer)) |>
+        dedup_decisions()
     } else {
       empty_decisions()
     }
@@ -211,14 +214,24 @@ load_data <- function(use_gs = FALSE, sheet_id = NULL) {
   )
 }
 
-#' Deduplicate decisions: keep latest per (abstract_id, reviewer) pair
+#' Deduplicate decisions: keep latest per (abstract_id, reviewer) pair.
+#' If any human reviewer has decided an abstract, all AUTO rows for that
+#' abstract are dropped — the human decision supersedes the algorithm.
 dedup_decisions <- function(decisions) {
   if (nrow(decisions) == 0) return(decisions)
-  decisions |>
+  # Keep latest per (abstract_id, reviewer)
+  deduped <- decisions |>
     group_by(abstract_id, reviewer) |>
     arrange(desc(review_timestamp)) |>
     slice(1) |>
     ungroup()
+  # Identify abstracts that now have at least one human decision
+  human_reviewed <- deduped |>
+    filter(reviewer != "AUTO") |>
+    pull(abstract_id) |>
+    unique()
+  # Drop AUTO rows for those abstracts
+  deduped |> filter(!(abstract_id %in% human_reviewed & reviewer == "AUTO"))
 }
 
 # --- JavaScript for keyboard shortcuts ---
@@ -690,22 +703,21 @@ server <- function(input, output, session) {
   })
 
   # --- Backend badge ---
+  GOOGLE_SHEET_URL <- "https://docs.google.com/spreadsheets/d/1d2YAsndMxCPK0AQMHw4bgKp3glFg_znGj8Riq5YpfaI/edit"
+
   output$backend_badge <- renderUI({
-    if (use_gs()) {
-      sid <- sheet_id()
-      url <- paste0("https://docs.google.com/spreadsheets/d/", sid)
-      tags$a(href = url, target = "_blank", class = "btn btn-sm btn-outline-success w-100 text-decoration-none",
-             icon("cloud"), " Open Google Sheet ", icon("up-right-from-square"))
+    backend_label <- if (use_gs()) {
+      span(class = "badge bg-success mb-1", icon("cloud"), " Google Sheets connected")
     } else {
-      csv_path <- app_path("output", "manual_review_decisions.csv")
-      tags$div(
-        span(class = "badge bg-secondary", icon("file"), " Local CSV"),
-        tags$div(class = "small mt-1", style = "word-break: break-all;",
-          tags$a(href = paste0("file://", csv_path), target = "_blank",
-                 csv_path)
-        )
-      )
+      span(class = "badge bg-secondary mb-1", icon("file"), " Local CSV fallback")
     }
+
+    tagList(
+      backend_label,
+      tags$a(href = GOOGLE_SHEET_URL, target = "_blank",
+             class = "btn btn-sm btn-outline-success w-100 text-decoration-none mt-1",
+             icon("table"), " Open Google Sheet ", icon("up-right-from-square"))
+    )
   })
 
   # --- Conflict detection ---
@@ -813,7 +825,8 @@ server <- function(input, output, session) {
     }
     ids <- rq$abstract_id
     if (isTRUE(input$filter_unreviewed)) {
-      reviewed <- unique(d$decisions$abstract_id)
+      human_decisions <- d$decisions |> filter(reviewer != "AUTO")
+      reviewed <- unique(human_decisions$abstract_id)
       ids <- ids[!ids %in% reviewed]
     }
     ids
@@ -821,7 +834,7 @@ server <- function(input, output, session) {
 
   # --- Build selector labels with checkmarks + conflict dots ---
   make_choices <- function(ids, d) {
-    reviewed <- unique(d$decisions$abstract_id)
+    reviewed <- unique(d$decisions$abstract_id[d$decisions$reviewer != "AUTO"])
     cs <- conflict_status()
     class_glyph <- c(definite = "[D]", probable = "[P]", possible = "[?]",
                      no_match = "[x]", excluded = "[E]", no_candidates = "[0]")
@@ -934,11 +947,14 @@ server <- function(input, output, session) {
       if (nrow(own) > 0) prev <- own
     }
 
-    if (nrow(prev) > 0) {
-      updateRadioButtons(session, "decision", selected = prev$manual_decision[1])
-      pmid_val <- if (!is.na(prev$manual_pmid[1])) as.character(prev$manual_pmid[1]) else ""
+    # Only pre-populate from human decisions — AUTO entries are algorithm
+    # suggestions and should not appear as if the reviewer already decided.
+    human_prev <- prev |> dplyr::filter(reviewer != "AUTO")
+    if (nrow(human_prev) > 0) {
+      updateRadioButtons(session, "decision", selected = human_prev$manual_decision[1])
+      pmid_val <- if (!is.na(human_prev$manual_pmid[1])) as.character(human_prev$manual_pmid[1]) else ""
       updateTextInput(session, "manual_pmid", value = pmid_val)
-      notes_val <- if (!is.na(prev$reviewer_notes[1])) prev$reviewer_notes[1] else ""
+      notes_val <- if (!is.na(human_prev$reviewer_notes[1])) human_prev$reviewer_notes[1] else ""
       updateTextAreaInput(session, "notes", value = notes_val)
     } else {
       # No prior human decision — pre-fill from algorithm classification so
@@ -994,7 +1010,8 @@ server <- function(input, output, session) {
 
     na <- get("n_authors"); nua <- get("n_unique_affiliations")
     st <- get("first_author_state"); dist <- get("first_author_acog_district")
-    g  <- get("first_author_gender")
+    g  <- get("gender_unified")
+    if (is.na(g)) g <- get("first_author_gender")
 
     bits <- list()
     if (!is.na(na))  bits[[length(bits)+1]] <- sprintf("%s authors", na)
@@ -1464,7 +1481,7 @@ server <- function(input, output, session) {
     req(d)
     ids <- visible_ids()
     total <- length(ids)
-    reviewed <- sum(ids %in% unique(d$decisions$abstract_id))
+    reviewed <- sum(ids %in% unique(d$decisions$abstract_id[d$decisions$reviewer != "AUTO"]))
     sprintf("%d / %d (%.0f%%)", reviewed, total,
             if (total > 0) reviewed / total * 100 else 0)
   })
@@ -1517,24 +1534,7 @@ server <- function(input, output, session) {
       }
     }
 
-    # Check for existing decision by a DIFFERENT reviewer — show confirmation
-    dd <- decisions_dedup()
-    existing <- dd |> filter(abstract_id == abs_id, reviewer != initials)
-    if (nrow(existing) > 0) {
-      other_decisions <- paste(existing$reviewer, "->", existing$manual_decision, collapse = ", ")
-      showModal(modalDialog(
-        title = "Other reviewer(s) have already decided",
-        p(sprintf("Existing decisions: %s", other_decisions)),
-        p("Your decision will be recorded alongside theirs. Continue?"),
-        footer = tagList(
-          actionButton("confirm_save", "Save Anyway", class = "btn-primary"),
-          modalButton("Cancel")
-        )
-      ))
-      return()
-    }
-
-    # No conflict — save directly
+    # Save directly — all reviewer decisions are kept
     do_save(abs_id, initials, pmid_input)
   })
 
@@ -1640,7 +1640,8 @@ server <- function(input, output, session) {
       n_unique_affiliations    = pick(rq_row, "n_unique_affiliations"),
       first_author_state       = pick(rq_row, "first_author_state"),
       first_author_acog_district = pick(rq_row, "first_author_acog_district"),
-      first_author_gender      = pick(rq_row, "first_author_gender")
+      first_author_gender      = coalesce(pick(rq_row, "gender_unified"),
+                                            pick(rq_row, "first_author_gender"))
     )
 
     saved_to_gs <- FALSE
@@ -1651,14 +1652,20 @@ server <- function(input, output, session) {
       }
     }
 
-    # Always update local data; also write local CSV as backup/fallback
-    updated_decisions <- bind_rows(d$decisions, new_decision)
+    # Always update local data; also write local CSV as backup/fallback.
+    # dedup_decisions() removes AUTO rows for any abstract that now has a
+    # human decision, so the in-memory state stays clean immediately.
+    updated_decisions <- dedup_decisions(bind_rows(d$decisions, new_decision))
 
     if (!saved_to_gs) {
-      # Write to local CSV (replace old row for same abstract_id + reviewer)
-      local_dedup <- dedup_decisions(updated_decisions)
-      write_csv(local_dedup, app_path("output", "manual_review_decisions.csv"))
+      write_csv(updated_decisions, app_path("output", "manual_review_decisions.csv"))
     }
+
+    # Capture next abstract BEFORE data(d) removes abs_id from visible_ids
+    pre_save_ids <- isolate(visible_ids())
+    pre_save_idx <- match(abs_id, pre_save_ids)
+    next_id <- if (!is.na(pre_save_idx) && pre_save_idx < length(pre_save_ids))
+      pre_save_ids[pre_save_idx + 1] else NULL
 
     d$decisions <- updated_decisions
     data(d)
@@ -1669,12 +1676,18 @@ server <- function(input, output, session) {
       type = "message"
     )
 
-    # Auto-advance within visible list
-    ids <- visible_ids()
-    current_idx <- match(abs_id, ids)
-    if (!is.na(current_idx) && current_idx < length(ids)) {
-      updateSelectInput(session, "abstract_select", selected = ids[current_idx + 1])
+    # Auto-advance using position captured before save removed abs_id from list
+    if (!is.null(next_id)) {
+      updateSelectInput(session, "abstract_select", selected = next_id)
     }
+
+    # Scroll all panels to top
+    shinyjs::runjs("window.scrollTo(0, 0); $('.card-body').scrollTop(0);")
+
+    # Reset decision inputs for the next abstract
+    updateRadioButtons(session, "decision", selected = "skip")
+    updateTextInput(session, "manual_pmid", value = "")
+    updateTextAreaInput(session, "notes", value = "")
   }
 
   # --- Refresh ---

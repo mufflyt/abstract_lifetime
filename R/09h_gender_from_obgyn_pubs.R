@@ -51,6 +51,7 @@ OBGYN_JOURNALS <- paste(
   '"Hum Reprod"[ta]',
   '"Menopause"[ta]',
   '"Ultrasound Obstet Gynecol"[ta]',
+  '"JSLS"[ta]',
   sep = " OR "
 )
 JOURNAL_FILTER <- paste0("(", OBGYN_JOURNALS, ")")
@@ -214,28 +215,7 @@ print(table(gender_tbl$obgyn_gender, useNA = "ifany"))
 write_csv(gender_tbl, out_path)
 cli_alert_success("Wrote {out_path}")
 
-# ── Merge (coalesce — never overwrite existing gender) ────────────────────────
-if ("obgyn_first_name" %in% names(matches)) matches[["obgyn_first_name"]] <- NULL
-
-matches <- matches |>
-  left_join(gender_tbl |> select(abstract_id, obgyn_first_name,
-                                  gender_new = obgyn_gender,
-                                  gender_p_new = obgyn_gender_p),
-            by = "abstract_id") |>
-  mutate(
-    first_author_gender   = coalesce(first_author_gender, gender_new),
-    first_author_gender_p = coalesce(first_author_gender_p, gender_p_new)
-  ) |>
-  select(-gender_new, -gender_p_new)
-
-n_total  <- sum(!is.na(matches$first_author_gender))
-n_female <- sum(matches$first_author_gender == "female", na.rm = TRUE)
-n_male   <- sum(matches$first_author_gender == "male",   na.rm = TRUE)
-cli_alert_success(
-  "Total gender coverage: {n_total} / {nrow(matches)} ({round(n_total/nrow(matches)*100,1)}%) — {n_female}F / {n_male}M"
-)
-
-write_csv(matches, matches_path)
-cli_alert_success("Updated abstracts_with_matches.csv")
+# NOTE: Merge into abstracts_with_matches.csv is handled by 10e_merge_demographics.R
+# This script only writes its sidecar CSV (gender_from_obgyn_pubs.csv).
 
 } # end nrow(name_tbl) > 0

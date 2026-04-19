@@ -243,25 +243,5 @@ print(table(gender_tbl$first_author_gender, useNA = "ifany"))
 write_csv(gender_tbl, here("data", "processed", "gender_from_pubmed.csv"))
 cli_alert_success("Wrote gender_from_pubmed.csv ({nrow(gender_tbl)} rows)")
 
-# ── Merge into abstracts_with_matches.csv ──────────────────────────────────────
-# Preserve existing gender where present; fill NAs from PubMed lookup
-if ("pubmed_full_first" %in% names(matches)) matches[["pubmed_full_first"]] <- NULL
-
-new_gender <- gender_tbl |>
-  select(abstract_id, pubmed_full_first,
-         gender_new = first_author_gender,
-         gender_p_new = first_author_gender_p)
-
-matches <- matches |>
-  left_join(new_gender, by = "abstract_id") |>
-  mutate(
-    first_author_gender   = coalesce(first_author_gender, gender_new),
-    first_author_gender_p = coalesce(first_author_gender_p, gender_p_new)
-  ) |>
-  select(-gender_new, -gender_p_new)
-
-n_gender <- sum(!is.na(matches$first_author_gender))
-cli_alert_success("Gender coverage in abstracts_with_matches: {n_gender} / {nrow(matches)} ({round(n_gender/nrow(matches)*100,1)}%)")
-
-write_csv(matches, matches_path)
-cli_alert_success("Updated abstracts_with_matches.csv")
+# NOTE: Merge into abstracts_with_matches.csv is handled by 10e_merge_demographics.R
+# This script only writes its sidecar CSV (gender_from_pubmed.csv).

@@ -1,12 +1,15 @@
-# 10f_senior_author_triangulation.R — Resolve first author full names via
-# PubMed co-author search with the senior (last listed) author.
+# 10g_second_author_triangulation.R — Resolve first author full names via
+# PubMed co-author search with the SECOND listed author.
 #
-# For 300 authors missing gender where we have a senior author name:
-# Search PubMed for "FirstAuthorLastName[AU] AND SeniorAuthorLastName[AU]"
+# For authors missing gender where we have a second coauthor name:
+# Search PubMed for "FirstAuthorLastName[AU] AND SecondAuthorLastName[AU]"
 # Extract the first author's full first name from the PubMed XML result.
 # Then run gender inference on that name.
 #
-# Writes: data/processed/senior_triangulation.csv
+# Rationale: the second author is typically a closer collaborator (co-resident,
+# research partner) than the senior author, so co-publications are more likely.
+#
+# Writes: data/processed/second_author_triangulation.csv
 # Updates: output/abstracts_with_matches.csv (gender_unified)
 
 suppressPackageStartupMessages({
@@ -16,33 +19,34 @@ suppressPackageStartupMessages({
 
 source(here("R", "utils_text.R"))
 
-cli_h1("Senior Author Triangulation for Name Resolution")
+cli_h1("Second Author Triangulation for Name Resolution")
 
 d <- read_csv(here("output", "abstracts_with_matches.csv"), show_col_types = FALSE)
 abs <- read_csv(here("data", "processed", "abstracts_cleaned.csv"), show_col_types = FALSE)
 
-# Target: missing gender with parseable senior author
-missing <- d |> filter(is.na(gender_unified))
+# Target: missing gender with parseable second author
+missing <- d |> filter(is.na(first_author_gender))
 missing_abs <- abs |>
   filter(abstract_id %in% missing$abstract_id,
          !is.na(authors_raw), str_count(authors_raw, ",") >= 1) |>
   mutate(
     parts = str_split(authors_raw, ",\\s*"),
-    senior_raw = sapply(parts, function(p) {
+    second_raw = sapply(parts, function(p) {
       p <- str_squish(p[!str_detect(p, "\\.\\.\\.")])
       p <- p[nchar(p) > 1]
-      if (length(p) >= 2) tail(p, 1) else NA_character_
+      if (length(p) >= 2) p[2] else NA_character_
     }),
     first_norm = vapply(author_name_first, normalize_author, character(1)),
-    senior_norm = vapply(senior_raw, normalize_author, character(1)),
+    second_norm = vapply(second_raw, normalize_author, character(1)),
     first_last = trimws(str_extract(first_norm, "^[a-z][a-z '-]+")),
-    senior_last = trimws(str_extract(senior_norm, "^[a-z][a-z '-]+"))
+    second_last = trimws(str_extract(second_norm, "^[a-z][a-z '-]+"))
   ) |>
-  filter(!is.na(first_last), !is.na(senior_last),
-         nchar(first_last) >= 2, nchar(senior_last) >= 2) |>
-  select(abstract_id, author_name_first, senior_raw, first_last, senior_last)
+  filter(!is.na(first_last), !is.na(second_last),
+         nchar(first_last) >= 2, nchar(second_last) >= 2,
+         first_last != second_last) |>  # skip same-surname pairs (false matches)
+  select(abstract_id, author_name_first, second_raw, first_last, second_last)
 
-cli_alert_info("Targets: {nrow(missing_abs)} authors with senior author")
+cli_alert_info("Targets: {nrow(missing_abs)} authors with second author")
 
 has_key <- nchar(Sys.getenv("ENTREZ_KEY", "")) > 0
 delay <- if (has_key) 0.1 else 0.35
@@ -52,8 +56,8 @@ for (i in seq_len(nrow(missing_abs))) {
   row <- missing_abs[i, ]
   if (i %% 50 == 0) cli_alert_info("  {i}/{nrow(missing_abs)}")
 
-  # Search PubMed: first author + senior author
-  query <- sprintf('"%s"[AU] AND "%s"[AU]', row$first_last, row$senior_last)
+  # Search PubMed: first author + second author
+  query <- sprintf('"%s"[AU] AND "%s"[AU]', row$first_last, row$second_last)
 
   Sys.sleep(delay)
   search_result <- tryCatch(
@@ -93,7 +97,7 @@ for (i in seq_len(nrow(missing_abs))) {
     results[[length(results) + 1]] <- tibble(
       abstract_id = row$abstract_id,
       aagl_author = row$author_name_first,
-      senior_author = row$senior_raw,
+      second_author = row$second_raw,
       resolved_first_name = resolved_first,
       pubmed_query = query,
       n_results = length(search_result$ids),
@@ -103,7 +107,7 @@ for (i in seq_len(nrow(missing_abs))) {
 }
 
 resolved <- bind_rows(results)
-cli_alert_success("Resolved {nrow(resolved)} first names via senior author triangulation")
+cli_alert_success("Resolved {nrow(resolved)} first names via second author triangulation")
 
 if (nrow(resolved) > 0) {
   # Run gender inference on resolved names
@@ -148,7 +152,7 @@ if (nrow(resolved) > 0) {
   cli_alert_info("Gender resolved: {n_gendered} / {nrow(resolved)}")
 
   # Save sidecar CSV
-  write_csv(resolved, here("data", "processed", "senior_triangulation.csv"))
+  write_csv(resolved, here("data", "processed", "second_author_triangulation.csv"))
 
   # NOTE: Merge into abstracts_with_matches.csv is handled by 10e_merge_demographics.R
 
@@ -156,8 +160,10 @@ if (nrow(resolved) > 0) {
   cli_alert_info("Sample resolved names:")
   for (k in seq_len(min(15, nrow(resolved)))) {
     cat(sprintf("  %-20s + %-20s -> %s (%s)\n",
-                resolved$aagl_author[k], resolved$senior_author[k],
+                resolved$aagl_author[k], resolved$second_author[k],
                 resolved$resolved_first_name[k],
                 if (is.na(resolved$tri_gender[k])) "?" else resolved$tri_gender[k]))
   }
+} else {
+  write_csv(tibble(), here("data", "processed", "second_author_triangulation.csv"))
 }

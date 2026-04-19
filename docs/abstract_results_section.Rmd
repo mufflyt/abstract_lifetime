@@ -36,8 +36,8 @@ med_ttp <- ttp$value[ttp$metric == "median_months"]
 q1_ttp <- ttp$value[ttp$metric == "q1_months"]
 q3_ttp <- ttp$value[ttp$metric == "q3_months"]
 
-n_female <- sum(d$first_author_gender == "female", na.rm = TRUE)
-n_male <- sum(d$first_author_gender == "male", na.rm = TRUE)
+n_female <- sum(d$gender_unified == "female", na.rm = TRUE)
+n_male <- sum(d$gender_unified == "male", na.rm = TRUE)
 n_gendered <- n_female + n_male
 pct_female <- round(n_female / n_gendered * 100, 1)
 

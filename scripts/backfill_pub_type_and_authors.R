@@ -32,7 +32,7 @@ push_cols <- intersect(
     "n_authors", "n_unique_affiliations", "n_authors_aagl",
     "first_author_last", "first_author_first",
     "first_author_state", "first_author_acog_district",
-    "first_author_country", "first_author_gender", "first_author_gender_p",
+    "first_author_country", "gender_unified", "gender_source",
     "practice_type", "subspecialty", "career_stage"
   ),
   names(matches)

@@ -104,6 +104,42 @@ source(here("R", "09g_gender_from_orcid.R"))
 cli_h2("Step 5h4: Gender from OB/GYN Publications")
 source(here("R", "09h_gender_from_obgyn_pubs.R"))
 
+# Step 5h5: Gender from OpenAlex works search (same journal list, different index)
+cli_h2("Step 5h5: Gender from OpenAlex Works Search")
+source(here("R", "09i_gender_from_openalex.R"))
+
+# Step 5h6: Gender from CMS Open Payments (Sunshine Act conference-window match)
+cli_h2("Step 5h6: Gender from Open Payments")
+source(here("R", "09j_gender_from_open_payments.R"))
+
+# Step 5h7: Consolidate all recovered first names into first_author_first
+cli_h2("Step 5h7: Consolidate first_author_first")
+local({
+  matches  <- readr::read_csv(here("output", "abstracts_with_matches.csv"), show_col_types = FALSE)
+  ac       <- readr::read_csv(here("data", "processed", "author_characteristics.csv"), show_col_types = FALSE)
+  pubmed_n <- readr::read_csv(here("data", "processed", "gender_from_pubmed.csv"), show_col_types = FALSE) |>
+    dplyr::filter(!is.na(pubmed_full_first), nchar(pubmed_full_first) >= 2) |>
+    dplyr::select(abstract_id, pubmed_full_first)
+  ac_names <- ac |>
+    dplyr::filter(!is.na(first_author_first)) |>
+    dplyr::select(abstract_id, ac_first = first_author_first)
+  matches <- matches |>
+    dplyr::left_join(pubmed_n, by = "abstract_id") |>
+    dplyr::left_join(ac_names, by = "abstract_id") |>
+    dplyr::mutate(first_author_first = dplyr::coalesce(
+      first_author_first, pubmed_full_first,
+      orcid_first_name, obgyn_first_name,
+      openalex_first_name, op_first_name, ac_first
+    )) |>
+    dplyr::select(-pubmed_full_first, -ac_first)
+  n_first  <- sum(!is.na(matches$first_author_first))
+  gender_col <- if ("gender_unified" %in% names(matches)) "gender_unified" else "first_author_gender"
+  n_gender <- sum(!is.na(matches[[gender_col]]))
+  orphan   <- sum(!is.na(matches[[gender_col]]) & is.na(matches$first_author_first))
+  cli::cli_alert_success("first_author_first: {n_first}/{nrow(matches)} | gender: {n_gender}/{nrow(matches)} | orphans: {orphan}")
+  readr::write_csv(matches, here("output", "abstracts_with_matches.csv"))
+})
+
 # Step 5i: Fidelity checks (abstract vs published paper comparison)
 cli_h2("Step 5i: Fidelity Checks")
 source(here("R", "09e_fidelity_checks.R"))
@@ -127,6 +163,15 @@ source(here("R", "07_make_tables.R"))
 # Step 8: Figures
 cli_h2("Step 8: Figures")
 source(here("R", "08_make_figures.R"))
+
+# Step 9: Deploy Shiny adjudication app
+cli_h2("Step 9: Deploy Shiny App")
+deploy_script <- here("shiny", "adjudication_app", "deploy.R")
+if (file.exists(deploy_script)) {
+  source(deploy_script)
+} else {
+  cli_alert_warning("Deploy script not found — skipping Shiny deploy")
+}
 
 cli_h1("Pipeline Complete")
 cli_alert_success("Results in: {here('output')}")

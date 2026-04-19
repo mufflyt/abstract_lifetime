@@ -158,8 +158,9 @@ test_that("gender coverage is at least 60%", {
   skip_if_not(path)
   d <- read_csv(path, show_col_types = FALSE)
 
-  if ("first_author_gender" %in% names(d)) {
-    pct <- mean(!is.na(d$first_author_gender))
+  gender_col <- if ("gender_unified" %in% names(d)) "gender_unified" else "first_author_gender"
+  if (gender_col %in% names(d)) {
+    pct <- mean(!is.na(d[[gender_col]]))
     expect_true(pct >= 0.60, label = "gender coverage >= 60%")
   }
 })

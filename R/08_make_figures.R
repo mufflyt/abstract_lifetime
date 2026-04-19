@@ -298,12 +298,12 @@ by_us <- results |>
 subgroup_data <- c(subgroup_data, list(by_us))
 
 # By gender
-if ("first_author_gender" %in% names(results)) {
+if ("gender_unified" %in% names(results)) {
   by_gen <- results |>
-    filter(!is.na(final_published), !is.na(first_author_gender)) |>
-    group_by(first_author_gender) |>
+    filter(!is.na(final_published), !is.na(gender_unified)) |>
+    group_by(gender_unified) |>
     summarise(n = n(), rate = mean(final_published) * 100, .groups = "drop") |>
-    mutate(category = "First Author Gender", subgroup = first_author_gender)
+    mutate(category = "First Author Gender", subgroup = gender_unified)
   subgroup_data <- c(subgroup_data, list(by_gen))
 }
 
@@ -354,7 +354,7 @@ if (file.exists(cox_path)) {
         term == "is_academicTRUE" ~ "Academic affiliation",
         term == "is_us_basedTRUE" ~ "US-based",
         term == "n_authors" ~ "Number of authors",
-        term == "first_author_gendermale" ~ "Male first author",
+        term == "gender_unifiedmale" ~ "Male first author",
         term == "practice_typecommunity" ~ "Community (vs Academic)",
         term == "practice_typemilitary_va" ~ "Military/VA (vs Academic)",
         term == "practice_typeprivate_practice" ~ "Private practice (vs Academic)",

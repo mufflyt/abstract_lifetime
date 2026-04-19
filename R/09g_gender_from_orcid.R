@@ -143,28 +143,5 @@ print(table(gender_tbl$orcid_gender, useNA = "ifany"))
 write_csv(gender_tbl, out_path)
 cli_alert_success("Wrote {out_path}")
 
-# ── Merge into abstracts_with_matches.csv (coalesce — never overwrite) ────────
-new_cols <- gender_tbl |>
-  select(abstract_id, orcid_first_name,
-         gender_orcid = orcid_gender,
-         gender_orcid_p = orcid_gender_p)
-
-if ("orcid_first_name" %in% names(matches)) matches[["orcid_first_name"]] <- NULL
-
-matches <- matches |>
-  left_join(new_cols, by = "abstract_id") |>
-  mutate(
-    first_author_gender   = coalesce(first_author_gender,   gender_orcid),
-    first_author_gender_p = coalesce(first_author_gender_p, gender_orcid_p)
-  ) |>
-  select(-gender_orcid, -gender_orcid_p)
-
-n_gender  <- sum(!is.na(matches$first_author_gender))
-n_female  <- sum(matches$first_author_gender == "female", na.rm = TRUE)
-n_male    <- sum(matches$first_author_gender == "male",   na.rm = TRUE)
-cli_alert_success(
-  "Total gender coverage: {n_gender} / {nrow(matches)} ({round(n_gender/nrow(matches)*100,1)}%) — {n_female}F / {n_male}M"
-)
-
-write_csv(matches, matches_path)
-cli_alert_success("Updated abstracts_with_matches.csv")
+# NOTE: Merge into abstracts_with_matches.csv is handled by 10e_merge_demographics.R
+# This script only writes its sidecar CSV (gender_from_orcid.csv).

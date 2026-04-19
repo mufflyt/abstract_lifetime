@@ -253,32 +253,8 @@ print(table(char_tbl$subspecialty, useNA = "ifany"))
 cli_alert_info("Career stage:")
 print(table(char_tbl$career_stage, useNA = "ifany"))
 
-# --- Merge into abstracts_with_matches.csv ---
-stale_cols <- intersect(names(matches),
-                        c("n_authors", "n_authors_aagl", "n_unique_affiliations",
-                          "first_author_last", "first_author_first",
-                          "first_author_state", "first_author_country",
-                          "first_author_acog_district",
-                          "first_author_gender", "first_author_gender_p",
-                          "practice_type", "subspecialty", "career_stage"))
-for (c in stale_cols) matches[[c]] <- NULL
-matches <- matches |> left_join(char_tbl, by = "abstract_id")
-
-# Blank PubMed-derived author demographics for no_match/possible/no_candidates
-# abstracts. These demographics come from the WRONG paper's authors — the
-# matched candidate is not the actual published version of the abstract.
-pubmed_author_cols <- c("first_author_last", "first_author_first",
-                        "first_author_country", "first_author_state",
-                        "first_author_gender", "first_author_gender_p",
-                        "first_author_acog_district",
-                        "practice_type", "subspecialty", "career_stage",
-                        "n_unique_affiliations")
-wrong_match <- matches$classification %in% c("no_match", "no_candidates", "possible")
-n_blanked <- sum(wrong_match)
-for (col in intersect(pubmed_author_cols, names(matches))) {
-  matches[[col]][wrong_match] <- NA
-}
-cli_alert_info("Blanked {n_blanked} rows of PubMed-derived demographics (no_match/possible/no_candidates)")
-
-write_csv(matches, matches_path)
-cli_alert_success("Merged {ncol(char_tbl) - 1} author columns into abstracts_with_matches.csv")
+# NOTE: Merge into abstracts_with_matches.csv and conditional blanking are now
+# handled by 10e_merge_demographics.R. This script only writes its sidecar CSV
+# (author_characteristics.csv). The blanking of PubMed-derived demographics for
+# no_match/possible/no_candidates is done reversibly in the orchestrator.
+cli_alert_success("author_characteristics.csv ready for merge by 10e_merge_demographics.R")
