@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![R >= 4.4](https://img.shields.io/badge/R-%3E%3D%204.4-blue.svg)](https://www.r-project.org/)
-[![Tests: 388 passing, 3 failing](https://img.shields.io/badge/tests-388%20passing%2C%203%20failing-yellow.svg)](tests/testthat/)
+[![Tests: 392 passing](https://img.shields.io/badge/tests-392%20passing-brightgreen.svg)](tests/testthat/)
 [![Shiny App](https://img.shields.io/badge/Shiny-Live%20App-orange.svg)](https://mufflyt.shinyapps.io/aagl-adjudication/)
 
 **Publication Rate, Time to Publication, and Predictors of Full Publication Among Oral Presentations at the AAGL Global Congress, 2012-2023**
@@ -20,6 +20,12 @@ peer-reviewed publication (174 of 1,067; 95% CI 15.0–19.6). A further 55 remai
 pending human adjudication. For context, the Cochrane review of this literature
 (Scherer et al., MR000005) reports a pooled rate near 45% across specialties —
 AAGL oral presentations publish at well under half that rate.
+
+> **This number is provisional.** A known denominator defect
+> ([#2](https://github.com/mufflyt/abstract_lifetime/issues/2)) drops 39
+> abstracts from the cohort that should be counted as unpublished, biasing the
+> rate upward. Corrected, it is approximately **16.6%**. See
+> [appendix A12.7](docs/technical_appendix.Rmd).
 
 ## Results
 
@@ -250,25 +256,25 @@ tracked so this README renders on GitHub.
 
 ```r
 testthat::test_dir("tests/testthat")
-# [ FAIL 3 | WARN 13 | SKIP 1 | PASS 388 ]
+# [ FAIL 0 | WARN 13 | SKIP 1 | PASS 392 ]
 ```
 
-**Three semantic tests currently fail.** All three are data-coverage assertions
-that predate the April 2026 matching corrections, and all three are visible in
-CI:
+A fresh checkout has no gitignored artefacts (`pubmed_candidates.csv`, the
+deploy bundle), so tests needing them skip rather than fail — CI reports genuine
+regressions, not missing fixtures. In a tracked-files-only checkout the suite is
+377 passing, 0 failing, 9 skipped.
 
-| Test | Assertion | Actual |
-|------|-----------|--------|
-| `test-pipeline_semantics.R:175` | `practice_type` coverage >= 80% | 18.1% |
-| `test-pipeline_semantics.R:186` | citation coverage >= 90% | below threshold |
-| `test-pipeline_semantics.R:272` | `abstracts_cleaned` and `abstracts_with_matches` share IDs | 1,106 vs 1,067 rows |
+Two coverage thresholds were previously unsatisfiable rather than unmet and have
+been re-pointed at regression floors: `practice_type` asserted >= 80% against
+~18% achieved (affiliations are frequently uninformative), and citation coverage
+asserted >= 90% across all abstracts when a citation count only exists for
+matched publications.
 
-The first two encode coverage targets the pipeline has never met — the
-thresholds are aspirational rather than descriptive, and should either be
-lowered to the achieved coverage or the enrichment improved to meet them. The
-third is a genuine data-integrity discrepancy: `abstracts_cleaned.csv` carries
-39 rows that never reach `abstracts_with_matches.csv`, and the cause has not
-been traced. None of the three should be dismissed as noise.
+The `abstract_id` consistency test no longer asserts set equality, because that
+failure was masking [issue #2](https://github.com/mufflyt/abstract_lifetime/issues/2).
+It now asserts the hard invariant — nothing downstream that is absent from
+`abstracts_cleaned` — and pins the reverse gap to the one known cause, so a
+**new** source of row loss still fails the suite.
 
 ## Reproducibility
 
