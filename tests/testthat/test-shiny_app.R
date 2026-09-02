@@ -8,6 +8,17 @@ library(readr)
 library(stringr)
 library(here)
 
+# Some pipeline artefacts are gitignored (see .gitignore): pubmed_candidates.csv
+# and the deploy bundle are regenerated locally and never committed. They are
+# therefore absent from a fresh CI checkout. Tests that need them skip rather
+# than fail, so CI reports genuine regressions instead of a missing-fixture
+# error every run.
+skip_if_no_file <- function(...) {
+  path <- here(...)
+  if (!file.exists(path)) skip(paste("Not in checkout (gitignored):", basename(path)))
+  path
+}
+
 # ── 1. App syntax ─────────────────────────────────────────────────────────────
 
 test_that("app.R parses without errors", {
@@ -20,10 +31,10 @@ test_that("app.R parses without errors", {
 
 # ── 2. Required data files ────────────────────────────────────────────────────
 
-test_that("all required data files exist", {
+test_that("all required tracked data files exist", {
+  # These are committed, so their absence is a real failure anywhere.
   files <- list(
-    abstracts_cleaned    = here("data", "processed", "abstracts_cleaned.csv"),
-    pubmed_candidates    = here("data", "processed", "pubmed_candidates.csv"),
+    abstracts_cleaned      = here("data", "processed", "abstracts_cleaned.csv"),
     abstracts_with_matches = here("output", "abstracts_with_matches.csv")
   )
   for (nm in names(files)) {
@@ -32,7 +43,15 @@ test_that("all required data files exist", {
   }
 })
 
+test_that("pubmed_candidates.csv exists when the pipeline has been run", {
+  p <- skip_if_no_file("data", "processed", "pubmed_candidates.csv")
+  expect_gt(file.info(p)$size, 1000L, label = "pubmed_candidates size")
+})
+
 test_that("bundle copies of data files exist and are non-empty", {
+  # The deploy bundle is built by shiny/adjudication_app/deploy.R and gitignored.
+  skip_if_no_file("shiny", "adjudication_app", "bundle", "data", "processed",
+                  "abstracts_cleaned.csv")
   bundle_files <- list(
     abstracts_cleaned = here("shiny", "adjudication_app", "bundle", "data",
                              "processed", "abstracts_cleaned.csv"),
@@ -99,7 +118,7 @@ test_that("abstracts_with_matches.csv has required columns", {
 })
 
 test_that("pubmed_candidates.csv has pmid and abstract_id columns", {
-  cands <- read_csv(here("data", "processed", "pubmed_candidates.csv"),
+  cands <- read_csv(skip_if_no_file("data", "processed", "pubmed_candidates.csv"),
                     show_col_types = FALSE)
   expect_true("pmid" %in% names(cands))
   expect_true("abstract_id" %in% names(cands))
@@ -107,12 +126,12 @@ test_that("pubmed_candidates.csv has pmid and abstract_id columns", {
 })
 
 test_that("abstract_ids are consistent across data files", {
+  cands <- read_csv(skip_if_no_file("data", "processed", "pubmed_candidates.csv"),
+                    show_col_types = FALSE)
   abs  <- read_csv(here("data", "processed", "abstracts_cleaned.csv"),
                    show_col_types = FALSE)
   rq   <- read_csv(here("output", "abstracts_with_matches.csv"),
                    show_col_types = FALSE)
-  cands <- read_csv(here("data", "processed", "pubmed_candidates.csv"),
-                    show_col_types = FALSE)
 
   abs_ids  <- unique(abs$abstract_id)
   rq_ids   <- unique(rq$abstract_id)
