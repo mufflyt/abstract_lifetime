@@ -20,7 +20,6 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 - `data/processed/gender_from_open_payments.csv` — 16 resolutions.
 - `output/final_analytical_dataset.csv` — unified 1,067 x 90 analytical dataset
   exported by `06_analyze_results.R`.
-- `data/AAGL Adjudication Decisions - decisions.csv` — 2,372 human decisions.
 - `docs/aagl_abstract_programmatic.Rmd` / `.docx` — programmatic abstract draft.
 - Technical appendix section A12, documenting the matching corrections below.
 - `CHANGELOG.md` (this file).

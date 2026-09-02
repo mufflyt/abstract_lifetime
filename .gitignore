@@ -53,5 +53,7 @@ shiny/adjudication_app/rsconnect/
 
 # Misc
 *.log
+# Single-test extracts written by the test-debugging tool; regenerable scratch
+tests/testthat/_problems/
 .claude/
 data/processed/pubmed_candidates.csv

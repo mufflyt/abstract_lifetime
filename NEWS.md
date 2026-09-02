@@ -59,8 +59,6 @@ suppressed true abstract-to-publication matches.
 - `output/final_analytical_dataset.csv` — unified dataset (1,067 rows x 90
   columns) with demographics and human decisions merged, exported by
   `06_analyze_results.R` for external analysis.
-- `data/AAGL Adjudication Decisions - decisions.csv` — 2,372 human adjudication
-  decisions.
 - `docs/aagl_abstract_programmatic.Rmd` / `.docx` — programmatic abstract draft.
 
 ### Regenerated
