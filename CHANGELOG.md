@@ -59,8 +59,27 @@ abstract-to-publication matches. Detail in appendix A12.
 - Stale `figure2_time_to_pub`, `figure3_km_curve`, `figure4_strategy_perf`, and
   `figure5_score_dist` files, superseded by the rename above.
 
+### Fixed (CI)
+
+- `test-shiny_app.R` read gitignored artefacts (`pubmed_candidates.csv`, the
+  deploy bundle) with no existence guard, so it could never pass in a fresh
+  `actions/checkout`. Guarded with `skip_if_no_file()`.
+- `practice_type` coverage asserted >= 80% against ~18% achieved, and citation
+  coverage asserted >= 90% across all abstracts when a citation count only
+  exists for matched publications. Both were unsatisfiable rather than unmet;
+  re-pointed at regression floors.
+
 ### Known issues
 
+- **Denominator defect ([#2](https://github.com/mufflyt/abstract_lifetime/issues/2), open).**
+  `R/05_adjudicate.R:64` drops abstracts whose best candidate predates the
+  conference (`classification == "excluded"`) out of the cohort, rather than
+  invalidating that candidate and falling back to `no_match`. All 39 rows lost
+  between `abstracts_cleaned.csv` (1,106) and `abstracts_with_matches.csv`
+  (1,067) are exactly that set. They are non-events, so removing them inflates
+  the rate: 17.2% as reported against 16.6% if retained. Affects the headline
+  result and every Table 2 subgroup. Not corrected — changing the denominator is
+  a methodological decision.
 - The four matching corrections shipped in a single re-run; their individual
   contributions are not separately identified and no ablation was performed.
 - Supplement detection still falls back to a November-month heuristic where

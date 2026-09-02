@@ -71,8 +71,23 @@ corrected pipeline. Figure set renamed (`figure2_km_curve`, `figure3_km_by_year`
 `figureS1`-`figureS4`); stale `figure2_time_to_pub`, `figure3_km_curve`,
 `figure4_strategy_perf`, and `figure5_score_dist` files removed.
 
+### CI restored
+
+CI had failed on `main` since at least 2026-04-19. Two causes, neither a real
+regression: `test-shiny_app.R` read gitignored artefacts with no existence
+guard (impossible to pass in a fresh checkout), and two coverage thresholds
+were unsatisfiable by construction rather than merely unmet. Suite is now
+392 passing / 0 failing locally, and green in a tracked-files-only checkout.
+
 ### Known gaps
 
+- **Denominator defect (issue #2, open).** `R/05_adjudicate.R:64` removes
+  abstracts whose best candidate predates the conference from the cohort
+  entirely, instead of invalidating just that candidate. The 39 rows lost
+  between `abstracts_cleaned.csv` and `abstracts_with_matches.csv` are exactly
+  that set, spread across all 12 congresses. They are non-events, so dropping
+  them inflates the reported rate — 17.2% against 16.6% if retained. Documented
+  in appendix A12.7; not corrected, because it changes a reported number.
 - The four matching corrections shipped in one re-run, so their individual
   contributions are not separately identified. No ablation was performed.
 - Supplement detection still falls back to a November-month heuristic where

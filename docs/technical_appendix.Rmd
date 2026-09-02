@@ -1144,3 +1144,28 @@ Two further sources were added to the waterfall: OpenAlex author search (157 res
 These columns exist to make sensitivity analysis possible. Any analysis stratified by author gender can now be re-run on the unconflicted subset to establish whether a reported association survives restriction to authors whose gender assignment is uncontested. That analysis is enabled by this change but has not yet been performed.
 
 **Second-author triangulation returned no resolutions.** `10g_second_author_triangulation.R` runs and writes `second_author_triangulation.csv` with zero rows. The script is retained because the senior-author equivalent (A10.11) does produce resolutions, but the second-author route currently contributes nothing to the waterfall and should not be counted as an active source.
+
+### A12.7 Denominator Defect in Cohort Assembly (Open)
+
+A fourth-order defect was identified while reconciling row counts between pipeline stages, and is documented here because it affects the reported publication rate directly. It is **not** corrected in the current results.
+
+`abstracts_cleaned.csv` carries 1,106 abstracts. `abstracts_with_matches.csv`, the analytical file, carries 1,067. The 39-row difference is not attrition from data quality: the missing rows show no elevated missingness on any column, are all `session_type == "Oral"`, and are distributed across all twelve congresses.
+
+They are exactly the abstracts whose best-scoring candidate carried the `excluded` classification, meaning the candidate publication predates the conference. `R/05_adjudicate.R` responds to that classification by filtering the abstract out of the cohort:
+
+```r
+results <- results |> filter(classification != "excluded")
+```
+
+The classification is a statement about the candidate, not about the abstract. A pre-conference paper cannot represent the full publication of a congress abstract, so the correct response is to invalidate that candidate and allow the abstract to fall back to `no_match`, or to its next-best candidate. Removing the abstract instead treats a bad match as grounds for excluding the presentation from the study.
+
+The direction of the resulting bias is unfavourable. The abstracts being removed are, by construction, ones for which no valid post-conference publication was identified — that is, non-events. Removing non-events from the denominator inflates the rate:
+
+| Denominator | Rate |
+|---|---|
+| 174 / (1,067 − 55 pending) = 174/1,012 | 17.2% (as reported) |
+| 174 / (1,106 − 55 pending) = 174/1,051 | 16.6% (if retained) |
+
+The Cochrane MR000005 convention supports retention: the denominator is abstracts presented, not abstracts for which a valid candidate was located. Under that convention the reported rate is approximately 0.6 percentage points too high, and every subgroup rate in Table 2 carries the same directional bias in proportion to how many `excluded` abstracts fall in each stratum.
+
+This defect is recorded rather than corrected because changing the denominator is a methodological decision affecting a reported result, not a code cleanup. Resolution requires a determination of whether `excluded` abstracts belong in the cohort and, if so, whether they should be assigned `no_match` or re-scored against their next-best candidate.
