@@ -2,20 +2,78 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![R >= 4.4](https://img.shields.io/badge/R-%3E%3D%204.4-blue.svg)](https://www.r-project.org/)
-[![Tests: 391 passing](https://img.shields.io/badge/tests-391%20passing-brightgreen.svg)](tests/testthat/)
+[![Tests: 392 passing](https://img.shields.io/badge/tests-392%20passing-brightgreen.svg)](tests/testthat/)
 [![Shiny App](https://img.shields.io/badge/Shiny-Live%20App-orange.svg)](https://mufflyt.shinyapps.io/aagl-adjudication/)
 
 **Publication Rate, Time to Publication, and Predictors of Full Publication Among Oral Presentations at the AAGL Global Congress, 2012-2023**
 
 A fully automated, reproducible pipeline that tracks whether conference abstracts presented at the AAGL Global Congress on Minimally Invasive Gynecology progress to full peer-reviewed publication. Designed to meet the methodological standards recommended by the [Cochrane review on full publication of results initially presented in abstracts](https://doi.org/10.1002/14651858.MR000005.pub4) (Scherer et al., 2018).
 
-**[Live Adjudication App](https://mufflyt.shinyapps.io/aagl-adjudication/)** | **[Technical Appendix](docs/technical_appendix.Rmd)** | **[Manuscript](docs/abstract_results_section.Rmd)**
+**[Live Adjudication App](https://mufflyt.shinyapps.io/aagl-adjudication/)** | **[Technical Appendix](docs/technical_appendix.Rmd)** | **[Manuscript](docs/abstract_results_section.Rmd)** | **[Changelog](CHANGELOG.md)**
 
 ---
 
-## Flow Diagram
+## Headline Result
 
-![STROBE Flow Diagram](output/figures/figure1_flow_diagram.png)
+**17.2%** of oral presentations at the AAGL Global Congress reached full
+peer-reviewed publication (174 of 1,067; 95% CI 15.0–19.6). A further 55 remain
+pending human adjudication. For context, the Cochrane review of this literature
+(Scherer et al., MR000005) reports a pooled rate near 45% across specialties —
+AAGL oral presentations publish at well under half that rate.
+
+> **This number is provisional.** A known denominator defect
+> ([#2](https://github.com/mufflyt/abstract_lifetime/issues/2)) drops 39
+> abstracts from the cohort that should be counted as unpublished, biasing the
+> rate upward. Corrected, it is approximately **16.6%**. See
+> [appendix A12.7](docs/technical_appendix.Rmd).
+
+## Results
+
+### Cohort Assembly
+
+![STROBE flow diagram tracing 1,067 AAGL oral presentations from the congress programs through PubMed searching, candidate scoring, and adjudication to the final classified cohort.](output/figures/figure1_flow_diagram.png)
+
+### Cumulative Publication Over Time
+
+![Kaplan-Meier curve of cumulative publication rate against months since conference. The curve rises steeply through the first 24 months, reaches roughly 15% by month 36, and flattens near 19% thereafter.](output/figures/figure2_km_curve.png)
+
+Publication is overwhelmingly an early event. The curve climbs steeply through
+the first two years, and abstracts that have not appeared within roughly three
+years of the congress rarely publish at all — the plateau after month 48 is
+nearly flat.
+
+### Publication Trajectory by Congress Year
+
+![Kaplan-Meier curves stratified by congress year, 2012 through 2023, showing separation between earlier and more recent congresses.](output/figures/figure3_km_by_year.png)
+
+Recent congresses carry less follow-up time and are therefore right-censored;
+their lower curves reflect administrative censoring, not necessarily a genuine
+decline in publication.
+
+### Publication Rate by Subgroup
+
+![Subgroup publication rates across study design, practice type, subspecialty, geography, and author gender, each with confidence intervals.](output/figures/figure4_subgroup_rates.png)
+
+### Predictors of Time to Publication
+
+![Cox proportional hazards forest plot. RCT design, multicenter studies, and number of authors show hazard ratios above 1 at p < 0.05; male first author falls below 1; academic affiliation, US-based, and funding reported are not significant.](output/figures/figure5_cox_forest.png)
+
+Randomized design (HR ≈ 2.2), multicenter conduct (HR ≈ 2.3), and author count
+are each associated with faster publication. Reported funding shows a wide,
+non-significant interval — the number of abstracts reporting funding is small.
+
+The male-first-author estimate falls below 1.0 with an interval that approaches
+it. Author gender is inferred, not self-reported, and 277 authors carry a
+cross-source disagreement recorded in `gender_conflict`. Treat this estimate as
+provisional until it has been re-run on the unconflicted subset.
+
+### Time to Publication
+
+![Histogram of months from conference to publication, concentrated in the first two years with a long right tail.](output/figures/figure6_time_to_pub.png)
+
+Four supplementary figures — publication rate by year, search strategy
+comparison, score distribution, and classification breakdown by year — are
+generated by `R/08_make_figures.R` into `output/figures/` but are not tracked.
 
 ## Installation
 
@@ -135,6 +193,14 @@ Six PubMed strategies per abstract, plus four supplementary databases and a nove
 - **No match** (score < 3): no viable publication found
 - **Excluded**: candidate published before the conference
 
+Four defects in this layer were corrected in April 2026, each of which had
+suppressed true matches: session-number title prefixes breaking phrase search,
+non-article publication types (letters, comments, editorials) displacing genuine
+publications, an over-broad JMIG supplement rule that discarded regular articles
+sharing a volume with the congress supplement, and stopword removal that broke
+`[TI]` phrase semantics outright. Full write-up in [technical appendix section
+A12](docs/technical_appendix.Rmd); summary in [CHANGELOG.md](CHANGELOG.md).
+
 ## Shiny Adjudication App
 
 Live at **https://mufflyt.shinyapps.io/aagl-adjudication/**
@@ -164,16 +230,21 @@ Web-based tool for blinded manual review of probable/possible matches:
 
 ## Figures
 
-**Main manuscript** (6 figures):
+**Main manuscript** (6 figures, tracked and embedded in [Results](#results) above):
 
-1. STROBE flow diagram
-2. Kaplan-Meier cumulative publication curve (pooled)
-3. KM curves stratified by congress year
-4. Publication rate by subgroup (study design, practice type, subspecialty, geography, gender)
-5. Cox PH forest plot (hazard ratios with 95% CI)
-6. Time to publication histogram
+| # | File | Content |
+|---|------|---------|
+| 1 | `figure1_flow_diagram.png` | STROBE flow diagram |
+| 2 | `figure2_km_curve.png` | Kaplan-Meier cumulative publication curve (pooled) |
+| 3 | `figure3_km_by_year.png` | KM curves stratified by congress year |
+| 4 | `figure4_subgroup_rates.png` | Publication rate by subgroup |
+| 5 | `figure5_cox_forest.png` | Cox PH forest plot (HRs with 95% CI) |
+| 6 | `figure6_time_to_pub.png` | Time to publication histogram |
 
-**Supplementary** (4 figures): publication rate by year, search strategy comparison, score distribution, classification breakdown by year
+**Supplementary** (4 figures, generated but not tracked): `figureS1_pub_rate_by_year`, `figureS2_strategy_perf`, `figureS3_score_dist`, `figureS4_class_by_year`.
+
+`output/figures/` is gitignored apart from the six main figures, which are
+tracked so this README renders on GitHub.
 
 ## Testing
 
@@ -185,8 +256,25 @@ Web-based tool for blinded manual review of probable/possible matches:
 
 ```r
 testthat::test_dir("tests/testthat")
-# [ FAIL 0 | WARN 13 | SKIP 18 | PASS 391 ]
+# [ FAIL 0 | WARN 13 | SKIP 1 | PASS 392 ]
 ```
+
+A fresh checkout has no gitignored artefacts (`pubmed_candidates.csv`, the
+deploy bundle), so tests needing them skip rather than fail — CI reports genuine
+regressions, not missing fixtures. In a tracked-files-only checkout the suite is
+377 passing, 0 failing, 9 skipped.
+
+Two coverage thresholds were previously unsatisfiable rather than unmet and have
+been re-pointed at regression floors: `practice_type` asserted >= 80% against
+~18% achieved (affiliations are frequently uninformative), and citation coverage
+asserted >= 90% across all abstracts when a citation count only exists for
+matched publications.
+
+The `abstract_id` consistency test no longer asserts set equality, because that
+failure was masking [issue #2](https://github.com/mufflyt/abstract_lifetime/issues/2).
+It now asserts the hard invariant — nothing downstream that is absent from
+`abstracts_cleaned` — and pins the reverse gap to the one known cause, so a
+**new** source of row loss still fails the suite.
 
 ## Reproducibility
 
@@ -205,12 +293,16 @@ data/
   validation/         # Gold standard (50 abstracts) + ACGME teaching hospital names
 output/
   *.csv               # Analysis results (aims 1-5, sensitivity, publication bias)
-  tables/             # Publication-quality tables (Table 1-4)
-  figures/            # Main (6) + supplementary (4) figures
+  final_analytical_dataset.csv   # Unified 1,067 x 90 dataset (demographics + decisions)
+  tables/             # Publication-quality tables (Table 1-4) [gitignored]
+  figures/            # Main (6, tracked) + supplementary (4, gitignored)
 docs/
   abstract_results_section.Rmd    # Full manuscript (Introduction + Methods + Results)
-  technical_appendix.Rmd          # Technical appendix (pipeline details)
+  technical_appendix.Rmd          # Technical appendix (pipeline details, A12 = matching fixes)
+  aagl_abstract_programmatic.Rmd  # Programmatic abstract draft
   reviewer_email.md               # Template email for adjudication reviewers
+CHANGELOG.md          # Dated change history (Keep a Changelog format)
+NEWS.md               # Same history, fuller narrative
 shiny/
   adjudication_app/   # Shiny app for human review of matches
 tests/

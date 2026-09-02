@@ -3,6 +3,13 @@
 # These tests drive a real headless Chromium session against the full app UI.
 
 library(testthat)
+
+# These drive a real headless Chromium session. shinytest2 is not in the CI
+# dependency list (see .github/workflows/R-CMD-check.yaml) and browser-driven
+# e2e tests need a working Chrome install, so the whole file skips where the
+# package is unavailable. A top-level skip() skips every test below it.
+skip_if_not_installed("shinytest2")
+
 library(shinytest2)
 library(here)
 

@@ -199,6 +199,7 @@ parse_pubmed_xml <- function(xml_text) {
     journal <- xml_text(xml_find_first(art, ".//Journal/Title")) %||% NA_character_
     journal_abbrev <- xml_text(xml_find_first(art, ".//Journal/ISOAbbreviation")) %||% NA_character_
     volume <- xml_text(xml_find_first(art, ".//JournalIssue/Volume")) %||% NA_character_
+    issue  <- xml_text(xml_find_first(art, ".//JournalIssue/Issue"))  %||% NA_character_
 
     # Date
     year <- xml_text(xml_find_first(art, ".//JournalIssue/PubDate/Year")) %||% NA_character_
@@ -232,6 +233,7 @@ parse_pubmed_xml <- function(xml_text) {
       pub_journal = journal,
       pub_journal_abbrev = journal_abbrev,
       pub_volume = volume,
+      pub_issue = issue,
       pub_year = year,
       pub_month = month,
       pub_day = day,
@@ -317,7 +319,13 @@ fetch_pubmed_xml <- function(pmid, cache_dir, delay = 0.34) {
 #' @export
 build_date_filter <- function(cfg = NULL) {
   if (is.null(cfg)) cfg <- config::get(file = here::here("config.yml"))
-  sprintf("%s:%s[PDAT]", cfg$pubmed$date_start, cfg$pubmed$date_end)
+  # Exclude publication types that are never valid abstract-to-publication matches.
+  # Letters, Comments, Editorials, and Errata are noise that crowd out real papers.
+  pt_exclusions <- paste0(
+    'NOT ("Letter"[PT] OR "Comment"[PT] OR "Editorial"[PT] OR ',
+    '"Published Erratum"[PT] OR "Retraction of Publication"[PT])'
+  )
+  sprintf("%s:%s[PDAT] AND %s", cfg$pubmed$date_start, cfg$pubmed$date_end, pt_exclusions)
 }
 
 #' @title Detect Whether a PubMed Result Row Is a JMIG Supplement Article
@@ -358,7 +366,16 @@ is_supplement_article <- function(details_row, cfg = NULL) {
   is_supplement_year <- !is.na(details_row$pub_year) &&
     details_row$pub_year %in% as.character(cfg$pubmed$exclude_supplement_year)
 
-  is_jmig && is_supplement_vol && is_supplement_year
+  # Require the PubMed Issue field to actually contain "Suppl" (or be November,
+  # the congress month). This prevents regular JMIG issues from being wrongly
+  # excluded just because they share a volume number with the supplement.
+  pub_issue <- if ("pub_issue" %in% names(details_row)) details_row$pub_issue else NA_character_
+  pub_month <- if ("pub_month" %in% names(details_row)) details_row$pub_month else NA_character_
+  is_suppl_issue <- (!is.na(pub_issue) && str_detect(tolower(pub_issue), "suppl")) ||
+    (is.na(pub_issue) && !is.na(pub_month) &&
+       str_detect(tolower(pub_month), "^(nov|11)"))
+
+  is_jmig && is_supplement_vol && is_supplement_year && is_suppl_issue
 }
 
 #' @title Generate All PubMed Search Strategies for One Abstract
@@ -422,16 +439,23 @@ build_search_strategies <- function(abstract_row, cfg = NULL) {
   strategies <- list()
 
   # Strategy 1: Title search
-  # Use key words from title (first 6 meaningful words)
-  title_words <- str_split(title_norm, "\\s+")[[1]]
-  title_words <- title_words[nchar(title_words) >= 3]
-  title_query_words <- head(title_words, 8)
-  if (length(title_query_words) > 0) {
-    strategies[["title"]] <- sprintf(
-      '"%s"[TI] AND %s',
-      paste(title_query_words, collapse = " "),
-      date_filter
-    )
+  # Take a consecutive 8-word window from the normalized title, starting at
+  # the first word with >= 3 characters (skips leading tokens like "2 - ").
+  # Preserving all words — including short stopwords like "in", "of" — keeps
+  # the phrase consecutive so PubMed's exact phrase search can match it.
+  title_all_words <- str_split(title_norm, "\\s+")[[1]]
+  title_all_words <- title_all_words[nchar(title_all_words) >= 1]
+  start_idx <- which(nchar(title_all_words) >= 3)
+  if (length(start_idx) > 0) {
+    s <- start_idx[1]
+    title_query_words <- title_all_words[s:min(s + 7L, length(title_all_words))]
+    if (length(title_query_words) > 0) {
+      strategies[["title"]] <- sprintf(
+        '"%s"[TI] AND %s',
+        paste(title_query_words, collapse = " "),
+        date_filter
+      )
+    }
   }
 
   # Strategy 2: First author + date

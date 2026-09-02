@@ -54,6 +54,10 @@ if (file.exists(manual_review_path)) {
     )
 }
 
+# Export the fully unified dataset with all demographics + human decisions for external analysis
+write_csv(results, here("output", "final_analytical_dataset.csv"))
+cli_alert_success("Exported unified dataset to output/final_analytical_dataset.csv")
+
 # ============================================================
 # AIM 1: Publication rate
 # ============================================================

@@ -1,5 +1,100 @@
 # NEWS
 
+## 2026-04-28
+
+Recovered from an external drive on 2026-09-01; this work was completed on
+2026-04-28 but never committed. See `docs/technical_appendix.Rmd` section A12
+for the full write-up.
+
+### Matching corrections
+
+Four defects in the matching layer, all biasing in the same direction — each
+suppressed true abstract-to-publication matches.
+
+- **Session-number prefixes stripped** (`utils_text.R`, `02_clean_abstracts.R`).
+  The 2013, 2017, 2018, and 2021 congress programs prefix titles with a session
+  number (`"4 - Laparoscopic..."`). The prefix entered PubMed Strategy 1 as part
+  of the title phrase, which then matched nothing. Because the affected
+  congresses are a non-random subset of years, this confounded the time trend.
+  Stripped via `^[0-9]+\s+[-–]\s*`; the required space before the dash
+  protects titles like `"5-year outcomes..."`.
+- **Non-article publication types excluded** (`build_date_filter()`). Letters,
+  comments, editorials, errata, and retractions were eligible candidates. They
+  carry the title and authors of the paper they discuss, so they score highly on
+  the two heaviest components and can outrank the genuine publication. Now
+  excluded at the search layer rather than post-hoc.
+- **JMIG supplement detection narrowed** (`is_supplement_article()`). The test
+  matched on journal + volume + year, but a supplement shares its volume with
+  that volume's regular issues — so every regular JMIG article in the matching
+  volume and year was excluded. This was the most consequential defect: AAGL
+  abstracts are likeliest to publish in JMIG within about a year, exactly the
+  window being blanked. Now requires the Issue field to contain `"Suppl"`, or
+  November publication where PubMed omits the issue.
+- **Title phrase search fixed** (`build_search_strategies()`). Strategy 1
+  dropped tokens under three characters, which does not shorten the phrase — it
+  produces a word sequence that appears in no title. Now takes a consecutive
+  8-word window preserving stopwords, anchored at the first token of 3+
+  characters.
+
+### Gender resolution transparency
+
+- **`gender_conflict` and `gender_n_sources`** populated for every row, recording
+  the shape of the evidence rather than only the winner of the priority
+  waterfall. Enables sensitivity analysis restricted to uncontested assignments.
+- **`data/processed/gender_conflicts.csv`** — 277 cross-source disagreements
+  with competing values.
+- **Two new waterfall sources**: OpenAlex author search (157 resolutions),
+  CMS Open Payments (16). `gender_unified` coverage 98.8%.
+- **Second-author triangulation returns zero rows.** Script retained (the
+  senior-author equivalent does resolve names) but contributes nothing; it
+  should not be counted as an active source.
+
+### PubMed metadata
+
+- `parse_pubmed_xml()` extracts `JournalIssue/Issue` as `pub_issue`, required by
+  the corrected supplement test.
+
+### New outputs
+
+- `output/final_analytical_dataset.csv` — unified dataset (1,067 rows x 90
+  columns) with demographics and human decisions merged, exported by
+  `06_analyze_results.R` for external analysis.
+- `docs/aagl_abstract_programmatic.Rmd` / `.docx` — programmatic abstract draft.
+
+### Regenerated
+
+Processed data, Cox/KM/logistic models, and result tables re-run against the
+corrected pipeline. Figure set renamed (`figure2_km_curve`, `figure3_km_by_year`,
+`figure4_subgroup_rates`, `figure5_cox_forest`, `figure6_time_to_pub`,
+`figureS1`-`figureS4`); stale `figure2_time_to_pub`, `figure3_km_curve`,
+`figure4_strategy_perf`, and `figure5_score_dist` files removed.
+
+### CI restored
+
+CI had failed on `main` since at least 2026-04-19. Two causes, neither a real
+regression: `test-shiny_app.R` read gitignored artefacts with no existence
+guard (impossible to pass in a fresh checkout), and two coverage thresholds
+were unsatisfiable by construction rather than merely unmet. Suite is now
+392 passing / 0 failing locally, and green in a tracked-files-only checkout.
+
+### Known gaps
+
+- **Denominator defect (issue #2, open).** `R/05_adjudicate.R:64` removes
+  abstracts whose best candidate predates the conference from the cohort
+  entirely, instead of invalidating just that candidate. The 39 rows lost
+  between `abstracts_cleaned.csv` and `abstracts_with_matches.csv` are exactly
+  that set, spread across all 12 congresses. They are non-events, so dropping
+  them inflates the reported rate — 17.2% against 16.6% if retained. Documented
+  in appendix A12.7; not corrected, because it changes a reported number.
+- The four matching corrections shipped in one re-run, so their individual
+  contributions are not separately identified. No ablation was performed.
+- Supplement detection still falls back to a November-month heuristic where
+  PubMed omits the issue field.
+- Three pre-existing `test-pipeline_semantics.R` failures remain (practice_type
+  coverage, citation coverage, and a 1,106 vs 1,067 row mismatch between
+  `abstracts_cleaned.csv` and `abstracts_with_matches.csv`). All three predate
+  this work; the gender-coverage failure that also predated it now passes.
+
 ## 2026-04-19
 
 ### Demographics pipeline hardening

@@ -28,6 +28,7 @@ library(dplyr)
 #' @export
 normalize_title <- function(title) {
   title |>
+    str_remove("^[0-9]+\\s+[-\u2013]\\s*") |>   # strip "N - " / "N – " session prefixes (space required before dash)
     tolower() |>
     str_replace_all("[^a-z0-9\\s]", " ") |>
     str_squish()

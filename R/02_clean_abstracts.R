@@ -38,7 +38,11 @@ if ("session_type" %in% names(abstracts)) {
 # --- Normalize titles ---
 cli_alert_info("Normalizing titles...")
 abstracts <- abstracts |>
-  mutate(title_normalized = vapply(title, normalize_title, character(1)))
+  mutate(
+    # Strip "N - " / "N – " session-number prefixes (2013, 2017, 2018, 2021 congresses)
+    title = stringr::str_remove(title, "^[0-9]+\\s+[-\u2013]\\s*"),
+    title_normalized = vapply(title, normalize_title, character(1))
+  )
 
 # --- Parse and normalize author names ---
 cli_alert_info("Parsing author names...")
