@@ -47,7 +47,12 @@ n_congresses <- length(unique(results$congress_year))
 year_range <- paste0(min(results$congress_year, na.rm = TRUE), "-",
                      max(results$congress_year, na.rm = TRUE))
 n_total <- nrow(results)
-n_probable <- sum(results$classification == "probable", na.rm = TRUE)
+# Count abstracts that are GENUINELY unresolved, not ones the algorithm merely
+# labelled "probable". Every probable/possible abstract has since been human
+# adjudicated, so the old count reported 81 "pending" when nothing was pending.
+# What remains unresolved is the set a reviewer marked "skip", which leaves
+# final_published as NA and drops the abstract from the rate denominator.
+n_unresolved <- sum(is.na(results$final_published))
 
 theme_pub <- theme_minimal(base_size = 12) +
   theme(
@@ -176,8 +181,8 @@ if (nrow(km_data) > 0) {
     scale_x_continuous(breaks = seq(0, 120, by = 12)) +
     labs(
       title = "Cumulative Publication Rate Over Time",
-      subtitle = sprintf("AAGL %s - %d definite matches; %d probable pending review",
-                         year_range, sum(km_data$event == 1), n_probable),
+      subtitle = sprintf("AAGL %s - %d published; %d unresolved (excluded from denominator)",
+                         year_range, sum(km_data$event == 1), n_unresolved),
       x = "Months Since Conference",
       y = "Cumulative Publication Rate"
     ) +
@@ -414,8 +419,8 @@ if (nrow(published) > 0) {
                color = "#B2182B", linewidth = 1) +
     labs(
       title = "Time from Conference Presentation to Full Publication",
-      subtitle = sprintf("AAGL %s (n = %d definite matches; %d probable pending review)",
-                         year_range, nrow(published), n_probable),
+      subtitle = sprintf("AAGL %s (n = %d published; %d unresolved, excluded from denominator)",
+                         year_range, nrow(published), n_unresolved),
       x = "Months to Publication",
       y = "Number of Abstracts"
     ) +
