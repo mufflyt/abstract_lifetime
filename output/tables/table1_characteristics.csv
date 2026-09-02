@@ -1,3 +1,3 @@
 final_published,n,n_rct,pct_rct,median_sample_size,iqr_sample_size,n_academic,pct_academic,n_us,pct_us,mean_authors,published
-FALSE,714,31,4.3,50,27-88,91,12.7,435,60.9,3.5,Not Published
-TRUE,132,16,12.1,50,22-149,16,12.1,89,67.4,3.9,Published
+FALSE,838,41,4.9,46,22-135,108,12.9,502,59.9,3.5,Not Published
+TRUE,174,22,12.6,73,21-190,24,13.8,117,67.2,3.9,Published

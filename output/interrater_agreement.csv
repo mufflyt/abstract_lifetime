@@ -1,2 +1,4 @@
 metric,value
-n_multi_reviewed,0
+n_multi_reviewed,519
+pct_agreement,98.1
+cohens_kappa,NA

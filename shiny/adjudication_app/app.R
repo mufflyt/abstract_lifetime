@@ -99,15 +99,27 @@ empty_decisions <- function() {
 #' Read decisions from Google Sheets
 gs_read_decisions <- function(sheet_id) {
   tryCatch({
-    col_types <- strrep("c", length(DECISION_COLS))
-    d <- read_sheet(sheet_id, sheet = "decisions", col_types = col_types)
+    # Read ALL columns without specifying col_types — the sheet may have more
+    # than length(DECISION_COLS) columns (because new_decision writes extra
+    # fields like matched_pub_title, abstract_subtype, etc.). Specifying a
+    # fixed-length col_types string causes read_sheet() to error when the
+    # sheet has more columns than specified.
+    d <- read_sheet(sheet_id, sheet = "decisions")
     if (nrow(d) == 0) return(empty_decisions())
+    # Ensure every DECISION_COL exists, convert everything to character
     for (col in DECISION_COLS) {
       if (!col %in% names(d)) d[[col]] <- NA_character_
     }
-    d |> mutate(across(everything(), as.character),
-                reviewer = if_else(is.na(reviewer) | reviewer == "NA", "AUTO", reviewer))
+    # Subset to only DECISION_COLS for consistent schema downstream
+    d <- d[, DECISION_COLS, drop = FALSE]
+    d |> mutate(
+      across(everything(), as.character),
+      abstract_id = trimws(abstract_id),
+      reviewer    = toupper(trimws(reviewer)),
+      reviewer    = if_else(is.na(reviewer) | reviewer == "NA", "AUTO", reviewer)
+    )
   }, error = function(e) {
+    message("[gs_read_decisions] ERROR: ", conditionMessage(e))
     NULL
   })
 }
@@ -160,6 +172,21 @@ gs_all_decisions <- function(sheet_id) {
   gs_read_decisions(sheet_id)
 }
 
+#' Compact the Google Sheet by rewriting only the deduplicated rows.
+#' Removes duplicate rows that accumulate from repeated sheet_append() calls.
+gs_dedup_sheet <- function(sheet_id) {
+  tryCatch({
+    raw <- gs_read_decisions(sheet_id)
+    if (is.null(raw) || nrow(raw) == 0) return(invisible(NULL))
+    clean <- dedup_decisions(raw)
+    if (nrow(clean) < nrow(raw)) {
+      range_clear(sheet_id, sheet = "decisions", range = "A2:Z")
+      if (nrow(clean) > 0) sheet_append(sheet_id, clean, sheet = "decisions")
+      message("gs_dedup_sheet: ", nrow(raw), " → ", nrow(clean), " rows")
+    }
+  }, error = function(e) warning("gs_dedup_sheet failed: ", conditionMessage(e)))
+}
+
 # --- Data loading ---
 load_data <- function(use_gs = FALSE, sheet_id = NULL) {
   # Primary queue = full 98 abstracts with algorithm classification. This
@@ -184,14 +211,22 @@ load_data <- function(use_gs = FALSE, sheet_id = NULL) {
   } else tibble(abstract_id = character(), abstract_text = character(),
                  authors_raw = character())
 
-  # Load decisions: Google Sheets first, then CSV fallback.
-  # dedup_decisions() runs immediately so AUTO rows are dropped for any
-  # abstract that already has a human decision in the sheet.
+  # Decisions: Google Sheets is primary; local CSV is fallback only when GS
+  # fails or returns nothing. These are NOT merged — one source wins per load.
+  message("[load_data] GS enabled: ", use_gs, " | sheet_id present: ", !is.null(sheet_id))
   decisions <- NULL
   if (use_gs && !is.null(sheet_id)) {
-    decisions <- dedup_decisions(gs_read_decisions(sheet_id))
+    raw   <- gs_read_decisions(sheet_id)
+    n_gs  <- if (!is.null(raw)) nrow(raw) else 0L
+    message("[load_data] GS read: ", if (!is.null(raw)) "OK" else "FAILED",
+            " | rows: ", n_gs)
+    if (!is.null(raw) && n_gs > 0) {
+      decisions <- dedup_decisions(raw)
+      message("[load_data] source = google_sheets | decisions after dedup: ", nrow(decisions))
+    }
   }
   if (is.null(decisions)) {
+    message("[load_data] source = local_csv")
     decisions <- if (file.exists(decisions_path)) {
       d <- read_csv(decisions_path, show_col_types = FALSE)
       for (col in DECISION_COLS) {
@@ -201,9 +236,22 @@ load_data <- function(use_gs = FALSE, sheet_id = NULL) {
                   reviewer = if_else(is.na(reviewer) | reviewer == "NA", "AUTO", reviewer)) |>
         dedup_decisions()
     } else {
+      message("[load_data] no CSV found — returning empty_decisions()")
       empty_decisions()
     }
+    message("[load_data] decisions from CSV after dedup: ", nrow(decisions))
   }
+
+  # Validate: flag any duplicates or blank keys that survive dedup
+  dupe_check <- decisions |> count(abstract_id, reviewer) |> filter(n > 1)
+  if (nrow(dupe_check) > 0)
+    warning("[load_data] ", nrow(dupe_check),
+            " duplicate (abstract_id, reviewer) pairs remain after dedup")
+  blank_check <- decisions |>
+    filter(is.na(abstract_id) | abstract_id == "" | is.na(reviewer) | reviewer == "")
+  if (nrow(blank_check) > 0)
+    warning("[load_data] ", nrow(blank_check),
+            " decisions have blank abstract_id or reviewer")
 
   list(
     review_queue  = review_queue,
@@ -218,13 +266,46 @@ load_data <- function(use_gs = FALSE, sheet_id = NULL) {
 #' If any human reviewer has decided an abstract, all AUTO rows for that
 #' abstract are dropped — the human decision supersedes the algorithm.
 dedup_decisions <- function(decisions) {
+  if (is.null(decisions)) return(empty_decisions())
   if (nrow(decisions) == 0) return(decisions)
-  # Keep latest per (abstract_id, reviewer)
+
+  # Normalize keys so case/whitespace variation doesn't create phantom duplicates
+  decisions <- decisions |>
+    mutate(
+      abstract_id = trimws(as.character(abstract_id)),
+      reviewer    = toupper(trimws(as.character(reviewer))),
+      reviewer    = if_else(is.na(reviewer) | reviewer == "NA", "AUTO", reviewer)
+    )
+
+  # Log pre-dedup duplicates
+  pre_dupes <- decisions |> count(abstract_id, reviewer) |> filter(n > 1)
+  if (nrow(pre_dupes) > 0)
+    message("[dedup_decisions] ", nrow(pre_dupes),
+            " (abstract_id, reviewer) groups have >1 row — deduplicating")
+
+  # Sort by timestamp as POSIXct for correct chronological comparison, then
+  # keep the single latest row per (abstract_id, reviewer).
   deduped <- decisions |>
+    mutate(
+      ts_sort = suppressWarnings(
+        as.POSIXct(review_timestamp, tz = "UTC", tryFormats = c(
+          "%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M:%OS",
+          "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d"
+        ))
+      )
+    ) |>
     group_by(abstract_id, reviewer) |>
-    arrange(desc(review_timestamp)) |>
+    arrange(desc(ts_sort), desc(review_timestamp)) |>
     slice(1) |>
-    ungroup()
+    ungroup() |>
+    select(-ts_sort)
+
+  # Log if any duplicates survive (should never happen)
+  post_dupes <- deduped |> count(abstract_id, reviewer) |> filter(n > 1)
+  if (nrow(post_dupes) > 0)
+    warning("[dedup_decisions] UNEXPECTED: ", nrow(post_dupes),
+            " duplicate groups remain after dedup")
+
   # Identify abstracts that now have at least one human decision
   human_reviewed <- deduped |>
     filter(reviewer != "AUTO") |>
@@ -824,11 +905,19 @@ server <- function(input, output, session) {
       rq <- rq[rq$classification %in% cls, , drop = FALSE]
     }
     ids <- rq$abstract_id
+    n_reviewed <- 0L
     if (isTRUE(input$filter_unreviewed)) {
       human_decisions <- d$decisions |> filter(reviewer != "AUTO")
       reviewed <- unique(human_decisions$abstract_id)
+      n_reviewed <- length(reviewed)
       ids <- ids[!ids %in% reviewed]
     }
+    cur <- isolate(input$abstract_select)
+    message("[visible_ids] total: ", nrow(d$review_queue),
+            " | human-reviewed: ", n_reviewed,
+            " | visible after filter: ", length(ids),
+            " | current selection: ", cur %||% "(none)",
+            " | selection valid: ", isTRUE(cur %in% ids))
     ids
   })
 
@@ -861,18 +950,26 @@ server <- function(input, output, session) {
     setNames(ids, labels)
   }
 
-  # Populate abstract selector
+  # Populate abstract selector; auto-advance if current selection is filtered out
   observe({
     d <- data()
     req(d)
     ids <- visible_ids()
-    if (length(ids) > 0) {
+    if (length(ids) == 0) {
+      message("[selector] no visible abstracts — clearing selection")
+      updateSelectInput(session, "abstract_select",
+                        choices = c("No abstracts match filter" = ""), selected = "")
+    } else {
       choices <- make_choices(ids, d)
       current <- isolate(input$abstract_select)
-      sel <- if (!is.null(current) && current %in% ids) current else ids[1]
+      if (!is.null(current) && nchar(current) > 0 && !(current %in% ids)) {
+        message("[selector] '", current,
+                "' not in visible_ids — auto-advancing to '", ids[1], "'")
+        sel <- ids[1]
+      } else {
+        sel <- if (!is.null(current) && current %in% ids) current else ids[1]
+      }
       updateSelectInput(session, "abstract_select", choices = choices, selected = sel)
-    } else {
-      updateSelectInput(session, "abstract_select", choices = c("No abstracts" = ""), selected = "")
     }
   })
 
@@ -1475,13 +1572,14 @@ server <- function(input, output, session) {
     dt
   })
 
-  # --- Progress (scoped to the current classification filter) ---
+  # --- Progress (always over ALL abstracts regardless of active filters) ---
   output$progress_count <- renderText({
     d <- data()
     req(d)
-    ids <- visible_ids()
-    total <- length(ids)
-    reviewed <- sum(ids %in% unique(d$decisions$abstract_id[d$decisions$reviewer != "AUTO"]))
+    all_ids <- d$review_queue$abstract_id
+    total   <- length(all_ids)
+    reviewed <- sum(all_ids %in%
+                    unique(d$decisions$abstract_id[d$decisions$reviewer != "AUTO"]))
     sprintf("%d / %d (%.0f%%)", reviewed, total,
             if (total > 0) reviewed / total * 100 else 0)
   })
@@ -1657,9 +1755,9 @@ server <- function(input, output, session) {
     # human decision, so the in-memory state stays clean immediately.
     updated_decisions <- dedup_decisions(bind_rows(d$decisions, new_decision))
 
-    if (!saved_to_gs) {
-      write_csv(updated_decisions, app_path("output", "manual_review_decisions.csv"))
-    }
+    # Always write CSV regardless of GS success. This keeps the local file
+    # current so that GS auth failures on reload don't lose decisions.
+    write_csv(updated_decisions, app_path("output", "manual_review_decisions.csv"))
 
     # Capture next abstract BEFORE data(d) removes abs_id from visible_ids
     pre_save_ids <- isolate(visible_ids())
@@ -1669,6 +1767,16 @@ server <- function(input, output, session) {
 
     d$decisions <- updated_decisions
     data(d)
+
+    # Pull any decisions other reviewers may have added since last load.
+    if (use_gs() && !is.null(sheet_id())) {
+      fresh <- gs_read_decisions(sheet_id())
+      if (!is.null(fresh)) {
+        d2 <- data()
+        d2$decisions <- dedup_decisions(bind_rows(fresh, d2$decisions))
+        data(d2)
+      }
+    }
 
     showNotification(
       paste("Saved:", abs_id, "->", input$decision,

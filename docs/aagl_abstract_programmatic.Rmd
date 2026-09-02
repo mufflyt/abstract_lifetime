@@ -1,0 +1,71 @@
+---
+title: "The Abstract Lifetime: Publication Rates and Predictors of Success for Presentations at the AAGL Global Congress"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(readr)
+library(dplyr)
+library(here)
+
+# Load data
+aim1 <- read_csv(here("output", "aim1_publication_rate.csv"), show_col_types = FALSE)
+ttp <- read_csv(here("output", "aim2_time_to_pub.csv"), show_col_types = FALSE)
+logit <- read_csv(here("output", "aim3_logistic_regression.csv"), show_col_types = FALSE)
+
+# Aim 1 Variables
+n_total_abstracts <- aim1$value[aim1$metric == "total_abstracts"]
+n_pending <- aim1$value[aim1$metric == "pending_review"]
+n_evaluated <- n_total_abstracts - n_pending
+n_published <- aim1$value[aim1$metric == "published"]
+pub_rate <- aim1$value[aim1$metric == "publication_rate"]
+
+# Aim 2 Variables
+med_ttp <- ttp$value[ttp$metric == "median_months"]
+q1_ttp <- ttp$value[ttp$metric == "q1_months"]
+q3_ttp <- ttp$value[ttp$metric == "q3_months"]
+
+# Aim 3 Variables (Logistic Regression)
+# RCT
+rct_row <- logit |> filter(term == "is_rctTRUE")
+rct_or <- round(rct_row$estimate, 2)
+rct_ci_lo <- round(rct_row$conf.low, 2)
+rct_ci_hi <- round(rct_row$conf.high, 2)
+rct_p <- if (rct_row$p.value < 0.001) "<0.001" else paste0("=", round(rct_row$p.value, 3))
+
+# Multicenter
+multi_row <- logit |> filter(term == "is_multicenterTRUE")
+multi_or <- round(multi_row$estimate, 2)
+multi_ci_lo <- round(multi_row$conf.low, 2)
+multi_ci_hi <- round(multi_row$conf.high, 2)
+multi_p <- if (multi_row$p.value < 0.001) "<0.001" else paste0("=", round(multi_row$p.value, 3))
+
+# Team Size (n_authors)
+author_row <- logit |> filter(term == "n_authors")
+author_or <- round(author_row$estimate, 2)
+author_p <- if (author_row$p.value < 0.001) "<0.001" else paste0("=", round(author_row$p.value, 3))
+```
+
+**Study Objective:**  
+To determine the full-text peer-reviewed publication rate of research presented at the AAGL Global Congress on Minimally Invasive Gynecology over a 12-year period, and to identify demographic and study-level predictors of successful publication. 
+
+**Design:**  
+Retrospective observational study utilizing a novel, fully automated natural language processing (NLP) and data enrichment pipeline.
+
+**Setting:**  
+AAGL Global Congress on Minimally Invasive Gynecology (2012–2023).
+
+**Patients or Participants:**  
+A total of `r format(n_evaluated, big.mark=",")` abstracts presented at the AAGL Global Congress.
+
+**Interventions:**  
+A massive-scale computational pipeline was developed to scrape and extract abstract metadata. To definitively link conference abstracts to full-text manuscripts, the algorithm deployed a 6-strategy search across multiple academic databases (PubMed, CrossRef, Europe PMC, OpenAlex), followed by a 10-component composite scoring system. All probable algorithmic matches were confirmed via blinded human adjudication. Advanced data enrichment techniques, including NPI and ORCID registry matching, were utilized to extract author demographics.
+
+**Measurements and Main Results:**  
+Of the `r format(n_evaluated, big.mark=",")` evaluated abstracts, `r format(n_published, big.mark=",")` (`r pub_rate`%) successfully progressed to a full-text peer-reviewed publication. Among abstracts that were successfully published, the median time from conference presentation to publication was `r med_ttp` months (interquartile range: `r q1_ttp`–`r q3_ttp` months). 
+
+In a multivariable logistic regression model, study design and team size were the strongest drivers of publication success. Abstracts representing Randomized Controlled Trials (RCTs) were nearly two-and-a-half times more likely to be published than observational studies (OR `r rct_or`; 95% CI `r rct_ci_lo`–`r rct_ci_hi`; p`r rct_p`). Multicenter studies were also significantly more likely to reach full publication (OR `r multi_or`; 95% CI `r multi_ci_lo`–`r multi_ci_hi`; p`r multi_p`). Furthermore, the likelihood of publication increased significantly with team size (OR `r author_or` per additional author; p`r author_p`). Notably, first-author gender, practice type (academic vs. private), geographic location (US vs. international), and the presence of declared funding were not statistically significant predictors of successful publication.
+
+**Conclusion:**  
+The conversion rate of AAGL abstracts to full-text publications is `r pub_rate`%, highlighting a significant "file drawer problem" where the vast majority of presented research remains unpublished. High-quality methodologies, specifically RCTs and multicenter collaborations, alongside larger research teams, are the primary predictors of navigating the peer-review process successfully. This comprehensive pipeline establishes a new, highly reproducible benchmark for tracking the lifecycle of surgical research.
