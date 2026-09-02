@@ -1052,3 +1052,95 @@ ACOG (American College of Obstetricians and Gynecologists) annual meeting abstra
 | **SASGOG** | None | Society website | No | None | No | No | ~50 | ✗ Low |
 
 **LWW societies (ACOG, CREOG/APGO, AUGS)** share a platform — a single LWW scraper covers all three. **ScienceDirect societies (AAGL, SMFM, SGO, NASPAG, ASRM, SFP)** share the existing Elsevier infrastructure. SASGOG remains the only society with no viable programmatic ingestion path.
+
+---
+
+## A12. Matching Corrections (April 2026)
+
+Four defects in the abstract-to-publication matching layer were identified and corrected after the initial analysis. Each one biased the candidate pool in a specific, traceable direction. This section documents the defect, the correction, and the expected effect on results, so that any change in the reported publication rate between the initial and corrected runs can be attributed to a named cause rather than to unexplained drift.
+
+### A12.1 Session-Number Prefixes in Abstract Titles
+
+The AAGL congress programs for 2013, 2017, 2018, and 2021 print oral presentation titles with a leading session number, rendered as `"4 - Laparoscopic Management of..."`. Earlier and later programs do not. The scraper captured this prefix verbatim, so the leading token entered `normalize_title()` and then entered PubMed Strategy 1 as part of the title phrase.
+
+A phrase search for `"4 laparoscopic management of"[TI]` matches nothing. Abstracts from these four congresses were therefore systematically deprived of their single strongest search strategy, and could only be recovered by the weaker author-based strategies. Because the affected congresses are a non-random subset of years, this depressed measured publication rates for those years specifically — a confound directly on the time trend the study reports.
+
+The prefix is now stripped at two points: in `normalize_title()` (`R/utils_text.R`), which protects every downstream consumer of the normalized title, and on the raw `title` column in `R/02_clean_abstracts.R`, which protects the displayed title in the adjudication app. The regular expression is `^[0-9]+\s+[-–]\s*`, matching both hyphen and en-dash forms.
+
+The pattern requires whitespace before the dash. This is deliberate: a title legitimately beginning with a number followed immediately by a hyphen, such as `"5-year outcomes after..."`, must not be truncated to `"year outcomes after..."`. The required space distinguishes a session-number prefix from a numeric prefix belonging to the title.
+
+### A12.2 Non-Article Publication Types in the Candidate Pool
+
+`build_date_filter()` previously constrained PubMed searches by date alone. Letters, comments, editorials, published errata, and retraction notices were therefore eligible candidates.
+
+These document types are strongly biased toward matching. They routinely carry the title of the paper they discuss, and they frequently share its author list. A letter commenting on a trial scores highly on title similarity and author overlap — the two heaviest components of the composite score — while being categorically incapable of representing the full publication of a congress abstract. The failure mode is not merely a wasted candidate slot: a high-scoring letter can outrank and displace the genuine publication, converting a correct match into an incorrect one.
+
+The date filter now appends an exclusion clause:
+
+```
+NOT ("Letter"[PT] OR "Comment"[PT] OR "Editorial"[PT] OR
+     "Published Erratum"[PT] OR "Retraction of Publication"[PT])
+```
+
+The exclusion is applied at the search layer rather than as a post-hoc filter on scored candidates. This is the more conservative placement: it prevents these records from ever competing for a candidate slot, rather than removing them after they may already have crowded out a true match.
+
+### A12.3 Over-Broad JMIG Supplement Detection
+
+Congress abstracts are themselves published in a JMIG supplement. Matching an abstract to its own supplement record would be circular, so `is_supplement_article()` exists to exclude that record. Its original test was a conjunction of journal, volume, and year.
+
+Volume numbers are not unique to supplements. A JMIG supplement shares its volume number with the regular issues of that volume. The test therefore excluded every regular JMIG article in the matching volume and year — not just the congress supplement.
+
+This is the most consequential of the four defects, because its bias is directional and falls hardest on the true positives. An AAGL abstract is more likely than chance to be published in JMIG, the society's own journal, and most likely to appear there within roughly a year of presentation, which is exactly the volume-year window the test was blanking. The rule was therefore most likely to discard precisely the publications the pipeline exists to find, and would depress the measured publication rate while inflating apparent time-to-publication for those recovered by other routes.
+
+The corrected test adds a fourth conjunct requiring positive evidence that the record is a supplement. `pub_issue` is now extracted from `JournalIssue/Issue` in the PubMed XML (`parse_pubmed_xml()`), and exclusion requires either that the issue string contains `"suppl"`, or — where PubMed omits the issue field — that the publication month is November, the congress month:
+
+```r
+is_suppl_issue <- (!is.na(pub_issue) && str_detect(tolower(pub_issue), "suppl")) ||
+  (is.na(pub_issue) && !is.na(pub_month) &&
+     str_detect(tolower(pub_month), "^(nov|11)"))
+
+is_jmig && is_supplement_vol && is_supplement_year && is_suppl_issue
+```
+
+The November fallback is a deliberate residual compromise. It is narrower than the original rule, since it applies only when the issue field is absent, but it is still a heuristic and will misclassify a genuine November JMIG article in a supplement volume whose issue metadata PubMed has not populated. Section A12.5 records this as a known limitation.
+
+### A12.4 Stopword Removal Broke Title Phrase Search
+
+Strategy 1 built its title phrase by discarding every token shorter than three characters and then joining the first eight survivors. The intent was to drop uninformative stopwords. The effect was to destroy the phrase.
+
+PubMed `[TI]` phrase search matches consecutive words. Removing `"in"`, `"of"`, and `"a"` from a title does not produce a shorter phrase that still matches — it produces a word sequence that never appears in any title. `"outcomes robotic surgery obese patients"` does not match *"Outcomes of robotic surgery in obese patients"*. Strategy 1, the highest-precision strategy in the pipeline, was reliably failing on any title containing a short function word, which is nearly all of them.
+
+The strategy now takes a consecutive eight-word window, preserving every token including stopwords, and begins the window at the first token of three or more characters:
+
+```r
+title_all_words <- str_split(title_norm, "\\s+")[[1]]
+start_idx <- which(nchar(title_all_words) >= 3)
+s <- start_idx[1]
+title_query_words <- title_all_words[s:min(s + 7L, length(title_all_words))]
+```
+
+Anchoring the start at the first substantial token preserves the original defensive intent — skipping a leading numeric artifact — while the consecutive window restores the phrase semantics the search depends on. This correction is partially redundant with A12.1, which removes session prefixes upstream; the anchor is retained as defence in depth against any leading-token artifact not covered by that pattern.
+
+### A12.5 Combined Effect and Known Limitations
+
+All four defects biased in the same direction: each one suppressed true matches. A12.1 and A12.4 removed the strongest search strategy for affected abstracts; A12.3 discarded genuine JMIG publications; A12.2 allowed non-articles to displace real ones. The corrected pipeline should therefore report a publication rate no lower than the original, with the increase concentrated in JMIG publications and in the 2013, 2017, 2018, and 2021 congresses.
+
+Because these four corrections shipped together in a single re-run, their individual contributions are not separately identified in the current results. Attributing the change to any one defect would require four additional pipeline runs holding the others fixed. No such ablation has been performed.
+
+Two limitations remain open:
+
+**Supplement detection still depends on a month heuristic.** Where PubMed does not populate the issue field, exclusion falls back to a November publication month. A genuine November JMIG article in a supplement volume with missing issue metadata will still be wrongly excluded. Quantifying this residual requires auditing JMIG records with absent `Issue` values against the print record.
+
+**Publication-type exclusion is not free of risk.** A small number of legitimate full publications are indexed by PubMed under `"Letter"[PT]` — brief research reports in journals that classify short-format original research this way. Excluding the type wholesale trades a small number of these for a much larger reduction in false-positive commentary. The trade is believed favourable but has not been measured against the gold standard.
+
+### A12.6 Cross-Source Gender Conflict Detection
+
+The gender waterfall documented in A10.11–A10.15 resolves a single value per author from up to ten sources by priority order. Priority resolution is silent about disagreement: an author assigned by NPI and contradicted by OpenAlex produced the same output as an author for whom only one source had an opinion.
+
+Two columns now record the shape of the evidence rather than only its winner. `gender_n_sources` counts contributing sources; `gender_conflict` flags authors where those sources disagree. Both are populated for every row. A sidecar, `data/processed/gender_conflicts.csv`, enumerates the disagreements with the competing values, in 277 rows.
+
+Two further sources were added to the waterfall: OpenAlex author search (157 resolutions) and CMS Open Payments (16). Coverage of `gender_unified` on the analytical dataset is 98.8% (1,067 rows).
+
+These columns exist to make sensitivity analysis possible. Any analysis stratified by author gender can now be re-run on the unconflicted subset to establish whether a reported association survives restriction to authors whose gender assignment is uncontested. That analysis is enabled by this change but has not yet been performed.
+
+**Second-author triangulation returned no resolutions.** `10g_second_author_triangulation.R` runs and writes `second_author_triangulation.csv` with zero rows. The script is retained because the senior-author equivalent (A10.11) does produce resolutions, but the second-author route currently contributes nothing to the waterfall and should not be counted as an active source.

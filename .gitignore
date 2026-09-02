@@ -29,9 +29,17 @@ Thumbs.db
 
 # Output (regenerable)
 output/tables/
-output/figures/
-# Exception: flow diagram for README
+# Note: `output/figures/*` (glob, not a trailing slash) — git cannot re-include
+# a file whose parent directory is itself excluded, so a trailing slash here
+# would make every `!` exception below silently inert.
+output/figures/*
+# Exceptions: figures embedded in README.md
 !output/figures/figure1_flow_diagram.png
+!output/figures/figure2_km_curve.png
+!output/figures/figure3_km_by_year.png
+!output/figures/figure4_subgroup_rates.png
+!output/figures/figure5_cox_forest.png
+!output/figures/figure6_time_to_pub.png
 
 # Google Sheets service account credentials
 google_credentials.json
