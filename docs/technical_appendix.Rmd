@@ -1145,27 +1145,51 @@ These columns exist to make sensitivity analysis possible. Any analysis stratifi
 
 **Second-author triangulation returned no resolutions.** `10g_second_author_triangulation.R` runs and writes `second_author_triangulation.csv` with zero rows. The script is retained because the senior-author equivalent (A10.11) does produce resolutions, but the second-author route currently contributes nothing to the waterfall and should not be counted as an active source.
 
-### A12.7 Denominator Defect in Cohort Assembly (Open)
+### A12.7 Denominator Defect in Cohort Assembly (Corrected)
 
-A fourth-order defect was identified while reconciling row counts between pipeline stages, and is documented here because it affects the reported publication rate directly. It is **not** corrected in the current results.
+A defect in cohort assembly was identified while reconciling row counts between pipeline stages, and has been corrected. It affected the reported publication rate directly.
 
-`abstracts_cleaned.csv` carries 1,106 abstracts. `abstracts_with_matches.csv`, the analytical file, carries 1,067. The 39-row difference is not attrition from data quality: the missing rows show no elevated missingness on any column, are all `session_type == "Oral"`, and are distributed across all twelve congresses.
+`abstracts_cleaned.csv` carried 1,106 abstracts; `abstracts_with_matches.csv`, the analytical file, carried 1,067. The 39-row difference was not attrition from data quality. The missing rows showed no elevated missingness on any column, were all `session_type == "Oral"`, and were distributed across all twelve congresses.
 
-They are exactly the abstracts whose best-scoring candidate carried the `excluded` classification, meaning the candidate publication predates the conference. `R/05_adjudicate.R` responds to that classification by filtering the abstract out of the cohort:
+They were exactly the abstracts whose best-scoring candidate carried the `excluded` classification, meaning the candidate publication predates the conference. `R/05_adjudicate.R` responded to that classification by filtering the abstract out of the cohort:
 
 ```r
 results <- results |> filter(classification != "excluded")
 ```
 
-The classification is a statement about the candidate, not about the abstract. A pre-conference paper cannot represent the full publication of a congress abstract, so the correct response is to invalidate that candidate and allow the abstract to fall back to `no_match`, or to its next-best candidate. Removing the abstract instead treats a bad match as grounds for excluding the presentation from the study.
+The classification is a statement about the candidate, not about the abstract. A pre-conference paper cannot represent the full publication of a congress abstract, so the correct response is to invalidate that candidate — not to remove the presentation from the study. The Cochrane MR000005 denominator is abstracts *presented*, not abstracts for which a valid candidate was located.
 
-The direction of the resulting bias is unfavourable. The abstracts being removed are, by construction, ones for which no valid post-conference publication was identified — that is, non-events. Removing non-events from the denominator inflates the rate:
+The filter has been removed. The abstracts are retained and, having no valid post-conference publication, counted as unpublished. No downstream change was required: `06_analyze_results.R`, `07_make_tables.R`, `08_make_figures.R`, and the adjudication app already map `classification == "excluded"` to `published = FALSE`. Those scripts were written expecting these rows to be present; the filter was the anomaly.
 
-| Denominator | Rate |
-|---|---|
-| 174 / (1,067 − 55 pending) = 174/1,012 | 17.2% (as reported) |
-| 174 / (1,106 − 55 pending) = 174/1,051 | 16.6% (if retained) |
+Publication fields are left populated on the retained rows. They describe the pre-conference paper that triggered the exclusion, which is the evidence for the decision. `months_to_pub` is negative on these rows by construction, and nothing consumes it without first gating on the published flag.
 
-The Cochrane MR000005 convention supports retention: the denominator is abstracts presented, not abstracts for which a valid candidate was located. Under that convention the reported rate is approximately 0.6 percentage points too high, and every subgroup rate in Table 2 carries the same directional bias in proportion to how many `excluded` abstracts fall in each stratum.
+#### Effect on the reported result
 
-This defect is recorded rather than corrected because changing the denominator is a methodological decision affecting a reported result, not a code cleanup. Resolution requires a determination of whether `excluded` abstracts belong in the cohort and, if so, whether they should be assigned `no_match` or re-scored against their next-best candidate.
+| | Before | After |
+|---|---|---|
+| Cohort | 1,067 | 1,106 |
+| Published | 174 | 178 |
+| Not published | 838 | 873 |
+| Pending review | 55 | 55 |
+| **Publication rate** | **17.2%** (95% CI 15.0–19.6) | **16.9%** (95% CI 14.8–19.3) |
+
+#### The defect also discarded confirmed publications
+
+The bias was expected to run in one direction: removing non-events from the denominator inflates the rate. That was the larger effect, but it was not the only one.
+
+Of the 39 recovered abstracts, **35 are unpublished and 4 are published**. The four carry an explicit human adjudication of `manual_decision == "match"` against a specific PMID:
+
+| Abstract | Congress | PMID |
+|---|---|---|
+| AAGL2021_002 | 2021 | 33992450 |
+| AAGL2021_049 | 2021 | 34130801 |
+| AAGL2023_042 | 2023 | 36852512 |
+| AAGL2023_048 | 2023 | 37271737 |
+
+For these four, a reviewer examined the candidate and recorded a match, while the algorithm had classified it pre-conference. The filter discarded the abstract before that human decision could take effect, removing confirmed publications from the numerator as well as non-events from the denominator. The two effects act in opposite directions, which is why the corrected rate moves by only 0.3 percentage points rather than the 0.6 predicted from the denominator change alone.
+
+These four warrant review on their own merits. A human match against a candidate the algorithm dates before the congress is most likely an online-first publication that appeared ahead of the November meeting. Whether such a paper counts as the conference-to-publication conversion is a methodological question this correction does not settle: it preserves the reviewer's decision rather than overriding it, on the principle that human adjudication takes precedence over algorithmic classification, which is the convention already encoded in `final_published`.
+
+#### Remaining limitation
+
+Abstracts whose best candidate is pre-conference are counted as unpublished without re-scoring against their next-best candidate. If the true publication was ranked second, it is not recovered. Quantifying that would require re-running adjudication with the pre-conference candidate suppressed and the next candidate promoted. That has not been done.

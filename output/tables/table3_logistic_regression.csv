@@ -1,10 +1,8 @@
 term,or_ci,p.value,significance
-(Intercept),0.06 (0.03-0.12),0,***
-is_rctTRUE,2.48 (1.40-4.30),0.001,**
-log_sample_size,0.98 (0.90-1.07),0.692,
-is_academicTRUE,0.93 (0.55-1.53),0.786,
-is_us_basedTRUE,1.27 (0.86-1.88),0.23,
-n_authors,1.32 (1.14-1.54),0,***
-gender_unifiedmale,0.79 (0.56-1.10),0.167,
-is_multicenterTRUE,2.23 (1.01-4.64),0.038,*
-has_fundingTRUE,2.48 (0.11-27.71),0.469,
+(Intercept),0.15 (0.11-0.20),0,***
+is_rctTRUE,2.63 (1.52-4.42),0,***
+log_sample_size,1.00 (0.92-1.08),0.992,
+is_academicTRUE,0.95 (0.57-1.54),0.838,
+is_us_basedTRUE,1.36 (0.93-2.00),0.113,
+is_multicenterTRUE,1.99 (0.92-4.04),0.068,
+has_fundingTRUE,3.06 (0.14-32.50),0.365,

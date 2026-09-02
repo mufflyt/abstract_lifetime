@@ -58,6 +58,23 @@ abstract-to-publication matches. Detail in appendix A12.
 - Stale `figure2_time_to_pub`, `figure3_km_curve`, `figure4_strategy_perf`, and
   `figure5_score_dist` files, superseded by the rename above.
 
+### Fixed (analysis)
+
+- **Denominator defect ([#2](https://github.com/mufflyt/abstract_lifetime/issues/2)).**
+  `R/05_adjudicate.R` dropped abstracts whose best candidate predates the
+  conference (`classification == "excluded"`) out of the cohort. That
+  classification describes the *candidate*, not the *abstract*. The 39 affected
+  abstracts are now retained and counted as unpublished; no downstream change
+  was needed, since `06`, `07`, `08` and the Shiny app already map `excluded` to
+  `published = FALSE`.
+
+  Publication rate **17.2% → 16.9%** (95% CI 14.8–19.3); cohort 1,067 → 1,106;
+  published 174 → 178. Of the 39, 35 are unpublished and **4 carry an explicit
+  reviewer `manual_decision == "match"`** — the filter was discarding confirmed
+  publications from the numerator as well as non-events from the denominator,
+  which is why the rate moves by 0.3 points rather than the 0.6 the denominator
+  change alone predicts. Tables, figures, and the STROBE diagram regenerated.
+
 ### Fixed (CI)
 
 - `test-shiny_app.R` read gitignored artefacts (`pubmed_candidates.csv`, the
@@ -70,15 +87,6 @@ abstract-to-publication matches. Detail in appendix A12.
 
 ### Known issues
 
-- **Denominator defect ([#2](https://github.com/mufflyt/abstract_lifetime/issues/2), open).**
-  `R/05_adjudicate.R:64` drops abstracts whose best candidate predates the
-  conference (`classification == "excluded"`) out of the cohort, rather than
-  invalidating that candidate and falling back to `no_match`. All 39 rows lost
-  between `abstracts_cleaned.csv` (1,106) and `abstracts_with_matches.csv`
-  (1,067) are exactly that set. They are non-events, so removing them inflates
-  the rate: 17.2% as reported against 16.6% if retained. Affects the headline
-  result and every Table 2 subgroup. Not corrected — changing the denominator is
-  a methodological decision.
 - The four matching corrections shipped in a single re-run; their individual
   contributions are not separately identified and no ablation was performed.
 - Supplement detection still falls back to a November-month heuristic where

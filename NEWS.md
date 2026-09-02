@@ -69,6 +69,19 @@ corrected pipeline. Figure set renamed (`figure2_km_curve`, `figure3_km_by_year`
 `figureS1`-`figureS4`); stale `figure2_time_to_pub`, `figure3_km_curve`,
 `figure4_strategy_perf`, and `figure5_score_dist` files removed.
 
+### Denominator defect fixed (issue #2)
+
+`R/05_adjudicate.R` dropped abstracts whose best candidate predates the
+conference out of the cohort. `excluded` describes the candidate, not the
+abstract, and the Cochrane MR000005 denominator is abstracts presented. The 39
+are retained and counted as unpublished. Nothing downstream needed changing —
+`06`, `07`, `08` and the Shiny app already treated `excluded` as unpublished.
+
+Publication rate **17.2% → 16.9%** (95% CI 14.8–19.3), cohort 1,067 → 1,106,
+published 174 → 178. Four of the 39 carry a reviewer's `manual_decision ==
+"match"`, so the filter was also discarding confirmed publications; the two
+effects partly offset. Details and the four PMIDs in appendix A12.7.
+
 ### CI restored
 
 CI had failed on `main` since at least 2026-04-19. Two causes, neither a real
@@ -79,13 +92,6 @@ were unsatisfiable by construction rather than merely unmet. Suite is now
 
 ### Known gaps
 
-- **Denominator defect (issue #2, open).** `R/05_adjudicate.R:64` removes
-  abstracts whose best candidate predates the conference from the cohort
-  entirely, instead of invalidating just that candidate. The 39 rows lost
-  between `abstracts_cleaned.csv` and `abstracts_with_matches.csv` are exactly
-  that set, spread across all 12 congresses. They are non-events, so dropping
-  them inflates the reported rate — 17.2% against 16.6% if retained. Documented
-  in appendix A12.7; not corrected, because it changes a reported number.
 - The four matching corrections shipped in one re-run, so their individual
   contributions are not separately identified. No ablation was performed.
 - Supplement detection still falls back to a November-month heuristic where

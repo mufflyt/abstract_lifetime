@@ -15,17 +15,16 @@ A fully automated, reproducible pipeline that tracks whether conference abstract
 
 ## Headline Result
 
-**17.2%** of oral presentations at the AAGL Global Congress reached full
-peer-reviewed publication (174 of 1,067; 95% CI 15.0–19.6). A further 55 remain
+**16.9%** of oral presentations at the AAGL Global Congress reached full
+peer-reviewed publication (178 of 1,106; 95% CI 14.8–19.3). A further 55 remain
 pending human adjudication. For context, the Cochrane review of this literature
 (Scherer et al., MR000005) reports a pooled rate near 45% across specialties —
 AAGL oral presentations publish at well under half that rate.
 
-> **This number is provisional.** A known denominator defect
-> ([#2](https://github.com/mufflyt/abstract_lifetime/issues/2)) drops 39
-> abstracts from the cohort that should be counted as unpublished, biasing the
-> rate upward. Corrected, it is approximately **16.6%**. See
-> [appendix A12.7](docs/technical_appendix.Rmd).
+> Supersedes an earlier reported figure of 17.2%. A denominator defect
+> ([#2](https://github.com/mufflyt/abstract_lifetime/issues/2), fixed) dropped
+> 39 abstracts out of the cohort — 35 unpublished, plus 4 carrying a reviewer's
+> confirmed match. See [appendix A12.7](docs/technical_appendix.Rmd).
 
 ## Results
 
