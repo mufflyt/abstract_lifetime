@@ -4,12 +4,15 @@
 # are derived from the analytical outputs. These tests fail when the data moves
 # and the documentation does not, or vice versa.
 #
-# Two of the assertions below (candidate-pool completeness and per-congress
-# capture) pin a KNOWN DEFECT at its current magnitude rather than asserting the
-# correct invariant. That is deliberate: an assertion of the correct invariant
-# would fail today and be muted, whereas a pinned value keeps the defect visible
-# and forces docs/FAILURE_MODES.md to be updated when it is fixed. See
-# docs/VALIDATION.md section 4.
+# One assertion below (per-congress capture, F1) pins a KNOWN DEFECT at its
+# current magnitude rather than asserting the correct invariant. That is
+# deliberate: an assertion of the correct invariant would fail today and be
+# muted, whereas a pinned value keeps the defect visible and forces
+# docs/FAILURE_MODES.md to be updated when it is fixed. See docs/VALIDATION.md
+# section 4.
+#
+# The candidate-pool assertion was pinned the same way until 2026-09-03, when
+# scripts/rebuild_candidate_pool.R fixed F2; it now asserts the true invariant.
 
 suppressPackageStartupMessages({
   library(testthat)
@@ -65,7 +68,7 @@ test_that("the final analytical dataset has the documented dimensions", {
 
   # Documented in docs/DATA_DICTIONARY.md and docs/COHORT_ASSEMBLY.md.
   expect_equal(nrow(fad), 1106L)
-  expect_equal(ncol(fad), 90L)
+  expect_equal(ncol(fad), 92L)
   expect_equal(dplyr::n_distinct(fad$abstract_id), nrow(fad))
 })
 
@@ -242,7 +245,7 @@ test_that("the inline decision logic in 07 and 08 still agrees with utils_decisi
 
 # --- Pinned known defects (see docs/FAILURE_MODES.md) -------------------------
 
-test_that("PINNED DEFECT F2: the candidate pool shortfall has not changed", {
+test_that("F2 (FIXED 2026-09-03): the candidate pool covers every scored pair", {
   sc_path   <- here::here("data", "processed", "match_scores.csv")
   cand_path <- here::here("data", "processed", "pubmed_candidates.csv")
   skip_if_no_file(sc_path)
@@ -258,12 +261,13 @@ test_that("PINNED DEFECT F2: the candidate pool shortfall has not changed", {
     dplyr::anti_join(dplyr::distinct(dplyr::select(cand, abstract_id, pmid)),
                      by = c("abstract_id", "best_pmid" = "pmid"))
 
-  # 283 as of 2026-09-03. Rebuilding the candidate pool should take this to 0;
-  # when it does, update docs/FAILURE_MODES.md F2 and change this to expect 0.
-  expect_equal(nrow(unresolvable), 283L,
-               info = paste("the candidate-pool shortfall changed.",
-                            "If it is now 0 the defect is fixed - update",
-                            "docs/FAILURE_MODES.md F2 and this test."))
+  # Was 283. scripts/rebuild_candidate_pool.R refetched the metadata that
+  # R/03b_search_crossref.R had overwritten, and the pool now covers every
+  # scored pair plus every reviewer-supplied PMID. The invariant is asserted
+  # directly rather than pinned, because it is now true.
+  expect_equal(nrow(unresolvable), 0L,
+               info = paste("R/03b rewrote the pool after 04 scored it.",
+                            "Run scripts/rebuild_candidate_pool.R"))
 })
 
 test_that("PINNED DEFECT F1: per-congress capture is still ceilinged near 100", {

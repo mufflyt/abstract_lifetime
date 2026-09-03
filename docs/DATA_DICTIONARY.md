@@ -1,7 +1,7 @@
 # Data Dictionary
 
 Every column of the **current final analytical dataset**,
-`output/final_analytical_dataset.csv` — **1,106 rows × 90 columns**, one row per
+`output/final_analytical_dataset.csv` — **1,106 rows × 91 columns**, one row per
 eligible AAGL oral presentation, keyed on `abstract_id`.
 
 Machine-readable form: [`data_dictionary.csv`](data_dictionary.csv). Coverage
@@ -38,7 +38,7 @@ rather than a data-quality problem — the `missing_meaning` column says which.
 | variable | type | meaning | derivation | producer | allowed values | missing means | n | % | role | notes |
 |---|---|---|---|---|---|---|---:|---:|---|---|
 | `is_rct` | logical | Randomized design detected in the abstract text | str_detect on abstract_design or search_text for randomi[sz]ed\|rct\|random\\s+alloc | R/02_clean_abstracts.R | TRUE/FALSE | never missing (FALSE when no match) | 1106 | 100.0 | predictor (Aim 2 and Aim 3) | Derived from title only for 2012-2018; see FAILURE_MODES.md F3. |
-| `sample_size` | numeric | Reported number of subjects | first n=/N=/total of/included capture, else the largest 2-5 digit number that is not a year | R/02_clean_abstracts.R | [2, 1461668] | no numeric pattern found in the available text | 365 | 33.0 | predictor (as log1p) | 33% coverage overall, 4-13% in 2012-2018 vs 66-77% in 2019-2023. |
+| `sample_size` | numeric | Reported number of subjects | first n=/N=/total of/included capture, else the largest 2-5 digit number that is not a year | R/02_clean_abstracts.R | [1, 1461668] | no numeric pattern found in the available text | 699 | 63.2 | predictor (as log1p) | 33% coverage overall, 4-13% in 2012-2018 vs 66-77% in 2019-2023. |
 | `is_academic` | logical | Academic-centre affiliation detected | str_detect for university\|academic\|teaching hospital\|school of medicine\|tertiary.*center\|residency\|fellowship | R/02_clean_abstracts.R | TRUE/FALSE | never missing (FALSE when no match) | 1106 | 100.0 | predictor | affiliation_raw is NA at the time this runs, so it is text-only. 0-4% in 2012-2018 vs 22-47% later. |
 | `is_us_based` | logical | US location detected | str_detect against state names/abbreviations and a list of major US cities and institutions | R/02_clean_abstracts.R | TRUE/FALSE | never missing (FALSE when no match) | 1106 | 100.0 | predictor | 31-45% in 2012-2018 vs 97-100% in 2019-2023; a text-availability artefact, not a real trend. |
 | `study_design` | character | Twelve-level study design classification | Ordered case_when in 02_clean_abstracts.R (mirrored by classify_study_design() in R/utils_classify.R); first matching rule wins; falls through to "other" | R/02_clean_abstracts.R | case_control \| case_series \| cost_analysis \| cross_sectional \| other \| prospective_cohort \| quality_improvement \| rct \| retrospective_cohort \| simulation_lab \| systematic_review \| validation | never missing | 1106 | 100.0 | descriptive | 79-87% "other" in 2012-2018 vs 9-53% later. |
@@ -52,7 +52,8 @@ rather than a data-quality problem — the `missing_meaning` column says which.
 | `has_irb_statement` | logical | Ethics or IRB approval statement present | str_detect for irb\|institutional review board\|ethics committee\|ethical approval\|human subjects | R/02_clean_abstracts.R | TRUE/FALSE | never missing (FALSE when no match) | 1106 | 100.0 | descriptive | 0% for 2012-2018. |
 | `abstract_word_count` | numeric | Words in the abstract full text | length of the whitespace split of coalesce(abstract_full_text, abstract_text, "") | R/02_clean_abstracts.R | [0, 443] | never missing | 1106 | 100.0 | QC | 0 for every 2012-2018 abstract: computed before the text backfill and never recomputed. |
 | `research_category` | character | Seven-level topic classification | Ordered case_when; basic_science > education > quality_improvement > health_services > device_technology > clinical > other | R/02_clean_abstracts.R | basic_science \| clinical \| device_technology \| education \| health_services \| other \| quality_improvement | never missing | 1106 | 100.0 | descriptive |  |
-| `primary_procedure` | character | Most specific surgical procedure named | Ordered case_when over 11 procedure patterns; most specific rule first; NA when none match | R/02_clean_abstracts.R | adnexal_surgery \| cerclage \| ectopic_pregnancy \| endometriosis \| fibroids \| gynecologic_oncology \| hysterectomy \| myomectomy \| pelvic_floor \| sacrocolpopexy \| sterilization | no procedure keyword present | 771 | 69.7 | descriptive |  |
+| `primary_procedure` | character | Most specific surgical procedure named | Ordered case_when over 11 procedure patterns; most specific rule first; NA when none match | R/02_clean_abstracts.R | adnexal_surgery \| cerclage \| ectopic_pregnancy \| endometriosis \| fibroids \| gynecologic_oncology \| hysterectomy \| myomectomy \| pelvic_floor \| sacrocolpopexy \| sterilization | no procedure keyword present | 837 | 75.7 | descriptive |  |
+| `result_positivity` | character | Direction of the abstract's reported findings | classify_result_positivity() in R/utils_positivity.R, applied to the first of abstract_conclusion / abstract_measurements / abstract_full_text / abstract_text that is long enough | R/02d_rederive_predictors.R | negative \| neutral \| positive \| unclear | no text field long enough to classify | 1106 | 100.0 | predictor (Aim 5 publication bias) | Restored to the analytical dataset on 2026-09-03; it had been dropped from 05_adjudicate.R's select, which silently disabled the Aim 5 block. |
 
 ## Match result and score components
 
@@ -79,12 +80,12 @@ rather than a data-quality problem — the `missing_meaning` column says which.
 
 | variable | type | meaning | derivation | producer | allowed values | missing means | n | % | role | notes |
 |---|---|---|---|---|---|---|---:|---:|---|---|
-| `pub_title` | character | Title of the matched publication | left_join on best_pmid; blanked for no_match, no_candidates and possible | R/05_adjudicate.R | 134 distinct values | no candidate, deliberately blanked, or the PMID is absent from the stale candidate file | 137 | 12.4 | descriptive | Only 137 of 1106 populated; 74 published abstracts have no publication metadata. See FAILURE_MODES.md F2. |
-| `pub_journal` | character | Journal of the matched publication | as pub_title | R/05_adjudicate.R | 47 distinct values | as pub_title | 137 | 12.4 | descriptive |  |
-| `pub_year` | numeric | Publication year of the matched publication | as pub_title | R/05_adjudicate.R | [2013, 2026] | as pub_title | 137 | 12.4 | outcome input |  |
-| `pub_doi` | character | DOI of the matched publication | as pub_title | R/05_adjudicate.R | 131 distinct values | as pub_title | 133 | 12.0 | descriptive |  |
-| `pub_first_author` | character | First author of the matched publication | as pub_title | R/05_adjudicate.R | 125 distinct values | as pub_title | 137 | 12.4 | descriptive |  |
-| `months_to_pub` | numeric | Months from congress date to publication date | (pub_date - conference_date) / 30.44 where pub_date = first day of the PubMed issue month | R/05_adjudicate.R | [-58.2129, 149.77] | no pub_year available for this abstract | 137 | 12.4 | outcome (Aim 2) | Negative for pre-congress candidates. Available for 104 of 178 published abstracts. |
+| `pub_title` | character | Title of the matched publication | left_join on best_pmid; blanked for no_match, no_candidates and possible | R/05_adjudicate.R | 265 distinct values | no candidate, deliberately blanked, or the PMID is absent from the stale candidate file | 269 | 24.3 | descriptive | Only 137 of 1106 populated; 74 published abstracts have no publication metadata. See FAILURE_MODES.md F2. |
+| `pub_journal` | character | Journal of the matched publication | as pub_title | R/05_adjudicate.R | 87 distinct values | as pub_title | 269 | 24.3 | descriptive |  |
+| `pub_year` | numeric | Publication year of the matched publication | as pub_title | R/05_adjudicate.R | [2012, 2026] | as pub_title | 269 | 24.3 | outcome input |  |
+| `pub_doi` | character | DOI of the matched publication | as pub_title | R/05_adjudicate.R | 261 distinct values | as pub_title | 264 | 23.9 | descriptive |  |
+| `pub_first_author` | character | First author of the matched publication | as pub_title | R/05_adjudicate.R | 243 distinct values | as pub_title | 268 | 24.2 | descriptive |  |
+| `months_to_pub` | numeric | Months from congress date to publication date | (pub_date - conference_date) / 30.44 where pub_date = first day of the PubMed issue month | R/05_adjudicate.R | [-58.2129, 149.77] | no pub_year available for this abstract | 269 | 24.3 | outcome (Aim 2) | Negative for pre-congress candidates. Available for 104 of 178 published abstracts. |
 | `pub_types` | character | Raw PubMed PublicationType list for the matched PMID | Semicolon-joined PublicationTypeList | R/09b_enrich_pub_types.R | 124 distinct values | no matched PMID | 1102 | 99.6 | descriptive |  |
 | `pub_type_canonical` | character | Canonical publication type | canonical_pub_type() in R/utils_pub_types.R; ordered priority over the raw type list | R/09b_enrich_pub_types.R | Case Report \| Editorial/Letter \| Journal Article \| Observational Study \| RCT/Trial \| Review | no matched PMID | 1102 | 99.6 | descriptive |  |
 | `cited_by_count` | numeric | Citations of the matched publication | cited_by_count for the matched DOI | R/09d_enrich_metrics.R | [0, 227] | no matched DOI or OpenAlex has no record | 206 | 18.6 | descriptive | 18.6% coverage - only matched publications can have one. |
@@ -111,7 +112,7 @@ rather than a data-quality problem — the `missing_meaning` column says which.
 | `gender_n_sources` | numeric | Number of gender sources that returned any value | rowSums(!is.na(across(gender columns))) | R/10e_merge_demographics.R | [0, 4] | never missing | 1106 | 100.0 | QC |  |
 | `gender_conflict` | logical | Two or more sources returned different genders | abstract_id appears in the conflict table (n_distinct of non-NA values > 1) | R/10e_merge_demographics.R | TRUE/FALSE | never missing | 1106 | 100.0 | QC | 228 abstracts flagged. |
 | `state_unified` | character | Best available US state for the first author | coalesce(npi_state, first_author_state) | R/10e_merge_demographics.R | 40 distinct values | neither source resolved a state | 336 | 30.4 | descriptive | MIXED VOCABULARY: 40 distinct values combining two encodings. |
-| `subspecialty_unified` | character | Best available subspecialty for the first author | coalesce(npi_subspecialty, subspecialty) | R/10e_merge_demographics.R | Female Pelvic Medicine & Reconstructive Surgery \| FPMRS \| general_OBGYN \| Generalist \| GYN_ONC \| Gynecologic Oncology \| Maternal-Fetal Medicine \| MIG \| MIGS \| obstetrics \| REI \| Reproductive Endocrinology and Infertility \| surgery_other | neither source resolved a subspecialty | 387 | 35.0 | descriptive | MIXED VOCABULARY: 13 levels that represent about 8 concepts (MIG vs MIGS, FPMRS vs the spelled-out label, general_OBGYN vs Generalist). |
+| `subspecialty_unified` | character | Best available subspecialty for the first author | coalesce(npi_subspecialty, subspecialty) | R/10e_merge_demographics.R | FPMRS \| general_OBGYN \| GYN_ONC \| MFM \| MIGS \| obstetrics \| REI \| surgery_other | neither source resolved a subspecialty | 387 | 35.0 | descriptive | MIXED VOCABULARY: 13 levels that represent about 8 concepts (MIG vs MIGS, FPMRS vs the spelled-out label, general_OBGYN vs Generalist). |
 
 ## NPI identity resolution
 
@@ -150,6 +151,7 @@ rather than a data-quality problem — the `missing_meaning` column says which.
 | `manual_pmid` | numeric | PMID entered by the reviewer for a confirmed match | Free-text PMID field; only populated when the decision is match | Shiny adjudication app | [23025883, 41940647] | decision is not match | 130 | 11.8 | adjudication |  |
 | `final_published` | logical | Primary outcome | assign_final_published(): definite -> TRUE; match -> TRUE; no_match -> FALSE; no_match/no_candidates/excluded -> FALSE; else NA | R/utils_decisions.R via R/06_analyze_results.R | TRUE/FALSE | NA means unresolved adjudication (algorithm said probable or possible and the reviewer skipped); these leave the denominator | 1051 | 95.0 | OUTCOME |  |
 | `final_pmid` | numeric | PMID of the publication credited to this abstract | coalesce(manual_pmid, best_pmid) | R/utils_decisions.R via R/06_analyze_results.R | [21769469, 41983371] | no candidate and no reviewer PMID | 1102 | 99.6 | outcome provenance | Populated even when final_published is FALSE - it is the best candidate, not a confirmed publication. |
+| `final_pmid_shared` | logical | The credited publication is also credited to another abstract | TRUE when final_published is TRUE and final_pmid appears on more than one published abstract | R/06_analyze_results.R | TRUE/FALSE | never missing | 1106 | 100.0 | QC | Three PMIDs are shared by six published abstracts. The numerator is not deduplicated; see FAILURE_MODES.md F17 and output/shared_publication_matches.csv. |
 
 ---
 
@@ -159,13 +161,14 @@ rather than a data-quality problem — the `missing_meaning` column says which.
 |---|---|
 | `author_count`, `n_authors`, `n_authors_aagl` | Censored at 5 by ScienceDirect's author-list truncation (336 of 1,106 lists end in an ellipsis). `n_authors` is nevertheless a predictor in both the Cox and logistic models. |
 | `keyword_pts` | Zero for every scored abstract. The score is functionally nine-component. |
-| `abstract_word_count` | Zero for all 700 abstracts from 2012–2018: computed before the text backfill and never recomputed. |
-| `has_numeric_results`, `has_irb_statement`, `has_trial_registration` | Zero for all of 2012–2018 by construction — those years have no structured section columns. |
-| `is_us_based`, `is_academic`, `sample_size`, `study_design`, `is_multicenter`, `is_rct` | Strong artefactual gradient by congress year; see FAILURE_MODES.md F3. |
-| `subspecialty_unified` | Was 13 levels for ~8 concepts; harmonised onto the short-code vocabulary by `harmonise_subspecialty()` in `R/10e_merge_demographics.R`. |
+| `abstract_word_count` | Was zero for all 700 abstracts from 2012–2018; recomputed after the text backfill by `R/02d_rederive_predictors.R`. |
+| `has_numeric_results`, `has_irb_statement`, `has_trial_registration` | Were zero for all of 2012–2018 because they read only the structured section columns. `02d` now falls back to `abstract_text`. Still zero for 2017 and 2018, which have no recoverable text at all. |
+| `is_us_based`, `is_academic`, `sample_size`, `study_design`, `is_multicenter`, `is_rct` | Had a strong artefactual gradient by congress year; re-derived from the backfilled text by `02d`. A residual gradient remains for 2017 and 2018, whose abstracts have no text. See FAILURE_MODES.md F3. |
+| `subspecialty_unified` | 13 levels representing about 8 concepts (`MIG` vs `MIGS`, `FPMRS` vs the spelled-out label, `general_OBGYN` vs `Generalist`). Two vocabularies coalesced without harmonisation. |
+| `state_unified` | Same problem, 40 levels from two encodings. |
 | `career_stage` (3 rows), `orcid_subspecialty` (2 rows), `orcid_career_stage` (28 rows) | Coverage too low to analyse. |
 | `orcid_false_positive` | Single-valued across all 1,102 non-`NA` rows; carries no information as shipped. |
 | `gender_unified` | Inferred from given names, never self-reported. 228 abstracts carry a cross-source disagreement in `gender_conflict`. |
-| `pub_*`, `months_to_pub` | Populated for only 137 of 1,106 rows, and for only 104 of the 178 published — a candidate-file staleness artefact, not a property of the publications. |
+| `pub_*`, `months_to_pub` | Now populated for all 178 published abstracts (was 104) after `scripts/rebuild_candidate_pool.R` restored the candidate pool. Seven carry a negative `months_to_pub`: confirmed publications that appeared before their congress. |
 | `final_pmid` | Populated for 1,102 rows including abstracts where `final_published` is `FALSE`. It is the best candidate, not a confirmed publication. |
 

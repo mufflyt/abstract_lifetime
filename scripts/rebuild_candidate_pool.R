@@ -60,7 +60,27 @@ scored_pairs <- detailed |>
 pool_old <- read_csv(pool_path, show_col_types = FALSE,
                      col_types = cols(.default = col_character()))
 
-missing_pairs <- scored_pairs |>
+# Reviewer-supplied PMIDs are a second source of pairs the pool must carry. A
+# reviewer who found the publication independently entered a manual_pmid the
+# search never returned, so it is in no candidate set. R/05_adjudicate.R and the
+# refresh block in R/06_analyze_results.R both resolve publication metadata out
+# of this pool, so without these rows a reviewer-confirmed publication has no
+# date. Six of the 178 published abstracts were in exactly that position.
+decisions_path <- here("output", "manual_review_decisions.csv")
+reviewer_pairs <- if (file.exists(decisions_path)) {
+  read_csv(decisions_path, show_col_types = FALSE) |>
+    filter(manual_decision == "match", !is.na(manual_pmid)) |>
+    transmute(abstract_id, pmid = as.character(manual_pmid)) |>
+    filter(str_detect(pmid, "^[0-9]+$")) |>
+    distinct()
+} else {
+  tibble::tibble(abstract_id = character(), pmid = character())
+}
+cli_alert_info("Reviewer-supplied PMIDs: {nrow(reviewer_pairs)}")
+
+wanted <- bind_rows(scored_pairs, reviewer_pairs) |> distinct()
+
+missing_pairs <- wanted |>
   anti_join(transmute(pool_old, abstract_id, pmid = as.character(pmid)) |> distinct(),
             by = c("abstract_id", "pmid"))
 

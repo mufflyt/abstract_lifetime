@@ -125,16 +125,36 @@ test_that("time-to-publication summary is ordered and expressed in months", {
 # SEMANTIC 2.7 — interval sign convention
 # ============================================================
 test_that("positive months_to_pub means published AFTER the congress", {
-  need(P_FINAL)
+  need(P_FINAL, P_AIM2)
   f <- readr::read_csv(P_FINAL, show_col_types = FALSE)
   neg <- f |> filter(!is.na(months_to_pub), months_to_pub < 0)
-  # Negative intervals exist by construction on pre-congress candidates. They
-  # must never be counted as conversions in the survival set.
+
+  # Revised 2026-09-03. This originally asserted that a negative interval must
+  # belong to an `excluded` or unpublished abstract. That held only because the
+  # affected rows had NO date at all: their PMIDs were missing from the stale
+  # candidate pool (docs/FAILURE_MODES.md F2). With the pool repaired, seven
+  # confirmed publications resolve to a date before their congress - four are
+  # pre-conference candidates a reviewer confirmed anyway, one is a `definite`
+  # online-first paper two weeks ahead of the 2015 meeting, two are 2018
+  # reviewer-supplied PMIDs. They belong in the numerator because a reviewer
+  # ruled they are the abstract's publication.
+  #
+  # The invariant that actually matters is unchanged and is asserted here: a
+  # negative interval must be explainable, and must never enter the survival
+  # analysis or the time-to-publication summary, where it is not a time.
   if (nrow(neg) > 0) {
-    expect_true(all(neg$classification == "excluded" | neg$final_published %in% c(FALSE, NA)),
-                label = "a negative interval must not belong to a counted publication event")
+    expect_true(
+      all(neg$classification %in% c("excluded", "definite") |
+            neg$manual_decision %in% "match" |
+            neg$final_published %in% c(FALSE, NA)),
+      label = "a negative interval reached the numerator without adjudication"
+    )
   }
-  succeed()
+
+  a2 <- readr::read_csv(P_AIM2, show_col_types = FALSE)
+  expect_gte(a2$value[a2$metric == "min_months"], 0)
+  expect_equal(a2$value[a2$metric == "n_pre_congress"],
+               nrow(neg |> filter(final_published %in% TRUE)))
 })
 
 # ============================================================

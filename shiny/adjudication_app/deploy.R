@@ -80,14 +80,25 @@ total_mb <- round(sum(file.info(bundle_files)$size) / 1e6, 1)
 cli_h2("Bundle ready: {total_mb} MB total")
 
 # ── Step 5: Deploy ───────────────────────────────────────────────────────────
-cli_h2("Deploying to shinyapps.io")
-
-rsconnect::deployApp(
-  appDir = app_dir,
-  appName = "aagl-adjudication",
-  account = "mufflyt",
-  forceUpdate = TRUE,
-  launch.browser = FALSE
-)
-
-cli_alert_success("Deploy complete!")
+# Deployment publishes to a live application that human reviewers use, so it is
+# opt-in. Set SHINY_DEPLOY=true to push. Without it this script only refreshes
+# bundle/, which is what tests/testthat/test-shiny_app.R checks for staleness.
+#
+# Note that a fresh bundle does NOT make the deployed app current. Until this
+# runs with SHINY_DEPLOY=true, reviewers on shinyapps.io continue to see
+# whatever was last pushed.
+if (identical(tolower(Sys.getenv("SHINY_DEPLOY", "false")), "true")) {
+  cli_h2("Deploying to shinyapps.io")
+  rsconnect::deployApp(
+    appDir = app_dir,
+    appName = "aagl-adjudication",
+    account = "mufflyt",
+    forceUpdate = TRUE,
+    launch.browser = FALSE
+  )
+  cli_alert_success("Deploy complete!")
+} else {
+  cli_alert_info("Bundle refreshed. Set SHINY_DEPLOY=true to publish to \
+                  shinyapps.io; until then the live app still serves the \
+                  previously deployed data.")
+}

@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![R >= 4.4](https://img.shields.io/badge/R-%3E%3D%204.4-blue.svg)](https://www.r-project.org/)
-[![Tests](https://img.shields.io/badge/tests-619%20passing%2C%206%20failing-yellow.svg)](docs/VALIDATION.md)
+[![Tests](https://img.shields.io/badge/tests-758%20passing%2C%203%20failing-yellow.svg)](docs/VALIDATION.md)
 [![Shiny App](https://img.shields.io/badge/Shiny-Live%20App-orange.svg)](https://mufflyt.shinyapps.io/aagl-adjudication/)
 
 **Publication Rate, Time to Publication, and Predictors of Full Publication
@@ -27,8 +27,10 @@ presentations; a further **55** remain unresolved in adjudication and are
 excluded from the denominator. For context, the Cochrane review of this
 literature reports a pooled rate near 45% across specialties.
 
-Median time from congress to publication was **13.8 months** (IQR 6.3–25.0),
-computed on the 104 published abstracts with a recoverable publication date.
+Median time from congress to publication was **13.7 months** (IQR 5.7–22.6),
+computed on the 171 published abstracts whose publication follows their
+congress. Seven confirmed publications appeared shortly *before* their meeting
+and are excluded from that summary but counted in the numerator.
 
 > Cohort 1,106 and denominator 1,051 are different quantities. See
 > [docs/COHORT_ASSEMBLY.md](docs/COHORT_ASSEMBLY.md).
@@ -57,16 +59,19 @@ opposite of what censoring alone predicts — see
 
 ![Cox proportional hazards forest plot showing hazard ratios with 95% confidence intervals for randomized design, academic affiliation, US location, author count, inferred male first author, multicenter conduct and reported funding.](output/figures/figure5_cox_forest.png)
 
-Randomized design (HR 2.30, 95% CI 1.29–4.07), author count (HR 1.24 per author,
-1.04–1.48), and US location (HR 1.71, 1.09–2.69) are associated with faster
-publication. Inferred male first authorship is associated with slower
-publication (HR 0.59, 0.39–0.89). Multicenter conduct (HR 1.13, 0.41–3.11) and
-reported funding (HR 3.52, 0.48–25.74) are not statistically distinguishable
-from no effect; only 38 and 3 abstracts respectively carry those flags.
+Randomized design (HR 2.21, 95% CI 1.47–3.32) and author count (HR 1.26 per
+author, 1.09–1.45) are associated with faster publication. Academic affiliation
+is associated with *slower* publication (HR 0.62, 0.44–0.88). US location
+(HR 1.42, 0.89–2.27), inferred male first authorship (HR 0.78, 0.58–1.07),
+multicenter conduct (HR 1.39, 0.81–2.38) and reported funding (HR 1.76,
+0.43–7.17) are not statistically distinguishable from no effect.
 
+Two cautions. The proportional-hazards assumption is only marginally supported
+(global p = 0.052 on 171 events); and the academic-affiliation estimate rests on
+a covariate whose ascertainment changed substantially in the 2026-09-03
+correction pass (148 → 371 abstracts flagged), so treat it as provisional.
 Author gender is **inferred from names, not self-reported**, and 228 abstracts
-carry a cross-source disagreement recorded in `gender_conflict`. Treat that
-estimate as provisional.
+carry a cross-source disagreement recorded in `gender_conflict`.
 
 ### Other figures
 
@@ -104,7 +109,7 @@ ScienceDirect JMIG supplements (12 congress issues)
    1,051 evaluated → 178 published · 873 not · 55 unresolved
         │  07_make_tables.R · 08_make_figures.R · strobe_flowchart.R
         ▼
-   final_analytical_dataset.csv (1,106 × 90), tables, figures
+   final_analytical_dataset.csv (1,106 × 92), tables, figures
 ```
 
 Full stage-by-stage detail, including a Mermaid DAG:
@@ -143,8 +148,15 @@ testthat::test_dir("tests/testthat")
 **Re-run the whole pipeline** — see the caveats below first:
 
 ```r
-Rscript 00_run_all.R          # 3-4 h cold, ~30 min warm
-Rscript R/run_demographics.R  # REQUIRED: 00_run_all.R does not call it
+Rscript 00_run_all.R   # 3-4 h cold, ~30 min warm; now includes the
+                       # demographics merge and the STROBE flow chart
+```
+
+If `data/processed/pubmed_candidates.csv` is missing or predates
+`match_scores.csv`, repair it before running steps 4-6:
+
+```r
+Rscript scripts/rebuild_candidate_pool.R
 ```
 
 ---
@@ -159,14 +171,14 @@ Rscript R/run_demographics.R  # REQUIRED: 00_run_all.R does not call it
 | [MATCHING_ALGORITHM.md](docs/MATCHING_ALGORITHM.md) | The composite score, component by component, with thresholds |
 | [OUTCOME_DEFINITION.md](docs/OUTCOME_DEFINITION.md) | When does an abstract count as published? (Methods-ready) |
 | [ADJUDICATION.md](docs/ADJUDICATION.md) | Human review: schema, precedence, and the decision accounting |
-| [DATA_DICTIONARY.md](docs/DATA_DICTIONARY.md) · [CSV](docs/data_dictionary.csv) | All 90 variables with derivation and coverage |
-| [DATA_INVENTORY.md](docs/DATA_INVENTORY.md) · [CSV](docs/data_inventory.csv) | All 70 data files with producer, consumers and grain |
+| [DATA_DICTIONARY.md](docs/DATA_DICTIONARY.md) · [CSV](docs/data_dictionary.csv) | All 92 variables with derivation and coverage |
+| [DATA_INVENTORY.md](docs/DATA_INVENTORY.md) · [CSV](docs/data_inventory.csv) | All 71 data files with producer, consumers and grain |
 | [AUTHOR_ENRICHMENT.md](docs/AUTHOR_ENRICHMENT.md) | Identity resolution and the ten-tier gender waterfall |
 | [STATISTICAL_ANALYSIS.md](docs/STATISTICAL_ANALYSIS.md) | Every model as fitted, with diagnostics |
 | [RESULTS_PROVENANCE.md](docs/RESULTS_PROVENANCE.md) | Every reported number → the file and code that produced it |
 | [SOURCE_OF_TRUTH.md](docs/SOURCE_OF_TRUTH.md) | Which file wins when two disagree |
 | [REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md) | What a clean clone gets, and what it does not |
-| [FAILURE_MODES.md](docs/FAILURE_MODES.md) | Sixteen ways this pipeline can be plausibly wrong |
+| [FAILURE_MODES.md](docs/FAILURE_MODES.md) | Seventeen ways this pipeline can be plausibly wrong, and which nine are now fixed |
 | [VALIDATION.md](docs/VALIDATION.md) | The test suite and the invariants that have no test |
 | [METHODOLOGICAL_HISTORY.md](docs/METHODOLOGICAL_HISTORY.md) | Corrections, with their effect on the numbers |
 | [technical_appendix.Rmd](docs/technical_appendix.Rmd) | Extended appendices A1–A13 |
@@ -182,31 +194,29 @@ Rscript R/run_demographics.R  # REQUIRED: 00_run_all.R does not call it
 | International gender lookup (300 names) | **Manual.** Tracked. |
 | ACGME teaching-hospital list (2,754 names) | External snapshot, tracked, no retrieval script. |
 | `data/cache/sd_html/` (1,154 files) | **Gitignored and unrefetchable** — ScienceDirect returns HTTP 403. This cache is currently the only copy of the source documents. |
-| `data/processed/pubmed_candidates.csv` (98 MB) | **Gitignored.** A clean clone cannot run steps 4–5 without re-running the search. |
-| NPI matching | **Irreproducible.** Both inputs are hard-coded absolute paths outside the repository, and neither exists on the current machine. |
+| `data/processed/pubmed_candidates.csv` (≈130 MB) | **Gitignored.** A clean clone cannot run steps 4–5 without re-running the search, or `scripts/rebuild_candidate_pool.R` against `match_scores_detailed.rds`. |
+| NPI matching | **Not currently regenerable.** Both inputs now come from `config.yml: external_data` (`ABOG_NPI_PATH`, `NPPES_DUCKDB_PATH`). Both files exist on this machine, but the ABOG `LATEST` symlink now targets a workforce export with no gender column and NPIs on 411 of 79,400 rows, so `R/10_npi_matching.R` refuses to overwrite the richer shipped sidecar. |
 | 2017 abstract text | **Irrecoverable** without institutional PDF access (CORS blocks the jmig.org scraper; no Wayback snapshots). 96 of 97 abstracts have no text. |
 
 ---
 
 ## Test status
 
-21 test files. As of 2026-09-03 16:50: **627 passing, 3 failing, 1 skipped.**
-The suite is under active development in a parallel workstream (the `cycle0*`
-files), so these counts move — [docs/VALIDATION.md](docs/VALIDATION.md) carries
-the current inventory and, more usefully, the list of scientific invariants that
-have **no** test.
+22 test files. As of 2026-09-03 17:50: **758 passing, 3 failing, 1 skipped**
+(from 519 passing / 1 failing at the start of the day). Every failure is
+deliberately left red, each marking a decision that belongs to the author rather
+than to code:
 
-Every failure reports a real problem rather than a broken fixture, and two are
-deliberately left red pending a decision:
-
-| Failing test | What it reports |
-|---|---|
-| `test-shiny_app.R:458` | The deployed Shiny bundle is 135 days behind `data/processed/`, so reviewers on the live app see pre-denominator-fix data. |
-| `test-cycle03_model_contracts.R:57` | **Left red by design.** `has_funding` is TRUE for 3 of 1,051 abstracts and its odds ratio spans 0.12–29.04. "Not significant" and "not estimable" are different claims; which to report has not been decided. |
-| `test-cycle04_validation_sensitivity.R:179` | **Left red by design.** `search_strategy_efficacy.csv` still carries the pre-correction `title`-strategy yield of 0.2% (3 hits in 1,742 queries) and has not been regenerated since the April 2026 title-phrase fix. |
+| Failing test | What it reports | Why it stays red |
+|---|---|---|
+| `test-cycle04_validation_sensitivity.R:179` | `search_strategy_efficacy.csv` still carries the pre-correction `title`-strategy yield of 0.2% | Regenerating it means re-running the whole search layer, which would change candidate sets and invalidate the human adjudication |
+| `test-cycle06_scoring_composite.R:83` | `keyword_pts` fires on 0 of 1,106 abstracts, so the "10-component" score has nine live components | Fixing the component changes every score and therefore every classification |
+| `test-cycle06_scoring_composite.R:116` | 3 PMIDs are credited to 6 published abstracts | Deciding which abstract owns each PMID is adjudication; surfaced in `final_pmid_shared` |
 
 CI runs three gates: decision-logic boundary contracts, then mutation tests
 (every planted defect must still be killed), then the full suite.
+Full inventory and the list of invariants that have **no** test:
+[docs/VALIDATION.md](docs/VALIDATION.md).
 
 ## Known limitations
 
@@ -217,33 +227,42 @@ CI runs three gates: decision-logic boundary contracts, then mutation tests
    presentations were never ingested. The cohort is best described as *the first
    ~95–100 presentations listed in each supplement*, not *all oral
    presentations*. [FAILURE_MODES.md F1](docs/FAILURE_MODES.md)
-2. **74 of the 178 published abstracts have no publication date**, because the
-   candidate file on disk is a stale subset of the pool the scores were computed
-   against. Time-to-publication, the Kaplan–Meier curve and the Cox model all
-   run on 104 events. [F2](docs/FAILURE_MODES.md)
-3. **Study characteristics were derived before the abstract text was
-   recovered.** For 2012–2018 the regex classifiers saw the title alone, giving
-   a step change at 2018/2019 in `is_us_based` (31–45% → 97–100%),
-   `is_academic` (0–4% → 22–47%), `sample_size` availability (4–13% → 66–77%)
-   and `has_numeric_results` (0% → 47–89%). Congress year is in neither model,
-   so every coefficient is confounded by year through measurement. [F3](docs/FAILURE_MODES.md)
-4. **`aim1_by_practice_type.csv` and `aim1_by_subspecialty.csv` are not
-   publication rates.** Both stratifiers are parsed from the matched
-   publication's affiliation and therefore exist almost only for published
-   abstracts. [F4](docs/FAILURE_MODES.md)
-5. **A failed API call is indistinguishable from a genuine zero result.** No
-   retry, no error column, and the checkpoint marks the abstract complete. [F5](docs/FAILURE_MODES.md)
-6. **`00_run_all.R` does not run the demographics merge.** Run
-   `R/run_demographics.R` separately or the models silently lose their
-   demographic terms. [F8](docs/FAILURE_MODES.md)
-7. Author gender is inferred; 27% of resolved values come from a single first
+2. **2017 and 2018 have no recoverable abstract text at all** (1 of 97 and 0 of
+   95). Every text-derived covariate is near zero for those two congresses, and
+   congress year is in neither model, so they act as a measurement-driven
+   stratum. The wider 2012–2018 version of this problem was a derivation-ordering
+   bug and is fixed. [F3](docs/FAILURE_MODES.md)
+3. **A failed API call is indistinguishable from a genuine zero result.** No
+   retry, no error column, and the checkpoint marks the abstract complete, so a
+   transient NCBI outage leaves a permanently under-searched abstract. [F5](docs/FAILURE_MODES.md)
+4. **Search checkpoints resume but never invalidate.** Editing a query does not
+   re-run it for an already-completed abstract. [F6](docs/FAILURE_MODES.md)
+5. **`aim1_by_practice_type.csv` and `aim1_by_subspecialty.csv` are rates
+   conditional on a match having been found**, not publication rates — the
+   stratifiers come from the matched publication's affiliation. The files now
+   carry the availability split that proves it. [F4](docs/FAILURE_MODES.md)
+6. Author gender is inferred; 27% of resolved values come from a single first
    initial and 228 carry a cross-source disagreement.
-8. `n_authors` is censored at 5 by ScienceDirect's author-list truncation, and
+7. `n_authors` is censored at 5 by ScienceDirect's author-list truncation, and
    is a significant term in both models.
-9. Publication dates are print/issue dates; `ArticleDate` is not read. Eleven
+8. Publication dates are print/issue dates; `ArticleDate` is not read. Eleven
    pre-congress exclusions rest on year-only dates resolved to 1 January.
+   Changing this would re-score every candidate and invalidate the human
+   adjudication, so it has not been changed. [F14](docs/FAILURE_MODES.md)
+9. The composite score is described as ten-component but `keyword_pts` is 0 for
+   every abstract, so nine are live. Fixing it has the same re-scoring
+   consequence as above.
 10. The 55 unresolved abstracts are removed from the denominator. Bounds:
     16.1% if all unpublished, 21.1% if all published.
+11. The proportional-hazards assumption is only marginally supported
+    (global p = 0.052).
+12. **Three publications are each credited to two abstracts**, so six of the 178
+    numerator rows rest on three papers. The numerator is not deduplicated —
+    two abstracts can legitimately merge into one paper — but the affected rows
+    are flagged in `final_pmid_shared` and listed in
+    `output/shared_publication_matches.csv`. One of the three is counted
+    published against an explicit reviewer `no_match`.
+    [F17](docs/FAILURE_MODES.md)
 
 ---
 

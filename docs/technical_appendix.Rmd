@@ -214,8 +214,20 @@ The algorithm achieved `r round(val$value[val$metric == "sensitivity"]*100,1)`% 
 ## A6. Sensitivity Analyses
 
 ```{r}
-kable(s, col.names = c("Scenario", "N evaluated", "N published", "Rate (%)"))
+# Column names are derived rather than hard-coded: sensitivity_analyses.csv
+# gained a `denominator` column on 2026-09-03 (scenarios 1-2 divide by the
+# cohort, 3 onward by the evaluated set), and a fixed four-name vector made the
+# whole appendix fail to knit.
+pretty <- c(scenario = "Scenario", denominator = "Denominator",
+            n = "N", n_published = "N published", rate = "Rate (%)")
+kable(s, col.names = ifelse(names(s) %in% names(pretty),
+                            pretty[names(s)], names(s)))
 ```
+
+Scenarios 1 and 2 are decidable without a reviewer and divide by the cohort;
+scenario 3 onward require an adjudicated outcome and divide by the evaluated
+set. The `Denominator` column states which, so the rates are not compared
+across different populations.
 
 ## A7. Cox Proportional Hazards Model
 

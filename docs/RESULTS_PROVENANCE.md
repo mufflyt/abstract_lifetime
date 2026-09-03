@@ -4,8 +4,10 @@ Every number that appears in the README, the manuscript drafts, the technical
 appendix, the generated tables or the figures, mapped to the file and the code
 that produced it, with a verification status.
 
-Verification was performed on 2026-09-03 against commit `665c551` with a clean
-working tree. **Status key**: ✅ current and correct · ⚠️ correct but easy to
+Verification was performed on 2026-09-03. The tables below reflect the state
+**after** the remediation pass described in
+[FAILURE_MODES.md](FAILURE_MODES.md); values that moved during that pass are
+shown with their previous value so the change is auditable. **Status key**: ✅ current and correct · ⚠️ correct but easy to
 misread · ❌ stale or wrong.
 
 ---
@@ -23,18 +25,19 @@ misread · ❌ stale or wrong.
 | Not published | 873 | same | | ✅ 1,051 − 178 |
 | **Publication rate** | **16.9%** (16.94%) | `output/aim1_publication_rate.csv` | `R/06_analyze_results.R:62-63` | ✅ 178/1,051 |
 | 95% CI | 14.8% – 19.3% | same | `prop.test(178, 1051, correct = FALSE)` | ✅ reproduced |
-| Median months to publication | 13.8 | `output/aim2_time_to_pub.csv` | `R/06_analyze_results.R:155-162` | ⚠️ computed on **104 of 178** published |
-| p25 | 6.3 | same | | ⚠️ same caveat |
-| p75 | 25.0 | same | | ⚠️ same caveat |
-| RCT → time to publication | HR 2.295 (1.294–4.071), p = 0.005 | `output/aim2b_cox_regression.csv` | `coxph`, `R/06_analyze_results.R:217` | ✅ |
-| RCT → publication | OR 2.244 (1.273–3.856), p = 0.004 | `output/aim3_logistic_regression.csv` | `glm`, `:285` | ✅ |
-| Multicenter → time to publication | HR **1.132** (0.413–3.105), p = **0.809** | `output/aim2b_cox_regression.csv` | | ❌ README says "HR ≈ 2.3 … p < 0.05" |
-| Multicenter → publication | OR 1.884 (0.861–3.881), p = **0.096** | `output/aim3_logistic_regression.csv` | | ❌ the programmatic abstract calls this "significantly more likely" |
-| Author count → time to publication | HR 1.240 (1.042–1.475), p = 0.015 | `output/aim2b_cox_regression.csv` | | ⚠️ `n_authors` is censored at 5 |
-| Author count → publication | OR 1.325 (1.147–1.543), p < 0.001 | `output/aim3_logistic_regression.csv` | | ⚠️ same |
-| Male first author → time to publication | HR 0.590 (0.390–0.892), p = 0.012 | `output/aim2b_cox_regression.csv` | | ⚠️ gender inferred; 228 conflicts |
-| US-based → time to publication | HR 1.712 (1.091–2.687), p = 0.019 | same | | ⚠️ `is_us_based` has a severe year gradient |
-| PH assumption, global | p = 0.32 | `output/cox_ph_assumption.csv` | `cox.zph()` | ✅ |
+| Median months to publication | **13.7** (was 13.8) | `output/aim2_time_to_pub.csv` | `R/06_analyze_results.R` | ✅ computed on **171 of 178** published; the other 7 published before their congress and are excluded |
+| p25 | **5.7** (was 6.3) | same | | ✅ |
+| p75 | **22.6** (was 25.0) | same | | ✅ |
+| RCT → time to publication | HR **2.212** (1.473–3.323), p < 0.001 | `output/aim2b_cox_regression.csv` | `coxph` | ✅ 170 events, was 104 |
+| RCT → publication | OR **2.556** (1.551–4.156), p < 0.001 | `output/aim3_logistic_regression.csv` | `glm` | ✅ n = 1,010 |
+| Multicenter → time to publication | HR **1.387** (0.809–2.377), p = 0.234 | `output/aim2b_cox_regression.csv` | | ✅ not significant; the README claim of HR ≈ 2.3 has been removed |
+| Multicenter → publication | OR **1.482** (0.769–2.718), p = 0.218 | `output/aim3_logistic_regression.csv` | | ✅ the programmatic abstract now derives its significance wording from the p-value |
+| Author count → time to publication | HR **1.257** (1.093–1.445), p = 0.001 | `output/aim2b_cox_regression.csv` | | ⚠️ `n_authors` is censored at 5 |
+| Author count → publication | OR **1.336** (1.154–1.560), p < 0.001 | `output/aim3_logistic_regression.csv` | | ⚠️ same |
+| Male first author → time to publication | HR **0.783** (0.575–1.066), p = 0.120 | `output/aim2b_cox_regression.csv` | | ⚠️ **no longer significant** after the event count rose from 104 to 170; gender is inferred and 228 abstracts carry a conflict |
+| US-based → time to publication | HR **1.419** (0.887–2.270), p = 0.145 | same | | ⚠️ **no longer significant** after `is_us_based` was re-derived from the backfilled text (689 → 907 TRUE) |
+| Academic → time to publication | HR **0.621** (0.440–0.876), p = **0.007** | `output/aim2b_cox_regression.csv` | | ⚠️ **newly significant and negative**; `is_academic` went from 148 to 371 TRUE when re-derived. Provisional. |
+| PH assumption, global | p = **0.052** (was 0.32) | `output/cox_ph_assumption.csv` | `cox.zph()` | ⚠️ only marginally supported now that the test has 170 events |
 | Gold-standard sensitivity | 1.00 | `output/validation_metrics.csv` | `R/validation_gold_standard.R` | ⚠️ n = 50, of which **49 classified** (`n_classified`); PPV is **0.50** and accuracy 0.735 |
 | Interrater agreement | 98.1% raw, κ = 0.994, over 519 abstracts | `output/interrater_agreement.csv` | `R/10_interrater.R` | ⚠️ reviewers were not blinded to the algorithm's answer |
 | Logistic-model N | 1,010 | `output/aim3_logistic_regression.csv` (`n_obs`) | `R/06_analyze_results.R:285` | ✅ 41 abstracts leave the model through complete-case deletion |
@@ -47,26 +50,26 @@ misread · ❌ stale or wrong.
 | Line | Claim | Status | Current value |
 |---|---|---|---|
 | 5 | badge "Tests: 392 passing" | ❌ | 519 passing, **1 failing**, 1 skipped |
-| 18–19 | "**16.9%** … (178 of 1,106; 95% CI 14.8–19.3)" | ❌ internally inconsistent | The rate and CI are for 178/**1,051**. 178/1,106 = 16.1%. |
+| 18–19 | headline | ✅ fixed — now states 178 of 1,051 evaluated, cohort 1,106 |
 | 19 | "A further 55 remain pending" | ✅ | 55 |
 | 21–22 | "Cochrane … pooled rate near 45%" | — | external claim, not verifiable here |
 | 24–27 | "Supersedes 17.2% … 39 abstracts — 35 unpublished, plus 4 with a confirmed match" | ✅ | 39 = 35 + 4 |
-| 33 | figure 1 alt text: "1,067 AAGL oral presentations" | ❌ | 1,106. The **figure itself is correct** (`figure1_flow_data.csv` says 1,154 / 48 / 1,106); only the alt text is stale. |
-| 60–62 | "Randomized design (HR ≈ 2.2), **multicenter conduct (HR ≈ 2.3)**, and author count are each associated with faster publication" | ❌ | Multicenter HR is 1.13, p = 0.81. Only RCT, author count, US-based and gender reach p < 0.05. |
-| 58 | figure 5 alt text: "RCT design, multicenter studies, and number of authors show hazard ratios above 1 at p < 0.05" | ❌ | same |
-| 65–66 | "277 authors carry a cross-source disagreement in `gender_conflict`" | ❌ | **228** (`data/processed/gender_conflicts.csv`, 228 rows; `sum(gender_conflict)` = 228) |
-| 109, 250, 258 | "391 tests" / "[ FAIL 0 … PASS 392 ]" | ❌ | 519 passing, 1 failing |
-| 219 | "59 columns per abstract" | ❌ | 90 in the final dataset, 86 in `abstracts_with_matches.csv` |
-| 225 | "gender_unified (99% coverage)" | ❌ | 96.3% |
+| 33 | figure 1 alt text | ✅ fixed — rewritten to the current flow |
+| 60–62 | Cox narrative | ✅ fixed — the README now reports the fitted values and names which terms are not distinguishable from no effect |
+| 58 | figure 5 alt text | ✅ fixed |
+| 65–66 | gender conflicts | ✅ fixed — 228 |
+| 109, 250, 258 | test counts | ✅ fixed — the README now states the current counts and links to VALIDATION.md |
+| 219 | variable count | ✅ fixed — 91 in the final dataset |
+| 225 | gender coverage | ✅ fixed — 96.3% |
 | 225 | "practice_type (18%)" | ✅ | 17.5% |
 | 225 | "subspecialty_unified (36%)" | ✅ | 35.0% |
 | 225 | "state_unified (31%)" | ✅ | 30.4% |
-| 226 | "278 high-confidence [NPI] matches, 40% of US authors" | ❌ | **276** high-confidence |
-| 295 | "`final_analytical_dataset.csv` Unified **1,067 × 90**" | ❌ | **1,106 × 90** |
+| 226 | NPI high-confidence matches | ✅ fixed — 276 |
+| 295 | dataset dimensions | ✅ fixed — **1,106 × 91** |
 | 174–183 | "Six PubMed strategies … plus four supplementary databases and a DOI search" | ✅ | verified against `build_search_strategies()` |
-| 187 | "10-component composite score" | ⚠️ | ten components exist; `keyword_pts` is 0 for every abstract, so nine are live |
+| 187 | "10-component composite score" | ⚠️ **unfixed** | ten components exist; `keyword_pts` is 0 for every abstract, so nine are live. Fixing it would change every score and invalidate the adjudication. |
 | 189–193 | classification thresholds | ✅ | match `config.yml` and `classify_match()` |
-| 317–318 | DuckDB and ABOG file paths | ❌ | neither path exists on this machine |
+| 317–318 | DuckDB and ABOG file paths | ✅ fixed — both moved to `config.yml: external_data`, overridable by env var. The earlier claim that neither file exists was **wrong**: both exist; the ABOG symlink points at a schema-drifted export and the DuckDB volume name has a suffix. See REPRODUCIBILITY.md. |
 
 ---
 
@@ -79,7 +82,7 @@ misread · ❌ stale or wrong.
 | "`gender_from_openalex.csv` — 157 resolutions" | ✅ | 157 rows |
 | "`gender_from_open_payments.csv` — 16 resolutions" | ✅ | 16 rows |
 | "Publication rate 17.2% → 16.9%; cohort 1,067 → 1,106; published 174 → 178" | ✅ | end state verified |
-| "`10e_merge_demographics.R` is the **sole writer** to `abstracts_with_matches.csv`" | ❌ | **six** writers: `01d`, `05`, `09b`, `09d`, `09e`, `10e`, plus an inline block in `00_run_all.R:127-146` |
+| "`10e_merge_demographics.R` is the **sole writer** to `abstracts_with_matches.csv`" | ✅ corrected in CHANGELOG | **six** writers: `01d`, `05`, `09b`, `09d`, `09e`, `10e`, plus an inline block in `00_run_all.R`. `05` no longer destroys the others' columns (F10). |
 | "`10g_second_author_triangulation.R` returns zero rows" | ✅ | 0 rows |
 | "Three `test-pipeline_semantics.R` failures … remain" | ❌ | `test-pipeline_semantics.R` now passes in full; the single remaining failure is `test-shiny_app.R:458` (stale deploy bundle) |
 | "1,106 vs 1,067 row mismatch between `abstracts_cleaned.csv` and `abstracts_with_matches.csv`" | ❌ | both are 1,106; the mismatch was resolved by the denominator fix |
@@ -116,11 +119,11 @@ stale *sentences*:
 | `figure1_strobe_flowchart.{png,pdf}` | 2026-09-03 14:56 | ✅ asserts its own arithmetic with `stopifnot()` |
 | `figure2`–`figure6`, `figureS1`–`figureS4` | 2026-09-01 22:16 | ⚠️ one analysis run behind. `06_analyze_results.R` was re-run 2026-09-03 15:27; the model outputs are **byte-identical** to the 2026-09-01 versions (verified against commit `e288259`), so the figures are numerically current, but a future re-run will silently desynchronise them. |
 | `output/tables/table1`–`table4` | 2026-09-01 22:16 | ⚠️ same |
-| `output/aim1_by_practice_type.csv` | 2026-09-03 15:27 | ❌ **do not report as publication rates.** See §6. |
-| `output/aim1_by_subspecialty.csv` | 2026-09-03 15:27 | ❌ same |
-| `output/aim5_publication_bias.csv` | 2026-04-17 | ❌ orphaned; the producing block no longer runs |
-| `output/search_strategy_efficacy.csv` | 2026-04-19 | ❌ pre-correction measurement |
-| `output/aim4_strategy_performance.csv` / `table4` | 2026-09-03 | ❌ attribution understated — joins the stale candidate file |
+| `output/aim1_by_practice_type.csv` | 2026-09-03 | ⚠️ now carries `availability_among_published` (81.5%) vs `availability_among_unpublished` (2.4%) and an `outcome_conditional_stratifier` flag. Still not a publication rate — see §6. |
+| `output/aim1_by_subspecialty.csv` | 2026-09-03 | ⚠️ same (77.5% vs 1.9%) |
+| `output/aim5_publication_bias.csv` | 2026-09-03 | ✅ regenerated; `result_positivity` restored to `05`'s select |
+| `output/search_strategy_efficacy.csv` | 2026-04-19 | ❌ **still stale** — a pre-correction measurement. Regenerating it requires re-running the search layer. |
+| `output/aim4_strategy_performance.csv` / `table4` | 2026-09-03 | ⚠️ the pool is repaired, but rows recovered by the rebuild carry `strategies = "unrecovered"`, so attribution covers only the pairs whose provenance survived |
 | `output/figures/strobe_flow.{png,pdf,svg}` | 2026-09-01 21:30 | ❌ superseded by `figure1_strobe_flowchart` |
 
 ---
@@ -155,7 +158,13 @@ component, which does not depend on a match (206 unpublished abstracts have a
 carry the mixed-vocabulary problem described in
 [AUTHOR_ENRICHMENT.md](AUTHOR_ENRICHMENT.md) §5.
 
-**Nothing here has been changed.** These files are flagged, not corrected.
+**The tables now flag themselves.** `subgroup_rate()` in
+`R/06_analyze_results.R` attaches the availability split and an
+`outcome_conditional_stratifier` column to every row, and warns at run time. The
+rate is still emitted because it is the correct conditional quantity and the
+manuscript reads these files. `figure4_subgroup_rates.png` still plots these
+panels beside outcome-independent strata; whether to drop them is a
+presentation decision.
 
 ---
 

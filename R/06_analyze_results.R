@@ -112,6 +112,43 @@ if (file.exists(candidates_path)) {
   cli_alert_warning("No candidate pool found - publication fields not refreshed")
 }
 
+# ------------------------------------------------------------------
+# One publication credited to more than one abstract.
+#
+# The publication rate is a per-abstract quantity, and two abstracts from the
+# same group can legitimately resolve to one paper - companion analyses merged
+# before submission, or a preliminary and a final report of one study. Cochrane
+# MR000005 counts these per abstract, so the numerator is NOT deduplicated here.
+#
+# But a shared PMID is also what a wrong match looks like, so it must be visible
+# rather than buried. `final_pmid_shared` flags every published abstract whose
+# credited publication is also credited to another, and the count is reported at
+# run time. Found by tests/testthat/test-cycle06_scoring_composite.R.
+# ------------------------------------------------------------------
+shared_pmids <- results |>
+  filter(!is.na(final_published), final_published, !is.na(final_pmid)) |>
+  count(final_pmid, name = ".n") |>
+  filter(.n > 1)
+
+results <- results |>
+  mutate(final_pmid_shared = !is.na(final_published) & final_published &
+           !is.na(final_pmid) & final_pmid %in% shared_pmids$final_pmid)
+
+if (nrow(shared_pmids) > 0) {
+  n_rows <- sum(results$final_pmid_shared)
+  cli_alert_warning(
+    "{nrow(shared_pmids)} publication{?s} {?is/are} credited to {n_rows} \
+     abstracts. The numerator is not deduplicated - see final_pmid_shared."
+  )
+  results |>
+    filter(final_pmid_shared) |>
+    select(abstract_id, congress_year, classification, manual_decision,
+           final_pmid, title) |>
+    arrange(final_pmid) |>
+    write_csv(here("output", "shared_publication_matches.csv"))
+  cli_alert_info("Detail: output/shared_publication_matches.csv")
+}
+
 # Export the fully unified dataset with all demographics + human decisions for external analysis
 write_csv(results, here("output", "final_analytical_dataset.csv"))
 cli_alert_success("Exported unified dataset to output/final_analytical_dataset.csv")
@@ -262,18 +299,37 @@ cli_h3("Aim 2: Time to Publication")
 published <- results |> filter(final_published)
 
 if (nrow(published) > 0 && "months_to_pub" %in% names(published)) {
-  ttp <- published$months_to_pub[!is.na(published$months_to_pub)]
+  # Time to publication is only defined for a publication that follows the
+  # congress. A handful of confirmed publications appeared shortly BEFORE their
+  # meeting - four are pre-conference candidates a reviewer confirmed anyway,
+  # and one is an online-first paper that appeared two weeks before the 2015
+  # congress. They belong in the numerator, because a reviewer ruled they are
+  # the abstract's publication, but a negative interval is not a time to
+  # publication and must not enter the median or the IQR.
+  dated  <- published$months_to_pub[!is.na(published$months_to_pub)]
+  ttp    <- dated[dated > 0]
+  n_pre  <- sum(dated <= 0)
+  n_none <- sum(is.na(published$months_to_pub))
+
+  if (n_pre > 0) {
+    cli_alert_info("{n_pre} confirmed publication{?s} predate their congress and \
+                    are excluded from the time-to-publication summary")
+  }
+  if (n_none > 0) {
+    cli_alert_warning("{n_none} confirmed publication{?s} have no resolvable date")
+  }
 
   aim2 <- tibble::tibble(
-    metric = c("n_with_dates", "median_months", "q1_months", "q3_months",
+    metric = c("n_published", "n_with_dates", "n_pre_congress", "n_undated",
+               "median_months", "q1_months", "q3_months",
                "mean_months", "min_months", "max_months"),
-    value = c(length(ttp),
+    value = c(nrow(published), length(ttp), n_pre, n_none,
               round(median(ttp), 1), round(quantile(ttp, 0.25), 1),
               round(quantile(ttp, 0.75), 1), round(mean(ttp), 1),
               round(min(ttp), 1), round(max(ttp), 1))
   )
 
-  cli_alert_info("Median time to publication: {round(median(ttp), 1)} months (IQR: {round(quantile(ttp, 0.25), 1)}-{round(quantile(ttp, 0.75), 1)})")
+  cli_alert_info("Median time to publication: {round(median(ttp), 1)} months (IQR: {round(quantile(ttp, 0.25), 1)}-{round(quantile(ttp, 0.75), 1)}) on {length(ttp)}/{nrow(published)} published")
 
   # Kaplan-Meier analysis
   # Create survival object: event = publication, time = months since conference

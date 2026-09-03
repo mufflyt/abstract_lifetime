@@ -3,33 +3,46 @@
 Inventory of the test suite, plus an audit of which scientific claims are and
 are not protected by a test.
 
-**Current status** (`testthat::test_dir("tests/testthat")`, 2026-09-03 16:50,
-full working tree, 21 test files):
+**Current status** (`testthat::test_dir("tests/testthat")`, 2026-09-03 17:45,
+after the remediation pass, 22 test files):
 
 ```
-[ FAIL 3 | WARN 17 | SKIP 1 | PASS 627 ]
+[ FAIL 3 | WARN 16 | SKIP 1 | PASS 758 ]
 ```
 
-All three failures report real problems; two are deliberately left red.
+All three remaining failures are **deliberately left red**: each marks a decision
+that belongs to the author rather than to code.
 
-| Failing test | Reports | Cross-reference |
+`test-cycle03_model_contracts.R:57` — which asserts that no reported odds ratio
+spans a 100-fold interval — now passes, because the `has_funding` interval
+narrowed from 0.117–29.04 to 0.293–11.345 when the event count rose from 104 to
+171. The underlying concern has not gone away: `has_funding` is TRUE for **3 of
+1,106** abstracts, and an estimate from three events is not interpretable
+whatever its interval width. It should be reported as not estimable, or dropped.
+
+| Failing test | Reports | Why it is not fixed |
 |---|---|---|
-| `test-shiny_app.R:458` | The deploy bundle is 135 days behind `data/processed/` | [FAILURE_MODES.md](FAILURE_MODES.md) F11 |
-| `test-cycle03_model_contracts.R:57` | `has_funding` OR spans 0.12–29.04 from 3 TRUE abstracts — not estimable rather than not significant. **Left red** pending a reporting decision. | [STATISTICAL_ANALYSIS.md](STATISTICAL_ANALYSIS.md) §Diagnostics |
-| `test-cycle04_validation_sensitivity.R:179` | `search_strategy_efficacy.csv` still carries the pre-correction 0.2% `title` yield. **Left red** until the search layer is re-run. | [PUBLICATION_SEARCH.md](PUBLICATION_SEARCH.md) §8 |
+| `test-cycle04_validation_sensitivity.R:179` | `search_strategy_efficacy.csv` still carries the pre-correction 0.2% `title` yield | Regenerating it means re-running the whole search layer, which would change candidate sets and invalidate the human adjudication |
+| `test-cycle06_scoring_composite.R:83` | `keyword_pts` fires on 0 of 1,106 abstracts | Fixing the component changes every composite score and therefore every classification, invalidating the adjudication |
+| `test-cycle06_scoring_composite.R:116` | 3 PMIDs credited to 6 published abstracts | Deciding which abstract owns each PMID is adjudication. Surfaced as `final_pmid_shared` and `output/shared_publication_matches.csv`; see FAILURE_MODES.md F17 |
 
-The single skip is the browser end-to-end suite, which needs `shinytest2`.
+Fixed during this pass, each having been a genuine failure: the stale deploy
+bundle (F11 — bundle refreshed; **the live shinyapps.io app is still stale and
+needs `SHINY_DEPLOY=true Rscript shiny/adjudication_app/deploy.R`, which is an
+outward-facing publish and is left to the author**), the gold-standard confusion
+cells summing to 49 against a stated n = 50, `cohens_kappa` silently `NA`
+because `irr` was not installed (now 0.994), `technical_appendix.Rmd` failing to
+knit after `sensitivity_analyses.csv` gained a column, and an outdated
+assertion in `test-cycle02_survival_estimand.R` that no confirmed publication
+may carry a negative interval.
 
-Two further failures existed earlier on 2026-09-03 and were fixed during this
-pass by a parallel workstream: the gold-standard confusion cells summing to 49
-against a stated n = 50 (now exported as `n_classified`; accuracy 0.720 →
-0.735), and `cohens_kappa` silently `NA` because `irr` was not installed
-(κ = 0.994).
+Before this work the suite stood at
+`[ FAIL 1 | WARN 17 | SKIP 1 | PASS 519 ]` across 16 files.
 
-Before this documentation pass the suite stood at
-`[ FAIL 1 | WARN 17 | SKIP 1 | PASS 519 ]` across 16 files. The test suite is
-under active development, so counts move; the invariant table in §2 is the
-durable part of this document.
+**Note on the deploy-bundle test.** It measures whether `bundle/` matches
+`data/processed/`, not whether the deployed application does. A green result
+means the next deploy will ship current data; it does not mean reviewers are
+seeing it.
 
 ---
 
@@ -57,6 +70,7 @@ durable part of this document.
 | `test-cycle03_model_contracts.R` | 10 | BVA + semantic + adversarial | Gate 3 | Partially | model RDS, `aim2b`/`aim3` CSVs | Logistic and Cox output contracts; the ≥50%-missing exclusion rule; complete-case attrition; determinism; artefact vintage. Added `n_obs` to `aim3_logistic_regression.csv` (1,010 against a denominator of 1,051 — 41 abstracts leave through complete-case deletion, previously invisible). |
 | `test-cycle04_validation_sensitivity.R` | 10 | semantic + adversarial | Gate 3 | Partially | `validation_metrics.csv`, `sensitivity_analyses.csv`, `interrater_agreement.csv`, `search_strategy_efficacy.csv` | Gold-standard confusion-cell partition; sensitivity-scenario denominator consistency; interrater completeness; search-efficacy vintage |
 | `test-docs_drift.R` *(added by this pass)* | 12 | contract | Gate 3 | Partially | `docs/*.csv`, the analytical outputs | Documentation-to-data agreement; see §4 |
+| `test-remediation_invariants.R` *(added by this pass)* | 8 | contract | Gate 3 | Partially | `abstracts_cleaned.csv`, `final_analytical_dataset.csv`, `pubmed_candidates.csv`, the aim CSVs | The defects fixed on 2026-09-03: no scraper footnote in `abstract_text`; no covariate structurally zero across a congress outside 2017–2018; `abstract_word_count` nonzero wherever text exists; the enrichment block survives a step-5 re-run; one subspecialty vocabulary; subgroup tables carry their availability split; sensitivity scenarios name their denominator; every winning PMID resolves; every published abstract carries a date; pre-congress publications are confined and excluded from Aim 2 |
 
 CI (`.github/workflows/tests.yaml`) runs on every push and pull request, plus a
 nightly cron, in three gates: the BVA contracts, then the mutation tests, then
@@ -86,17 +100,18 @@ described in [PUBLICATION_SEARCH.md](PUBLICATION_SEARCH.md) §1.
 | Candidate score in range | Partial | `test-pipeline_semantics.R:68, 79` | Moderate — asserts definite ≥ 7 and no_match < 3; no explicit `[-5, 14]` bound |
 | Publication-date validity | Partial | `test-pipeline_semantics.R:129, 139` | Moderate — bounds the median at 6–36 months and forbids negative times among the published |
 | Human-adjudication completeness | **No** | — | **GAP.** Nothing asserts that every cohort abstract has a decision, nor that decisions with no matching abstract are accounted for (47 video orphans). |
+| One publication per abstract | **Yes** | `test-cycle06_scoring_composite.R:116` | **Strong, and currently violated by design** — 3 PMIDs are credited to 6 abstracts. Surfaced in `final_pmid_shared`. F17. |
 | Final dataset grain | Partial | `test-pipeline_semantics.R:18` | Moderate — row count and year set, on `abstracts_with_matches.csv` |
-| Model cohort reconciliation | **No** | — | **GAP.** Nothing asserts `nrow(model_data)` against `n_evaluated`, or that the Cox event count equals the number published. The 104-vs-178 gap would have surfaced immediately. |
+| Model cohort reconciliation | **Yes** | `test-cycle03_model_contracts.R`, `test-remediation_invariants.R` | Moderate. `aim3_logistic_regression.csv` now exports `n_obs` (1,010 against a denominator of 1,051), and publication-date coverage among the published is asserted at ≥ 95% — it is now 178/178, was 104/178. |
 | Manuscript numbers match generated output | Partial → **now yes** | `test-docs_drift.R` | Moderate — see §4 |
 | Every congress year has a config date | Yes | `test-cycle01_thresholds_contracts.R:175` | Strong |
 | Classifier boundary behaviour | Yes | `test-cycle01_thresholds_contracts.R:24, 41, 90` | Strong |
 | Dedup is order-invariant | Yes | `test-cycle01_thresholds_contracts.R:151` | Strong |
-| **Candidate pool matches what was scored** | **No** | — | **GAP — and it is currently violated.** `sum(match_scores$n_candidates)` (64,718) ≠ `nrow(pubmed_candidates.csv)` (48,984), and 283 winning PMIDs are unresolvable. F2. |
+| **Candidate pool matches what was scored** | **Yes** | `test-remediation_invariants.R`, `test-docs_drift.R` | **Strong, and now satisfied.** Every winning PMID resolves; cohort pairs 64,728 against 64,718 scored. Fixed by `scripts/rebuild_candidate_pool.R`. |
 | **Cohort completeness against the source supplement** | **No** | — | **GAP — and it is currently violated.** Nothing compares the captured DOI set against Crossref. F1. |
-| **Predictor derivation postdates the text backfill** | **No** | — | **GAP — and it is currently violated.** Nothing detects that `has_numeric_results` is 0.0% for seven consecutive congress years. F3. |
-| **Subgroup variables are not outcome-conditional** | **No** | — | **GAP — and it is currently violated.** F4. |
-| **The demographics merge ran** | **No** | — | **GAP.** `06` silently drops model terms that are absent. F8. |
+| **Predictor derivation postdates the text backfill** | **Yes** | `test-remediation_invariants.R` | **Strong.** Asserts no text-derived covariate is 0% across a whole congress outside 2017–2018, and that no scraper footnote sits in `abstract_text`. Fixed by `R/02d_rederive_predictors.R`. |
+| **Subgroup variables are not outcome-conditional** | **Partly** | `test-remediation_invariants.R` | Moderate. The rate is still emitted, but every row now carries the availability split and an `outcome_conditional_stratifier` flag, and the test asserts those columns exist. |
+| **The demographics merge ran** | **Partly** | `test-remediation_invariants.R` | Moderate. The enrichment block's presence in `abstracts_with_matches.csv` is asserted, and `00_run_all.R` now calls `10e`. The automatic variable screen in `06` still drops an absent term silently. |
 | Search failure is distinguishable from a zero result | **No** | — | **GAP.** No status is recorded, so no test is possible without a code change. F5. |
 | Gender inference quality | Partial | `test-pipeline_semantics.R:156` (coverage ≥ 60%) | **Weak.** Coverage is not accuracy. Nothing tests the 228 conflicts or the 292 initial-only calls. |
 
