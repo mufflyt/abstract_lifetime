@@ -32,6 +32,11 @@ rate_def <- s$rate[s$scenario == "Definite only"]
 rate_def_prob <- s$rate[s$scenario == "Definite + probable"]
 rate_confirmed <- s$rate[s$scenario == "Definite + reviewer-confirmed"]
 
+# Denominator for the time-to-publication sentence: the median is computed on
+# published abstracts carrying a usable interval, which is a strict subset of
+# all published abstracts. Both numbers are shown so the subset is visible.
+aim1_ <- read_csv(here::here("output", "aim1_publication_rate.csv"), show_col_types = FALSE)
+n_published_total <- aim1_$value[aim1_$metric == "published"]
 med_ttp <- ttp$value[ttp$metric == "median_months"]
 q1_ttp <- ttp$value[ttp$metric == "q1_months"]
 q3_ttp <- ttp$value[ttp$metric == "q3_months"]
@@ -43,8 +48,18 @@ pct_female <- round(n_female / n_gendered * 100, 1)
 
 n_academic <- prac$n[prac$practice_type == "academic"]
 rate_academic <- prac$rate[prac$practice_type == "academic"]
-n_community <- prac$n[prac$practice_type == "community"]
-rate_community <- prac$rate[prac$practice_type == "community"]
+# classify_practice_type() no longer emits a "community" level, so these
+# lookups returned numeric(0) and rendered as nothing. Read the levels that
+# actually exist, and fall back to 0 for any that do not.
+prac_n <- function(level) {
+  v <- prac$n[prac$practice_type == level]
+  if (length(v) == 0) 0L else v
+}
+n_community <- prac_n("community")
+rate_community <- {
+  v <- prac$rate[prac$practice_type == "community"]
+  if (length(v) == 0) NA_real_ else v
+}
 
 us_hr <- cox$estimate[cox$term == "is_us_basedTRUE"]
 us_ci_lo <- cox$conf.low[cox$term == "is_us_basedTRUE"]
@@ -127,7 +142,7 @@ Abstract-level variables were extracted using a combination of structured field 
 
 **Result direction.** Abstract conclusions were classified as reporting positive, negative, neutral, or unclear results using a validated regex-based classifier that scanned conclusion text, measurements sections, and full abstract text for directional language (e.g., "significant," "improved," "no difference," "failed to").
 
-**Author and institutional characteristics.** For each abstract's corresponding published paper (when identified), full author names and institutional affiliations were extracted from PubMed XML records via the NCBI E-Utilities API. First-author gender was inferred using US Social Security Administration name-gender data (R `gender` package, 1930-2012 birth cohorts) with genderize.io as a fallback for international names. First-author practice type was classified as academic, community, military/VA, research institute, or private practice by cross-referencing affiliations against 2,754 ACGME-accredited teaching hospital names and applying regex-based institution classification. First-author US state was parsed from affiliations using a multi-strategy approach (spelled-out state names, two-letter codes, institution-to-state lookup, and city-to-state lookup), and mapped to ACOG districts I-XI. Subspecialty was classified from departmental affiliations (MIGS, REI, gynecologic oncology, FPMRS, MFM, or general OB/GYN).
+**Author and institutional characteristics.** For each abstract's corresponding published paper (when identified), full author names and institutional affiliations were extracted from PubMed XML records via the NCBI E-Utilities API. First-author gender was inferred using US Social Security Administration name-gender data (R `gender` package, 1930-2012 birth cohorts) with genderize.io as a fallback for international names. First-author practice type was classified as academic, military/VA, research institute, or private practice by cross-referencing affiliations against 2,754 ACGME-accredited teaching hospital names and applying regex-based institution classification. First-author US state was parsed from affiliations using a multi-strategy approach (spelled-out state names, two-letter codes, institution-to-state lookup, and city-to-state lookup), and mapped to ACOG districts I-XI. Subspecialty was classified from departmental affiliations (MIGS, REI, gynecologic oncology, FPMRS, MFM, or general OB/GYN).
 
 ### Publication Search Strategy
 
@@ -181,7 +196,7 @@ A total of `r n_total` oral presentations from `r n_congresses` consecutive AAGL
 
 Of the `r n_total` abstracts, `r n_numeric_results` (`r round(n_numeric_results/n_total*100,1)`%) reported numeric results (p-values, odds ratios, or effect sizes), `r n_database` (`r round(n_database/n_total*100,1)`%) utilized national administrative databases (NSQIP, NIS, SEER, NCDB, or equivalent), `r n_industry` (`r round(n_industry/n_total*100,1)`%) disclosed industry involvement, `r n_trial_reg` (`r round(n_trial_reg/n_total*100,1)`%) reported a trial registration number, and `r n_irb` (`r round(n_irb/n_total*100,1)`%) included an IRB or ethics committee statement.
 
-Among `r n_gendered` first authors with gender data (`r round(n_gendered/n_total*100,1)`% coverage), `r n_female` (`r pct_female`%) were female and `r n_male` (`r round(100-pct_female,1)`%) were male. The majority of presentations originated from academic medical centers (`r n_academic`, `r round(n_academic/sum(prac$n)*100,1)`%), with community hospitals (`r n_community`), research institutes (`r prac$n[prac$practice_type == "research_institute"]`), military/VA facilities (`r prac$n[prac$practice_type == "military_va"]`), and private practices (`r prac$n[prac$practice_type == "private_practice"]`) comprising the remainder.
+Among `r n_gendered` first authors with gender data (`r round(n_gendered/n_total*100,1)`% coverage), `r n_female` (`r pct_female`%) were female and `r n_male` (`r round(100-pct_female,1)`%) were male. The majority of presentations originated from academic medical centers (`r n_academic`, `r round(n_academic/sum(prac$n)*100,1)`%), with research institutes (`r prac_n("research_institute")`), military/VA facilities (`r prac_n("military_va")`), and private practices (`r prac_n("private_practice")`) comprising the remainder. Practice type is parsed from the matched publication's affiliation, so it is available almost only for abstracts that were matched; these counts describe the matched subset, not the cohort.
 
 ### Publication Rate
 
@@ -191,7 +206,7 @@ Publication rates varied by congress year, ranging from `r min(pub_yr$rate)`% (`
 
 ### Time to Publication
 
-Among definite matches, the median time from conference presentation to full publication was `r med_ttp` months (IQR `r q1_ttp`-`r q3_ttp`). Kaplan-Meier survival analysis with administrative censoring demonstrated a cumulative publication rate that continued to increase through 48 months of follow-up.
+Among published abstracts with a resolvable publication date (n = `r ttp$value[ttp$metric == "n_with_dates"]` of `r n_published_total`), the median time from conference presentation to full publication was `r med_ttp` months (IQR `r q1_ttp`-`r q3_ttp`). Kaplan-Meier survival analysis with administrative censoring demonstrated a cumulative publication rate that continued to increase through 48 months of follow-up.
 
 ### Predictors of Publication
 

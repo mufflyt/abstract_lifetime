@@ -275,6 +275,35 @@ matches <- matches |>
   left_join(g9, by = "abstract_id") |>
   assert_rows("gender waterfall joins")
 
+
+#' Collapse the two subspecialty vocabularies onto one set of labels
+#'
+#' `npi_subspecialty` uses ABOG's spelled-out certification names and
+#' `subspecialty` uses the short codes emitted by
+#' \code{\link{classify_subspecialty}()}. Both feed `subspecialty_unified`.
+#' This maps every known spelling to the short code.
+#'
+#' @param x Character vector of subspecialty labels from either vocabulary.
+#' @return Character vector using the short-code vocabulary. Unrecognised values
+#'   are returned unchanged so a new upstream label is visible rather than
+#'   silently dropped.
+#' @keywords internal
+harmonise_subspecialty <- function(x) {
+  map <- c(
+    "Female Pelvic Medicine & Reconstructive Surgery" = "FPMRS",
+    "Female Pelvic Medicine and Reconstructive Surgery" = "FPMRS",
+    "Generalist"                                     = "general_OBGYN",
+    "Gynecologic Oncology"                           = "GYN_ONC",
+    "Maternal-Fetal Medicine"                        = "MFM",
+    "Reproductive Endocrinology and Infertility"     = "REI",
+    "MIG"                                            = "MIGS",
+    "Critical Care Medicine"                         = "critical_care",
+    "CRI"                                            = "critical_care"
+  )
+  out <- unname(map[x])
+  ifelse(is.na(out), x, out)
+}
+
 # ── Gender resolution policy (explicit, not implicit) ────────────────────────
 # Priority order for gender inference. Higher-ranked sources are preferred.
 # Rationale: sources using full given names are more reliable than those
@@ -435,7 +464,15 @@ cli_h2("5. Unified state & subspecialty")
 matches <- matches |>
   mutate(
     state_unified = coalesce(npi_state, first_author_state),
-    subspecialty_unified = coalesce(npi_subspecialty, subspecialty)
+    # Both inputs use two-letter USPS codes, so state needs no harmonisation.
+    # Subspecialty does: npi_subspecialty carries ABOG's spelled-out labels and
+    # `subspecialty` carries classify_subspecialty()'s short codes, so a plain
+    # coalesce() produced 13 levels for 8 concepts (MIG vs MIGS, FPMRS vs the
+    # spelled-out form, Generalist vs general_OBGYN, ...). Any subgroup analysis
+    # on the unharmonised column split real categories in two.
+    subspecialty_unified = harmonise_subspecialty(
+      coalesce(npi_subspecialty, subspecialty)
+    )
   )
 cli_alert_info("State coverage: {sum(!is.na(matches$state_unified))} / {nrow(matches)}")
 cli_alert_info("Subspecialty coverage: {sum(!is.na(matches$subspecialty_unified))} / {nrow(matches)}")

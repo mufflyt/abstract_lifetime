@@ -452,3 +452,60 @@ test of my own rescoped, two collapsed.
 Failures: 3.2 funding term, 4.9 re-run tracker, 6.5 dead component, 6.7
 duplicate PMIDs, shiny mtime (pre-existing). Four are open decisions; none is a
 regression.
+
+---
+
+## Cycle 7 — 2026-09-03 23:05 MDT
+
+Mix required: 4 BVA / 3 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle07_manuscript_consistency.R` (19 assertions).
+Target: agreement between the manuscript prose and the artifacts it describes.
+Cycles 0-6 tested the pipeline; nothing had checked that the sentences in docs/
+still describe the numbers in output/.
+
+| # | Category | Target | Assumption challenged |
+|---|---|---|---|
+| 7.1 | BVA | both cohort artifacts | same rows, ids and classification distribution |
+| 7.2 | BVA | prose video count | the hardcoded n=48 matches the data |
+| 7.3 | BVA | prose ordinals | "41st through 52nd" matches config |
+| 7.4 | BVA | prose windows | 12/24/36/48 months exist as scenarios |
+| 7.5 | semantic | time-to-pub sentence | the stated population is the real one |
+| 7.6 | semantic | prose video years | "only in 2022-2023" is true of the data |
+| 7.7 | semantic | n_total | the reported cohort is the cohort on disk |
+| 7.8 | adversarial | both Rmds | every file read actually exists |
+| 7.9 | adversarial | study_design | counts stay inside the cohort |
+| 7.10 | adversarial | technical appendix | A13 still derives from the stage files |
+
+### Defect fixed — the results section named the wrong population
+Line 194 read "**Among definite matches**, the median time from conference
+presentation to full publication was 13.8 months". `med_ttp` is read from
+`aim2_time_to_pub.csv`, which cycle 2 established is computed over every
+published abstract carrying a usable interval, **not** over definite matches.
+The test measured the gap exactly: the median covers **104** abstracts while
+definite-with-a-date is **89**.
+
+Rewritten to name its real population and expose the subset:
+
+> Among published abstracts with a resolvable publication date (n = 104 of 178),
+> the median time from conference presentation to full publication was 13.8
+> months (IQR 6.3-25).
+
+This also surfaces in the manuscript the caveat cycle 2 recorded: the median
+rests on 58% of the published set. Document re-knits cleanly.
+
+### Regression I introduced and fixed in the same cycle
+The first edit referenced `n_published_total` without defining it, which would
+have broken the knit. Caught by rendering the document rather than by a test,
+because **no test asserts the Rmd files knit**. Defined the variable from
+`aim1_publication_rate.csv` and confirmed the render. Added to the cycle 8
+target list: a test that both Rmd documents knit.
+
+### Drift guards now in place
+7.2, 7.3, 7.4 and 7.6 lock the manuscript's hardcoded claims (48 videos, 41st
+through 52nd, the four follow-up windows, videos only in 2022-2023) against the
+data. All four are currently true; they will fail if either side moves.
+
+**Result:** 9/10 pass on first run, 1 real defect found and fixed, 10/10 after.
+
+**Suite after cycle 7:** 22 files, 704 passed (+19), 5 failed, 0 errors.
+Failures unchanged from cycle 6: four open decisions and one pre-existing.

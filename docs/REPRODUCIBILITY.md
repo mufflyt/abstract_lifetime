@@ -106,15 +106,32 @@ Using the five categories from the specification.
 
 ### Category 5 — currently irreproducible
 
-- **NPI matching** (`R/10_npi_matching.R`,
-  `data/processed/npi_matches.csv`, 689 rows). Both inputs are hard-coded
-  absolute paths outside the repository and **neither exists on this machine**:
-  `/Users/tylermuffly/isochrones/data/canonical_abog/canonical_abog_npi_LATEST.csv`
-  (directory exists, filename does not) and
-  `/Volumes/MufflySamsung/DuckDB/nber_my_duckdb.duckdb` (the drive mounts as
-  `/Volumes/MufflySamsung 1 1/`). NPI is **tier 1 of the gender waterfall** and
-  supplies 256 of the 1,065 resolved genders, so this blocks reproduction of a
-  quarter of the gender variable.
+- **NPI matching** (`R/10_npi_matching.R`, `data/processed/npi_matches.csv`,
+  689 rows). Both inputs now come from `config.yml: external_data` and can be
+  overridden with `ABOG_NPI_PATH` / `NPPES_DUCKDB_PATH`. Neither resolves to a
+  usable source on this machine today:
+
+  - The ABOG pool **is present** at
+    `~/isochrones/data/canonical_abog/canonical_abog_npi_LATEST.csv`, but the
+    `LATEST` symlink has been repointed upstream since the shipped
+    `npi_matches.csv` was built. The current target is an ABOG *workforce*
+    export: 79,400 rows using `first`/`last`/`middle`/`subspecialty_name`
+    instead of `first_name`/`last_name`/`middle_name`/`subspecialty`, carrying
+    **no gender column at all**, and with an NPI for only **411 of 79,400
+    rows**. `R/10_npi_matching.R` now maps the renamed columns and runs to
+    completion against it, but produces 1 NPI instead of 265 and no gender, so
+    it refuses to overwrite the richer existing sidecar and writes
+    `npi_matches_nogender.csv` instead.
+  - The NPPES DuckDB mirror **is present** at
+    `/Volumes/MufflySamsung 1 1/DuckDB/nber_my_duckdb.duckdb` (84 GB), but the
+    configured path says `/Volumes/MufflySamsung/DuckDB/...`. The volume name
+    depends on how many copies of that drive macOS has mounted, so the path is
+    not stable and the taxonomy fallback is skipped with a warning.
+
+  NPI is **tier 1 of the gender waterfall** and supplies 256 of the 1,065
+  resolved genders. The shipped `npi_matches.csv` is therefore a **category 4**
+  artefact — it can be used but not currently regenerated — rather than
+  category 5.
 - **The original ScienceDirect scrape** — HTTP 403, see category 3.
 - **2017 abstract text** — `scripts/jmig_2017_scraper.js` fails on CORS at the
   Elsevier SSO redirect; the Wayback Machine has no snapshots. 96 of 97 abstracts

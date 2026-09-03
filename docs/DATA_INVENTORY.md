@@ -108,12 +108,15 @@ reason.
 
 | Path | Referenced by | Status |
 |---|---|---|
-| `/Volumes/MufflySamsung/DuckDB/nber_my_duckdb.duckdb` | `R/10_npi_matching.R:415` | **Absent.** The drive mounts as `/Volumes/MufflySamsung 1 1/`; `/Volumes/MufflySamsung/DuckDB` does not exist. |
-| `/Users/tylermuffly/isochrones/data/canonical_abog/canonical_abog_npi_LATEST.csv` | `R/10_npi_matching.R:43` | **Absent.** The directory exists but contains `abog_npi_matched_clean.csv`, `abog_workforce_latest.csv`, `abog_workforce_raw.csv`. |
+| `/Volumes/MufflySamsung/DuckDB/nber_my_duckdb.duckdb` | `config.yml: external_data$nppes_duckdb_path` | **Path wrong, file present.** The 84 GB mirror is at `/Volumes/MufflySamsung 1 1/DuckDB/`; the volume suffix depends on how many copies of the drive macOS has mounted. The taxonomy fallback is skipped with a warning. |
+| `~/isochrones/data/canonical_abog/canonical_abog_npi_LATEST.csv` | `config.yml: external_data$abog_npi_path` | **Present, but schema-drifted.** The `LATEST` symlink now points at an ABOG *workforce* export (79,400 rows, `first`/`last`/`middle`/`subspecialty_name`, no gender column, NPI on only 411 rows). `R/10_npi_matching.R` maps the renamed columns and completes, but yields 1 NPI and no gender, so it refuses to overwrite the shipped sidecar. |
 | `data/processed/abstracts_parsed_pdf.csv` | `00_run_all.R:25`, `R/01c_compare_sources.R` | Never produced; the comparison step never fires. |
 | `data/raw/` | `.gitignore` | Directory does not exist. The PDF fallback has no input. |
 
-Both NPI inputs are hard-coded absolute paths outside the repository. NPI
-matching is therefore **currently irreproducible**, and
-`data/processed/npi_matches.csv` (689 rows, 265 with an NPI) can only be taken
-as given. See [REPRODUCIBILITY.md](REPRODUCIBILITY.md).
+Both NPI inputs live outside the repository. They are now declared in
+`config.yml: external_data` and overridable with `ABOG_NPI_PATH` /
+`NPPES_DUCKDB_PATH` rather than hard-coded, but on this machine neither
+resolves to the source that produced the shipped results.
+`data/processed/npi_matches.csv` (689 rows, 265 with an NPI, 256 with a gender)
+can be used but **not currently regenerated**. See
+[REPRODUCIBILITY.md](REPRODUCIBILITY.md).

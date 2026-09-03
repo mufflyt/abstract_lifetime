@@ -162,8 +162,7 @@ rather than a data-quality problem — the `missing_meaning` column says which.
 | `abstract_word_count` | Zero for all 700 abstracts from 2012–2018: computed before the text backfill and never recomputed. |
 | `has_numeric_results`, `has_irb_statement`, `has_trial_registration` | Zero for all of 2012–2018 by construction — those years have no structured section columns. |
 | `is_us_based`, `is_academic`, `sample_size`, `study_design`, `is_multicenter`, `is_rct` | Strong artefactual gradient by congress year; see FAILURE_MODES.md F3. |
-| `subspecialty_unified` | 13 levels representing about 8 concepts (`MIG` vs `MIGS`, `FPMRS` vs the spelled-out label, `general_OBGYN` vs `Generalist`). Two vocabularies coalesced without harmonisation. |
-| `state_unified` | Same problem, 40 levels from two encodings. |
+| `subspecialty_unified` | Was 13 levels for ~8 concepts; harmonised onto the short-code vocabulary by `harmonise_subspecialty()` in `R/10e_merge_demographics.R`. |
 | `career_stage` (3 rows), `orcid_subspecialty` (2 rows), `orcid_career_stage` (28 rows) | Coverage too low to analyse. |
 | `orcid_false_positive` | Single-valued across all 1,102 non-`NA` rows; carries no information as shipped. |
 | `gender_unified` | Inferred from given names, never self-reported. 228 abstracts carry a cross-source disagreement in `gender_conflict`. |

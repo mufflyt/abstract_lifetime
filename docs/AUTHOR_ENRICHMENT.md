@@ -207,16 +207,22 @@ state_unified        = coalesce(npi_state, first_author_state)
 subspecialty_unified = coalesce(npi_subspecialty, subspecialty)
 ```
 
-The two inputs use different label sets and are coalesced without harmonisation.
-`subspecialty_unified` therefore has 13 levels representing about 8 concepts:
-`MIG` and `MIGS`, `FPMRS` and `Female Pelvic Medicine & Reconstructive Surgery`,
-`general_OBGYN` and `Generalist`, `GYN_ONC` and `Gynecologic Oncology`, `REI`
-and `Reproductive Endocrinology and Infertility` are each two spellings of one
-category. Any subgroup analysis on this column splits real categories in two.
-`state_unified` has the same problem across 40 levels.
+`state_unified` is fine: both `npi_state` and `first_author_state` use
+two-letter USPS codes, and its 40 levels are simply the union of the two
+sources' coverage.
 
-This has not been fixed. Harmonising it changes
-`output/aim1_by_subspecialty.csv` and figure 4.
+`subspecialty_unified` was **not** fine. `npi_subspecialty` carries ABOG's
+spelled-out certification names and `subspecialty` carries
+`classify_subspecialty()`'s short codes, so a plain `coalesce()` produced 13
+levels for about 8 concepts: `MIG`/`MIGS`, `FPMRS`/`Female Pelvic Medicine &
+Reconstructive Surgery`, `general_OBGYN`/`Generalist`, `GYN_ONC`/`Gynecologic
+Oncology`, `REI`/`Reproductive Endocrinology and Infertility`. Any subgroup
+analysis on that column split real categories in two.
+
+**Fixed.** `harmonise_subspecialty()` in `R/10e_merge_demographics.R` now maps
+every known spelling onto the short-code vocabulary before the coalesce, and
+returns unrecognised values unchanged so a new upstream label stays visible
+rather than being silently dropped.
 
 ---
 

@@ -39,9 +39,131 @@ if (file.exists(manual_review_path)) {
     )
 }
 
+# ------------------------------------------------------------------
+# Refresh the publication fields against final_pmid.
+#
+# R/05_adjudicate.R joins publication metadata on best_pmid, and it runs BEFORE
+# the reviewer decisions are read. Two consequences it could not avoid:
+#
+#   1. Where a reviewer supplied a different PMID, the publication fields and
+#      months_to_pub still described the algorithm's candidate, not the
+#      reviewer's paper (docs/FAILURE_MODES.md F12).
+#   2. Where a reviewer confirmed a match on an abstract classified `possible`
+#      or `no_match`, 05 had already blanked the publication fields, so a
+#      confirmed publication carried no date at all.
+#
+# Both are fixed here by re-joining on final_pmid. This is a file operation
+# against the candidate pool - no network call - so 06 stays offline.
+# ------------------------------------------------------------------
+candidates_path <- here("data", "processed", "pubmed_candidates.csv")
+if (file.exists(candidates_path)) {
+  pool <- read_csv(candidates_path, show_col_types = FALSE,
+                   col_types = cols(.default = col_character()))
+
+  refreshed <- results |>
+    transmute(abstract_id, .fp = as.character(final_pmid)) |>
+    filter(!is.na(.fp)) |>
+    left_join(
+      pool |>
+        transmute(abstract_id, .fp = as.character(pmid),
+                  .pub_title = pub_title, .pub_journal = pub_journal,
+                  .pub_year = pub_year, .pub_month = pub_month,
+                  .pub_doi = pub_doi, .pub_first_author = pub_first_author) |>
+        distinct(abstract_id, .fp, .keep_all = TRUE),
+      by = c("abstract_id", ".fp")
+    )
+
+  results <- results |>
+    left_join(select(refreshed, -.fp), by = "abstract_id") |>
+    mutate(
+      .pub_month_num = case_when(
+        !is.na(suppressWarnings(as.integer(.pub_month))) ~ as.integer(.pub_month),
+        .pub_month %in% month.abb ~ match(.pub_month, month.abb),
+        TRUE ~ 1L
+      ),
+      .pub_date = if_else(!is.na(.pub_year),
+                          as.Date(sprintf("%s-%02d-01", .pub_year, .pub_month_num)),
+                          as.Date(NA)),
+      # Only fill where the outcome is TRUE: a publication field on an abstract
+      # counted unpublished would describe a rejected candidate.
+      .fill = !is.na(final_published) & final_published & !is.na(.pub_year),
+      pub_title        = if_else(.fill, .pub_title, pub_title),
+      pub_journal      = if_else(.fill, .pub_journal, pub_journal),
+      pub_doi          = if_else(.fill, .pub_doi, pub_doi),
+      pub_first_author = if_else(.fill, .pub_first_author, pub_first_author),
+      pub_year         = if_else(.fill, as.numeric(.pub_year), as.numeric(pub_year)),
+      months_to_pub    = if_else(
+        .fill,
+        as.numeric(difftime(.pub_date, conference_date_for(congress_year, cfg),
+                            units = "days")) / 30.44,
+        months_to_pub
+      )
+    )
+
+  n_pub   <- sum(results$final_published, na.rm = TRUE)
+  n_dated <- sum(results$final_published & !is.na(results$months_to_pub), na.rm = TRUE)
+  cli_alert_info("Publication dates available for {n_dated}/{n_pub} published abstracts")
+  if (n_dated < n_pub) {
+    cli_alert_warning("{n_pub - n_dated} published abstract{?s} still lack a \
+                       publication date; time-to-event analyses use {n_dated} events")
+  }
+  results <- results |> select(-starts_with(".pub"), -.fill)
+} else {
+  cli_alert_warning("No candidate pool found - publication fields not refreshed")
+}
+
 # Export the fully unified dataset with all demographics + human decisions for external analysis
 write_csv(results, here("output", "final_analytical_dataset.csv"))
 cli_alert_success("Exported unified dataset to output/final_analytical_dataset.csv")
+
+
+# ------------------------------------------------------------------
+# Subgroup rates, with a guard against stratifiers that are themselves
+# a function of the outcome.
+#
+# practice_type, subspecialty and career_stage are parsed from the MATCHED
+# PUBLICATION's PubMed affiliation string, so they can only exist for an
+# abstract that has a matched publication: 145 of 178 published abstracts carry
+# a practice_type against 21 of 873 unpublished. Grouping the publication rate
+# by such a variable returns ~90-100% in every stratum by construction. The
+# tables were being written with no indication of this. See
+# docs/FAILURE_MODES.md F4.
+#
+# The rate is still emitted, because it is the correct conditional quantity and
+# the manuscript reads these files, but every row now carries the availability
+# split that produced it and an explicit flag.
+# ------------------------------------------------------------------
+subgroup_rate <- function(data, var) {
+  present <- !is.na(data[[var]])
+  pub <- !is.na(data$final_published) & data$final_published
+  unpub <- !is.na(data$final_published) & !data$final_published
+
+  avail_pub   <- if (sum(pub) > 0) mean(present[pub]) else NA_real_
+  avail_unpub <- if (sum(unpub) > 0) mean(present[unpub]) else NA_real_
+  conditional <- !is.na(avail_pub) && !is.na(avail_unpub) &&
+    avail_unpub > 0 && (avail_pub / avail_unpub) > 3
+
+  if (isTRUE(conditional)) {
+    cli_alert_warning(
+      "{var} is available for {round(avail_pub * 100, 1)}% of published and \
+       {round(avail_unpub * 100, 1)}% of unpublished abstracts. It is a \
+       function of the outcome; the rates below are conditional on a match \
+       having been found and are NOT publication rates."
+    )
+  }
+
+  data |>
+    filter(!is.na(final_published), !is.na(.data[[var]])) |>
+    group_by(across(all_of(var))) |>
+    summarise(n = n(), n_published = sum(final_published),
+              rate = round(mean(final_published) * 100, 1), .groups = "drop") |>
+    mutate(
+      availability_among_published   = round(avail_pub * 100, 1),
+      availability_among_unpublished = round(avail_unpub * 100, 1),
+      outcome_conditional_stratifier = conditional
+    ) |>
+    arrange(desc(rate))
+}
 
 # ============================================================
 # AIM 1: Publication rate
@@ -102,12 +224,7 @@ if ("pub_type_canonical" %in% names(results)) {
 
 # Publication rate by practice type
 if ("practice_type" %in% names(results)) {
-  aim1_by_practice <- results |>
-    filter(!is.na(final_published), !is.na(practice_type)) |>
-    group_by(practice_type) |>
-    summarise(n = n(), n_published = sum(final_published),
-              rate = round(mean(final_published) * 100, 1), .groups = "drop") |>
-    arrange(desc(rate))
+  aim1_by_practice <- subgroup_rate(results, "practice_type")
   write_csv(aim1_by_practice, here("output", "aim1_by_practice_type.csv"))
   cli_alert_info("Publication rate by practice type:")
   print(aim1_by_practice)
@@ -115,12 +232,7 @@ if ("practice_type" %in% names(results)) {
 
 # Publication rate by subspecialty
 if ("subspecialty" %in% names(results)) {
-  aim1_by_subspec <- results |>
-    filter(!is.na(final_published), !is.na(subspecialty)) |>
-    group_by(subspecialty) |>
-    summarise(n = n(), n_published = sum(final_published),
-              rate = round(mean(final_published) * 100, 1), .groups = "drop") |>
-    arrange(desc(rate))
+  aim1_by_subspec <- subgroup_rate(results, "subspecialty")
   write_csv(aim1_by_subspec, here("output", "aim1_by_subspecialty.csv"))
   cli_alert_info("Publication rate by subspecialty:")
   print(aim1_by_subspec)
@@ -468,18 +580,25 @@ sens_rows <- list()
 # Definite-only publication rate
 n_def <- sum(results$classification == "definite", na.rm = TRUE)
 sens_rows[[1]] <- tibble(scenario = "Definite only",
+                         denominator = "cohort",
                          n = n_total, n_published = n_def,
                          rate = round(n_def / n_total * 100, 1))
 
 # Definite + probable (treats all probable as published)
 n_prob <- sum(results$classification %in% c("definite", "probable"), na.rm = TRUE)
 sens_rows[[2]] <- tibble(scenario = "Definite + probable",
+                         denominator = "cohort",
                          n = n_total, n_published = n_prob,
                          rate = round(n_prob / n_total * 100, 1))
 
 # Definite + reviewer-confirmed
 n_confirmed <- sum(results$final_published, na.rm = TRUE)
+# Scenarios 1-2 are decidable without a reviewer, so they divide by the cohort.
+# Scenario 3 onward require an adjudicated outcome and divide by the evaluated
+# set. The `denominator` column states which, because a reader comparing 11.8%
+# with 16.9% is otherwise comparing two different populations.
 sens_rows[[3]] <- tibble(scenario = "Definite + reviewer-confirmed",
+                         denominator = "evaluated",
                          n = n_total - sum(is.na(results$final_published)),
                          n_published = n_confirmed,
                          rate = round(n_confirmed / (n_total - sum(is.na(results$final_published))) * 100, 1))
@@ -498,6 +617,7 @@ for (window_mo in c(12, 24, 36, 48)) {
   if (nrow(sub) > 0) {
     sens_rows[[length(sens_rows) + 1]] <- tibble(
       scenario = paste0("Published within ", window_mo, " months"),
+      denominator = "evaluated with sufficient follow-up",
       n = nrow(sub), n_published = sum(sub$pub_in_window),
       rate = round(mean(sub$pub_in_window) * 100, 1))
   }

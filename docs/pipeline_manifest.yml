@@ -164,6 +164,29 @@ stages:
     tests: [tests/testthat/test-shiny_app.R]
     notes: Same limitation as 02b.
 
+  - id: "02d"
+    name: Re-derive study characteristics after the text backfill
+    script: R/02d_rederive_predictors.R
+    in_run_all: true
+    functions: [classify_result_positivity]
+    inputs: [data/processed/abstracts_cleaned.csv]
+    outputs: [data/processed/abstracts_cleaned.csv]
+    external_sources: []
+    grain_in: one eligible oral presentation
+    grain_out: one eligible oral presentation
+    primary_key: abstract_id
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: [tests/testthat/test-docs_drift.R]
+    notes: >
+      Recomputes the ~20 text-derived covariates over the post-backfill
+      abstract_text, using the same rules as 02. Covariates only - it does not
+      touch title, authors or keywords, which feed the search and the score.
+      Also clears 96 degenerate abstract_text values (the footnote
+      "*: Corresponding author." written into every 2018 row by the snippet
+      backfill). Fixes docs/FAILURE_MODES.md F3.
+
   - id: "03"
     name: Six-strategy PubMed search
     script: R/03_search_pubmed.R
@@ -540,8 +563,8 @@ stages:
     functions: [acog_district_for_state]
     inputs:
       - output/abstracts_with_matches.csv
-      - /Users/tylermuffly/isochrones/data/canonical_abog/canonical_abog_npi_LATEST.csv
-      - /Volumes/MufflySamsung/DuckDB/nber_my_duckdb.duckdb
+      - config.yml#external_data.abog_npi_path (env ABOG_NPI_PATH)
+      - config.yml#external_data.nppes_duckdb_path (env NPPES_DUCKDB_PATH)
     outputs: [data/processed/npi_matches.csv]
     external_sources: [ABOG NPI file, NPPES DuckDB mirror, Physician Compare]
     grain_in: one US first author
@@ -552,8 +575,13 @@ stages:
     reproducible: false
     tests: []
     notes: >
-      Both inputs are hard-coded absolute paths outside the repository and
-      neither exists on this machine (F16). Currently irreproducible.
+      Both external paths now come from config.yml and are overridable by
+      environment variable. On this machine the ABOG pool is present but its
+      LATEST symlink points at a workforce export with renamed columns, no
+      gender and NPIs on 411 of 79,400 rows; the script maps the renames,
+      completes, and refuses to overwrite the richer shipped sidecar. The NPPES
+      mirror exists under a different volume name and the fallback is skipped
+      with a warning. See docs/REPRODUCIBILITY.md category 4.
 
   - id: "10c"
     name: Coauthor triangulation

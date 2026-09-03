@@ -41,6 +41,16 @@ multi_ci_lo <- round(multi_row$conf.low, 2)
 multi_ci_hi <- round(multi_row$conf.high, 2)
 multi_p <- if (multi_row$p.value < 0.001) "<0.001" else paste0("=", round(multi_row$p.value, 3))
 
+# Significance wording is derived, not asserted. The draft previously called
+# multicenter conduct "significantly more likely" while printing an interval
+# that crosses 1; see docs/RESULTS_PROVENANCE.md section 4.
+sig_phrase <- function(row, alpha = 0.05) {
+  if (nrow(row) == 0) return("not estimated")
+  if (row$p.value < alpha) "significantly more likely" else "not significantly more likely"
+}
+multi_phrase <- sig_phrase(multi_row)
+rct_phrase <- sig_phrase(rct_row)
+
 # Team Size (n_authors)
 author_row <- logit |> filter(term == "n_authors")
 author_or <- round(author_row$estimate, 2)
@@ -60,12 +70,12 @@ AAGL Global Congress on Minimally Invasive Gynecology (2012–2023).
 A total of `r format(n_evaluated, big.mark=",")` abstracts presented at the AAGL Global Congress.
 
 **Interventions:**  
-A massive-scale computational pipeline was developed to scrape and extract abstract metadata. To definitively link conference abstracts to full-text manuscripts, the algorithm deployed a 6-strategy search across multiple academic databases (PubMed, CrossRef, Europe PMC, OpenAlex), followed by a 10-component composite scoring system. All probable algorithmic matches were confirmed via blinded human adjudication. Advanced data enrichment techniques, including NPI and ORCID registry matching, were utilized to extract author demographics.
+A massive-scale computational pipeline was developed to scrape and extract abstract metadata. To definitively link conference abstracts to full-text manuscripts, the algorithm deployed a six-strategy PubMed search supplemented by four further bibliographic sources (CrossRef, Europe PMC, OpenAlex, Semantic Scholar) and a reverse-citation search on each abstract's own DOI, followed by a ten-component composite scoring system. All probable and possible algorithmic matches, and all scoring ties, were referred for human adjudication by three reviewers working side-by-side with the candidate record. Review was **not** blinded to the algorithm: the interface displayed the classification tier and every score component and pre-selected the algorithm's answer. Advanced data enrichment techniques, including NPI and ORCID registry matching, were utilized to extract author demographics.
 
 **Measurements and Main Results:**  
 Of the `r format(n_evaluated, big.mark=",")` evaluated abstracts, `r format(n_published, big.mark=",")` (`r pub_rate`%) successfully progressed to a full-text peer-reviewed publication. Among abstracts that were successfully published, the median time from conference presentation to publication was `r med_ttp` months (interquartile range: `r q1_ttp`–`r q3_ttp` months). 
 
-In a multivariable logistic regression model, study design and team size were the strongest drivers of publication success. Abstracts representing Randomized Controlled Trials (RCTs) were nearly two-and-a-half times more likely to be published than observational studies (OR `r rct_or`; 95% CI `r rct_ci_lo`–`r rct_ci_hi`; p`r rct_p`). Multicenter studies were also significantly more likely to reach full publication (OR `r multi_or`; 95% CI `r multi_ci_lo`–`r multi_ci_hi`; p`r multi_p`). Furthermore, the likelihood of publication increased significantly with team size (OR `r author_or` per additional author; p`r author_p`). Notably, first-author gender, practice type (academic vs. private), geographic location (US vs. international), and the presence of declared funding were not statistically significant predictors of successful publication.
+In a multivariable logistic regression model, study design and team size were the strongest drivers of publication success. Abstracts representing Randomized Controlled Trials (RCTs) were `r rct_phrase` to be published than abstracts of every other design combined, which is the reference category (OR `r rct_or`; 95% CI `r rct_ci_lo`–`r rct_ci_hi`; p`r rct_p`). Multicenter studies were `r multi_phrase` to reach full publication (OR `r multi_or`; 95% CI `r multi_ci_lo`–`r multi_ci_hi`; p`r multi_p`). Furthermore, the likelihood of publication increased significantly with team size (OR `r author_or` per additional author; p`r author_p`). First-author gender, geographic location (US vs. international) and declared funding were not statistically significant predictors in this model. Declared funding is TRUE for a very small number of abstracts and its interval spans two orders of magnitude, so it is better described as not estimable than as not significant. Practice type is not in the model: it is parsed from the matched publication's affiliation and therefore exists almost only for published abstracts.
 
 **Conclusion:**  
 The conversion rate of AAGL abstracts to full-text publications is `r pub_rate`%, highlighting a significant "file drawer problem" where the vast majority of presented research remains unpublished. High-quality methodologies, specifically RCTs and multicenter collaborations, alongside larger research teams, are the primary predictors of navigating the peer-review process successfully. This comprehensive pipeline establishes a new, highly reproducible benchmark for tracking the lifecycle of surgical research.
