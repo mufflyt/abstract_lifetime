@@ -3,31 +3,33 @@
 Inventory of the test suite, plus an audit of which scientific claims are and
 are not protected by a test.
 
-**Current status** (`testthat::test_dir("tests/testthat")`, 2026-09-03 16:40,
+**Current status** (`testthat::test_dir("tests/testthat")`, 2026-09-03 16:50,
 full working tree, 21 test files):
 
 ```
-[ FAIL 6 | WARN 17 | SKIP 1 | PASS 619 ]
+[ FAIL 3 | WARN 17 | SKIP 1 | PASS 627 ]
 ```
 
-Every one of the six failures reports a real problem rather than a broken
-fixture. Four of them independently corroborate findings documented elsewhere in
-`docs/`:
+All three failures report real problems; two are deliberately left red.
 
 | Failing test | Reports | Cross-reference |
 |---|---|---|
 | `test-shiny_app.R:458` | The deploy bundle is 135 days behind `data/processed/` | [FAILURE_MODES.md](FAILURE_MODES.md) F11 |
-| `test-cycle03_model_contracts.R:57` | `has_funding` OR spans 0.12–29.04 from 3 TRUE abstracts — not estimable rather than not significant. **Deliberately left red** pending a reporting decision. | [STATISTICAL_ANALYSIS.md](STATISTICAL_ANALYSIS.md) §Diagnostics |
-| `test-cycle04_validation_sensitivity.R:29` | Gold-standard confusion cells summed to 49 against a stated n = 50 — **since fixed** in the parallel workstream by adding `n_classified` and dividing accuracy by it (0.720 → 0.735) | §5 below |
-| `test-cycle04_validation_sensitivity.R:97` | `sensitivity_analyses.csv` mixes denominators 1,106 and 1,051 | [STATISTICAL_ANALYSIS.md](STATISTICAL_ANALYSIS.md) §Sensitivity |
-| `test-cycle04_validation_sensitivity.R:146` | `cohens_kappa` was `NA` because `irr` was not installed — **since fixed**; κ = 0.994 | [ADJUDICATION.md](ADJUDICATION.md) §5 |
-| `test-cycle04_validation_sensitivity.R:161` | `search_strategy_efficacy.csv` still carries the pre-correction 0.2% `title` yield | [PUBLICATION_SEARCH.md](PUBLICATION_SEARCH.md) §8 |
+| `test-cycle03_model_contracts.R:57` | `has_funding` OR spans 0.12–29.04 from 3 TRUE abstracts — not estimable rather than not significant. **Left red** pending a reporting decision. | [STATISTICAL_ANALYSIS.md](STATISTICAL_ANALYSIS.md) §Diagnostics |
+| `test-cycle04_validation_sensitivity.R:179` | `search_strategy_efficacy.csv` still carries the pre-correction 0.2% `title` yield. **Left red** until the search layer is re-run. | [PUBLICATION_SEARCH.md](PUBLICATION_SEARCH.md) §8 |
 
 The single skip is the browser end-to-end suite, which needs `shinytest2`.
 
-The suite is under active development in a parallel workstream (the `cycle0*`
-files), so counts move. Before this documentation pass the suite stood at
-`[ FAIL 1 | WARN 17 | SKIP 1 | PASS 519 ]` across 16 files.
+Two further failures existed earlier on 2026-09-03 and were fixed during this
+pass by a parallel workstream: the gold-standard confusion cells summing to 49
+against a stated n = 50 (now exported as `n_classified`; accuracy 0.720 →
+0.735), and `cohens_kappa` silently `NA` because `irr` was not installed
+(κ = 0.994).
+
+Before this documentation pass the suite stood at
+`[ FAIL 1 | WARN 17 | SKIP 1 | PASS 519 ]` across 16 files. The test suite is
+under active development, so counts move; the invariant table in §2 is the
+durable part of this document.
 
 ---
 

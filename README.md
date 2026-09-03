@@ -190,26 +190,23 @@ Rscript R/run_demographics.R  # REQUIRED: 00_run_all.R does not call it
 
 ## Test status
 
-As of 2026-09-03 16:40, 21 test files, 619 passing assertions, 1 skip (the
-browser end-to-end suite, which needs `shinytest2`), and **6 failures — all of
-them reporting real problems rather than broken fixtures**. The suite is under
-active development in a parallel workstream (the `cycle0*` files), so these
-counts move; two of the six below were already fixed while this section was
-being written.
+21 test files. As of 2026-09-03 16:50: **627 passing, 3 failing, 1 skipped.**
+The suite is under active development in a parallel workstream (the `cycle0*`
+files), so these counts move — [docs/VALIDATION.md](docs/VALIDATION.md) carries
+the current inventory and, more usefully, the list of scientific invariants that
+have **no** test.
+
+Every failure reports a real problem rather than a broken fixture, and two are
+deliberately left red pending a decision:
 
 | Failing test | What it reports |
 |---|---|
 | `test-shiny_app.R:458` | The deployed Shiny bundle is 135 days behind `data/processed/`, so reviewers on the live app see pre-denominator-fix data. |
-| `test-cycle03_model_contracts.R:57` | **Deliberately left red.** `has_funding` is TRUE for 3 of 1,051 abstracts and its odds ratio spans 0.12–29.04. "Not significant" and "not estimable" are different claims; the decision of which to report has not been made. |
-| `test-cycle04_validation_sensitivity.R:29` | The gold-standard confusion cells summed to 49 against a stated n = 50 (fixed in a parallel workstream while this was written). |
-| `test-cycle04_validation_sensitivity.R:97` | `sensitivity_analyses.csv` mixes two denominators (1,106 and 1,051) across rows describing the same abstracts. |
-| `test-cycle04_validation_sensitivity.R:146` | `cohens_kappa` was `NA` because `irr` was not installed (fixed in a parallel workstream; κ = 0.994). |
-| `test-cycle04_validation_sensitivity.R:161` | `search_strategy_efficacy.csv` still carries the pre-correction `title`-strategy yield of 0.2%. |
+| `test-cycle03_model_contracts.R:57` | **Left red by design.** `has_funding` is TRUE for 3 of 1,051 abstracts and its odds ratio spans 0.12–29.04. "Not significant" and "not estimable" are different claims; which to report has not been decided. |
+| `test-cycle04_validation_sensitivity.R:179` | **Left red by design.** `search_strategy_efficacy.csv` still carries the pre-correction `title`-strategy yield of 0.2% (3 hits in 1,742 queries) and has not been regenerated since the April 2026 title-phrase fix. |
 
 CI runs three gates: decision-logic boundary contracts, then mutation tests
 (every planted defect must still be killed), then the full suite.
-Full inventory and the list of invariants that have **no** test:
-[docs/VALIDATION.md](docs/VALIDATION.md).
 
 ## Known limitations
 
