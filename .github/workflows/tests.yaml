@@ -1,0 +1,115 @@
+# Test suite: every push and PR on any branch, plus nightly.
+#
+# The nightly run exists because this repository's analytical outputs are
+# committed. tests/testthat/test-decision_precedence_bva.R asserts invariants
+# against those committed files, so a nightly run catches an output tree that
+# has drifted out of agreement with the code that produced it, which is the
+# failure mode that produced the 1,067 / 1,012 / 1,051 confusion.
+#
+# NOTE: GitHub only fires `schedule` on the repository's DEFAULT branch. The
+# nightly will not run until this workflow is merged to master.
+
+name: tests
+
+on:
+  push:
+  pull_request:
+  schedule:
+    # 08:00 UTC = 02:00 America/Denver (MDT). Adjust to 09:00 UTC for MST.
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  testthat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::testthat
+            any::here
+            any::config
+            any::dplyr
+            any::tibble
+            any::tidyr
+            any::readr
+            any::purrr
+            any::stringr
+            any::stringi
+            any::stringdist
+            any::digest
+            any::cli
+            any::yaml
+
+      # Gate 1. The decision-logic contracts. These encode defects that reached
+      # the analysis outputs, so they run first and a failure here stops the job
+      # before the slower suite runs.
+      - name: Decision precedence and denominator contracts (BVA)
+        run: |
+          library(testthat)
+          res <- test_file("tests/testthat/test-decision_precedence_bva.R",
+                           reporter = "summary", stop_on_failure = FALSE)
+          df <- as.data.frame(res)
+          n_fail <- sum(df$failed) + sum(df$error)
+          cat("BVA assertions passed:", sum(df$passed), " failed:", n_fail, "\n")
+          if (n_fail > 0) stop("BVA contract failures: ", n_fail)
+        shell: Rscript {0}
+
+      # Gate 2. Mutation testing. A surviving mutant means the suite above has
+      # stopped detecting a defect it was written to catch, which is not visible
+      # from a passing test run alone.
+      - name: Mutation tests (every planted defect must be killed)
+        run: |
+          library(testthat)
+          res <- test_file("tests/testthat/test-decision_mutation.R",
+                           reporter = "summary", stop_on_failure = FALSE)
+          df <- as.data.frame(res)
+          n_fail <- sum(df$failed) + sum(df$error)
+          cat("mutation assertions passed:", sum(df$passed), " failed:", n_fail, "\n")
+          if (n_fail > 0) {
+            stop("A planted defect survived. The test suite no longer detects a ",
+                 "regression it was written to catch. Do not weaken the mutant; ",
+                 "strengthen the invariant battery in test-decision_mutation.R.")
+          }
+        shell: Rscript {0}
+
+      # Gate 3. Everything else.
+      - name: Full test suite
+        run: |
+          library(testthat)
+          res <- test_dir("tests/testthat", reporter = "summary",
+                          stop_on_failure = FALSE)
+          df <- as.data.frame(res)
+          n_fail <- sum(df$failed) + sum(df$error)
+          cat("\n--- suite summary ---\n")
+          cat("files:", length(unique(df$file)), " passed:", sum(df$passed),
+              " failed:", sum(df$failed), " errors:", sum(df$error),
+              " skipped:", sum(df$skipped), "\n")
+          if (n_fail > 0) {
+            bad <- df[df$failed > 0 | df$error > 0, c("file", "test", "failed", "error")]
+            print(bad)
+            stop("suite failures: ", n_fail)
+          }
+        shell: Rscript {0}
+
+      - name: Lint
+        run: |
+          if (requireNamespace("lintr", quietly = TRUE)) lintr::lint_dir("R/")
+        shell: Rscript {0}
+        continue-on-error: true

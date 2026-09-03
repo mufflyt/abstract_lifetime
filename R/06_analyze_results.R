@@ -9,6 +9,7 @@ library(broom)
 library(cli)
 library(config)
 source(here("R", "utils_congresses.R"))
+source(here("R", "utils_decisions.R"))
 
 cfg <- config::get(file = here("config.yml"))
 
@@ -23,28 +24,12 @@ if (file.exists(manual_review_path)) {
   decisions <- read_csv(manual_review_path, show_col_types = FALSE)
   cli_alert_info("Incorporating {nrow(decisions)} manual review decisions")
 
-  # Deduplicate to latest decision per abstract (multi-reviewer abstracts would
-  # otherwise duplicate rows in results, inflating all downstream counts).
-  decisions_deduped <- decisions |>
-    filter(!is.na(reviewer)) |>
-    group_by(abstract_id) |>
-    arrange(desc(review_timestamp)) |>
-    slice(1) |>
-    ungroup()
+  # Precedence and status assignment live in R/utils_decisions.R so they can be
+  # tested directly. See tests/testthat/test-decision_precedence_bva.R and
+  # test-decision_mutation.R.
+  decisions_deduped <- dedup_decisions_for_analysis(decisions)
 
-  results <- results |>
-    left_join(decisions_deduped |> select(abstract_id, manual_decision, manual_pmid),
-              by = "abstract_id") |>
-    mutate(
-      final_published = case_when(
-        classification == "definite" ~ TRUE,
-        manual_decision == "match" ~ TRUE,
-        manual_decision == "no_match" ~ FALSE,
-        classification %in% c("no_match", "no_candidates", "excluded") ~ FALSE,
-        TRUE ~ NA  # Still pending review (probable/possible)
-      ),
-      final_pmid = coalesce(manual_pmid, best_pmid)
-    )
+  results <- assign_final_published(results, decisions_deduped)
 } else {
   cli_alert_warning("No manual review decisions found — using auto-classification only")
   results <- results |>
@@ -79,9 +64,9 @@ if (n_evaluated == 0) {
 }
 
 aim1 <- tibble::tibble(
-  metric = c("total_abstracts", "published", "not_published", "pending_review",
-             "publication_rate", "ci_lower", "ci_upper"),
-  value = c(n_total, n_published, n_total - n_pending - n_published, n_pending,
+  metric = c("total_abstracts", "n_evaluated", "published", "not_published",
+             "pending_review", "publication_rate", "ci_lower", "ci_upper"),
+  value = c(n_total, n_evaluated, n_published, n_total - n_pending - n_published, n_pending,
             round(pub_rate * 100, 1),
             round(prop_test$conf.int[1] * 100, 1),
             round(prop_test$conf.int[2] * 100, 1))

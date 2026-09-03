@@ -1,5 +1,6 @@
 metric,value
 total_abstracts,1106
+n_evaluated,1051
 published,178
 not_published,873
 pending_review,55
