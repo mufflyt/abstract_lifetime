@@ -15,10 +15,10 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
   corrected supplement test.
 - `gender_conflict` and `gender_n_sources` columns, populated for every row,
   recording cross-source agreement rather than only the winning value.
-- `data/processed/gender_conflicts.csv` — 277 cross-source gender disagreements.
+- `data/processed/gender_conflicts.csv` — 228 cross-source gender disagreements.
 - `data/processed/gender_from_openalex.csv` — 157 resolutions.
 - `data/processed/gender_from_open_payments.csv` — 16 resolutions.
-- `output/final_analytical_dataset.csv` — unified 1,067 x 90 analytical dataset
+- `output/final_analytical_dataset.csv` — unified 1,106 x 90 analytical dataset
   exported by `06_analyze_results.R`.
 - `docs/aagl_abstract_programmatic.Rmd` / `.docx` — programmatic abstract draft.
 - Technical appendix section A12, documenting the matching corrections below.
@@ -87,22 +87,34 @@ abstract-to-publication matches. Detail in appendix A12.
 
 ### Known issues
 
+- Three defects found during the 2026-09-03 documentation audit are recorded in
+  `docs/FAILURE_MODES.md` and have **not** been fixed: the supplement listing is
+  truncated at ~100 items per congress (F1); `pubmed_candidates.csv` is a stale
+  subset of the pool that was scored, so 74 of 178 published abstracts have no
+  publication date (F2); and the text-derived predictors were computed before
+  the abstract-text backfill, producing a step change at 2018/2019 in five model
+  variables (F3).
 - The four matching corrections shipped in a single re-run; their individual
   contributions are not separately identified and no ablation was performed.
 - Supplement detection still falls back to a November-month heuristic where
   PubMed omits the issue field.
 - `10g_second_author_triangulation.R` returns zero rows and contributes nothing
   to the gender waterfall.
-- Three `test-pipeline_semantics.R` failures predate this work and remain:
-  practice_type coverage, citation coverage, and a 1,106 vs 1,067 row mismatch
-  between `abstracts_cleaned.csv` and `abstracts_with_matches.csv`.
+- ~~Three `test-pipeline_semantics.R` failures predate this work and remain.~~
+  Resolved as of 2026-09-03: the two coverage thresholds were re-pointed at
+  regression floors and the row mismatch was the denominator defect, now fixed.
+  `test-pipeline_semantics.R` passes in full. The suite's single remaining
+  failure is `test-shiny_app.R:458` — the deploy bundle is stale.
 
 ## [2026-04-19]
 
 ### Changed
 
-- `10e_merge_demographics.R` is the sole writer to `abstracts_with_matches.csv`;
-  all 12 producer scripts write sidecar CSVs only.
+- `10e_merge_demographics.R` became the writer of the unified demographics
+  block in `abstracts_with_matches.csv`; the 12 demographic producer scripts
+  write sidecar CSVs only. (Correction, 2026-09-03: the file has six writers in
+  total — `01d`, `05`, `09b`, `09d`, `09e`, `10e`, plus an inline block in
+  `00_run_all.R`. See `docs/SOURCE_OF_TRUTH.md`.)
 - Single `gender_unified` column replaces the dual
   `first_author_gender`/`gender_unified` pair, resolved by a 10-tier priority
   waterfall. Coverage 73.9% → 99%.

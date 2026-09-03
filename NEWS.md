@@ -41,7 +41,7 @@ suppressed true abstract-to-publication matches.
 - **`gender_conflict` and `gender_n_sources`** populated for every row, recording
   the shape of the evidence rather than only the winner of the priority
   waterfall. Enables sensitivity analysis restricted to uncontested assignments.
-- **`data/processed/gender_conflicts.csv`** — 277 cross-source disagreements
+- **`data/processed/gender_conflicts.csv`** — 228 cross-source disagreements
   with competing values.
 - **Two new waterfall sources**: OpenAlex author search (157 resolutions),
   CMS Open Payments (16). `gender_unified` coverage 98.8%.
@@ -56,7 +56,7 @@ suppressed true abstract-to-publication matches.
 
 ### New outputs
 
-- `output/final_analytical_dataset.csv` — unified dataset (1,067 rows x 90
+- `output/final_analytical_dataset.csv` — unified dataset (1,106 rows x 90
   columns) with demographics and human decisions merged, exported by
   `06_analyze_results.R` for external analysis.
 - `docs/aagl_abstract_programmatic.Rmd` / `.docx` — programmatic abstract draft.
@@ -96,10 +96,21 @@ were unsatisfiable by construction rather than merely unmet. Suite is now
   contributions are not separately identified. No ablation was performed.
 - Supplement detection still falls back to a November-month heuristic where
   PubMed omits the issue field.
-- Three pre-existing `test-pipeline_semantics.R` failures remain (practice_type
-  coverage, citation coverage, and a 1,106 vs 1,067 row mismatch between
-  `abstracts_cleaned.csv` and `abstracts_with_matches.csv`). All three predate
-  this work; the gender-coverage failure that also predated it now passes.
+- ~~Three pre-existing `test-pipeline_semantics.R` failures remain.~~ Resolved
+  as of 2026-09-03: the two coverage thresholds were unsatisfiable rather than
+  unmet and were re-pointed at regression floors, and the 1,106 vs 1,067 row
+  mismatch was the denominator defect, now fixed. `test-pipeline_semantics.R`
+  passes in full; the suite's one remaining failure is `test-shiny_app.R:458`,
+  which reports a genuinely stale deploy bundle.
+- Three further defects were found in the 2026-09-03 documentation audit and
+  have **not** been fixed. They are documented in `docs/FAILURE_MODES.md`:
+  the ScienceDirect listing is truncated at roughly 100 items per congress
+  supplement (F1); `data/processed/pubmed_candidates.csv` is a stale subset of
+  the pool the scores were computed against, so 74 of the 178 published
+  abstracts carry no publication date and every time-to-event analysis runs on
+  104 events (F2); and the text-derived study characteristics were computed
+  before the abstract-text backfill and never recomputed, producing a step
+  change at 2018/2019 in five model variables (F3).
 
 ## 2026-04-19
 

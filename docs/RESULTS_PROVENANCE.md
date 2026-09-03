@@ -35,8 +35,10 @@ misread · ❌ stale or wrong.
 | Male first author → time to publication | HR 0.590 (0.390–0.892), p = 0.012 | `output/aim2b_cox_regression.csv` | | ⚠️ gender inferred; 228 conflicts |
 | US-based → time to publication | HR 1.712 (1.091–2.687), p = 0.019 | same | | ⚠️ `is_us_based` has a severe year gradient |
 | PH assumption, global | p = 0.32 | `output/cox_ph_assumption.csv` | `cox.zph()` | ✅ |
-| Gold-standard sensitivity | 1.00 | `output/validation_metrics.csv` | `R/validation_gold_standard.R` | ⚠️ n = 50, PPV 0.50 |
-| Interrater agreement | 98.1% over 519 abstracts | `output/interrater_agreement.csv` | `R/10_interrater.R` | ⚠️ κ is `NA` — `irr` not installed |
+| Gold-standard sensitivity | 1.00 | `output/validation_metrics.csv` | `R/validation_gold_standard.R` | ⚠️ n = 50, of which **49 classified** (`n_classified`); PPV is **0.50** and accuracy 0.735 |
+| Interrater agreement | 98.1% raw, κ = 0.994, over 519 abstracts | `output/interrater_agreement.csv` | `R/10_interrater.R` | ⚠️ reviewers were not blinded to the algorithm's answer |
+| Logistic-model N | 1,010 | `output/aim3_logistic_regression.csv` (`n_obs`) | `R/06_analyze_results.R:285` | ✅ 41 abstracts leave the model through complete-case deletion |
+| Cox-model N / events | 938 / 104 | `data/processed/cox_model.rds` | `R/06_analyze_results.R:217` | ⚠️ 104 events, not 178 |
 
 ---
 

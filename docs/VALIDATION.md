@@ -3,19 +3,31 @@
 Inventory of the test suite, plus an audit of which scientific claims are and
 are not protected by a test.
 
-**Current status** (`testthat::test_dir("tests/testthat")`, 2026-09-03, commit
-`665c551`, full working tree):
+**Current status** (`testthat::test_dir("tests/testthat")`, 2026-09-03 16:40,
+full working tree, 21 test files):
 
 ```
-[ FAIL 1 | WARN 17 | SKIP 1 | PASS 519 ]
+[ FAIL 6 | WARN 17 | SKIP 1 | PASS 619 ]
 ```
 
-The single failure is `test-shiny_app.R:458` — the deploy bundle is 135 days
-behind `data/processed/`. That is a **real finding**, not a fixture problem; see
-[FAILURE_MODES.md](FAILURE_MODES.md) F11. The single skip is the browser
-end-to-end suite, which needs `shinytest2`.
+Every one of the six failures reports a real problem rather than a broken
+fixture. Four of them independently corroborate findings documented elsewhere in
+`docs/`:
 
-The README's badge and prose ("392 passing", "391 tests") are stale.
+| Failing test | Reports | Cross-reference |
+|---|---|---|
+| `test-shiny_app.R:458` | The deploy bundle is 135 days behind `data/processed/` | [FAILURE_MODES.md](FAILURE_MODES.md) F11 |
+| `test-cycle03_model_contracts.R:57` | `has_funding` OR spans 0.12–29.04 from 3 TRUE abstracts — not estimable rather than not significant. **Deliberately left red** pending a reporting decision. | [STATISTICAL_ANALYSIS.md](STATISTICAL_ANALYSIS.md) §Diagnostics |
+| `test-cycle04_validation_sensitivity.R:29` | Gold-standard confusion cells summed to 49 against a stated n = 50 — **since fixed** in the parallel workstream by adding `n_classified` and dividing accuracy by it (0.720 → 0.735) | §5 below |
+| `test-cycle04_validation_sensitivity.R:97` | `sensitivity_analyses.csv` mixes denominators 1,106 and 1,051 | [STATISTICAL_ANALYSIS.md](STATISTICAL_ANALYSIS.md) §Sensitivity |
+| `test-cycle04_validation_sensitivity.R:146` | `cohens_kappa` was `NA` because `irr` was not installed — **since fixed**; κ = 0.994 | [ADJUDICATION.md](ADJUDICATION.md) §5 |
+| `test-cycle04_validation_sensitivity.R:161` | `search_strategy_efficacy.csv` still carries the pre-correction 0.2% `title` yield | [PUBLICATION_SEARCH.md](PUBLICATION_SEARCH.md) §8 |
+
+The single skip is the browser end-to-end suite, which needs `shinytest2`.
+
+The suite is under active development in a parallel workstream (the `cycle0*`
+files), so counts move. Before this documentation pass the suite stood at
+`[ FAIL 1 | WARN 17 | SKIP 1 | PASS 519 ]` across 16 files.
 
 ---
 
@@ -39,6 +51,9 @@ The README's badge and prose ("392 passing", "391 tests") are stale.
 | `test-utils_text.R` | 5 | unit | Gate 3 | No | `R/utils_text.R` | Title/author normalisation, Jaccard, keyword extraction |
 | `test-utils_positivity.R` | 5 | unit | Gate 3 | No | `R/utils_positivity.R` | Result-direction classification |
 | `test-utils_crossref.R` | 2 | unit | Gate 3 | No | `R/utils_crossref.R` | Query construction only — no network |
+| `test-cycle02_survival_estimand.R` | 10 | BVA + semantic + adversarial | Gate 3 | Partially | `final_analytical_dataset.csv`, `km_fit.rds` | Kaplan–Meier set construction; the time-to-publication estimand and its population; per-year denominators; the join that builds the analytical dataset (found and fixed a missing duplicate-`abstract_id` guard in `assign_final_published()`) |
+| `test-cycle03_model_contracts.R` | 10 | BVA + semantic + adversarial | Gate 3 | Partially | model RDS, `aim2b`/`aim3` CSVs | Logistic and Cox output contracts; the ≥50%-missing exclusion rule; complete-case attrition; determinism; artefact vintage. Added `n_obs` to `aim3_logistic_regression.csv` (1,010 against a denominator of 1,051 — 41 abstracts leave through complete-case deletion, previously invisible). |
+| `test-cycle04_validation_sensitivity.R` | 10 | semantic + adversarial | Gate 3 | Partially | `validation_metrics.csv`, `sensitivity_analyses.csv`, `interrater_agreement.csv`, `search_strategy_efficacy.csv` | Gold-standard confusion-cell partition; sensitivity-scenario denominator consistency; interrater completeness; search-efficacy vintage |
 | `test-docs_drift.R` *(added by this pass)* | 12 | contract | Gate 3 | Partially | `docs/*.csv`, the analytical outputs | Documentation-to-data agreement; see §4 |
 
 CI (`.github/workflows/tests.yaml`) runs on every push and pull request, plus a
@@ -127,3 +142,24 @@ Point 12 is deliberate. A test that simply asserted the correct invariant would
 fail today and be muted; a test pinned to the current value keeps the defect
 visible in every run and forces the documentation to be updated when it is
 fixed.
+
+
+---
+
+## 5. The gold-standard confusion matrix
+
+`output/validation_metrics.csv` reported `n = 50` while
+`true_positives (13) + false_positives (13) + false_negatives (0) +
+true_negatives (23) = 49`, and `accuracy` divided a numerator measured on the 49
+classified rows by a denominator of 50. The 50th abstract carries `NA` in
+`truth` or `predicted` and is dropped from all four cells by `na.rm`.
+
+Fixed on 2026-09-03 in the parallel test workstream:
+`R/validation_gold_standard.R` now exports `n_classified` alongside `n`, and
+accuracy divides by `n_classified` (0.720 → **0.735**).
+
+The remaining point to carry into the manuscript is **PPV = 0.50**: before human
+adjudication, half the algorithm's positive calls are wrong. That is the
+justification for the review step, and it belongs alongside the sensitivity
+figure of 1.00 rather than behind it. `n = 50` is also small enough that every
+metric has a wide interval; no interval is currently reported.

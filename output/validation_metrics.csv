@@ -1,5 +1,6 @@
 metric,value
 n,50
+n_classified,49
 true_positives,13
 false_positives,13
 false_negatives,0
@@ -8,4 +9,4 @@ sensitivity,1
 specificity,0.639
 ppv,0.5
 npv,1
-accuracy,0.72
+accuracy,0.735

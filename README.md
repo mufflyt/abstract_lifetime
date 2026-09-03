@@ -2,79 +2,118 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![R >= 4.4](https://img.shields.io/badge/R-%3E%3D%204.4-blue.svg)](https://www.r-project.org/)
-[![Tests: 392 passing](https://img.shields.io/badge/tests-392%20passing-brightgreen.svg)](tests/testthat/)
+[![Tests](https://img.shields.io/badge/tests-619%20passing%2C%206%20failing-yellow.svg)](docs/VALIDATION.md)
 [![Shiny App](https://img.shields.io/badge/Shiny-Live%20App-orange.svg)](https://mufflyt.shinyapps.io/aagl-adjudication/)
 
-**Publication Rate, Time to Publication, and Predictors of Full Publication Among Oral Presentations at the AAGL Global Congress, 2012-2023**
+**Publication Rate, Time to Publication, and Predictors of Full Publication
+Among Oral Presentations at the AAGL Global Congress, 2012–2023**
 
-A fully automated, reproducible pipeline that tracks whether conference abstracts presented at the AAGL Global Congress on Minimally Invasive Gynecology progress to full peer-reviewed publication. Designed to meet the methodological standards recommended by the [Cochrane review on full publication of results initially presented in abstracts](https://doi.org/10.1002/14651858.MR000005.pub4) (Scherer et al., 2018).
-
-**[Live Adjudication App](https://mufflyt.shinyapps.io/aagl-adjudication/)** | **[Technical Appendix](docs/technical_appendix.Rmd)** | **[Manuscript](docs/abstract_results_section.Rmd)** | **[Changelog](CHANGELOG.md)**
+A reproducible pipeline that tracks whether abstracts presented orally at the
+AAGL Global Congress on Minimally Invasive Gynecology go on to full peer-reviewed
+publication. Abstracts are ingested from the *Journal of Minimally Invasive
+Gynecology* congress supplements, searched against six bibliographic sources,
+scored by a composite matching algorithm, adjudicated by human reviewers, and
+analysed against the methodological standards of the
+[Cochrane review on full publication of results initially presented in abstracts](https://doi.org/10.1002/14651858.MR000005.pub4)
+(Scherer et al., 2018).
 
 ---
 
-## Headline Result
+## Headline result
 
-**16.9%** of oral presentations at the AAGL Global Congress reached full
-peer-reviewed publication (178 of 1,106; 95% CI 14.8–19.3). A further 55 remain
-pending human adjudication. For context, the Cochrane review of this literature
-(Scherer et al., MR000005) reports a pooled rate near 45% across specialties —
-AAGL oral presentations publish at well under half that rate.
+**16.9%** of AAGL oral presentations reached full peer-reviewed publication —
+**178 of 1,051 evaluated** (95% CI 14.8–19.3). The cohort is **1,106** oral
+presentations; a further **55** remain unresolved in adjudication and are
+excluded from the denominator. For context, the Cochrane review of this
+literature reports a pooled rate near 45% across specialties.
 
-> Supersedes an earlier reported figure of 17.2%. A denominator defect
-> ([#2](https://github.com/mufflyt/abstract_lifetime/issues/2), fixed) dropped
-> 39 abstracts out of the cohort — 35 unpublished, plus 4 carrying a reviewer's
-> confirmed match. See [appendix A12.7](docs/technical_appendix.Rmd).
+Median time from congress to publication was **13.8 months** (IQR 6.3–25.0),
+computed on the 104 published abstracts with a recoverable publication date.
 
-## Results
+> Cohort 1,106 and denominator 1,051 are different quantities. See
+> [docs/COHORT_ASSEMBLY.md](docs/COHORT_ASSEMBLY.md).
 
-### Cohort Assembly
+### Cohort assembly
 
-![STROBE flow diagram tracing 1,067 AAGL oral presentations from the congress programs through PubMed searching, candidate scoring, and adjudication to the final classified cohort.](output/figures/figure1_flow_diagram.png)
+![STROBE flow diagram: 1,154 presentations parsed from the AAGL congress supplements, 48 video presentations excluded, 1,106 oral presentations forming the cohort, 55 excluded for unresolved adjudication, 1,051 evaluated, of which 178 published and 873 not published.](output/figures/figure1_flow_diagram.png)
 
-### Cumulative Publication Over Time
+### Cumulative publication over time
 
-![Kaplan-Meier curve of cumulative publication rate against months since conference. The curve rises steeply through the first 24 months, reaches roughly 15% by month 36, and flattens near 19% thereafter.](output/figures/figure2_km_curve.png)
+![Kaplan-Meier curve of cumulative publication against months since conference, rising steeply through the first 24 months and flattening thereafter.](output/figures/figure2_km_curve.png)
 
-Publication is overwhelmingly an early event. The curve climbs steeply through
-the first two years, and abstracts that have not appeared within roughly three
-years of the congress rarely publish at all — the plateau after month 48 is
-nearly flat.
+Publication is overwhelmingly an early event. Abstracts that have not appeared
+within roughly three years of the congress rarely publish at all.
 
-### Publication Trajectory by Congress Year
+### Publication trajectory by congress year
 
-![Kaplan-Meier curves stratified by congress year, 2012 through 2023, showing separation between earlier and more recent congresses.](output/figures/figure3_km_by_year.png)
+![Kaplan-Meier curves stratified by congress year, 2012 through 2023.](output/figures/figure3_km_by_year.png)
 
-Recent congresses carry less follow-up time and are therefore right-censored;
-their lower curves reflect administrative censoring, not necessarily a genuine
-decline in publication.
+Recent congresses carry less follow-up and are right-censored. Note that the
+crude rate *rises* with congress recency (5.6% in 2017 to 33.3% in 2023), the
+opposite of what censoring alone predicts — see
+[Known limitations](#known-limitations).
 
-### Publication Rate by Subgroup
+### Predictors of time to publication
 
-![Subgroup publication rates across study design, practice type, subspecialty, geography, and author gender, each with confidence intervals.](output/figures/figure4_subgroup_rates.png)
+![Cox proportional hazards forest plot showing hazard ratios with 95% confidence intervals for randomized design, academic affiliation, US location, author count, inferred male first author, multicenter conduct and reported funding.](output/figures/figure5_cox_forest.png)
 
-### Predictors of Time to Publication
+Randomized design (HR 2.30, 95% CI 1.29–4.07), author count (HR 1.24 per author,
+1.04–1.48), and US location (HR 1.71, 1.09–2.69) are associated with faster
+publication. Inferred male first authorship is associated with slower
+publication (HR 0.59, 0.39–0.89). Multicenter conduct (HR 1.13, 0.41–3.11) and
+reported funding (HR 3.52, 0.48–25.74) are not statistically distinguishable
+from no effect; only 38 and 3 abstracts respectively carry those flags.
 
-![Cox proportional hazards forest plot. RCT design, multicenter studies, and number of authors show hazard ratios above 1 at p < 0.05; male first author falls below 1; academic affiliation, US-based, and funding reported are not significant.](output/figures/figure5_cox_forest.png)
+Author gender is **inferred from names, not self-reported**, and 228 abstracts
+carry a cross-source disagreement recorded in `gender_conflict`. Treat that
+estimate as provisional.
 
-Randomized design (HR ≈ 2.2), multicenter conduct (HR ≈ 2.3), and author count
-are each associated with faster publication. Reported funding shows a wide,
-non-significant interval — the number of abstracts reporting funding is small.
+### Other figures
 
-The male-first-author estimate falls below 1.0 with an interval that approaches
-it. Author gender is inferred, not self-reported, and 277 authors carry a
-cross-source disagreement recorded in `gender_conflict`. Treat this estimate as
-provisional until it has been re-run on the unconflicted subset.
+![Publication rate by subgroup, with confidence intervals.](output/figures/figure4_subgroup_rates.png)
 
-### Time to Publication
+![Histogram of months from conference to publication.](output/figures/figure6_time_to_pub.png)
 
-![Histogram of months from conference to publication, concentrated in the first two years with a long right tail.](output/figures/figure6_time_to_pub.png)
+Four supplementary figures are generated into `output/figures/` but not tracked.
 
-Four supplementary figures — publication rate by year, search strategy
-comparison, score distribution, and classification breakdown by year — are
-generated by `R/08_make_figures.R` into `output/figures/` but are not tracked.
+---
 
-## Installation
+## Pipeline
+
+```
+ScienceDirect JMIG supplements (12 congress issues)
+        │  01b_parse_web.R + 01d_tag_session_type.R
+        ▼
+   1,154 presentations
+        │  02_clean_abstracts.R  (−48 video)
+        ▼
+   1,106 oral presentations  ── the COHORT
+        │  03 / 03b / 03c   PubMed · CrossRef · Europe PMC ·
+        │                   OpenAlex · Semantic Scholar · DOI chain
+        ▼
+   64,718 scored (abstract × candidate) pairs
+        │  04_score_matches.R   10-component composite score
+        ▼
+   definite 131 · probable 81 · possible 142 · no_match 709 ·
+   excluded 39 · no_candidates 4
+        │  05_adjudicate.R → Shiny app → Google Sheets
+        ▼
+   1,153 adjudicated decisions (3 human reviewers + an AUTO pass)
+        │  06_analyze_results.R   utils_decisions.R
+        ▼
+   1,051 evaluated → 178 published · 873 not · 55 unresolved
+        │  07_make_tables.R · 08_make_figures.R · strobe_flowchart.R
+        ▼
+   final_analytical_dataset.csv (1,106 × 90), tables, figures
+```
+
+Full stage-by-stage detail, including a Mermaid DAG:
+[docs/PIPELINE.md](docs/PIPELINE.md) ·
+machine-readable: [docs/pipeline_manifest.yml](docs/pipeline_manifest.yml)
+
+---
+
+## Quick start
 
 ```bash
 git clone https://github.com/mufflyt/abstract_lifetime.git
@@ -82,288 +121,147 @@ cd abstract_lifetime
 ```
 
 ```r
-# Install required packages
 install.packages(c(
   "tidyverse", "here", "config", "cli", "rentrez", "xml2", "httr",
   "jsonlite", "survival", "broom", "gender", "stringdist", "digest",
-  "rvest", "purrr", "DiagrammeR", "htmlwidgets", "webshot2", "scales"
+  "rvest", "purrr", "yaml", "flowchart", "DiagrammeR", "htmlwidgets",
+  "webshot2", "scales"
 ))
-
-# Optional (Shiny app + deployment)
-install.packages(c("shiny", "bslib", "DT", "shinyjs", "googlesheets4", "rsconnect"))
-
-# Optional (gender inference for international names)
-install.packages("gender")
 ```
 
-## Quick Start
+**Reproduce the reported numbers from tracked files** (works from a clean clone,
+takes about a minute):
 
 ```r
-# Full pipeline (3-4 hours cold, ~30 min with cache)
-Rscript 00_run_all.R
-
-# Render manuscript
-rmarkdown::render("docs/abstract_results_section.Rmd")
-rmarkdown::render("docs/technical_appendix.Rmd")
-
-# Run tests (391 tests)
+source("R/06_analyze_results.R")   # outcome, all five aims, models
+source("R/07_make_tables.R")
+source("R/08_make_figures.R")
+source("R/strobe_flowchart.R")
 testthat::test_dir("tests/testthat")
-
-# Deploy Shiny adjudication app
-Rscript shiny/adjudication_app/deploy.R
-
-# Run demographics pipeline only (skip scraping + search)
-Rscript R/run_demographics.R
 ```
 
-## Pipeline Architecture
-
-```
-00_run_all.R                         # Master pipeline (runs all steps sequentially)
-R/
-  01b_parse_web.R                    # Step 1: Scrape JMIG supplements from ScienceDirect
-  01d_tag_session_type.R             # Step 1d: Classify Oral vs Video from TOC
-  02_clean_abstracts.R               # Step 2: Normalize + extract 20+ predictor variables
-  03_search_pubmed.R                 # Step 3: 6-strategy PubMed search per abstract
-  03b_search_crossref.R              # Step 3b: CrossRef + Europe PMC + OpenAlex + Semantic Scholar
-  03c_doi_chain_search.R             # Step 3c: Reverse citation search via OpenAlex
-  04_score_matches.R                 # Step 4: 10-component composite scoring
-  05_adjudicate.R                    # Step 5: Cochrane-aligned 5-tier classification
-  09b_enrich_pub_types.R             # Step 5b: PubMed publication type extraction
-  09_enrich_authors.R                # Step 5c: Author names + affiliations from PubMed XML
-  09c_author_characteristics.R       # Step 5d: Gender, ACOG district, practice type
-  09d_enrich_metrics.R               # Step 5e: Citation counts + journal impact from OpenAlex
-  09f_enrich_gender_from_pubmed.R    # Step 5f: Gender from PubMed full-name search
-  09g_gender_from_orcid.R            # Step 5g: Gender from ORCID person records
-  09h_gender_from_obgyn_pubs.R       # Step 5h: Gender from OB/GYN publication search
-  09i_gender_from_openalex.R         # Step 5i: Gender from OpenAlex author search
-  09j_gender_from_open_payments.R    # Step 5j: Gender from CMS Open Payments
-  10_npi_matching.R                  # Step 6a: NPI identity resolution (ABOG + NPPES)
-  10b_resolve_names_openalex.R       # Step 6b: Full name resolution via OpenAlex DOIs
-  10d_orcid_demographics.R           # Step 6c: ORCID demographics enrichment
-  10e_merge_demographics.R           # Step 6d: SOLE MERGE — unified demographics waterfall
-  10f_senior_author_triangulation.R  # Step 6e: Name resolution via senior coauthor
-  10g_second_author_triangulation.R  # Step 6f: Name resolution via second coauthor
-  run_demographics.R                 # Demographics orchestrator (runs 09c-10e in order)
-  06_analyze_results.R               # Step 7: KM, Cox PH, logistic regression, sensitivity
-  07_make_tables.R                   # Step 7: 4 publication-quality tables
-  08_make_figures.R                  # Step 8: 6 main + 4 supplementary figures
-  utils_acog.R                       # US state -> ACOG district mapping
-  utils_affiliation.R                # Practice type, subspecialty, career stage from affiliations
-  utils_classify.R                   # Study design, research category, procedure classifiers
-  utils_congresses.R                 # Multi-congress date lookup
-  utils_crossref.R                   # CrossRef/OpenAlex/EuroPMC/SemanticScholar API wrappers
-  utils_positivity.R                 # Result direction classifier (positive/negative/neutral)
-  utils_pub_types.R                  # PubMed PublicationType canonicalization
-  utils_pubmed.R                     # PubMed E-Utilities search + XML parsing
-  utils_scoring.R                    # Composite match scoring algorithm
-  utils_states.R                     # US state parsing from affiliation text
-  utils_text.R                       # Text normalization, Jaccard similarity, keywords
-  validation_gold_standard.R         # Gold standard validation + threshold tuning
-scripts/
-  build_gold_standard.R              # Intensive PubMed verification of sampled abstracts
-  prefill_algorithm_decisions.R      # Push AUTO decisions to Google Sheet
-  backfill_*.R                       # Backfill new columns onto existing sheet rows
-  cleanup_no_match_rows.R            # Blank matched-pub fields on no_match decisions
-  rescue_2016.R                      # Recovery script for rate-limited congress years
-shiny/adjudication_app/deploy.R      # Build bundle + slim data + deploy to shinyapps.io
-```
-
-## Search Strategy
-
-Six PubMed strategies per abstract, plus four supplementary databases and a novel DOI-based reverse citation search:
-
-| Source | Method |
-|--------|--------|
-| PubMed | Title phrase, first/last author, author+keywords, distinctive phrase, author broad |
-| CrossRef | Title-based (low-hit abstracts) |
-| Europe PMC | Multi-strategy title + author |
-| OpenAlex | Keyword search with PMID resolution |
-| Semantic Scholar | Title-based |
-| DOI-chain | Reverse citations via OpenAlex (papers citing the abstract DOI) |
-
-## Matching Algorithm
-
-10-component composite score (title similarity, abstract semantic, first/last/coauthor match, journal relevance, keywords, publication date) with Cochrane-aligned classification:
-
-- **Definite** (score >= 7 + text evidence): auto-accepted
-- **Probable** (score 3-7 + text evidence): human review required
-- **Possible** (weak evidence or ties): human review required
-- **No match** (score < 3): no viable publication found
-- **Excluded**: candidate published before the conference
-
-Four defects in this layer were corrected in April 2026, each of which had
-suppressed true matches: session-number title prefixes breaking phrase search,
-non-article publication types (letters, comments, editorials) displacing genuine
-publications, an over-broad JMIG supplement rule that discarded regular articles
-sharing a volume with the congress supplement, and stopword removal that broke
-`[TI]` phrase semantics outright. Full write-up in [technical appendix section
-A12](docs/technical_appendix.Rmd); summary in [CHANGELOG.md](CHANGELOG.md).
-
-## Shiny Adjudication App
-
-Live at **https://mufflyt.shinyapps.io/aagl-adjudication/**
-
-Web-based tool for blinded manual review of probable/possible matches:
-
-- Side-by-side abstract vs candidate comparison
-- Per-component score breakdowns
-- Google Sheets backend for multi-reviewer collaboration
-- Keyboard shortcuts (m/n/s/Enter/arrows)
-- Filters by congress year (2012-2023), classification tier
-- Conflict detection between reviewers
-- Help tooltips on every control
-
-## Variable Extraction
-
-59 columns per abstract, extracted via NLP and API enrichment:
-
-| Category | Variables |
-|----------|-----------|
-| Study characteristics | study_design (12 categories), research_category, primary_procedure, is_rct, sample_size, is_multicenter |
-| Cochrane variables | has_funding, has_industry, has_trial_registration, has_irb_statement, has_numeric_results, is_database_study |
-| Author demographics | gender_unified (99% coverage), practice_type (18%), subspecialty_unified (36%), state_unified (31%), ACOG district, n_authors |
-| NPI identity resolution | npi_number, npi_match_confidence, npi_subspecialty, npi_state (278 high-confidence matches, 40% of US authors) |
-| Publication outcomes | pub_type_canonical, cited_by_count, journal_impact_proxy, months_to_pub |
-| Match quality | classification, best_score, 10 score components, has_tie |
-
-## Figures
-
-**Main manuscript** (6 figures, tracked and embedded in [Results](#results) above):
-
-| # | File | Content |
-|---|------|---------|
-| 1 | `figure1_flow_diagram.png` | STROBE flow diagram |
-| 2 | `figure2_km_curve.png` | Kaplan-Meier cumulative publication curve (pooled) |
-| 3 | `figure3_km_by_year.png` | KM curves stratified by congress year |
-| 4 | `figure4_subgroup_rates.png` | Publication rate by subgroup |
-| 5 | `figure5_cox_forest.png` | Cox PH forest plot (HRs with 95% CI) |
-| 6 | `figure6_time_to_pub.png` | Time to publication histogram |
-
-**Supplementary** (4 figures, generated but not tracked): `figureS1_pub_rate_by_year`, `figureS2_strategy_perf`, `figureS3_score_dist`, `figureS4_class_by_year`.
-
-`output/figures/` is gitignored apart from the six main figures, which are
-tracked so this README renders on GitHub.
-
-## Testing
-
-391 tests across 13 test files:
-
-- **Unit tests**: text normalization, scoring, state parsing, ACOG mapping, gender, affiliation classification, study design, research category, procedure classification, publication type canonicalization
-- **Semantic tests**: pipeline output plausibility checks against Cochrane MR000005 benchmarks (publication rate bounds, time-to-publication bounds, classification vocabulary, predictor coverage thresholds, Cox PH validity)
-- **Integration tests**: Shiny app data integrity, Google Sheets schema consistency
+**Re-run the whole pipeline** — see the caveats below first:
 
 ```r
-testthat::test_dir("tests/testthat")
-# [ FAIL 0 | WARN 13 | SKIP 1 | PASS 392 ]
+Rscript 00_run_all.R          # 3-4 h cold, ~30 min warm
+Rscript R/run_demographics.R  # REQUIRED: 00_run_all.R does not call it
 ```
 
-A fresh checkout has no gitignored artefacts (`pubmed_candidates.csv`, the
-deploy bundle), so tests needing them skip rather than fail — CI reports genuine
-regressions, not missing fixtures. In a tracked-files-only checkout the suite is
-377 passing, 0 failing, 9 skipped.
+---
 
-Two coverage thresholds were previously unsatisfiable rather than unmet and have
-been re-pointed at regression floors: `practice_type` asserted >= 80% against
-~18% achieved (affiliations are frequently uninformative), and citation coverage
-asserted >= 90% across all abstracts when a citation count only exists for
-matched publications.
+## Documentation
 
-The `abstract_id` consistency test no longer asserts set equality, because that
-failure was masking [issue #2](https://github.com/mufflyt/abstract_lifetime/issues/2).
-It now asserts the hard invariant — nothing downstream that is absent from
-`abstracts_cleaned` — and pins the reverse gap to the one known cause, so a
-**new** source of row loss still fails the suite.
+| Document | Answers |
+|---|---|
+| [COHORT_ASSEMBLY.md](docs/COHORT_ASSEMBLY.md) | What exactly is the denominator, and what happened to every parsed abstract? |
+| [PIPELINE.md](docs/PIPELINE.md) | Every stage: input → transformation → output, with a DAG |
+| [PUBLICATION_SEARCH.md](docs/PUBLICATION_SEARCH.md) | Every search query, verbatim, per source |
+| [MATCHING_ALGORITHM.md](docs/MATCHING_ALGORITHM.md) | The composite score, component by component, with thresholds |
+| [OUTCOME_DEFINITION.md](docs/OUTCOME_DEFINITION.md) | When does an abstract count as published? (Methods-ready) |
+| [ADJUDICATION.md](docs/ADJUDICATION.md) | Human review: schema, precedence, and the decision accounting |
+| [DATA_DICTIONARY.md](docs/DATA_DICTIONARY.md) · [CSV](docs/data_dictionary.csv) | All 90 variables with derivation and coverage |
+| [DATA_INVENTORY.md](docs/DATA_INVENTORY.md) · [CSV](docs/data_inventory.csv) | All 70 data files with producer, consumers and grain |
+| [AUTHOR_ENRICHMENT.md](docs/AUTHOR_ENRICHMENT.md) | Identity resolution and the ten-tier gender waterfall |
+| [STATISTICAL_ANALYSIS.md](docs/STATISTICAL_ANALYSIS.md) | Every model as fitted, with diagnostics |
+| [RESULTS_PROVENANCE.md](docs/RESULTS_PROVENANCE.md) | Every reported number → the file and code that produced it |
+| [SOURCE_OF_TRUTH.md](docs/SOURCE_OF_TRUTH.md) | Which file wins when two disagree |
+| [REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md) | What a clean clone gets, and what it does not |
+| [FAILURE_MODES.md](docs/FAILURE_MODES.md) | Sixteen ways this pipeline can be plausibly wrong |
+| [VALIDATION.md](docs/VALIDATION.md) | The test suite and the invariants that have no test |
+| [METHODOLOGICAL_HISTORY.md](docs/METHODOLOGICAL_HISTORY.md) | Corrections, with their effect on the numbers |
+| [technical_appendix.Rmd](docs/technical_appendix.Rmd) | Extended appendices A1–A13 |
 
-## Reproducibility
+---
 
-- All API responses cached to disk (PubMed XML, ScienceDirect HTML)
-- RDS checkpoints at each search stage (resume after interruption)
-- `set.seed(42)` for reproducible sampling
-- Manuscript Rmd files use inline R code pulling from pipeline CSVs
-- Full re-run with populated cache: ~30 minutes
+## What requires manual or external data
 
-## Project Structure
+| Component | Status |
+|---|---|
+| Human adjudication (1,263 decisions, 3 reviewers) | **Manual.** Tracked in `output/manual_review_decisions.csv`; the live store is a Google Sheet requiring a service-account key. |
+| Gold standard (50 abstracts) | **Manual.** Tracked. Cannot be regenerated by code. |
+| International gender lookup (300 names) | **Manual.** Tracked. |
+| ACGME teaching-hospital list (2,754 names) | External snapshot, tracked, no retrieval script. |
+| `data/cache/sd_html/` (1,154 files) | **Gitignored and unrefetchable** — ScienceDirect returns HTTP 403. This cache is currently the only copy of the source documents. |
+| `data/processed/pubmed_candidates.csv` (98 MB) | **Gitignored.** A clean clone cannot run steps 4–5 without re-running the search. |
+| NPI matching | **Irreproducible.** Both inputs are hard-coded absolute paths outside the repository, and neither exists on the current machine. |
+| 2017 abstract text | **Irrecoverable** without institutional PDF access (CORS blocks the jmig.org scraper; no Wayback snapshots). 96 of 97 abstracts have no text. |
 
-```
-data/
-  processed/          # Intermediate pipeline outputs (abstracts, candidates, scores)
-  cache/              # API response cache (PubMed XML, ScienceDirect HTML) [gitignored]
-  validation/         # Gold standard (50 abstracts) + ACGME teaching hospital names
-output/
-  *.csv               # Analysis results (aims 1-5, sensitivity, publication bias)
-  final_analytical_dataset.csv   # Unified 1,067 x 90 dataset (demographics + decisions)
-  tables/             # Publication-quality tables (Table 1-4) [gitignored]
-  figures/            # Main (6, tracked) + supplementary (4, gitignored)
-docs/
-  abstract_results_section.Rmd    # Full manuscript (Introduction + Methods + Results)
-  technical_appendix.Rmd          # Technical appendix (pipeline details, A12 = matching fixes)
-  aagl_abstract_programmatic.Rmd  # Programmatic abstract draft
-  reviewer_email.md               # Template email for adjudication reviewers
-CHANGELOG.md          # Dated change history (Keep a Changelog format)
-NEWS.md               # Same history, fuller narrative
-shiny/
-  adjudication_app/   # Shiny app for human review of matches
-tests/
-  testthat/           # 391 automated tests
-config.yml            # All pipeline parameters (congresses, thresholds, API settings)
-```
+---
 
-## Requirements
+## Test status
 
-- R >= 4.4
-- Key packages: tidyverse, rentrez, xml2, httr, jsonlite, survival, gender, stringdist, humaniformat, DiagrammeR
-- Optional: googlesheets4 (Shiny backend), rsconnect (deployment), webshot2 (flow diagram PNG)
-- DuckDB database: `/Volumes/MufflySamsung/DuckDB/nber_my_duckdb.duckdb` (for NPI matching, Mac-local)
-- ABOG-NPI file: `isochrones/data/canonical_abog/canonical_abog_npi_LATEST.csv` (for NPI matching)
+As of 2026-09-03 16:40, 21 test files, 619 passing assertions, 1 skip (the
+browser end-to-end suite, which needs `shinytest2`), and **6 failures — all of
+them reporting real problems rather than broken fixtures**. The suite is under
+active development in a parallel workstream (the `cycle0*` files), so these
+counts move; two of the six below were already fixed while this section was
+being written.
 
-## API Keys & Environment Variables
+| Failing test | What it reports |
+|---|---|
+| `test-shiny_app.R:458` | The deployed Shiny bundle is 135 days behind `data/processed/`, so reviewers on the live app see pre-denominator-fix data. |
+| `test-cycle03_model_contracts.R:57` | **Deliberately left red.** `has_funding` is TRUE for 3 of 1,051 abstracts and its odds ratio spans 0.12–29.04. "Not significant" and "not estimable" are different claims; the decision of which to report has not been made. |
+| `test-cycle04_validation_sensitivity.R:29` | The gold-standard confusion cells summed to 49 against a stated n = 50 (fixed in a parallel workstream while this was written). |
+| `test-cycle04_validation_sensitivity.R:97` | `sensitivity_analyses.csv` mixes two denominators (1,106 and 1,051) across rows describing the same abstracts. |
+| `test-cycle04_validation_sensitivity.R:146` | `cohens_kappa` was `NA` because `irr` was not installed (fixed in a parallel workstream; κ = 0.994). |
+| `test-cycle04_validation_sensitivity.R:161` | `search_strategy_efficacy.csv` still carries the pre-correction `title`-strategy yield of 0.2%. |
 
-The pipeline uses several external APIs. All work without keys but with lower rate limits. Set these in `~/.Renviron` for better performance:
+CI runs three gates: decision-logic boundary contracts, then mutation tests
+(every planted defect must still be killed), then the full suite.
+Full inventory and the list of invariants that have **no** test:
+[docs/VALIDATION.md](docs/VALIDATION.md).
 
-```bash
-# NCBI E-Utilities (PubMed search) — 3 req/sec without key, 10 req/sec with key
-# Get one at: https://www.ncbi.nlm.nih.gov/account/settings/ → "API Key Management"
-ENTREZ_KEY=your_ncbi_api_key_here
+## Known limitations
 
-# genderize.io (international gender inference) — 100 req/day free, unlimited with key
-# Get one at: https://store.genderize.io/ (free tier available)
-GENDERIZE_API_KEY=your_genderize_key_here
+1. **The cohort is truncated.** The ScienceDirect listing scraper captures only
+   the first ~100 items per congress supplement, against 392–852 items deposited
+   in Crossref. For congress years 2012–2021 the captured window ends while
+   still inside the oral-presentation block, so an unknown number of oral
+   presentations were never ingested. The cohort is best described as *the first
+   ~95–100 presentations listed in each supplement*, not *all oral
+   presentations*. [FAILURE_MODES.md F1](docs/FAILURE_MODES.md)
+2. **74 of the 178 published abstracts have no publication date**, because the
+   candidate file on disk is a stale subset of the pool the scores were computed
+   against. Time-to-publication, the Kaplan–Meier curve and the Cox model all
+   run on 104 events. [F2](docs/FAILURE_MODES.md)
+3. **Study characteristics were derived before the abstract text was
+   recovered.** For 2012–2018 the regex classifiers saw the title alone, giving
+   a step change at 2018/2019 in `is_us_based` (31–45% → 97–100%),
+   `is_academic` (0–4% → 22–47%), `sample_size` availability (4–13% → 66–77%)
+   and `has_numeric_results` (0% → 47–89%). Congress year is in neither model,
+   so every coefficient is confounded by year through measurement. [F3](docs/FAILURE_MODES.md)
+4. **`aim1_by_practice_type.csv` and `aim1_by_subspecialty.csv` are not
+   publication rates.** Both stratifiers are parsed from the matched
+   publication's affiliation and therefore exist almost only for published
+   abstracts. [F4](docs/FAILURE_MODES.md)
+5. **A failed API call is indistinguishable from a genuine zero result.** No
+   retry, no error column, and the checkpoint marks the abstract complete. [F5](docs/FAILURE_MODES.md)
+6. **`00_run_all.R` does not run the demographics merge.** Run
+   `R/run_demographics.R` separately or the models silently lose their
+   demographic terms. [F8](docs/FAILURE_MODES.md)
+7. Author gender is inferred; 27% of resolved values come from a single first
+   initial and 228 carry a cross-source disagreement.
+8. `n_authors` is censored at 5 by ScienceDirect's author-list truncation, and
+   is a significant term in both models.
+9. Publication dates are print/issue dates; `ArticleDate` is not read. Eleven
+   pre-congress exclusions rest on year-only dates resolved to 1 January.
+10. The 55 unresolved abstracts are removed from the denominator. Bounds:
+    16.1% if all unpublished, 21.1% if all published.
 
-# Google Sheets (Shiny adjudication app backend)
-# Place service account JSON at: shiny/adjudication_app/google_credentials.json
-# Get one at: https://console.cloud.google.com → IAM & Admin → Service Accounts → Create Key
-GOOGLE_SHEETS_ID=your_google_sheet_id_here
+---
 
-# Contact email for polite API pools (OpenAlex, CrossRef)
-# Used in User-Agent headers per API terms of service
-PIPELINE_EMAIL=your.email@example.com
-```
+## Citation
 
-**No-key APIs** (work without authentication):
-- **OpenAlex** — polite pool with `mailto` parameter (set via `PIPELINE_EMAIL`); no key needed
-- **CrossRef** — polite pool with `mailto`; no key needed
-- **Europe PMC** — fully open; no key needed
-- **Semantic Scholar** — public API; no key needed (rate limited to ~100 req/5min)
-- **ORCID** — public API for reading; no key needed
-- **NPPES/NPI Registry** — public API; no key needed
-
-**shinyapps.io deployment** (optional):
-```r
-# Configure once — get token at https://www.shinyapps.io/admin/#/tokens
-rsconnect::setAccountInfo(name = "your_account", token = "YOUR_TOKEN", secret = "YOUR_SECRET")
-```
+See [CITATION.cff](CITATION.cff). Change history:
+[CHANGELOG.md](CHANGELOG.md) (dated) and [NEWS.md](NEWS.md) (narrative);
+methodological history with quantified effects in
+[docs/METHODOLOGICAL_HISTORY.md](docs/METHODOLOGICAL_HISTORY.md).
 
 ## Contributing
 
-Contributions welcome. Please:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/your-feature`)
-3. Add tests for new functionality
-4. Ensure `testthat::test_dir("tests/testthat")` passes
-5. Submit a pull request
+Fork, branch, add tests, ensure `testthat::test_dir("tests/testthat")` does not
+regress, open a pull request.
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
+MIT. See [LICENSE](LICENSE).

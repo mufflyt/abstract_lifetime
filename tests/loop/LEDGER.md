@@ -267,3 +267,73 @@ Failure 1 is the preserved 3.2 above. Failure 2 is the pre-existing
 preserve failing tests that represent genuine scientific ambiguity rather than
 silently choosing an estimand. It will stay red until the `has_funding` decision
 is made.
+
+---
+
+## Cycle 4 — 2026-09-03 22:35 MDT
+
+Mix required: 4 BVA / 3 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle04_validation_sensitivity.R` (29 assertions).
+First tests ever written against validation_metrics, sensitivity_analyses,
+interrater_agreement, aim4_strategy_performance and aim5_publication_bias.
+
+| # | Category | Target | Assumption challenged |
+|---|---|---|---|
+| 4.1 | BVA | validation_metrics | confusion cells partition their population; accuracy divides by it |
+| 4.2 | BVA | sensitivity_analyses | each scenario recomputes from its own counts |
+| 4.3 | BVA | interrater_agreement | agreement bounded; population no larger than the cohort |
+| 4.4 | BVA | aim4 | yield percentages recompute from their own counts |
+| 4.5 | semantic | sensitivity_analyses | every scenario exposes its denominator; none exceeds the cohort |
+| 4.6 | semantic | aim5 | OR direction agrees with the underlying rates |
+| 4.7 | semantic | validation_metrics | the sample is drawn from the human-reviewed population |
+| 4.8 | adversarial | interrater_agreement | kappa is reported, not silently absent |
+| 4.9 | adversarial | aim4 | no strategy silently contributes nothing |
+| 4.10 | adversarial | sensitivity_analyses | longer follow-up windows cannot grow the cohort |
+
+### Defect 1 fixed — accuracy divided by the wrong denominator
+`R/validation_gold_standard.R` counts the four confusion cells with
+`na.rm = TRUE`, so a row with NA in `truth` or `predicted` is dropped from all
+four. `n` was still `nrow(validation)`. The cells summed to 49 while n said 50,
+and `accuracy <- (tp + tn) / nrow(validation)` mixed a numerator measured on 49
+rows with a denominator of 50.
+
+Fixed: `n_classified` is now computed and exported, and accuracy divides by it.
+**Accuracy moves from 0.720 to 0.735.** This is a bug fix, not an estimand
+change: the numerator and denominator now describe the same rows.
+
+### Defect 2 fixed — Cohen's kappa was silently absent
+`R/10_interrater.R` guards the kappa computation with
+`requireNamespace("irr", quietly = TRUE)`. The package was not installed, so
+`cohens_kappa` was written as NA with no indication why. A reader sees 98.1%
+raw agreement on 519 abstracts and an absent kappa, and cannot tell whether
+kappa was undefined for the data or never attempted.
+
+Installed `irr` and added it to the CI extra-packages so the metric cannot go
+missing again. **Cohen's kappa is 0.994** (p = 0) on 519 multi-reviewed
+abstracts. Raw agreement alone overstates reliability when one category
+dominates, which is why Cochrane MR000005 asks for kappa; it is now reported.
+
+### Test defects of my own, corrected
+- **4.1** asserted the cells sum to `n`. After adding `n_classified` the correct
+  assertion is against that, plus `n_classified <= n` and the accuracy identity.
+- **4.5** demanded a single denominator across all match-definition scenarios.
+  That premise was wrong. "Definite only" is decidable for all 1,106 because
+  classification is always present; "Definite + reviewer-confirmed" needs a
+  reviewer and is decidable only for the 1,051 evaluated. The denominators
+  differ for a principled reason and the table exposes both. Rewritten to assert
+  that no scenario exceeds the cohort and that the reviewer-confirmed scenario
+  matches the evaluated denominator.
+
+### PRESERVED FAILING TEST — tracks an un-executed fix (4.9)
+The `title` search strategy searched 1,742 abstracts and hit **3** (0.2% yield).
+Technical appendix A12.4 records that stopword removal broke the title phrase
+search; the fix was written 2026-04-28 while the candidate pool was last
+retrieved 2026-04-19. This test is the cheapest available signal that the
+re-run has happened, and goes green when it does. Not a defect to fix in code.
+
+**Result:** 6/10 pass on first run. Two real defects found and fixed, two of my
+own tests corrected, one failure preserved as a re-run tracker.
+
+**Suite after cycle 4:** 19 files, 627 passed (+57), 3 failed, 0 errors.
+Failures: 3.2 (funding term, decision required), 4.9 (re-run tracker),
+shiny mtime (pre-existing). No unintended regressions.

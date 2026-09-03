@@ -56,6 +56,7 @@ jobs:
             any::digest
             any::cli
             any::yaml
+            any::irr
 
       # Gate 1. The decision-logic contracts. These encode defects that reached
       # the analysis outputs, so they run first and a failure here stops the job

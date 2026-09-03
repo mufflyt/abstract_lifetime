@@ -125,11 +125,18 @@ Rows per abstract in the raw log range from 1 to 10; the modal abstract has 3
   and no recorded adjudication of conflicts.
 
 Interrater agreement (`R/10_interrater.R`, `output/interrater_agreement.csv`):
-**519 abstracts** reviewed by ≥ 2 humans, **98.1%** raw agreement.
-`cohens_kappa` is `NA` because the `irr` package is not installed on the
-machine that produced the file — the script degrades silently rather than
-failing. With 1,491 of 2,372 decisions being `no_match`, raw agreement is a weak
-statistic and kappa is the number that should be reported.
+**519 abstracts** reviewed by ≥ 2 humans, **98.1%** raw agreement, **Cohen's
+κ = 0.994**.
+
+κ was `NA` until 2026-09-03 because the `irr` package was not installed on the
+machine producing the file; `R/10_interrater.R:67` degrades silently rather than
+failing, so the gap was invisible in the output. It matters: with 1,491 of 2,372
+decisions being `no_match`, raw agreement is inflated by the base rate and κ is
+the number that should be reported. κ = 0.994 is near-perfect, which is
+consistent with 29 disagreements over 519 abstracts, but note that reviewers
+were **not** blinded to the algorithm's answer — the app pre-selects it — so
+agreement partly measures agreement with the algorithm rather than independent
+concordance.
 
 Reviewers per abstract among the human-reviewed set: 14 abstracts have one
 reviewer, 507 have two, 12 have three.

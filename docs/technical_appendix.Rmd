@@ -30,9 +30,42 @@ xml_cache <- length(list.files(here("data", "cache", "pubmed_xml")))
 html_cache <- length(list.files(here("data", "cache", "sd_html")))
 ```
 
+## A0. Relationship to the `docs/` reference set
+
+This appendix is a **narrative supplement**, not the primary reference. Since
+2026-09-03 the authoritative, continuously verified description of the pipeline
+lives in `docs/`, and a lightweight test
+(`tests/testthat/test-docs_drift.R`) fails when those documents disagree with
+the data. Where this appendix and a `docs/` file differ, **the `docs/` file is
+current.**
+
+| Topic | Authoritative document |
+|---|---|
+| Cohort assembly, the denominator, per-congress reconciliation | `docs/COHORT_ASSEMBLY.md` |
+| Stage-by-stage pipeline, DAG, machine-readable manifest | `docs/PIPELINE.md`, `docs/pipeline_manifest.yml` |
+| Every search query, per source | `docs/PUBLICATION_SEARCH.md` |
+| Score components, thresholds, tie-breaking, publication dating | `docs/MATCHING_ALGORITHM.md` |
+| Operational definition of the outcome | `docs/OUTCOME_DEFINITION.md` |
+| Adjudication schema, precedence, decision accounting | `docs/ADJUDICATION.md` |
+| All 90 analytical variables | `docs/DATA_DICTIONARY.md` |
+| Identity resolution and the gender waterfall | `docs/AUTHOR_ENRICHMENT.md` |
+| Models as fitted, with diagnostics | `docs/STATISTICAL_ANALYSIS.md` |
+| Every reported number and its provenance | `docs/RESULTS_PROVENANCE.md` |
+| Reproduction requirements and blockers | `docs/REPRODUCIBILITY.md` |
+| Known ways the pipeline can be plausibly wrong | `docs/FAILURE_MODES.md` |
+| Test inventory and untested invariants | `docs/VALIDATION.md` |
+| Corrections and their quantified effects | `docs/METHODOLOGICAL_HISTORY.md` |
+
+Sections A8 (abstract-text recovery for 2012-2018), A10 (NPI identity
+resolution), A11 (extending the pipeline to other societies) and A13 (the
+denominator chain) carry material that is not duplicated in `docs/` and remain
+the primary record for those topics.
+
+---
+
 ## A1. Pipeline Architecture
 
-The abstract-to-publication matching pipeline is implemented as a modular, fully reproducible R codebase comprising 20 R scripts, 12 test files (`r 391` unit and semantic tests), and a Shiny web application for human adjudication. The pipeline executes in 10 sequential steps, with checkpoint-based resume support for API-dependent stages. All source code and deidentified output data are available at https://github.com/mufflyt/abstract_lifetime.
+The abstract-to-publication matching pipeline is implemented as a modular, fully reproducible R codebase comprising 20 R scripts, `r length(list.files(here("tests","testthat"), pattern = "^test-"))` test files (see `docs/VALIDATION.md` for the current pass/fail status), and a Shiny web application for human adjudication. The pipeline executes in 10 sequential steps, with checkpoint-based resume support for API-dependent stages. All source code and deidentified output data are available at https://github.com/mufflyt/abstract_lifetime.
 
 ### A1.1 System Requirements
 
@@ -233,16 +266,10 @@ A server-side R scraper using session cookies extracted from Chrome's DevTools A
 
 ### A8.3 Final Abstract Text Coverage
 
-| Congress Year | N Abstracts | Has Text | Coverage |
-|---|---|---|---|
-| 2012 | 97 | ~60 | ~62% |
-| 2013 | 97 | ~65 | ~67% |
-| 2014 | 97 | ~55 | ~57% |
-| 2015 | 97 | ~70 | ~72% |
-| 2016 | 97 | ~75 | ~77% |
-| 2017 | 96 | 0 | 0% |
-| 2018 | 97 | ~75 | ~77% |
-| 2019–2023 | 428 | 428 | 100% |
+The table below is computed from `data/processed/abstracts_cleaned.csv` at
+render time. A static version previously printed here reported 97 abstracts per
+congress and 0% coverage for 2017; both were superseded and the static table has
+been removed rather than maintained in parallel.
 
 ```{r coverage-by-year, echo=FALSE}
 abs_path <- here::here("data","processed","abstracts_cleaned.csv")
@@ -263,7 +290,9 @@ if (file.exists(abs_path)) {
 
 ### A8.4 Impact on Matching Algorithm
 
-For abstracts lacking text, the matching algorithm operated in title-and-author–only mode: the abstract semantic similarity component contributed 0 points, and the no-text penalty (−2 points) was applied when neither title nor abstract similarity exceeded threshold. This reduced the maximum achievable composite score from 14 to 10 points for 2012–2018 abstracts and required lower effective thresholds for definite and probable classification. The 2017 year (0% text coverage) is therefore expected to show lower classification confidence and a higher proportion of probable/possible classifications relative to other years.
+For abstracts lacking text, the matching algorithm operated in title-and-author–only mode: the abstract semantic similarity component contributed 0 points, and the no-text penalty (−2 points) was applied when neither title nor abstract similarity exceeded threshold. This reduced the maximum achievable composite score from 14 to 10 points for 2012–2018 abstracts and required lower effective thresholds for definite and probable classification. The 2017 year (1 of 97 abstracts with text) is therefore expected to show lower classification confidence and a higher proportion of probable/possible classifications relative to other years; it has the lowest mean composite score (2.62) and the lowest publication rate (5.6%) of any congress.
+
+A second consequence was not recognised at the time and is more serious. `R/02_clean_abstracts.R` derives every text-based predictor *before* the recovery steps in A8.2 run, and never recomputes them, so the recovered text improved matching but not variable extraction. The resulting step change at 2018/2019 in `is_us_based`, `is_academic`, `sample_size`, `study_design` and `has_numeric_results` is documented as F3 in `docs/FAILURE_MODES.md` and affects every coefficient in the Cox and logistic models.
 
 ### A8.5 Recommended Path for Future Recovery
 
