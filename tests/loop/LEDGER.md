@@ -384,3 +384,71 @@ and no cohort number appears as a literal.
 **Suite after cycle 5:** 20 files, 655 passed (+28), 3 failed, 0 errors.
 Failures unchanged: 3.2 (funding term, decision required), 4.9 (re-run tracker),
 shiny mtime (pre-existing). No unintended regressions.
+
+---
+
+## Cycle 6 — 2026-09-03 22:55 MDT
+
+Mix required: 3 BVA / 3 semantic / 4 adversarial. File:
+`tests/testthat/test-cycle06_scoring_composite.R` (32 assertions).
+Target: the composite score itself. Cycle 1 tested the tiers built on top of the
+score; nothing had tested the score, its components, or the uniqueness of what
+it selects.
+
+| # | Category | Target | Assumption challenged |
+|---|---|---|---|
+| 6.1 | BVA | best_score | equals the sum of its ten components |
+| 6.2 | BVA | components | each stays inside its documented range |
+| 6.3 | BVA | title_sim | bounded; zero similarity earns no title points |
+| 6.4 | semantic | tie rule | a tied best candidate is never left definite |
+| 6.5 | semantic | components | every component can actually contribute |
+| 6.6 | semantic | no_text_penalty | non-positive, and bars the definite tier |
+| 6.7 | adversarial | final_pmid | one publication is not two abstracts' conversion |
+| 6.8 | adversarial | n_candidates | zero candidates cannot carry a match |
+| 6.9 | adversarial | match tiers | a match tier carries the PMID it matched |
+| 6.10 | adversarial | components | no NA that rowSums would swallow |
+
+### Invariants confirmed (worth locking in)
+`best_score` equals the sum of its ten components on **1,106 of 1,106** rows.
+Every component stays inside its range. The tie-demotion rule at
+`utils_scoring.R:481` works: zero definite classifications carry `has_tie`.
+
+### PRESERVED FAILING TEST 6.5 — a scoring component is structurally dead
+`keyword_pts` is **0 for all 1,106 abstracts**. The scorer guards the block with
+`!is.null(abstract$keywords)`, and the cleaned abstracts carry **no keywords
+column at all**, so the branch is unreachable. The manuscript describes a
+"10-component composite scoring system"; one of the ten cannot fire.
+
+Decision needed: remove the component, source keywords for the abstracts, or
+describe the composite as nine components. All three change either the score or
+the methods text, so none is taken here.
+
+### PRESERVED FAILING TEST 6.7 — three publications double-counted
+Three PMIDs are each claimed by two abstracts counted as published, so the
+numerator of 178 carries **three duplicate credits**. PMIDs 32604198, 38906210,
+39490893.
+
+The clearest example: AAGL2019_036 "Occult Uterine Malignancy at the Time of
+Surgery for Pelvic Organ Prolapse: A Systematic Review" and AAGL2019_081
+"Occult Uterine Malignancy at the Time of Surgery for Benign Gynecologic
+Indications: An Updated Systematic Review" both matched PMID 32604198. These are
+different studies; at most one is the publication of that paper.
+
+Decision needed: adjudicate which abstract owns each PMID. If all three
+duplicates resolve to one abstract each, the numerator falls from 178 to 175 and
+the rate from 16.9% to 16.7%.
+
+### Test defects of my own, corrected
+- **6.10** flagged NA components on the four `no_candidates` abstracts. Those
+  rows correctly have no components because nothing was scored. Rescoped to
+  abstracts that have a candidate.
+- **6.5 and 6.7** each reported twice, using `expect_*` followed by `fail()`.
+  Collapsed to one assertion apiece so the failure count reflects findings.
+
+**Result:** 7/10 pass on first run. Two findings preserved as failing tests, one
+test of my own rescoped, two collapsed.
+
+**Suite after cycle 6:** 21 files, 685 passed (+30), 5 failed, 0 errors.
+Failures: 3.2 funding term, 4.9 re-run tracker, 6.5 dead component, 6.7
+duplicate PMIDs, shiny mtime (pre-existing). Four are open decisions; none is a
+regression.

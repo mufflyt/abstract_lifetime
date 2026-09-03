@@ -182,6 +182,15 @@ default:
   # Set via PIPELINE_EMAIL env var or override here
   contact_email: ""
 
+  # --- External data outside the repository (NPI identity resolution) ---
+  # Both are optional. When either is absent, R/10_npi_matching.R degrades to a
+  # smaller or empty match set rather than failing, and tier 1 of the gender
+  # waterfall loses coverage. Override with the ABOG_NPI_PATH and
+  # NPPES_DUCKDB_PATH environment variables.
+  external_data:
+    abog_npi_path: "~/isochrones/data/canonical_abog/canonical_abog_npi_LATEST.csv"
+    nppes_duckdb_path: "/Volumes/MufflySamsung/DuckDB/nber_my_duckdb.duckdb"
+
   # --- Pipeline ---
   pipeline:
     checkpoint_dir: "data/cache/checkpoints"

@@ -44,6 +44,14 @@ source(here("R", "02b_backfill_abstract_text.R"))
 cli_h2("Step 2c: Abstract Text Backfill (ScienceDirect snippets)")
 source(here("scripts", "backfill_sciencedirect_snippets.R"))
 
+# Step 2d: Re-derive the study characteristics now that the text exists.
+# 02 computes them from `search_text`, which for 2012-2018 is the title alone
+# because the backfills above had not yet run. Without this step the covariates
+# carry a step change at 2018/2019 that is a measurement artefact, not a trend.
+# See docs/FAILURE_MODES.md F3.
+cli_h2("Step 2d: Re-derive Study Characteristics")
+source(here("R", "02d_rederive_predictors.R"))
+
 # Step 3: Search PubMed
 cli_h2("Step 3: PubMed Search")
 source(here("R", "03_search_pubmed.R"))
@@ -140,6 +148,19 @@ local({
   readr::write_csv(matches, here("output", "abstracts_with_matches.csv"))
 })
 
+# Step 5h8: Demographics merge. R/10e_merge_demographics.R resolves the ten-tier
+# gender waterfall and joins the NPI and ORCID sidecars onto
+# output/abstracts_with_matches.csv. It was previously reachable only through
+# R/run_demographics.R, so a clean run of this pipeline produced a dataset with
+# no gender_unified, npi_* or state_unified columns, and 06_analyze_results.R
+# then dropped those model terms without warning. See docs/FAILURE_MODES.md F8.
+cli_h2("Step 5h8: Demographics Merge")
+source(here("R", "10b_resolve_names_openalex.R"))
+source(here("R", "10d_orcid_demographics.R"))
+source(here("R", "10f_senior_author_triangulation.R"))
+source(here("R", "10g_second_author_triangulation.R"))
+source(here("R", "10e_merge_demographics.R"))
+
 # Step 5i: Fidelity checks (abstract vs published paper comparison)
 cli_h2("Step 5i: Fidelity Checks")
 source(here("R", "09e_fidelity_checks.R"))
@@ -163,6 +184,11 @@ source(here("R", "07_make_tables.R"))
 # Step 8: Figures
 cli_h2("Step 8: Figures")
 source(here("R", "08_make_figures.R"))
+
+# Step 8b: STROBE cohort flow chart. Derives every count from the pipeline files
+# and asserts the arithmetic with stopifnot() before drawing.
+cli_h2("Step 8b: STROBE Flow Chart")
+source(here("R", "strobe_flowchart.R"))
 
 # Step 9: Deploy Shiny adjudication app
 cli_h2("Step 9: Deploy Shiny App")

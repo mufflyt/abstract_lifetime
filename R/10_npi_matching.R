@@ -40,11 +40,45 @@ cfg <- config::get(file = here("config.yml"))
 cli_h1("NPI Matching for AAGL First Authors")
 
 # ---- Load ABOG-NPI pool ----
-abog_path <- "/Users/tylermuffly/isochrones/data/canonical_abog/canonical_abog_npi_LATEST.csv"
-if (!file.exists(abog_path)) {
-  cli_alert_danger("ABOG-NPI file not found at {abog_path}")
-  invisible(NULL)
+# Path comes from config.yml (external_data$abog_npi_path) or the ABOG_NPI_PATH
+# environment variable. It lives outside the repository, so a checkout on
+# another machine will not have it. See docs/REPRODUCIBILITY.md category 5.
+abog_path <- path.expand(
+  Sys.getenv("ABOG_NPI_PATH",
+             unset = cfg$external_data$abog_npi_path %||% "")
+)
+
+# `return()` is invalid at the top level of a sourced file, so the remainder of
+# this script is wrapped in `if (npi_pool_ok)` rather than exited early. The
+# previous guard called invisible(NULL), which does not stop a sourced script,
+# so execution fell through to read_csv() and the pipeline aborted here.
+npi_pool_ok <- nzchar(abog_path) && file.exists(abog_path)
+
+if (!npi_pool_ok) {
+  cli_alert_danger("ABOG-NPI pool not found at {.path {abog_path}}")
+  cli_alert_info("Skipping NPI matching. Tier 1 of the gender waterfall will be \
+                  empty; every other tier is unaffected.")
+  # Write an empty sidecar with the expected schema so
+  # R/10e_merge_demographics.R joins cleanly rather than erroring on a missing
+  # file. An existing sidecar from a machine that HAS the pool is left alone.
+  npi_sidecar <- here("data", "processed", "npi_matches.csv")
+  if (!file.exists(npi_sidecar)) {
+    readr::write_csv(
+      tibble::tibble(
+        abstract_id = character(), npi_number = character(),
+        npi_gender = character(), npi_state = character(),
+        npi_subspecialty = character(), npi_match_score = numeric(),
+        npi_match_confidence = character(), npi_match_strategy = character(),
+        npi_full_name = character(), npi_acog_district = character()
+      ),
+      npi_sidecar
+    )
+  } else {
+    cli_alert_info("Leaving the existing {.path {npi_sidecar}} in place.")
+  }
 }
+
+if (npi_pool_ok) {
 
 pool <- read_csv(abog_path, show_col_types = FALSE) |>
   filter(!is.na(first_name), !is.na(last_name), nchar(first_name) > 0) |>
@@ -412,7 +446,14 @@ if (nrow(dupes) > 0) {
 # ---- Fallback: NPPES with OB/GYN taxonomy filtering (isochrones approach) ----
 cli_h2("Fallback: NPPES + Physician Compare with taxonomy filtering")
 
-db_path <- "/Volumes/MufflySamsung/DuckDB/nber_my_duckdb.duckdb"
+db_path <- path.expand(
+  Sys.getenv("NPPES_DUCKDB_PATH",
+             unset = cfg$external_data$nppes_duckdb_path %||% "")
+)
+if (!nzchar(db_path) || !file.exists(db_path)) {
+  cli_alert_warning("NPPES DuckDB not found at {.path {db_path}} - skipping the \
+                     taxonomy fallback")
+}
 still_unmatched <- npi_matches |>
   filter(npi_match_confidence != "high") |>
   inner_join(lookup |> select(abstract_id, congress_year, last_name_upper, full_first_name,
@@ -635,3 +676,5 @@ cli_alert_info("MIGS specialists matched: {migs_matches}")
 out_path <- here("data", "processed", "npi_matches.csv")
 write_csv(npi_matches, out_path)
 cli_alert_success("Saved: {out_path}")
+
+}  # end if (npi_pool_ok)
