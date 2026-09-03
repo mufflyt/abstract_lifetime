@@ -118,3 +118,38 @@ underpowered rather than null. Whether restoring affiliation_raw changes those
 conclusions has not been tested.
 
 STATUS: unresolved, handed to maintainer. Not a code defect introduced here.
+
+---
+
+## Cycle 1 — 2026-09-03 21:40 MDT
+
+Mix required: 4 BVA / 3 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle01_thresholds_contracts.R` (59 assertions).
+
+| # | Category | Target | Assumption challenged | Not covered before because |
+|---|---|---|---|---|
+| 1.1 | BVA | `classify_match()` | cutoffs inclusive at 7 and 3, exclusive just below; definite tier unreachable without text evidence at any score | cycle 0 tested the decision cascade, never the score tiers; test-utils_classify.R covers study-design classification, a different function |
+| 1.2 | BVA | `classify_match()` | Inf / -Inf / NA scores must not classify as a match | no non-finite score case existed anywhere |
+| 1.3 | BVA | `publication_rate_summary()` | cohort of size 1 and size 0 | cycle 0 tested zero-pending and all-pending, not minimum cohort size |
+| 1.4 | BVA | `publication_rate_summary()` | returns an unrounded proportion so export controls precision | rounding was only asserted downstream at the export |
+| 1.5 | semantic | `classify_match()` | `pre_conference` dominates score; it is a validity statement, not a penalty | the flag's precedence over a perfect score was untested |
+| 1.6 | semantic | `conference_date_for()` | Date class preserved, length equals input, integer and character years agree, length-0 in gives length-0 out | existing file tests values and NA fallback, never class, length, or type equivalence |
+| 1.7 | semantic | `publication_rate_summary()` | pending means unresolved, not unpublished; FALSE is evaluated | mutant M8 covered miscounting, not the label/quantity distinction |
+| 1.8 | adversarial | `congress_date_lookup()` | duplicate congress years in config must not silently yield one of two conflicting dates | no malformed-config case existed |
+| 1.9 | adversarial | `dedup_decisions_for_analysis()` | result invariant to input row order across 8 shuffles | cycle 0 fixtures were always in a fixed order |
+| 1.10 | adversarial | config vs cohort vintage | every cohort congress year has a config date, else it silently falls back to the legacy date and corrupts months_to_pub for that year | no test compared config vintage to shipped data |
+
+**Result:** 10/10 pass on first run. No implementation defects found this cycle.
+
+**Suite after cycle 1:** 15 files, 519 passed (+59), 1 failed, 0 errors, 0 skipped.
+The single failure is the pre-existing `test-shiny_app.R` mtime check recorded
+above. No new regressions.
+
+**CI:** `tests` workflow green on all three gates
+(run 33808813998). Worth noting: the full-suite gate passed in CI while the same
+suite fails locally, which confirms the mtime staleness test is inert in CI
+because actions/checkout resets mtimes. That test still cannot detect the real
+`affiliation_raw` divergence.
+
+**Unresolved from cycle 0:** branch order in `final_published`; treatment of the
+55 unresolved abstracts; pre-congress window; `affiliation_raw` loss.
