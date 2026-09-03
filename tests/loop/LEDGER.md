@@ -199,3 +199,71 @@ recorded in the technical appendix A13.6.
 **Suite after cycle 2:** 16 files, 544 passed (+25), 1 failed, 0 errors.
 Same pre-existing `test-shiny_app.R` mtime failure. No new regressions.
 Related files re-run green: BVA 50, mutation 18, cycle01 59.
+
+---
+
+## Cycle 3 — 2026-09-03 22:25 MDT
+
+Mix required: 3 BVA / 3 semantic / 4 adversarial. File:
+`tests/testthat/test-cycle03_model_contracts.R` (27 assertions).
+
+| # | Category | Target | Assumption challenged |
+|---|---|---|---|
+| 3.1 | BVA | aim3 / aim2b | ratios positive, finite, bracketed by their own CI |
+| 3.2 | BVA | aim3 | no term reported with an uninterpretably wide interval |
+| 3.3 | BVA | aim3 / aim2b | p-values in [0,1]; a printed 0 means below precision |
+| 3.4 | semantic | aim3 | estimates are exponentiated ratios, not log-odds |
+| 3.5 | semantic | aim3 | an effect table must carry the N it was fitted on |
+| 3.6 | semantic | aim3 vs aim2b | shared predictors agree in direction |
+| 3.7 | adversarial | model spec | no term from a variable >=50% missing |
+| 3.8 | adversarial | complete-case | attrition does not quietly halve the model cohort |
+| 3.9 | adversarial | glm | determinism across seeds and row order |
+| 3.10 | adversarial | artifacts | model outputs not older than the dataset |
+
+### Defect found and fixed
+**3.5 — `aim3_logistic_regression.csv` reported odds ratios with no N.** The
+model is complete-case, so its sample is smaller than the publication-rate
+denominator and could not be recovered from the file. Added `n_obs` to the
+export. It is **1,010**, against a denominator of 1,051: 41 abstracts drop out
+of the model through complete-case deletion and this was previously invisible.
+
+### Test defect found in my own work
+3.5 initially passed for the wrong reason: the regex `^n_` matched the
+*predictor* `n_authors` rather than a sample-size column. Corrected to require a
+named column, after which it failed correctly. Recorded because a test that
+passes spuriously is worse than no test.
+
+3.9's first fixture created perfect separation, so `glm` did not converge and
+the determinism claim was being tested on a degenerate fit. Rebuilt with
+overlapping groups.
+
+### PRESERVED FAILING TEST — decision required (3.2)
+`has_funding` is TRUE for **3 of 1,051** evaluated abstracts: 2 unpublished, 1
+published. Its odds ratio of 2.609 (0.117 to 29.04) spans 248-fold and is
+estimated from a single event.
+
+The draft abstract states that "the presence of declared funding" was not a
+statistically significant predictor. **Not significant and not estimable are
+different claims.** The decision needed is either to drop the term from the
+model specification, or to report it explicitly as not estimable. Both change
+what the manuscript may say, so neither is taken here. The test fails until
+someone decides.
+
+### Manuscript discrepancy found while reading the model output
+The April draft abstract reports multicenter status as significant:
+OR 2.23, 95% CI 1.01-4.64, p=0.038. The current model gives
+**OR 1.884, 95% CI 0.861-3.881, p=0.096** — no longer significant. RCT has also
+moved (2.48 to 2.244) though it remains significant. Team size is unchanged.
+The abstract's multicenter claim does not survive the current data.
+
+**Result:** 8/10 pass on first run. One real defect fixed, two test defects of
+my own corrected, one failure preserved by design.
+
+**Suite after cycle 3:** 17 files, 570 passed (+26), 2 failed, 0 errors.
+Failure 1 is the preserved 3.2 above. Failure 2 is the pre-existing
+`test-shiny_app.R` mtime check. No unintended regressions.
+
+**CI IS NOW RED.** This is intentional and follows the protocol's instruction to
+preserve failing tests that represent genuine scientific ambiguity rather than
+silently choosing an estimand. It will stay red until the `has_funding` decision
+is made.

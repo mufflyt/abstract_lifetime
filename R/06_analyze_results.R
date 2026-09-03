@@ -295,8 +295,13 @@ if (nrow(model_data) >= 20 && length(unique(model_data$published_int)) >= 2) {
       tidy(model, exponentiate = TRUE, conf.int = FALSE)
     }
   )
+  # The model is complete-case, so its N is smaller than the publication-rate
+  # denominator and cannot be recovered from a coefficient table alone. Carry it
+  # on every row so an odds ratio is never reported without the sample it was
+  # estimated from. Caught by tests/testthat/test-cycle03_model_contracts.R.
   aim3 <- model_tidy |>
-    mutate(across(where(is.numeric), ~ round(.x, 3)))
+    mutate(across(where(is.numeric), ~ round(.x, 3))) |>
+    mutate(n_obs = stats::nobs(model))
 
   write_csv(aim3, here("output", "aim3_logistic_regression.csv"))
   saveRDS(model, here("data", "processed", "logistic_model.rds"))
