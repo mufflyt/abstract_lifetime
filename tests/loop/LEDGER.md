@@ -337,3 +337,50 @@ own tests corrected, one failure preserved as a re-run tracker.
 **Suite after cycle 4:** 19 files, 627 passed (+57), 3 failed, 0 errors.
 Failures: 3.2 (funding term, decision required), 4.9 (re-run tracker),
 shiny mtime (pre-existing). No unintended regressions.
+
+---
+
+## Cycle 5 — 2026-09-03 22:45 MDT
+
+Mix required: 3 BVA / 4 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle05_flow_fidelity_tables.R` (28 assertions).
+
+| # | Category | Target | Assumption challenged |
+|---|---|---|---|
+| 5.1 | BVA | figure1_flow_data | classification tiers partition the cohort |
+| 5.2 | BVA | fidelity_checks | title_jaccard bounded; unchanged titles not scored as dissimilar |
+| 5.3 | BVA | figure1_flow_data | searched splits exactly into with/without candidates |
+| 5.4 | semantic | figure1_flow_data | a step label names the quantity beneath it |
+| 5.5 | semantic | gender fields | a conflict flag requires two or more sources |
+| 5.6 | semantic | output/tables | a derived table agrees with the analysis it derives from |
+| 5.7 | semantic | R/strobe_flowchart.R | the stopifnot guards actually reject bad arithmetic |
+| 5.8 | adversarial | config.yml | scoring thresholds ordered so the tiers cannot invert |
+| 5.9 | adversarial | R/strobe_flowchart.R | no hardcoded cohort numbers |
+| 5.10 | adversarial | fidelity_checks | one row per abstract, valid classifications only |
+
+### Defect fixed — a flow-diagram step did not name what it counted
+`figure1_flow_data.csv` reported step "No match" as **713**, while
+`classification == "no_match"` is **709**. The extra 4 are the `no_candidates`
+abstracts, which the figure already lists as their own step above. A reader
+summing the labelled steps counts those 4 twice.
+
+Worse, the DiagrammeR node labelled the same box "No match (score < 3)" — but
+the four no-candidate abstracts never had a score to fall below 3.
+
+Renamed the step and the graph node to "No match or no candidates" in
+`R/08_make_figures.R` and regenerated. Counts are unchanged; only the labels
+were wrong. The tiers still partition the cohort exactly (131 + 81 + 142 + 39 +
+713 = 1,106), which is why test 5.1 passed while 5.4 failed.
+
+### Self-coverage note
+5.7 and 5.9 test `R/strobe_flowchart.R`, written earlier in this session. 5.9
+strips comments and string literals before scanning for cohort literals, so the
+explanatory comments naming 1,154 and 1,051 do not mask a genuine hardcoded
+number. Both pass: the guards reject all three inconsistent-arithmetic cases,
+and no cohort number appears as a literal.
+
+**Result:** 9/10 pass on first run, 1 real defect found and fixed, 10/10 after.
+
+**Suite after cycle 5:** 20 files, 655 passed (+28), 3 failed, 0 errors.
+Failures unchanged: 3.2 (funding term, decision required), 4.9 (re-run tracker),
+shiny mtime (pre-existing). No unintended regressions.

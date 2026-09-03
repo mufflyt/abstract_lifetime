@@ -85,7 +85,12 @@ n_excluded_fig <- sum(results$classification == "excluded", na.rm = TRUE)
 flow <- tibble::tibble(
   step = c("Total abstracts parsed", "Video excluded", "Oral included",
            "Searched", "With candidates", "No candidates",
-           "Definite", "Probable", "Possible", "Excluded", "No match"),
+           # n_no_match_fig folds classification == "no_candidates" into
+           # classification == "no_match". Naming the step "No match" made the
+           # label disagree with the quantity and double-counted the
+           # no-candidate abstracts against the separate step above.
+           "Definite", "Probable", "Possible", "Excluded",
+           "No match or no candidates"),
   n = c(n_scraped, n_video_excluded, n_total, n_total,
         n_with_candidates, n_total - n_with_candidates,
         n_definite_fig, n_probable_fig, n_possible_fig,
@@ -113,7 +118,7 @@ tryCatch({
       def [label="Definite match\\n(score >= 7, text evidence)\\nn = %d", fillcolor="#D5E8D4", color="#82B366"]
       prob [label="Probable match\\n(score 3-7, text evidence)\\nn = %d", fillcolor="#FFF2CC", color="#D6B656"]
       poss [label="Possible match\\n(weak evidence or ties)\\nn = %d", fillcolor="#FFE6CC", color="#D79B00"]
-      nomatch [label="No match\\n(score < 3)\\nn = %d", fillcolor="#F8CECC", color="#B85450"]
+      nomatch [label="No match or no candidates\\nn = %d", fillcolor="#F8CECC", color="#B85450"]
       excl [label="Excluded\\n(pre-conference\\npublication)\\nn = %d", fillcolor="#E1D5E7", color="#9673A6"]
 
       id -> inc
