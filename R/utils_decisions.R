@@ -70,6 +70,20 @@ dedup_decisions_for_analysis <- function(decisions) {
 assign_final_published <- function(results, decisions_deduped) {
   stopifnot(is.data.frame(results), "classification" %in% names(results))
 
+  # The join below is one-to-one by contract. A decisions table carrying more
+  # than one row per abstract silently multiplies cohort rows and inflates every
+  # downstream count, which is the failure dedup_decisions_for_analysis() exists
+  # to prevent. Fail loudly rather than returning a larger cohort than was
+  # passed in. Caught by tests/testthat/test-cycle02_survival_estimand.R.
+  if ("abstract_id" %in% names(decisions_deduped)) {
+    n_dup <- sum(duplicated(decisions_deduped$abstract_id))
+    if (n_dup > 0) {
+      stop("assign_final_published: decisions table has ", n_dup,
+           " duplicate abstract_id row(s). Pass it through ",
+           "dedup_decisions_for_analysis() first.")
+    }
+  }
+
   join_cols <- intersect(c("abstract_id", "manual_decision", "manual_pmid"),
                          names(decisions_deduped))
 

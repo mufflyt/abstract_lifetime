@@ -153,3 +153,49 @@ because actions/checkout resets mtimes. That test still cannot detect the real
 
 **Unresolved from cycle 0:** branch order in `final_published`; treatment of the
 55 unresolved abstracts; pre-congress window; `affiliation_raw` loss.
+
+---
+
+## Cycle 2 — 2026-09-03 22:15 MDT
+
+Mix required: 3 BVA / 4 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle02_survival_estimand.R` (25 assertions).
+
+| # | Category | Target | Assumption challenged | Not covered before because |
+|---|---|---|---|---|
+| 2.1 | BVA | KM set construction, `06:187` | `filter(time > 0)` is exclusive, so an abstract published ON its congress date is dropped without being censored or counted | no test touched the survival set |
+| 2.2 | BVA | `aim1_by_congress_year` | per-year n must partition the global denominator exactly | cycles 0-1 tested the global denominator only |
+| 2.3 | BVA | censoring window | follow-up strictly decreases with congress year and every congress precedes the search end date | censoring was untested |
+| 2.4 | semantic | `aim2_time_to_pub` | the label describes published abstracts; the quantity is computed only on those with a usable interval | population/label mismatch never asserted |
+| 2.5 | semantic | `aim1_by_congress_year` | each year's rate divides by that year's n, not the global denominator | per-year estimand untested |
+| 2.6 | semantic | `aim2_time_to_pub` | quartiles ordered, units are months not days or years | unit correctness untested |
+| 2.7 | semantic | `months_to_pub` | positive means AFTER the congress; a negative interval must never be a counted event | sign convention untested |
+| 2.8 | adversarial | `assign_final_published()` | duplicate abstract_ids must not multiply cohort rows | cycle 0 always passed deduplicated input |
+| 2.9 | adversarial | `aim1_by_congress_year` | no cohort year may vanish from the by-year table | sparse-year case untested |
+| 2.10 | adversarial | by-year summarisation | a zero-publication year yields rate 0 rather than disappearing | empty-subset case untested |
+
+### Defect found and fixed
+**2.8 — `assign_final_published()` silently inflated the cohort.** Passing a
+decisions table with duplicate `abstract_id` turned a 2-row cohort into 3 rows.
+The left join is one-to-one by contract and had no guard; the comment in
+`06_analyze_results.R` even names this failure mode as the reason dedup exists,
+but nothing enforced it. Added a duplicate-id check that stops with an
+instruction to call `dedup_decisions_for_analysis()` first.
+
+Not currently triggered in production because the pipeline always dedups, but
+the function is callable directly and the hazard was real. Smallest defensible
+change: validation only, no behaviour change on valid input.
+`final_analytical_dataset.csv` is byte-identical after re-running 06.
+
+### Observation for the manuscript (not a code defect)
+2.4 confirms `n_with_dates` = 104 against `published` = 178. The reported median
+time to publication of 13.8 months is computed on **58% of the published set**;
+the other 74 publications have no resolvable interval. The draft abstract states
+the median without noting the subset. This compounds the date-granularity issue
+recorded in the technical appendix A13.6.
+
+**Result:** 9/10 pass on first run, 1 real defect found and fixed, 10/10 after.
+
+**Suite after cycle 2:** 16 files, 544 passed (+25), 1 failed, 0 errors.
+Same pre-existing `test-shiny_app.R` mtime failure. No new regressions.
+Related files re-run green: BVA 50, mutation 18, cycle01 59.
