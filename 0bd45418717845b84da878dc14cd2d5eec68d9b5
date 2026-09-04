@@ -1,0 +1,26 @@
+ATTRIBUTION CORRECTION (added 2026-09-04).
+
+This commit's message describes only the cycle-3 test work. The commit was
+staged with 'git add -A' while a second agent was working in the same tree, so
+it also contains that agent's unrelated files. The message therefore
+under-describes the commit.
+
+Authored by this commit's stated work (cycle 3, model contract tests):
+  R/06_analyze_results.R            (added n_obs to the aim3 export)
+  output/aim3_logistic_regression.csv
+  tests/testthat/test-cycle03_model_contracts.R
+  tests/loop/LEDGER.md
+
+Swept in from the concurrent agent, NOT part of the cycle-3 work:
+  docs/FAILURE_MODES.md
+  docs/METHODOLOGICAL_HISTORY.md
+  docs/REPRODUCIBILITY.md
+  docs/RESULTS_PROVENANCE.md
+  docs/SOURCE_OF_TRUTH.md
+  docs/VALIDATION.md
+  docs/pipeline_manifest.yml
+  tests/testthat/test-docs_drift.R
+
+History is not rewritten: these commits are on origin/main with later commits
+built on top, so a rewrite would force-push the default branch and invalidate
+the other agent's clone. See tests/loop/LEDGER.md.
