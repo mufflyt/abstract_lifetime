@@ -39,6 +39,14 @@ jobs:
         with:
           use-public-rspm: true
 
+      # mysterycall is a GitHub-only package. Without an explicit source pak
+      # resolves it from CRAN, finds nothing, and the dependency step fails
+      # before a single test runs. Pinned to the same commit as
+      # docs/REPRODUCIBILITY.md. Every use of it degrades gracefully, so the
+      # suite still passes if this install is ever dropped.
+      #
+      # Comments must NOT appear inside the block literal below: pak reads every
+      # line of it as a package reference and fails with "Cannot parse package".
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: |
@@ -56,13 +64,8 @@ jobs:
             any::digest
             any::cli
             any::yaml
-            # mysterycall is a GitHub-only package. Without an explicit source
-            # pak resolves it from CRAN, finds nothing, and the whole dependency
-            # step fails before a single test runs. Pinned to the same commit as
-            # docs/REPRODUCIBILITY.md. Every use of it degrades gracefully, so
-            # the suite still passes if this install is ever removed.
-            mufflyt/mysterycall@42d66d92ef52a0f85d1f7c61208c2ddd79d9c06e
             any::irr
+            mufflyt/mysterycall@42d66d92ef52a0f85d1f7c61208c2ddd79d9c06e
 
       # Gate 1. The decision-logic contracts. These encode defects that reached
       # the analysis outputs, so they run first and a failure here stops the job
