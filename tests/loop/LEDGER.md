@@ -819,3 +819,81 @@ manuscript may say.
 
 **Result:** 11/14 assertions passed on the first run, 12/14 after the fix. Two
 failures are the finding above.
+
+## Cycle 12 - 2026-09-04
+
+Mix required: 3 BVA / 3 semantic / 4 adversarial. File:
+`tests/testthat/test-cycle12_covariate_integrity.R` (14 assertions).
+
+Cycle 11 established that one model covariate, `n_authors`, is censored at a
+display cap while being reported as a significant predictor. This cycle asks the
+same question of every other term in aim3: is the variable behind the
+coefficient what the coefficient claims it is.
+
+| # | Category | Target | Assumption challenged |
+|---|---|---|---|
+| 12.1 | BVA | sample_size | positive, finite, integral, safe to log |
+| 12.2 | BVA | binary covariates | minority cell large enough to estimate |
+| 12.3 | BVA | gender_unified | closed vocabulary, usable coverage |
+| 12.4 | semantic | aim3 terms | every term maps to an exported column |
+| 12.5 | semantic | is_us_based | agrees with first_author_country |
+| 12.6 | semantic | is_rct | agrees with study_design |
+| 12.7 | adversarial | missingness | does not track congress year |
+| 12.8 | adversarial | sample_size | magnitudes plausible, not parsed years |
+| 12.9 | adversarial | attrition | explained by the reported terms |
+| 12.10 | adversarial | covariates | none effectively constant |
+
+### THREE FINDINGS - pending registration, manifest still mid-edit
+`tests/expected_failures.yaml` still carries the concurrent agent's uncommitted
+deletion, so these are recorded here rather than registered.
+
+**12.7 - `sample_size` missingness ranges from 13% to 93% ACROSS CONGRESS YEARS.**
+
+    2013  13.3%     2017  86.7%
+    2012  14.9%     2018  92.6%
+    2015  16.3%     2014  42.2%
+
+The logistic model deletes rows with any missing covariate and `log_sample_size`
+is a term, so 2017 and 2018 are almost entirely absent from the model that
+estimates the predictors. 2018 is also the year carrying the highest reported
+publication rate in `aim1_by_congress_year.csv` (27.4%). Any predictor estimate
+is fitted on a cohort whose congress-year composition is set by data
+availability rather than by design. This compounds, independently, the human
+review coverage gap already recorded at cycle 0.
+
+**12.4 - `log_sample_size` is a reported model term with no column in the
+exported dataset.** It is derived inside `06_analyze_results.R` and never
+written out, so nobody holding `final_analytical_dataset.csv` can reproduce,
+check or correct the model. Not fixed here because `06_analyze_results.R` is
+mid-edit by the concurrent agent.
+
+**12.5 - `first_author_country` contains US states.** 161 of 178 rows with both
+fields disagree with `is_us_based`, and the country column holds values like
+`"Arizona."`, `"Illinois."`, `"Massachusetts."` alongside `"Canada."` and
+`"Italy."`, all with a trailing period. The parser is writing a state into a
+country field. `is_us_based` is the term the model actually uses, so the
+regression is not directly affected, but any US-versus-international description
+drawn from `first_author_country` is wrong.
+
+### Collateral damage I caused and repaired
+Cycle 11 added `authors_truncated` to `output/abstracts_with_matches.csv`, which
+is a Shiny bundle source. That broke two of the concurrent agent's tests in
+`test-shiny_bundle_currency.R`, which assert every bundle file is byte-identical
+to its source. Refreshed the bundle with `deploy.R` (deployment is opt-in behind
+`SHINY_DEPLOY`, so this only rebuilt `bundle/` and regenerated
+`bundle_manifest.csv`). Their 55 assertions pass again. The manifest diff is one
+md5, one byte count and the timestamps, which is exactly what a single added
+column should produce.
+
+Lesson recorded: changing a pipeline output is not a local act in this
+repository. Outputs are committed, bundled and asserted against.
+
+### Test defect of my own
+12.2 flagged `has_funding` as too thin to estimate. It is thin, but the
+concurrent agent's variable screen has since dropped it from the model, so
+flagging it is noise rather than a finding. Scoped the test to covariates that
+appear in `aim3_logistic_regression.csv`. Also collapsed five `expect_*` plus
+`fail()` pairs that were each reporting one finding twice.
+
+**Result:** 10/17 assertions passed on the first run, 11/14 after correcting my
+own test. Three failures are the findings above.
