@@ -645,3 +645,64 @@ key without checking it holds.
 
 **Suite after cycle 9:** 29 files, 926 passed (+19), 4 failed, all on the
 manifest. Gate green.
+
+## Cycle 10 - 2026-09-04
+
+Mix required: 4 BVA / 3 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle10_score_component_rules.R` (33 assertions).
+
+Cycle 6 tested the composite score as a SUM: components in range, parts adding
+to the total, no dead NA. It never tested the RULES that produce each component.
+This cycle drives `score_match()` directly at each configured threshold, which
+is where an off-by-one in a comparison operator lives.
+
+| # | Category | Target | Assumption challenged |
+|---|---|---|---|
+| 10.1 | BVA | title_points | steps at the Jaccard cutoffs, inclusive from above |
+| 10.2 | BVA | date_points | sign switches exactly at the congress date |
+| 10.3 | BVA | date_points | steps down at the early (18mo) and late (30mo) cutoffs |
+| 10.4 | BVA | no_text_penalty | fires only with neither title nor abstract evidence |
+| 10.5 | semantic | cross-stage | scoring and survival agree on "published on the day" |
+| 10.6 | semantic | total | equals the components the same call reports |
+| 10.7 | semantic | journal_points | rewards an in-scope journal over an unrelated one |
+| 10.8 | adversarial | determinism | same pair scored twice is identical |
+| 10.9 | adversarial | sparse candidate | missing date/journal/authors degrades, never crashes |
+| 10.10 | adversarial | empty title | earns no title credit |
+
+**Result: 10/10 pass. No implementation defects, and no defects in my own tests
+this cycle** (the first cycle with neither).
+
+### Recorded, not failing: two stages disagree on a same-day publication
+`utils_scoring.R` tests `months_diff < 0`, strictly, so a candidate published ON
+the congress date is treated as post-conference and earns the full early-window
+point (verified by 10.2). `06_analyze_results.R` builds the survival set with
+`filter(time > 0)`, which is exclusive and drops `months_to_pub == 0` without
+censoring it (cycle 2, test 2.1).
+
+The scorer would credit such an abstract; the survival stage would silently
+discard it. No such abstract exists today, so 10.5 asserts the scorer's side and
+leans on 2.1 to assert the survival side currently has nothing to drop. Both go
+red together if one ever appears. Not fixed here: choosing which stage is right
+is a methodological call.
+
+### Confirmed by 10.9
+An unparseable publication date scores `date_points = 0`, not the -3
+pre-conference penalty. That is the correct behaviour and is now locked: the
+alternative would push legitimate candidates below the match threshold purely
+for having a coarse date, which is the same date-granularity trap recorded in
+technical appendix A13.6.
+
+**Suite after cycle 10:** 30 files, 959 passed (+33).
+
+### Gate red from concurrent work, not from this cycle
+The gate reports `test-pipeline_semantics.R :: PH assumption holds` as
+UNEXPECTED. That is the concurrent agent's in-flight work, verified as such:
+they have uncommitted edits to `R/06_analyze_results.R`,
+`tests/testthat/test-pipeline_semantics.R` and `tests/expected_failures.yaml`
+(the PH entry removed, which is what the manifest's own rule requires once a
+decision is taken), plus new stratified and time-varying Cox artifacts. They are
+implementing the fix the entry was waiting on.
+
+Category (d) under the protocol: pre-existing, external, unrelated to this
+cycle. Not touched, and deliberately NOT re-added to the manifest, since that
+would undo their removal. All three of my registered entries still behave.
