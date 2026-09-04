@@ -539,6 +539,31 @@ stages:
     tests: []
     notes: null
 
+  - id: "09k"
+    name: Gender from the NPPES registry (waterfall tier 1)
+    script: R/09k_gender_from_nppes.R
+    in_run_all: true
+    functions: [mysterycall::mysterycall_nppes_gender]
+    inputs: [data/processed/npi_matches.csv]
+    outputs:
+      - data/processed/gender_from_nppes.csv
+      - data/processed/gender_nppes_abog_conflicts.csv
+    external_sources: [NPPES registry via the npi package]
+    grain_in: one high-confidence NPI match
+    grain_out: one abstract with a registrant-reported sex
+    primary_key: abstract_id
+    cache: data/cache/nppes_gender/ (one file per NPI, failures not cached)
+    manual_step: false
+    reproducible: true
+    tests: [tests/testthat/test-gender_nppes_tier.R]
+    notes: >
+      Replaces the ABOG gender column as tier 1 of the waterfall. Not because
+      it is more accurate - they agree on 251 of 252 - but because it is
+      regenerable from a public registry, whereas the ABOG export lost its
+      gender column upstream (docs/FAILURE_MODES.md F16), and because it
+      resolves 263 of 265 against ABOG's 252 over the same population.
+      Requires the mysterycall package, pinned in docs/REPRODUCIBILITY.md.
+
   - id: "10b"
     name: Full-name resolution via OpenAlex DOI lookup (waterfall tier 2)
     script: R/10b_resolve_names_openalex.R

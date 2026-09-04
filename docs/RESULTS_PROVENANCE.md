@@ -34,10 +34,10 @@ misread · ❌ stale or wrong.
 | Multicenter → publication | OR **1.482** (0.769–2.718), p = 0.218 | `output/aim3_logistic_regression.csv` | | ✅ the programmatic abstract now derives its significance wording from the p-value |
 | Author count → time to publication | HR **1.257** (1.093–1.445), p = 0.001 | `output/aim2b_cox_regression.csv` | | ⚠️ `n_authors` is censored at 5 |
 | Author count → publication | OR **1.336** (1.154–1.560), p < 0.001 | `output/aim3_logistic_regression.csv` | | ⚠️ same |
-| Male first author → time to publication | HR **0.783** (0.575–1.066), p = 0.120 | `output/aim2b_cox_regression.csv` | | ⚠️ **no longer significant** after the event count rose from 104 to 170; gender is inferred and 228 abstracts carry a conflict |
+| Male first author → time to publication | HR **0.811** (0.596–1.103), p = 0.181 | `output/aim2b_cox_regression.csv` | | ⚠️ not significant. Moved again on 2026-09-04 when NPPES registry gender became tier 1; 231 abstracts carry a cross-source conflict |
 | US-based → time to publication | HR **1.419** (0.887–2.270), p = 0.145 | same | | ⚠️ **no longer significant** after `is_us_based` was re-derived from the backfilled text (689 → 907 TRUE) |
 | Academic → time to publication | HR **0.621** (0.440–0.876), p = **0.007** | `output/aim2b_cox_regression.csv` | | ⚠️ **newly significant and negative**; `is_academic` went from 148 to 371 TRUE when re-derived. Provisional. |
-| PH assumption, global | p = **0.052** (was 0.32) | `output/cox_ph_assumption.csv` | `cox.zph()` | ⚠️ only marginally supported now that the test has 170 events |
+| PH assumption, global | p = **0.056** (was 0.32) | `output/cox_ph_assumption.csv` | `cox.zph()` | ⚠️ only marginally supported now that the test has 170 events |
 | Gold-standard sensitivity | 1.00 | `output/validation_metrics.csv` | `R/validation_gold_standard.R` | ⚠️ n = 50, of which **49 classified** (`n_classified`); PPV is **0.50** and accuracy 0.735 |
 | Interrater agreement | 98.1% raw, κ = 0.994, over 519 abstracts | `output/interrater_agreement.csv` | `R/10_interrater.R` | ⚠️ reviewers were not blinded to the algorithm's answer |
 | Logistic-model N | 1,010 | `output/aim3_logistic_regression.csv` (`n_obs`) | `R/06_analyze_results.R:285` | ✅ 41 abstracts leave the model through complete-case deletion |
@@ -60,7 +60,7 @@ misread · ❌ stale or wrong.
 | 65–66 | gender conflicts | ✅ fixed — 228 |
 | 109, 250, 258 | test counts | ✅ fixed — the README now states the current counts and links to VALIDATION.md |
 | 219 | variable count | ✅ fixed — 91 in the final dataset |
-| 225 | gender coverage | ✅ fixed — 96.3% |
+| 225 | gender coverage | ✅ fixed — 96.4% (1,066 of 1,106) |
 | 225 | "practice_type (18%)" | ✅ | 17.5% |
 | 225 | "subspecialty_unified (36%)" | ✅ | 35.0% |
 | 225 | "state_unified (31%)" | ✅ | 30.4% |

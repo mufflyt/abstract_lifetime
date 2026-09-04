@@ -112,22 +112,59 @@ no information.
 `data/processed/gender_resolution_policy.csv`; lines 361-380 apply it with a
 single `coalesce()` and a parallel `case_when()` that records `gender_source`.
 
-| Tier | Source | Column | Name resolution | Rationale |
+| Tier | Source | Column | Resolution | Rationale |
 |---:|---|---|---|---|
-| 1 | `npi` | `gender_npi` | full name | ABOG board-certification record — authoritative identity, gender is a recorded field, not inferred |
-| 2 | `openalex` | `gender_oa` | full name | Given name from the abstract DOI via OpenAlex |
-| 3 | `pubmed_fullname` | `gender_pubmed` | full name | Given name from PubMed author + affiliation search |
-| 4 | `obgyn_pubs` | `gender_obgyn` | full name | Given name from an OB/GYN journal author search |
-| 5 | `openalex_search` | `gender_oax` | full name | Given name from an OpenAlex works search |
-| 6 | `orcid` | `gender_orcid` | full name | Given name from an ORCID person profile |
-| 7 | `open_payments` | `gender_opm` | full name | Given name from CMS Open Payments |
-| 8 | `senior_triangulation` | `gender_tri_sr` | full name | Given name via a senior-coauthor co-publication |
-| 9 | `second_triangulation` | `gender_tri_2nd` | full name | Never fires |
-| 10 | `ssa` | `first_author_gender` | **initial only** | SSA baby-name data via the `gender` package, then genderize.io for names SSA misses (`R/09c_author_characteristics.R:67-130`), plus a hand-curated 300-name international lookup (`data/validation/international_gender_lookup.csv`) |
+| 1 | `nppes` | `gender_nppes` | **registry** | Registrant-reported sex from the NPPES `basic_sex` field, keyed on the NPI that `10_npi_matching.R` resolved. Not inferred from a name. Added 2026-09-04. |
+| 2 | `npi` | `gender_npi` | **registry** | ABOG board-certification record. Also a recorded field rather than an inference, but no longer regenerable — see below. |
+| 3 | `openalex` | `gender_oa` | full name | Given name from the abstract DOI via OpenAlex |
+| 4 | `pubmed_fullname` | `gender_pubmed` | full name | Given name from PubMed author + affiliation search |
+| 5 | `obgyn_pubs` | `gender_obgyn` | full name | Given name from an OB/GYN journal author search |
+| 6 | `openalex_search` | `gender_oax` | full name | Given name from an OpenAlex works search |
+| 7 | `orcid` | `gender_orcid` | full name | Given name from an ORCID person profile |
+| 8 | `open_payments` | `gender_opm` | full name | Given name from CMS Open Payments |
+| 9 | `senior_triangulation` | `gender_tri_sr` | full name | Given name via a senior-coauthor co-publication |
+| 10 | `second_triangulation` | `gender_tri_2nd` | full name | Never fires |
+| 11 | `ssa` | `first_author_gender` | **initial only** | SSA baby-name data via the `gender` package, then genderize.io for names SSA misses (`R/09c_author_characteristics.R:67-130`), plus a hand-curated 300-name international lookup (`data/validation/international_gender_lookup.csv`) |
 
-Tiers 1–9 use a full given name. **Tier 10 works from an initial**, which maps
-to hundreds of names spanning both genders — this is why it is last, and why
-`gender_source` should be reported alongside any gender result.
+**Tiers 1–2 are registry lookups; tiers 3–10 infer from a full given name; tier
+11 infers from a single initial.** That three-way distinction, not the tier
+number, is what should qualify any gender-stratified estimate.
+
+### Why NPPES outranks ABOG
+
+Not accuracy — they agree on **251 of 252** shared abstracts (99.6%). Two other
+reasons:
+
+1. **Reproducibility.** The ABOG export's `LATEST` symlink was repointed
+   upstream to a workforce file with no gender column at all, so tier 2 can be
+   used but not rebuilt on another machine
+   ([FAILURE_MODES.md](FAILURE_MODES.md) F16). NPPES is a public registry keyed
+   on an NPI the pipeline already resolved, so tier 1 is regenerable.
+2. **Coverage over the same population.** Of the 265 high-confidence NPIs,
+   NPPES resolves **263** against ABOG's 252. Putting NPPES first gains 11
+   abstracts and loses none, because tier 2 still covers the four NPPES leaves
+   blank.
+
+Produced by `R/09k_gender_from_nppes.R` via
+`mysterycall::mysterycall_nppes_gender()`, cached one file per NPI under
+`data/cache/nppes_gender/`. A failed lookup is deliberately **not** cached, so
+it is retried rather than frozen as a negative.
+
+**What changed when it was added** (2026-09-04): coverage 1,065 → 1,066; **11
+abstracts moved from a name-inferred tier to a registry tier**; four values
+changed, all four now registry-sourced —
+
+| abstract | was | from | now |
+|---|---|---|---|
+| `AAGL2018_021` | male | `ssa` (initial only) | female |
+| `AAGL2021_053` | female | `openalex_search` | male |
+| `AAGL2022_003` | male | `ssa` (initial only) | female |
+| `AAGL2022_031` | female | `npi` (ABOG) | male |
+
+The first three replaced a name inference with a registry value; two of those
+had rested on a single first initial. The fourth is the only NPPES/ABOG
+disagreement and is logged to
+`data/processed/gender_nppes_abog_conflicts.csv`.
 
 **Disagreement handling.** `R/10e_merge_demographics.R:314-338` computes, per
 abstract, the set of distinct non-`NA` values across all ten columns. An
@@ -145,29 +182,34 @@ result rests on a single source with no corroboration.
 
 | `gender_source` | n |
 |---|---:|
-| `ssa` (tier 10, **initial only**) | 292 |
-| `npi` (tier 1) | 256 |
-| `obgyn_pubs` (tier 4) | 225 |
-| `openalex_search` (tier 5) | 101 |
-| `openalex` (tier 2) | 83 |
-| `pubmed_fullname` (tier 3) | 83 |
-| `orcid` (tier 6) | 16 |
-| `open_payments` (tier 7) | 8 |
-| `senior_triangulation` (tier 8) | 1 |
-| `second_triangulation` (tier 9) | 0 |
-| unresolved | 41 |
+| `ssa` (tier 11, **initial only**) | 287 |
+| `nppes` (tier 1, **registry**) | 263 |
+| `obgyn_pubs` (tier 5) | 224 |
+| `openalex_search` (tier 6) | 100 |
+| `openalex` (tier 3) | 82 |
+| `pubmed_fullname` (tier 4) | 82 |
+| `orcid` (tier 7) | 16 |
+| `open_payments` (tier 8) | 7 |
+| `npi` (tier 2, **registry**) | 4 |
+| `senior_triangulation` (tier 9) | 1 |
+| `second_triangulation` (tier 10) | 0 |
+| unresolved | 40 |
 
-**292 of the 1,065 resolved genders (27.4%) rest on tier 10 — a single first
-initial.** That is the largest single contributor.
+**267 of the 1,066 resolved genders (25.0%) now come from a registry** rather
+than from a name. **287 (26.9%) still rest on tier 11 — a single first
+initial** — and that remains the largest single contributor and the main reason
+to treat gender-stratified estimates cautiously.
 
-**41 abstracts have no gender at all.** 228 of the 1,065 resolved values
-(21.4%) rest on a cross-source disagreement.
+**40 abstracts have no gender at all.** 231 of the 1,066 resolved values
+(21.7%) rest on a cross-source disagreement — up from 228 because NPPES adds an
+eleventh source that can disagree.
 
 ### The required statement
 
 **Inferred gender is not self-reported gender.** Every value in
-`gender_unified` except the `npi` tier is a probabilistic inference from a
-given name (and, at tier 10, from a single initial). Name-based inference is
+`gender_unified` except the two registry tiers (`nppes`, `npi` — 267 of 1,066)
+is a probabilistic inference from a given name, and 287 of them from a single
+initial. Name-based inference is
 known to perform worse for non-Western names, which are heavily represented in
 this international cohort. Any estimate stratified by `gender_unified` —
 including the Cox term reported in the README — carries non-differential
@@ -231,9 +273,9 @@ rather than being silently dropped.
 | Quantity | n | % of 1,106 |
 |---|---:|---:|
 | Full given name recovered for the first author | 211 | 19.1% |
-| Gender resolved | 1,065 | 96.3% |
-| Gender resting on ≥ 2 sources (agreeing or not) | 729 | 65.9% |
-| Gender with a cross-source disagreement | 228 | 20.6% |
+| Gender resolved | 1,066 | 96.4% |
+| Gender from a registry rather than a name | 267 | 24.1% |
+| Gender with a cross-source disagreement | 231 | 20.9% |
 | NPI number assigned | 265 | 24.0% |
 | ORCID iD resolved | 198 | 17.9% |
 | Practice type classified | 193 | 17.5% |
@@ -242,6 +284,6 @@ rather than being silently dropped.
 
 Note the tension between rows 1 and 2: **gender is resolved for 1,065 abstracts
 but a full given name is recorded for only 211.** The gap is the SSA/genderize
-tier working from initials plus the sidecar sources that returned a gender
-without their given name surviving into the final dataset. Read
-`gender_source` before using `gender_unified`.
+tier working from initials, the registry tiers that need no name at all, and the
+sidecar sources that returned a gender without their given name surviving into
+the final dataset. Read `gender_source` before using `gender_unified`.

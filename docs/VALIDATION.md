@@ -3,11 +3,11 @@
 Inventory of the test suite, plus an audit of which scientific claims are and
 are not protected by a test.
 
-**Current status** (`testthat::test_dir("tests/testthat")`, 2026-09-03 18:10,
-after the remediation pass, 23 test files):
+**Current status** (`testthat::test_dir("tests/testthat")`, 2026-09-04,
+25 test files):
 
 ```
-[ FAIL 3 | WARN 18 | SKIP 1 | PASS 806 ]
+[ FAIL 3 | WARN 18 | SKIP 1 | PASS 837 ]
 ```
 
 All three remaining failures are **deliberately left red**: each marks a decision
@@ -73,6 +73,7 @@ shinyapps.io.
 | `test-cycle03_model_contracts.R` | 10 | BVA + semantic + adversarial | Gate 3 | Partially | model RDS, `aim2b`/`aim3` CSVs | Logistic and Cox output contracts; the ≥50%-missing exclusion rule; complete-case attrition; determinism; artefact vintage. Added `n_obs` to `aim3_logistic_regression.csv` (1,010 against a denominator of 1,051 — 41 abstracts leave through complete-case deletion, previously invisible). |
 | `test-cycle04_validation_sensitivity.R` | 10 | semantic + adversarial | Gate 3 | Partially | `validation_metrics.csv`, `sensitivity_analyses.csv`, `interrater_agreement.csv`, `search_strategy_efficacy.csv` | Gold-standard confusion-cell partition; sensitivity-scenario denominator consistency; interrater completeness; search-efficacy vintage |
 | `test-docs_drift.R` *(added by this pass)* | 12 | contract | Gate 3 | Partially | `docs/*.csv`, the analytical outputs | Documentation-to-data agreement; see §4 |
+| `test-gender_nppes_tier.R` *(added 2026-09-04)* | 6 | contract | Gate 3 | Partially | `gender_from_nppes.csv`, `npi_matches.csv`, `gender_resolution_policy.csv`, `abstracts_with_matches.csv` | The NPPES registry tier: population identity with the high-confidence NPI set, vocabulary, resolution rate, NPPES/ABOG agreement floor, that the policy file puts NPPES first and matches the coalesce order in the code, and that every row labelled `nppes` carries the sidecar's value |
 | `test-shiny_bundle_currency.R` *(added by this pass)* | 9 | contract + end-to-end | Gate 3 | Yes — the bundle is gitignored | `shiny/adjudication_app/bundle/**`, `abstracts_cleaned.csv`, `match_scores.csv`, `pubmed_candidates.csv` | Whether the adjudication app serves the data the analysis was run on: md5 equality for the five verbatim files, cohort identity, no abstract under-served candidates, every winning PMID displayable, the candidate-to-score join resolves, and `deploy.R` gates publication behind `SHINY_DEPLOY`. Two tests drive the real server through `shiny::testServer()`. |
 | `test-remediation_invariants.R` *(added by this pass)* | 8 | contract | Gate 3 | Partially | `abstracts_cleaned.csv`, `final_analytical_dataset.csv`, `pubmed_candidates.csv`, the aim CSVs | The defects fixed on 2026-09-03: no scraper footnote in `abstract_text`; no covariate structurally zero across a congress outside 2017–2018; `abstract_word_count` nonzero wherever text exists; the enrichment block survives a step-5 re-run; one subspecialty vocabulary; subgroup tables carry their availability split; sensitivity scenarios name their denominator; every winning PMID resolves; every published abstract carries a date; pre-congress publications are confined and excluded from Aim 2 |
 

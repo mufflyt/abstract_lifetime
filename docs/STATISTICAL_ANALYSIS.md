@@ -180,7 +180,7 @@ confidence intervals from `broom::tidy(exponentiate = TRUE, conf.int = TRUE)`:
 | `is_academicTRUE` | **0.621** | 0.440 – 0.876 | **0.007** |
 | `is_us_basedTRUE` | 1.419 | 0.887 – 2.270 | 0.145 |
 | `n_authors` | 1.257 | 1.093 – 1.445 | 0.001 |
-| `gender_unifiedmale` | 0.783 | 0.575 – 1.066 | 0.120 |
+| `gender_unifiedmale` | 0.811 | 0.596 – 1.103 | 0.181 |
 | `is_multicenterTRUE` | 1.387 | 0.809 – 2.377 | 0.234 |
 | `has_fundingTRUE` | 1.757 | 0.431 – 7.169 | 0.432 |
 
@@ -231,7 +231,7 @@ CIs):
 | `is_academicTRUE` | **0.603** | 0.405 – 0.887 | **0.011** |
 | `is_us_basedTRUE` | 1.621 | 0.964 – 2.808 | 0.075 |
 | `n_authors` | 1.336 | 1.154 – 1.560 | <0.001 |
-| `gender_unifiedmale` | 0.804 | 0.571 – 1.127 | 0.208 |
+| `gender_unifiedmale` | 0.835 | 0.594 – 1.171 | 0.298 |
 | `is_multicenterTRUE` | 1.482 | 0.769 – 2.718 | 0.218 |
 | `has_fundingTRUE` | 2.211 | 0.293 – 11.345 | 0.372 |
 
@@ -312,7 +312,7 @@ analysis. ---
 
 | Check | Implemented | Result |
 |---|---|---|
-| Proportional hazards | `cox.zph(cox_model)`, global test written to `output/cox_ph_assumption.csv` | global p = **0.052**. It was 0.32 on 104 events; with 171 events the test is far better powered and the assumption is now only marginally supported. A stratified or time-varying specification is worth considering before the hazard ratios are reported as constant. |
+| Proportional hazards | `cox.zph(cox_model)`, global test written to `output/cox_ph_assumption.csv` | global p = **0.056**. It was 0.32 on 104 events; with 171 events the test is far better powered and the assumption is now only marginally supported. A stratified or time-varying specification is worth considering before the hazard ratios are reported as constant. |
 | Collinearity | **not implemented** | — |
 | Goodness of fit (Hosmer–Lemeshow, calibration, AUC) | **not implemented** | — |
 | Sparse-category handling | Implicit only: the < 50% missing and ≥ 2 level screen. No minimum cell count. | `has_funding` is TRUE for 3 of 1,106 abstracts; its Cox CI spans 0.48–25.7 and its logistic CI 0.12–29.0 |
@@ -338,8 +338,12 @@ screen because the screen tests *missingness and level count*, not cell counts.
    [FAILURE_MODES.md](FAILURE_MODES.md) F3.
 2. **`n_authors` is censored at 5** and is the second-strongest term in both
    models.
-3. **`gender_unified` is inferred**, 27% of it from a single initial, and 228
-   abstracts carry a cross-source disagreement.
+3. **`gender_unified` is only partly a registry value.** 267 of 1,066 come from
+   NPPES or ABOG; the remaining 799 are inferred from a name and 287 of those
+   from a single first initial. 231 abstracts carry a cross-source
+   disagreement. Adding the NPPES tier on 2026-09-04 moved the Cox estimate
+   from HR 0.783 (p = 0.120) to 0.811 (p = 0.181) — still not significant, and
+   the movement is a reminder of how sensitive it is to the gender source.
 4. **Proportional hazards is now only marginally supported** (global p = 0.052
    on 171 events, against 0.32 on 104). The constant-hazard-ratio reading of the
    Cox table should be checked with a stratified or time-varying model.

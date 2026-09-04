@@ -13,7 +13,8 @@
 #   09c (base demographics) → 10b (OpenAlex names) → 10_npi (NPI matching) →
 #   10d (ORCID) → 10f (senior triangulation) → 10g (second triangulation) →
 #   09f (PubMed gender) → 09g (ORCID gender) → 09h (OB/GYN pubs gender) →
-#   09i (OpenAlex gender) → 09j (Open Payments gender) → 10e (MERGE)
+#   09i (OpenAlex gender) → 09j (Open Payments gender) →
+#   09k (NPPES registry gender, needs 10_npi) → 10e (MERGE)
 
 suppressPackageStartupMessages(library(here))
 
@@ -32,6 +33,7 @@ steps <- list(
   list(script = "R/09h_gender_from_obgyn_pubs.R",         label = "09h: Gender from OB/GYN pubs"),
   list(script = "R/09i_gender_from_openalex.R",           label = "09i: Gender from OpenAlex"),
   list(script = "R/09j_gender_from_open_payments.R",      label = "09j: Gender from Open Payments"),
+  list(script = "R/09k_gender_from_nppes.R",              label = "09k: Gender from NPPES registry"),
   list(script = "R/10e_merge_demographics.R",             label = "10e: MERGE (sole writer)")
 )
 

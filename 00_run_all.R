@@ -120,6 +120,13 @@ source(here("R", "09i_gender_from_openalex.R"))
 cli_h2("Step 5h6: Gender from Open Payments")
 source(here("R", "09j_gender_from_open_payments.R"))
 
+# Step 5h6b: Gender from the NPPES registry (tier 1 of the waterfall).
+# Registrant-reported sex keyed on the NPI that 10_npi_matching.R resolved. Not
+# inferred from a name, and regenerable from a public registry - which the ABOG
+# gender column it supersedes no longer is. See docs/FAILURE_MODES.md F16.
+cli_h2("Step 5h6b: Gender from NPPES")
+source(here("R", "09k_gender_from_nppes.R"))
+
 # Step 5h7: Consolidate all recovered first names into first_author_first
 cli_h2("Step 5h7: Consolidate first_author_first")
 local({

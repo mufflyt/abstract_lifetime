@@ -500,9 +500,19 @@ that "neither path exists" was **wrong** — both files exist:
    renamed columns and names any it cannot find, so an upstream rename degrades
    rather than halting.
 3. Running against that export yields 1 NPI and no gender, against 265 NPIs and
-   256 genders in the shipped sidecar — and `npi_gender` is tier 1 of the gender
-   waterfall. The script now **refuses to overwrite a richer sidecar with a
-   poorer one**, writing `npi_matches_nogender.csv` and explaining why.
+   256 genders in the shipped sidecar. The script now **refuses to overwrite a
+   richer sidecar with a poorer one**, writing `npi_matches_nogender.csv` and
+   explaining why.
+
+**Gender no longer depends on that file (2026-09-04).** The ABOG gender column
+was tier 1 of the waterfall, so its disappearance made a quarter of the gender
+variable unreproducible. `R/09k_gender_from_nppes.R` now reads registrant-
+reported sex from the NPPES registry keyed on the NPI that `10_npi_matching.R`
+resolved, and it is the new tier 1; ABOG is tier 2 and still covers the four
+abstracts NPPES leaves blank. NPPES resolves 263 of the 265 high-confidence
+NPIs and agrees with ABOG on 251 of 252 (99.6%). The remaining ABOG dependency
+is for `npi_state` and `npi_subspecialty`, neither of which is a model term.
+See [AUTHOR_ENRICHMENT.md](AUTHOR_ENRICHMENT.md) §4.
 
 The NPPES mirror is present at `/Volumes/MufflySamsung 1 1/DuckDB/` (84 GB); the
 configured path lacks the volume suffix macOS assigns when more than one copy of

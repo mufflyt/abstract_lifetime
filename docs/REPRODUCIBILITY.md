@@ -26,6 +26,24 @@ What a fresh clone gets by running `Rscript 00_run_all.R`, and what it does not.
 - Database: `DBI`, `duckdb` (NPI fallback only)
 - Shiny: `shiny`, `bslib`, `DT`, `shinyjs`, `googlesheets4`, `rsconnect`
 - Tests: `testthat`, `shinytest2` (optional), `irr` (optional)
+- Gender tier 1: `mysterycall` and `npi`
+
+### The one pinned external package
+
+`R/09k_gender_from_nppes.R` calls
+`mysterycall::mysterycall_nppes_gender()`. `mysterycall` is a development
+package (`1.6.3.9000`) under active change, so depending on its `main` branch
+would couple this analysis to a moving target. **Install it at the recorded
+commit:**
+
+```r
+remotes::install_github("mufflyt/mysterycall@42d66d92ef52a0f85d1f7c61208c2ddd79d9c06e")
+```
+
+Installed here on 2026-09-04 from that SHA (311 exports). The script degrades
+with a clear message rather than failing if the package is absent, and will not
+overwrite an existing sidecar in that case — every other gender tier is
+unaffected.
 
 `irr` is **not installed** on the machine that produced the current outputs,
 which is why `output/interrater_agreement.csv` reports `cohens_kappa = NA`
@@ -55,6 +73,9 @@ three are documented in the README but not in the example file.
 Using the five categories from the specification.
 
 ### Category 1 — fully reproducible from public sources
+
+- NPPES registry gender (`gender_from_nppes.csv`) — public registry, no key,
+  cached per NPI under `data/cache/nppes_gender/`
 
 - Europe PMC search (`data/processed/europmc_candidates.csv`)
 - OpenAlex search and citation metrics (`openalex_candidates.csv`,
@@ -128,10 +149,14 @@ Using the five categories from the specification.
     depends on how many copies of that drive macOS has mounted, so the path is
     not stable and the taxonomy fallback is skipped with a warning.
 
-  NPI is **tier 1 of the gender waterfall** and supplies 256 of the 1,065
-  resolved genders. The shipped `npi_matches.csv` is therefore a **category 4**
-  artefact — it can be used but not currently regenerated — rather than
-  category 5.
+  **Gender no longer depends on this file.** Since 2026-09-04 tier 1 of the
+  waterfall is `R/09k_gender_from_nppes.R`, which reads registrant-reported sex
+  from the public NPPES registry keyed on the NPI, so 263 of the 267
+  registry-sourced genders are regenerable from a public source. The ABOG
+  export is still needed for `npi_state` and `npi_subspecialty` — neither of
+  which is a model term — so `npi_matches.csv` remains a **category 4**
+  artefact: usable, not currently regenerable, and no longer load-bearing for
+  any reported estimate.
 - **The original ScienceDirect scrape** — HTTP 403, see category 3.
 - **2017 abstract text** — `scripts/jmig_2017_scraper.js` fails on CORS at the
   Elsevier SSO redirect; the Wayback Machine has no snapshots. 96 of 97 abstracts

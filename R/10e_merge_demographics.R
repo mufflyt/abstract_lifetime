@@ -137,6 +137,7 @@ g_orc   <- read_sidecar(here("data", "processed", "gender_from_orcid.csv"), "09g
 g_obg   <- read_sidecar(here("data", "processed", "gender_from_obgyn_pubs.csv"), "09h gender from OB/GYN pubs")
 g_oax   <- read_sidecar(here("data", "processed", "gender_from_openalex.csv"), "09i gender from OpenAlex search")
 g_opm   <- read_sidecar(here("data", "processed", "gender_from_open_payments.csv"), "09j gender from Open Payments")
+g_npp   <- read_sidecar(here("data", "processed", "gender_from_nppes.csv"), "09k gender from NPPES")
 
 # ── 1. Merge author characteristics (09c) ────────────────────────────────────
 cli_h2("1. Author characteristics from 09c")
@@ -175,9 +176,26 @@ if (nrow(char) > 0) {
 }
 
 # ── 2. Build gender waterfall ────────────────────────────────────────────────
-cli_h2("2. Gender waterfall (10 tiers)")
+cli_h2("2. Gender waterfall (11 tiers)")
 
-# Tier 1: NPI gender (authoritative identity)
+# Tier 1: NPPES registry sex, keyed on the NPI already resolved by 10_npi.
+#
+# This outranks the ABOG value below it for two reasons, neither of which is
+# about accuracy - they agree on 251 of 252 shared abstracts. First, NPPES is
+# regenerable from a public registry given an NPI, whereas the ABOG export's
+# gender column has disappeared upstream, so tier 2 alone cannot be rebuilt on
+# another machine (docs/FAILURE_MODES.md F16). Second, NPPES resolves 263 of the
+# 265 high-confidence NPIs against ABOG's 252 over the same population, so
+# putting it first gains 11 abstracts rather than losing any - tier 2 still
+# covers the handful NPPES leaves blank.
+nppes_gender_tbl <- if (nrow(g_npp) > 0 && "nppes_gender" %in% names(g_npp)) {
+  g_npp |>
+    filter(!is.na(nppes_gender)) |>
+    transmute(abstract_id, gender_nppes = nppes_gender) |>
+    distinct(abstract_id, .keep_all = TRUE)
+} else tibble(abstract_id = character(), gender_nppes = character())
+
+# Tier 2: ABOG board-certification gender, from the NPI match.
 npi_gender_tbl <- if (nrow(npi) > 0) {
   npi |>
     filter(npi_match_confidence == "high") |>
@@ -264,6 +282,7 @@ g9 <- extract_gender(tri_2nd, "tri_gender", "gender_tri_2nd")
 
 # Join all gender sources (extract_gender already deduplicates by abstract_id)
 matches <- matches |>
+  left_join(nppes_gender_tbl, by = "abstract_id") |>
   left_join(npi_gender_tbl, by = "abstract_id") |>
   left_join(oa_gender_tbl, by = "abstract_id") |>
   left_join(g3, by = "abstract_id") |>
@@ -312,17 +331,18 @@ harmonise_subspecialty <- function(x) {
 # initial maps to hundreds of names spanning both genders, leading to
 # higher misclassification risk compared to full-name sources.
 GENDER_PRIORITY <- tibble::tibble(
-  tier = 1:10,
-  source = c("npi", "openalex", "pubmed_fullname", "obgyn_pubs",
+  tier = 1:11,
+  source = c("nppes", "npi", "openalex", "pubmed_fullname", "obgyn_pubs",
              "openalex_search", "orcid", "open_payments",
              "senior_triangulation", "second_triangulation", "ssa"),
-  column = c("gender_npi", "gender_oa", "gender_pubmed", "gender_obgyn",
-             "gender_oax", "gender_orcid", "gender_opm",
+  column = c("gender_nppes", "gender_npi", "gender_oa", "gender_pubmed",
+             "gender_obgyn", "gender_oax", "gender_orcid", "gender_opm",
              "gender_tri_sr", "gender_tri_2nd", "first_author_gender"),
-  resolution = c("full_name", "full_name", "full_name", "full_name",
-                  "full_name", "full_name", "full_name",
-                  "full_name", "full_name", "initial_only"),
+  resolution = c("registry", "registry", "full_name", "full_name", "full_name",
+                 "full_name", "full_name", "full_name",
+                 "full_name", "full_name", "initial_only"),
   description = c(
+    "NPPES registrant-reported sex, keyed on the resolved NPI (not inferred)",
     "ABOG board certification records (authoritative identity)",
     "Full name from abstract DOI via OpenAlex works API",
     "Full name from PubMed author+affiliation search",
@@ -390,11 +410,12 @@ if ("first_author_state" %in% names(matches) && nrow(npi) > 0) {
 matches <- matches |>
   mutate(
     gender_unified = coalesce(
-      gender_npi, gender_oa, gender_pubmed, gender_obgyn,
+      gender_nppes, gender_npi, gender_oa, gender_pubmed, gender_obgyn,
       gender_oax, gender_orcid, gender_opm,
       gender_tri_sr, gender_tri_2nd, first_author_gender
     ),
     gender_source = case_when(
+      !is.na(gender_nppes)   ~ "nppes",
       !is.na(gender_npi)     ~ "npi",
       !is.na(gender_oa)      ~ "openalex",
       !is.na(gender_pubmed)  ~ "pubmed_fullname",
@@ -413,7 +434,7 @@ matches <- matches |>
     gender_conflict = abstract_id %in% conflicts$abstract_id
   ) |>
   # Drop intermediate columns — keep unified + source + conflict metadata
-  select(-any_of(c("gender_npi", "gender_oa", "gender_pubmed", "gender_obgyn",
+  select(-any_of(c("gender_nppes", "gender_npi", "gender_oa", "gender_pubmed", "gender_obgyn",
                     "gender_oax", "gender_orcid", "gender_opm",
                     "gender_tri_sr", "gender_tri_2nd",
                     "first_author_gender", "first_author_gender_p")))

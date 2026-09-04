@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![R >= 4.4](https://img.shields.io/badge/R-%3E%3D%204.4-blue.svg)](https://www.r-project.org/)
-[![Tests](https://img.shields.io/badge/tests-806%20passing%2C%203%20failing-yellow.svg)](docs/VALIDATION.md)
+[![Tests](https://img.shields.io/badge/tests-837%20passing%2C%203%20failing-yellow.svg)](docs/VALIDATION.md)
 [![Shiny App](https://img.shields.io/badge/Shiny-Live%20App-orange.svg)](https://mufflyt.shinyapps.io/aagl-adjudication/)
 
 **Publication Rate, Time to Publication, and Predictors of Full Publication
@@ -62,16 +62,17 @@ opposite of what censoring alone predicts — see
 Randomized design (HR 2.21, 95% CI 1.47–3.32) and author count (HR 1.26 per
 author, 1.09–1.45) are associated with faster publication. Academic affiliation
 is associated with *slower* publication (HR 0.62, 0.44–0.88). US location
-(HR 1.42, 0.89–2.27), inferred male first authorship (HR 0.78, 0.58–1.07),
-multicenter conduct (HR 1.39, 0.81–2.38) and reported funding (HR 1.76,
-0.43–7.17) are not statistically distinguishable from no effect.
+(HR 1.42, 0.89–2.27), male first authorship (HR 0.81, 0.60–1.10), multicenter
+conduct (HR 1.39, 0.81–2.38) and reported funding (HR 1.76, 0.43–7.17) are not
+statistically distinguishable from no effect.
 
 Two cautions. The proportional-hazards assumption is only marginally supported
-(global p = 0.052 on 171 events); and the academic-affiliation estimate rests on
+(global p = 0.056 on 171 events); and the academic-affiliation estimate rests on
 a covariate whose ascertainment changed substantially in the 2026-09-03
 correction pass (148 → 371 abstracts flagged), so treat it as provisional.
-Author gender is **inferred from names, not self-reported**, and 228 abstracts
-carry a cross-source disagreement recorded in `gender_conflict`.
+Author gender is **registry-reported for 267 of 1,066 abstracts and inferred
+from a name for the rest**, 287 of those from a single first initial; 231 carry
+a cross-source disagreement recorded in `gender_conflict`.
 
 ### Other figures
 
@@ -172,7 +173,7 @@ Rscript scripts/rebuild_candidate_pool.R
 | [OUTCOME_DEFINITION.md](docs/OUTCOME_DEFINITION.md) | When does an abstract count as published? (Methods-ready) |
 | [ADJUDICATION.md](docs/ADJUDICATION.md) | Human review: schema, precedence, and the decision accounting |
 | [DATA_DICTIONARY.md](docs/DATA_DICTIONARY.md) · [CSV](docs/data_dictionary.csv) | All 92 variables with derivation and coverage |
-| [DATA_INVENTORY.md](docs/DATA_INVENTORY.md) · [CSV](docs/data_inventory.csv) | All 71 data files with producer, consumers and grain |
+| [DATA_INVENTORY.md](docs/DATA_INVENTORY.md) · [CSV](docs/data_inventory.csv) | All 74 data files with producer, consumers and grain |
 | [AUTHOR_ENRICHMENT.md](docs/AUTHOR_ENRICHMENT.md) | Identity resolution and the ten-tier gender waterfall |
 | [STATISTICAL_ANALYSIS.md](docs/STATISTICAL_ANALYSIS.md) | Every model as fitted, with diagnostics |
 | [RESULTS_PROVENANCE.md](docs/RESULTS_PROVENANCE.md) | Every reported number → the file and code that produced it |
@@ -203,7 +204,7 @@ Rscript scripts/rebuild_candidate_pool.R
 
 ## Test status
 
-23 test files. As of 2026-09-03 18:10: **806 passing, 3 failing, 1 skipped**
+25 test files. As of 2026-09-04: **837 passing, 3 failing, 1 skipped**
 (from 519 passing / 1 failing at the start of the day). Every failure is
 deliberately left red, each marking a decision that belongs to the author rather
 than to code:
@@ -242,8 +243,9 @@ Full inventory and the list of invariants that have **no** test:
    conditional on a match having been found**, not publication rates — the
    stratifiers come from the matched publication's affiliation. The files now
    carry the availability split that proves it. [F4](docs/FAILURE_MODES.md)
-6. Author gender is inferred; 27% of resolved values come from a single first
-   initial and 228 carry a cross-source disagreement.
+6. Author gender is registry-reported for 267 of 1,066 abstracts (NPPES, then
+   ABOG) and name-inferred for the rest; 287 rest on a single first initial and
+   231 carry a cross-source disagreement.
 7. `n_authors` is censored at 5 by ScienceDirect's author-list truncation, and
    is a significant term in both models.
 8. Publication dates are print/issue dates; `ArticleDate` is not read. Eleven
@@ -256,7 +258,7 @@ Full inventory and the list of invariants that have **no** test:
 10. The 55 unresolved abstracts are removed from the denominator. Bounds:
     16.1% if all unpublished, 21.1% if all published.
 11. The proportional-hazards assumption is only marginally supported
-    (global p = 0.052).
+    (global p = 0.056).
 12. **Three publications are each credited to two abstracts**, so six of the 178
     numerator rows rest on three papers. The numerator is not deduplicated —
     two abstracts can legitimately merge into one paper — but the affected rows
