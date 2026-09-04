@@ -1,0 +1,25 @@
+ATTRIBUTION CORRECTION (added 2026-09-04).
+
+This commit's message describes only the cycle-6 test work. The commit was
+staged with 'git add -A' while a second agent was working in the same tree, so
+it also contains that agent's unrelated files.
+
+Authored by this commit's stated work (cycle 6, composite scoring tests):
+  tests/testthat/test-cycle06_scoring_composite.R
+  tests/loop/LEDGER.md
+
+Swept in from the concurrent agent, NOT part of the cycle-6 work:
+  00_run_all.R
+  R/02d_rederive_predictors.R
+  R/07_make_tables.R
+  R/08_make_figures.R
+  R/10_npi_matching.R
+  config.yml
+  data/processed/abstracts_cleaned.csv
+  scripts/rebuild_candidate_pool.R
+
+Note in particular that config.yml and data/processed/abstracts_cleaned.csv
+changed here. Neither was touched by the cycle-6 work, and the commit message
+gives no indication that the cohort data moved.
+
+History is not rewritten: see the note on 0bd4541.
