@@ -189,9 +189,11 @@ gs_dedup_sheet <- function(sheet_id) {
 
 # --- Data loading ---
 load_data <- function(use_gs = FALSE, sheet_id = NULL) {
-  # Primary queue = full 98 abstracts with algorithm classification. This
-  # lets reviewers spot-check auto-accepts and auto-rejects, not just the
-  # algorithm's "review" cases.
+  # Primary queue is the FULL cohort with its algorithm classification, not
+  # just output/manual_review_queue.csv. That lets reviewers spot-check
+  # auto-accepts and auto-rejects rather than only the probable/possible cases.
+  # (It said "98 abstracts" from the 2023-only era; the cohort is 1,106 across
+  # twelve congresses and the count is read from the data, never assumed.)
   review_path     <- app_path("output", "abstracts_with_matches.csv")
   candidates_path <- app_path("data", "processed", "pubmed_candidates.csv")
   scores_path     <- app_path("data", "processed", "match_scores_detailed.rds")

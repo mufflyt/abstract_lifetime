@@ -5,6 +5,8 @@
 #
 # Steps:
 #   1. Copy latest data files into bundle/
+#   2. Verify the bundle is byte-identical to the analysis inputs
+#   3. Refuse to deploy if it is not
 #   2. Slim pubmed_candidates.csv (truncate abstracts, drop unneeded columns)
 #   3. Deploy to shinyapps.io via rsconnect
 
@@ -74,12 +76,80 @@ if (file.exists(candidates_full)) {
   cli_alert_warning("No pubmed_candidates.csv found — skipping")
 }
 
-# ── Step 4: Report bundle size ───────────────────────────────────────────────
+# ── Step 4: Verify the bundle before anything can be published ───────────────
+# The bundle was 135 days stale for the whole of 2026, so reviewers adjudicated
+# against a pre-denominator-fix cohort and a candidate pool missing 283 of the
+# 1,102 winning PMIDs. Steps 2 and 3 above only WARN when a source file is
+# absent, which is how that survived. Nothing may deploy unless the bundle is
+# demonstrably the data the analysis was run on.
+cli_h2("Verifying bundle")
+
+verify_problems <- character()
+
+verbatim <- list(
+  c("data/processed/abstracts_cleaned.csv",     "data/processed/abstracts_cleaned.csv"),
+  c("data/processed/match_scores_detailed.rds", "data/processed/match_scores_detailed.rds"),
+  c("output/abstracts_with_matches.csv",        "output/abstracts_with_matches.csv"),
+  c("output/manual_review_decisions.csv",       "output/manual_review_decisions.csv"),
+  c("output/manual_review_queue.csv",           "output/manual_review_queue.csv")
+)
+for (pair in verbatim) {
+  src <- here(pair[1])
+  bun <- file.path(bundle_dir, pair[2])
+  if (!file.exists(src)) {
+    verify_problems <- c(verify_problems, paste("source missing:", pair[1]))
+  } else if (!file.exists(bun)) {
+    verify_problems <- c(verify_problems, paste("bundle missing:", pair[2]))
+  } else if (!identical(unname(tools::md5sum(src)), unname(tools::md5sum(bun)))) {
+    verify_problems <- c(verify_problems, paste("bundle differs from source:", pair[2]))
+  }
+}
+
+# The winning candidate is the one a reviewer is asked to rule on. If it is not
+# in the slimmed pool the comparison pane renders blank.
+scores_path <- here("data", "processed", "match_scores.csv")
+if (file.exists(scores_path) && file.exists(candidates_out)) {
+  scores <- read_csv(scores_path, show_col_types = FALSE) |>
+    mutate(best_pmid = as.character(best_pmid))
+  slim <- read_csv(candidates_out, show_col_types = FALSE,
+                   col_types = readr::cols(.default = readr::col_character()))
+  missing_best <- scores |>
+    filter(!is.na(best_pmid)) |>
+    anti_join(distinct(select(slim, abstract_id, pmid)),
+              by = c("abstract_id", "best_pmid" = "pmid"))
+  if (nrow(missing_best) > 0) {
+    verify_problems <- c(verify_problems, paste(
+      nrow(missing_best), "winning PMIDs absent from the bundle candidate pool",
+      "- run scripts/rebuild_candidate_pool.R"))
+  }
+  short <- scores |>
+    filter(n_candidates > 0) |>
+    select(abstract_id, n_candidates) |>
+    left_join(count(slim, abstract_id, name = "n_bundle"), by = "abstract_id") |>
+    mutate(n_bundle = coalesce(n_bundle, 0L)) |>
+    filter(n_bundle < n_candidates)
+  if (nrow(short) > 0) {
+    verify_problems <- c(verify_problems, paste(
+      nrow(short), "abstracts have fewer candidates in the bundle than were scored"))
+  }
+} else {
+  verify_problems <- c(verify_problems,
+                       "match_scores.csv or the slimmed candidate pool is missing")
+}
+
+if (length(verify_problems) > 0) {
+  for (p in verify_problems) cli_alert_danger(p)
+  stop("Bundle verification failed. Refusing to deploy stale or incomplete data.",
+       call. = FALSE)
+}
+cli_alert_success("Bundle verified against the current analysis")
+
+# ── Step 5: Report bundle size ───────────────────────────────────────────────
 bundle_files <- list.files(bundle_dir, recursive = TRUE, full.names = TRUE)
 total_mb <- round(sum(file.info(bundle_files)$size) / 1e6, 1)
 cli_h2("Bundle ready: {total_mb} MB total")
 
-# ── Step 5: Deploy ───────────────────────────────────────────────────────────
+# ── Step 6: Deploy ───────────────────────────────────────────────────────────
 # Deployment publishes to a live application that human reviewers use, so it is
 # opt-in. Set SHINY_DEPLOY=true to push. Without it this script only refreshes
 # bundle/, which is what tests/testthat/test-shiny_app.R checks for staleness.

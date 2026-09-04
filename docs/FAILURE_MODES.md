@@ -352,7 +352,7 @@ structural fix.
 
 ---
 
-## F11 🟠 The Shiny deploy bundle is 135 days stale — **has occurred**
+## F11 🟠 ~~The Shiny deploy bundle is 135 days stale~~ — **FIXED 2026-09-03 (bundle), live app awaiting a deploy**
 
 **Failure.** `shiny/adjudication_app/bundle/` holds copies of
 `abstracts_cleaned.csv`, `match_scores_detailed.rds`, `pubmed_candidates.csv`,
@@ -366,9 +366,36 @@ within 24 hours of the main CSV. **It currently fails** with a 11,706,678-second
 (135-day) gap — this is the single failing test in the suite, and it is
 reporting a real problem rather than a fixture problem.
 
-**Prevention.** Run `Rscript shiny/adjudication_app/deploy.R` after any
-pipeline re-run, which is what `00_run_all.R:167-173` does. The gap exists
-because the September re-runs were of steps 05–08 only.
+**Fix applied.** Three changes:
+
+1. The bundle is refreshed and now byte-identical to every source it copies.
+   Verified by content hash, not modification time.
+2. `deploy.R` gained a **verification step that runs before anything can be
+   published** and `stop()`s the script if the bundle is not the data the
+   analysis was run on. It checks md5 equality for the five verbatim files, that
+   every winning PMID is present in the slimmed candidate pool, and that no
+   abstract has fewer candidates in the bundle than were scored. Both failure
+   paths were exercised: removing a source file and removing 40 winning
+   candidates each abort the deploy with exit code 1.
+   Steps 2 and 3 previously only emitted `cli_alert_warning()` and carried on,
+   which is how the staleness survived unnoticed.
+3. Deployment is now opt-in behind `SHINY_DEPLOY=true`, so refreshing the bundle
+   in CI or a test run cannot publish to a live application reviewers are using.
+
+**Verified end to end.** The app was started locally, served HTTP 200, and
+rendered all twelve congress years. `tests/testthat/test-shiny_bundle_currency.R`
+(48 assertions) drives the real server through `shiny::testServer()` and asserts
+that the loaded cohort equals `abstracts_cleaned.csv`, that no abstract is served
+fewer candidates than were scored, that every winning PMID is displayable, and
+that the candidate-to-score join resolves. The last of those matters: before the
+pool was rebuilt the app showed 26 candidates for `AAGL2012_001` where 35 had
+been scored.
+
+**Still outstanding — needs the author.** A verified bundle is not a deployed
+one. Until `SHINY_DEPLOY=true Rscript shiny/adjudication_app/deploy.R` is run,
+reviewers on shinyapps.io continue to see the April data. That is an
+outward-facing publish to a shared application and has deliberately not been
+done automatically.
 
 ---
 

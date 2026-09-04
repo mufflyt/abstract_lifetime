@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![R >= 4.4](https://img.shields.io/badge/R-%3E%3D%204.4-blue.svg)](https://www.r-project.org/)
-[![Tests](https://img.shields.io/badge/tests-758%20passing%2C%203%20failing-yellow.svg)](docs/VALIDATION.md)
+[![Tests](https://img.shields.io/badge/tests-806%20passing%2C%203%20failing-yellow.svg)](docs/VALIDATION.md)
 [![Shiny App](https://img.shields.io/badge/Shiny-Live%20App-orange.svg)](https://mufflyt.shinyapps.io/aagl-adjudication/)
 
 **Publication Rate, Time to Publication, and Predictors of Full Publication
@@ -194,6 +194,7 @@ Rscript scripts/rebuild_candidate_pool.R
 | International gender lookup (300 names) | **Manual.** Tracked. |
 | ACGME teaching-hospital list (2,754 names) | External snapshot, tracked, no retrieval script. |
 | `data/cache/sd_html/` (1,154 files) | **Gitignored and unrefetchable** — ScienceDirect returns HTTP 403. This cache is currently the only copy of the source documents. |
+| Shiny adjudication app | The bundle is verified current and `deploy.R` refuses to publish a stale one, but **the live app at shinyapps.io still serves April data** until someone runs `SHINY_DEPLOY=true Rscript shiny/adjudication_app/deploy.R`. |
 | `data/processed/pubmed_candidates.csv` (≈130 MB) | **Gitignored.** A clean clone cannot run steps 4–5 without re-running the search, or `scripts/rebuild_candidate_pool.R` against `match_scores_detailed.rds`. |
 | NPI matching | **Not currently regenerable.** Both inputs now come from `config.yml: external_data` (`ABOG_NPI_PATH`, `NPPES_DUCKDB_PATH`). Both files exist on this machine, but the ABOG `LATEST` symlink now targets a workforce export with no gender column and NPIs on 411 of 79,400 rows, so `R/10_npi_matching.R` refuses to overwrite the richer shipped sidecar. |
 | 2017 abstract text | **Irrecoverable** without institutional PDF access (CORS blocks the jmig.org scraper; no Wayback snapshots). 96 of 97 abstracts have no text. |
@@ -202,7 +203,7 @@ Rscript scripts/rebuild_candidate_pool.R
 
 ## Test status
 
-22 test files. As of 2026-09-03 17:50: **758 passing, 3 failing, 1 skipped**
+23 test files. As of 2026-09-03 18:10: **806 passing, 3 failing, 1 skipped**
 (from 519 passing / 1 failing at the start of the day). Every failure is
 deliberately left red, each marking a decision that belongs to the author rather
 than to code:
