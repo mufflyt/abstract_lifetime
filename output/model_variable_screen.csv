@@ -1,0 +1,18 @@
+model,variable,kept,pct_missing,n_levels,reason
+cox,is_rct,TRUE,0,2,kept
+cox,log_sample_size,FALSE,NA,NA,absent from the model frame
+cox,is_academic,TRUE,0,2,kept
+cox,is_us_based,TRUE,0,2,kept
+cox,session_type,FALSE,0,1,fewer than 2 distinct values
+cox,n_authors,TRUE,0.4,5,kept
+cox,gender_unified,TRUE,3.7,2,kept
+cox,practice_type,FALSE,84.2,4,more than 50% missing
+cox,is_multicenter,TRUE,0,2,kept
+cox,has_funding,FALSE,0,2,"near-zero variance (freq ratio > 19, distinct < 10%)"
+logistic,session_type,FALSE,0,1,fewer than 2 distinct values
+logistic,n_authors,TRUE,0.4,5,kept
+logistic,gender_unified,TRUE,3.8,2,kept
+logistic,practice_type,FALSE,84.2,4,more than 50% missing
+logistic,is_multicenter,TRUE,0,2,kept
+logistic,has_funding,FALSE,0,2,"near-zero variance (freq ratio > 19, distinct < 10%)"
+logistic,subspecialty,FALSE,85.3,8,more than 50% missing

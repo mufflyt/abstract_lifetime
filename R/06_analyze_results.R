@@ -202,6 +202,121 @@ subgroup_rate <- function(data, var) {
     arrange(desc(rate))
 }
 
+
+# ------------------------------------------------------------------
+# Model variable screen.
+#
+# Both models previously selected their terms with an inline rule - "< 50%
+# missing and >= 2 distinct values" - written out twice, once for the Cox model
+# and once for the logistic. docs/STATISTICAL_ANALYSIS.md flagged that as a
+# data-dependent specification: the model changes with the data and nothing
+# records what was dropped or why.
+#
+# This makes the screen a single function, adds a near-zero-variance criterion,
+# and writes the decision for every candidate to
+# output/model_variable_screen.csv so the specification is reconstructible from
+# the outputs alone.
+#
+# The near-zero-variance rule is the conventional one (Kuhn's, as used by
+# caret::nearZeroVar): a variable is near-zero-variance when the ratio of its
+# most to second-most common value exceeds `freq_cut` AND its share of distinct
+# values is below `unique_cut`. `has_funding` is TRUE for 7 of 1,051 evaluated
+# abstracts - a frequency ratio of 149:1 - and its interval spans an order of
+# magnitude in both models. "Not significant" and "not estimable" are different
+# claims, and the screen now makes that call by rule rather than by judgement.
+#
+# mysterycall::mysterycall_remove_near_zero() is used when available; the
+# fallback below implements the identical rule so the specification does not
+# depend on whether the package is installed.
+# ------------------------------------------------------------------
+NZV_FREQ_CUT <- 19
+NZV_UNIQUE_CUT <- 10
+
+#' Is a vector near-zero-variance?
+#' @param x A vector.
+#' @return Logical scalar.
+#' @keywords internal
+is_near_zero_var <- function(x) {
+  v <- x[!is.na(x)]
+  if (length(v) == 0) return(TRUE)
+  tab <- sort(table(v), decreasing = TRUE)
+  if (length(tab) == 1) return(TRUE)
+  freq_ratio <- as.numeric(tab[1]) / as.numeric(tab[2])
+  pct_unique <- 100 * length(tab) / length(v)
+  freq_ratio > NZV_FREQ_CUT && pct_unique < NZV_UNIQUE_CUT
+}
+
+#' Screen candidate model terms and record every decision
+#'
+#' @param data Model frame.
+#' @param candidates Character vector of candidate column names.
+#' @param model_label Character; which model this screen is for.
+#' @return Character vector of the terms that pass.
+#' @keywords internal
+screen_model_vars <- function(data, candidates, model_label) {
+  rows <- lapply(candidates, function(v) {
+    if (!v %in% names(data)) {
+      return(tibble::tibble(model = model_label, variable = v, kept = FALSE,
+                            pct_missing = NA_real_, n_levels = NA_integer_,
+                            reason = "absent from the model frame"))
+    }
+    vals <- data[[v]]
+    pct_na <- mean(is.na(vals))
+    n_lv <- length(unique(vals[!is.na(vals)]))
+    nzv <- is_near_zero_var(vals)
+    reason <- if (pct_na >= 0.5) {
+      "more than 50% missing"
+    } else if (n_lv < 2) {
+      "fewer than 2 distinct values"
+    } else if (nzv) {
+      sprintf("near-zero variance (freq ratio > %g, distinct < %g%%)",
+              NZV_FREQ_CUT, NZV_UNIQUE_CUT)
+    } else {
+      "kept"
+    }
+    tibble::tibble(model = model_label, variable = v, kept = reason == "kept",
+                  pct_missing = round(100 * pct_na, 1), n_levels = n_lv,
+                  reason = reason)
+  })
+  report <- dplyr::bind_rows(rows)
+
+  # Cross-check against the package implementation where it is available, so a
+  # divergence between the two is visible rather than silent.
+  if (requireNamespace("mysterycall", quietly = TRUE)) {
+    present <- report$variable[report$variable %in% names(data)]
+    if (length(present) > 0) {
+      kept_pkg <- tryCatch(
+        names(suppressMessages(
+          mysterycall::mysterycall_remove_near_zero(as.data.frame(data[, present, drop = FALSE]))
+        )),
+        error = function(e) NULL
+      )
+      if (!is.null(kept_pkg)) {
+        dropped_pkg <- setdiff(present, kept_pkg)
+        dropped_local <- report$variable[!report$kept &
+                                           grepl("near-zero", report$reason)]
+        if (!setequal(dropped_pkg, dropped_local)) {
+          cli_alert_warning(
+            "near-zero screen disagrees with mysterycall: local dropped \
+             {.val {dropped_local}}, package dropped {.val {dropped_pkg}}"
+          )
+        }
+      }
+    }
+  }
+
+  dropped <- report |> dplyr::filter(!kept)
+  if (nrow(dropped) > 0) {
+    for (i in seq_len(nrow(dropped))) {
+      cli_alert_info("{model_label}: dropping {.field {dropped$variable[i]}} - {dropped$reason[i]}")
+    }
+  }
+  .screen_log[[model_label]] <<- report
+  report$variable[report$kept]
+}
+
+.screen_log <- list()
+
 # ============================================================
 # AIM 1: Publication rate
 # ============================================================
@@ -360,21 +475,14 @@ if (nrow(published) > 0 && "months_to_pub" %in% names(published)) {
     cli_alert_success("Kaplan-Meier model saved")
 
     # Cox proportional hazards model (Cochrane MR000005 requirement)
-    cox_vars <- intersect(
-      c("is_rct", "log_sample_size", "is_academic", "is_us_based",
-        "session_type", "n_authors", "gender_unified",
-        "practice_type", "is_multicenter", "has_funding"),
-      names(km_data)
-    )
-    # Only include variables with >=2 levels and <50% missing
-    cox_formula_parts <- character()
-    for (v in cox_vars) {
-      vals <- km_data[[v]]
-      if (is.null(vals)) next
-      pct_na <- mean(is.na(vals))
-      n_levels <- length(unique(vals[!is.na(vals)]))
-      if (pct_na < 0.5 && n_levels >= 2) cox_formula_parts <- c(cox_formula_parts, v)
-    }
+    # NOT pre-intersected with names(km_data): a candidate that never exists
+    # must be recorded as absent rather than vanish. `log_sample_size` is the
+    # standing example - it is listed as a Cox candidate but is only ever
+    # created inside the Aim 3 block, so it has never entered the Cox model.
+    cox_vars <- c("is_rct", "log_sample_size", "is_academic", "is_us_based",
+                  "session_type", "n_authors", "gender_unified",
+                  "practice_type", "is_multicenter", "has_funding")
+    cox_formula_parts <- screen_model_vars(km_data, cox_vars, "cox")
 
     if (length(cox_formula_parts) >= 2) {
       cox_formula <- as.formula(paste("Surv(time, event) ~",
@@ -432,18 +540,11 @@ model_data <- results |>
 if (nrow(model_data) >= 20 && length(unique(model_data$published_int)) >= 2) {
   # Expanded logistic regression (Cochrane MR000005: include presentation type,
   # author demographics, result direction, and temporal effects)
-  extra_vars <- intersect(
-    c("session_type", "n_authors", "gender_unified",
-      "practice_type", "is_multicenter", "has_funding", "subspecialty"),
-    names(model_data)
-  )
-  # Filter to variables with enough variation
-  usable_extras <- character()
-  for (v in extra_vars) {
-    vals <- model_data[[v]]
-    if (!is.null(vals) && mean(is.na(vals)) < 0.5 &&
-        length(unique(vals[!is.na(vals)])) >= 2) usable_extras <- c(usable_extras, v)
-  }
+  extra_vars <- c("session_type", "n_authors", "gender_unified",
+                  "practice_type", "is_multicenter", "has_funding", "subspecialty")
+  # The four core terms are pre-specified and are NOT screened out; only the
+  # optional extras go through the screen.
+  usable_extras <- screen_model_vars(model_data, extra_vars, "logistic")
   logit_formula <- as.formula(paste(
     "published_int ~ is_rct + log_sample_size + is_academic + is_us_based",
     if (length(usable_extras) > 0) paste("+", paste(usable_extras, collapse = " + ")) else ""
@@ -573,6 +674,11 @@ cli_alert_success("Strategy ablation analysis complete")
 # ============================================================
 # Save all aim summaries
 # ============================================================
+if (length(.screen_log) > 0) {
+  write_csv(bind_rows(.screen_log), here("output", "model_variable_screen.csv"))
+  cli_alert_success("Model variable screen: output/model_variable_screen.csv")
+}
+
 write_csv(aim1, here("output", "aim1_publication_rate.csv"))
 write_csv(aim2, here("output", "aim2_time_to_pub.csv"))
 if (exists("aim3")) write_csv(aim3, here("output", "aim3_logistic_regression.csv"))

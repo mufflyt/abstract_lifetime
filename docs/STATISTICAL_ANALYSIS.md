@@ -152,11 +152,40 @@ keeping only those that (a) exist as a column in `km_data`, (b) have < 50%
 missing, and (c) have ≥ 2 distinct non-missing values. The model is fitted only
 if ≥ 2 variables survive and ≥ 30 complete cases remain.
 
-**This is a data-dependent specification.** `session_type` drops because it is
-constant. `practice_type` (17.5%) and `subspecialty` drop on the missingness
-rule. `log_sample_size` is never created in `km_data` — it is built inside the
-Aim 3 block only — so it can never enter the Cox model despite being listed.
-Rerunning on different data can silently change the model.
+**This is a data-dependent specification**, and since 2026-09-04 it is at least
+a *recorded* one. `screen_model_vars()` in `R/06_analyze_results.R` applies one
+rule to both models and writes every decision to
+`output/model_variable_screen.csv`, so the specification can be reconstructed
+from the outputs alone rather than inferred from the code plus the data.
+
+Three criteria, in order: more than 50% missing; fewer than 2 distinct values;
+**near-zero variance** (the conventional rule — frequency ratio of the most to
+second-most common value above 19, and distinct values below 10% of rows).
+A candidate that does not exist in the model frame is recorded as `absent`
+rather than silently removed.
+
+| model | variable | kept | reason |
+|---|---|---|---|
+| cox | `is_rct`, `is_academic`, `is_us_based`, `n_authors`, `gender_unified`, `is_multicenter` | ✅ | kept |
+| cox | `log_sample_size` | ❌ | **absent from the model frame** — listed as a Cox candidate but only ever created inside the Aim 3 block, so it has never entered the Cox model |
+| cox | `session_type` | ❌ | fewer than 2 distinct values |
+| cox | `practice_type` | ❌ | 84.2% missing |
+| cox | `has_funding` | ❌ | **near-zero variance** |
+| logistic | `n_authors`, `gender_unified`, `is_multicenter` | ✅ | kept |
+| logistic | `session_type`, `practice_type` (84.2%), `subspecialty` (85.3%), `has_funding` | ❌ | as above |
+
+The near-zero-variance criterion is new and it changed both models:
+`has_funding` is TRUE for 7 of 1,051 evaluated abstracts, a frequency ratio of
+about 149:1, and is now excluded by rule rather than reported with an interval
+spanning an order of magnitude. Every other coefficient moved by less than 0.03
+(Cox `is_rct` 2.205 → 2.227; logistic `is_rct` 2.552 → 2.563).
+
+**One consequence to note.** The Cox proportional-hazards global test moved from
+p = 0.056 to **p = 0.043** when the term was dropped, so the assumption is now
+formally violated at α = 0.05 rather than marginally supported. The
+constant-hazard-ratio reading of the Cox table should be checked against a
+stratified or time-varying specification before the hazard ratios are reported
+as such.
 
 **The formula that actually ran** (read back from
 `data/processed/cox_model.rds`):
@@ -308,6 +337,67 @@ treatment of the 55 unresolved.
 The follow-up-window rows are the closest thing to a lead-time sensitivity
 analysis. ---
 
+## Model stability
+
+`R/06d_model_stability.R`. Neither model previously carried any influence,
+leave-one-out or stability diagnostic, and `is_academic` was described as
+"provisional" on the strength of a judgement rather than a number.
+
+### Bootstrap predictor retention
+
+500 resamples of the logistic model's complete-case frame (n = 1,011), counting
+how often each term is retained at p < 0.05
+(`output/model_predictor_stability.csv`):
+
+| predictor | retained | reading |
+|---|---:|---|
+| `n_authors` | **97.2%** | robust |
+| `is_rct` | **93.6%** | robust |
+| `is_academic` | 67.4% | unstable |
+| `is_us_based` | 42.4% | unstable |
+| `log_sample_size` | 27.4% | unstable |
+| `is_multicenter` | 25.0% | unstable |
+| `gender_unified` | 17.0% | unstable |
+
+**Only two terms are robust to resampling.** `is_academic` reaches p = 0.012 in
+the fitted model but survives in barely two-thirds of resamples, which is the
+quantitative form of the caution already attached to it.
+
+### Leave-one-congress-out
+
+The model refitted twelve times, dropping each congress in turn, for all seven
+terms — 84 refits, all converged
+(`output/model_leave_one_congress_out.csv`):
+
+| term | ratio range | significant in |
+|---|---|---:|
+| `is_rctTRUE` | 2.12 – 3.21 | 12 / 12 |
+| `n_authors` | 1.27 – 1.38 | 12 / 12 |
+| `is_academicTRUE` | 0.55 – 0.66 | 12 / 12 |
+| `is_us_basedTRUE` | 1.15 – 5.31 | 3 / 12 |
+| `is_multicenterTRUE` | 1.28 – 1.82 | 0 / 12 |
+| `gender_unifiedmale` | 0.78 – 0.90 | 0 / 12 |
+| `log_sample_size` | 0.92 – 0.97 | 1 / 12 |
+
+No term changes direction when a congress is dropped. This matters
+specifically because 2017 and 2018 have no recoverable abstract text, so their
+covariates are near-constant; a finding resting on either would be an artefact.
+None does.
+
+### Reading the two together
+
+They disagree about `is_academic`, and the disagreement is informative rather
+than contradictory. It is significant in **all twelve** leave-one-congress-out
+refits — so it does not depend on any single congress — but survives only
+**67.4%** of bootstrap resamples — so it is sensitive to which *abstracts* are
+drawn. The two diagnostics test different things, and the honest summary is
+that `is_academic` is not congress-driven but is not sampling-robust either. It
+should be reported with that qualification, not as a headline.
+
+`is_rct` and `n_authors` pass both.
+
+---
+
 ## Missing data
 
 `R/06b_missingness.R` produces what the Methods previously asserted without
@@ -373,11 +463,13 @@ for adaptation into Methods.
 
 | Check | Implemented | Result |
 |---|---|---|
-| Proportional hazards | `cox.zph(cox_model)`, global test written to `output/cox_ph_assumption.csv` | global p = **0.056**. It was 0.32 on 104 events; with 171 events the test is far better powered and the assumption is now only marginally supported. A stratified or time-varying specification is worth considering before the hazard ratios are reported as constant. |
+| Proportional hazards | `cox.zph(cox_model)`, global test written to `output/cox_ph_assumption.csv` | global p = **0.043** — now violated, having moved from 0.056 when `has_funding` was dropped by the screen. It was 0.32 on 104 events; with 171 events the test is far better powered and the assumption is now only marginally supported. A stratified or time-varying specification is worth considering before the hazard ratios are reported as constant. |
 | Collinearity | **not implemented** | — |
+| Predictor stability | `R/06d_model_stability.R`, 500 bootstrap refits | Only `n_authors` (97.2%) and `is_rct` (93.6%) are robust |
+| Leave-one-congress-out | `R/06d_model_stability.R`, 84 refits | No term changes direction; `is_us_based` significant in only 3 of 12 |
 | Goodness of fit (Hosmer–Lemeshow, calibration, AUC) | **not implemented** | — |
-| Sparse-category handling | Implicit only: the < 50% missing and ≥ 2 level screen. No minimum cell count. | `has_funding` is TRUE for 7 of 1,106 abstracts (it was 3 before `02d` re-derived the predictors from the backfilled text); its Cox CI spans 0.43–7.17 and its logistic CI 0.29–11.3. `mysterycall_remove_near_zero()` flags it automatically at a frequency ratio of 1044:7 |
-| Influence / outliers | **not implemented** | — |
+| Sparse-category handling | **Explicit** since 2026-09-04: `screen_model_vars()` applies a near-zero-variance rule and records every decision to `output/model_variable_screen.csv`. | `has_funding` is TRUE for 7 of 1,106 abstracts (it was 3 before `02d` re-derived the predictors from the backfilled text); its Cox CI spans 0.43–7.17 and its logistic CI 0.29–11.3. `mysterycall_remove_near_zero()` flags it automatically at a frequency ratio of 1044:7 |
+| Influence / outliers | partially — leave-one-congress-out covers group-level influence | no single-observation diagnostic |
 | Overdispersion | not applicable (binomial with n = 1 trials) | — |
 
 `has_funding` (**7** abstracts TRUE cohort-wide) and `is_multicenter` (65 TRUE)

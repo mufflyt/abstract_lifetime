@@ -239,12 +239,36 @@ test_that("Cox PH model has valid hazard ratios", {
   expect_true(all(cox$conf.low < cox$conf.high, na.rm = TRUE), label = "CI lower < upper")
 })
 
+# PRESERVED FAILING TEST, 2026-09-04. The threshold is NOT relaxed.
+#
+# The global cox.zph test was p = 0.32 when the Cox model had 104 events. It
+# moved to 0.056 when scripts/rebuild_candidate_pool.R restored the publication
+# dates and the event count rose to 171, and to 0.043 when the variable screen
+# dropped has_funding (TRUE for 7 of 1,051) by a near-zero-variance rule.
+#
+# The assumption is now violated at alpha = 0.05. That is a finding about the
+# model, not a fixture problem: with 171 events the test is properly powered,
+# and removing a near-constant term made a latent violation visible rather than
+# creating one.
+#
+# The response is a methodological decision that has not been taken - stratify
+# the Cox model, allow time-varying coefficients, or report the hazard ratios
+# explicitly as averages over follow-up. Weakening this assertion would hide
+# the question. See docs/STATISTICAL_ANALYSIS.md.
 test_that("PH assumption holds", {
   path <- here::here("output", "cox_ph_assumption.csv")
   skip_if_not(path)
   ph <- read_csv(path, show_col_types = FALSE)
 
-  expect_true(ph$p_value[1] > 0.05, label = "global PH p > 0.05")
+  expect_true(
+    ph$p_value[1] > 0.05,
+    label = sprintf(
+      paste("global cox.zph p = %.3f. Proportional hazards is violated, so the",
+            "hazard ratios in aim2b_cox_regression.csv are averages over",
+            "follow-up rather than constants. Decide between a stratified fit,",
+            "time-varying coefficients, or reporting them as averages"),
+      ph$p_value[1])
+  )
 })
 
 # ============================================================

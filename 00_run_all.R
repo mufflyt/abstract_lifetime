@@ -176,6 +176,12 @@ source(here("R", "09e_fidelity_checks.R"))
 cli_h2("Step 6: Analysis")
 source(here("R", "06_analyze_results.R"))
 
+# Step 6a2: Model stability. Bootstrap predictor retention and
+# leave-one-congress-out refits, so the regression findings carry a measure of
+# how much they depend on the particular sample and the particular congresses.
+cli_h2("Step 6a2: Model Stability")
+source(here("R", "06d_model_stability.R"))
+
 # Step 6b0: Missing-data analysis. Reports item-level missingness, Little's
 # MCAR test, and whether the 55 unresolved abstracts differ from the evaluated
 # set - the assumption the publication-rate denominator rests on.

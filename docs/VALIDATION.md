@@ -4,14 +4,14 @@ Inventory of the test suite, plus an audit of which scientific claims are and
 are not protected by a test.
 
 **Current status** (`testthat::test_dir("tests/testthat")`, 2026-09-04,
-26 test files):
+27 test files):
 
 ```
-[ FAIL 3 | WARN 18 | SKIP 1 | PASS 878 ]
+[ FAIL 4 | WARN 18 | SKIP 1 | PASS 900 ]
 ```
 
-All three remaining failures are **deliberately left red**: each marks a decision
-that belongs to the author rather than to code.
+All remaining failures are **deliberately left red**: each marks a decision that
+belongs to the author rather than to code.
 
 `test-cycle03_model_contracts.R:57` — which asserts that no reported odds ratio
 spans a 100-fold interval — now passes, because the `has_funding` interval
@@ -25,6 +25,7 @@ frequency ratio of 1044:7, above the conventional 19:1 cutoff.
 
 | Failing test | Reports | Why it is not fixed |
 |---|---|---|
+| `test-pipeline_semantics.R:247` | Cox proportional hazards is violated, global p = 0.043 | 0.32 on 104 events → 0.056 when the event count rose to 171 → 0.043 when the screen dropped `has_funding`. Removing a near-constant term made a latent violation visible. The response — stratify, allow time-varying coefficients, or report the HRs as averages over follow-up — is a methodological decision. Relaxing the threshold would hide it. |
 | `test-cycle04_validation_sensitivity.R:179` | `search_strategy_efficacy.csv` still carries the pre-correction 0.2% `title` yield | Regenerating it means re-running the whole search layer, which would change candidate sets and invalidate the human adjudication |
 | `test-cycle06_scoring_composite.R:83` | `keyword_pts` fires on 0 of 1,106 abstracts | Fixing the component changes every composite score and therefore every classification, invalidating the adjudication |
 | `test-cycle06_scoring_composite.R:116` | 3 PMIDs credited to 6 published abstracts | Deciding which abstract owns each PMID is adjudication. Surfaced as `final_pmid_shared` and `output/shared_publication_matches.csv`; see FAILURE_MODES.md F17 |
@@ -76,6 +77,7 @@ shinyapps.io.
 | `test-cycle03_model_contracts.R` | 10 | BVA + semantic + adversarial | Gate 3 | Partially | model RDS, `aim2b`/`aim3` CSVs | Logistic and Cox output contracts; the ≥50%-missing exclusion rule; complete-case attrition; determinism; artefact vintage. Added `n_obs` to `aim3_logistic_regression.csv` (1,010 against a denominator of 1,051 — 41 abstracts leave through complete-case deletion, previously invisible). |
 | `test-cycle04_validation_sensitivity.R` | 10 | semantic + adversarial | Gate 3 | Partially | `validation_metrics.csv`, `sensitivity_analyses.csv`, `interrater_agreement.csv`, `search_strategy_efficacy.csv` | Gold-standard confusion-cell partition; sensitivity-scenario denominator consistency; interrater completeness; search-efficacy vintage |
 | `test-docs_drift.R` *(added by this pass)* | 12 | contract | Gate 3 | Partially | `docs/*.csv`, the analytical outputs | Documentation-to-data agreement; see §4 |
+| `test-model_stability.R` *(added 2026-09-04)* | 7 | contract | Gate 3 | Partially | `model_variable_screen.csv`, the stability outputs, the fitted models | That the screen records a reason for every candidate; that its kept set is exactly what the models were fitted on; that a near-zero-variance term is excluded by that named rule; that a never-present candidate is recorded rather than vanishing; that stability is reported for every fitted term and its label follows its number; that every congress is dropped for every term; and that `is_rct` and `n_authors` survive dropping any single congress |
 | `test-mysterycall_integrations.R` *(added 2026-09-04)* | 9 | contract | Gate 3 | Partially | Table 1 outputs, `10e` helpers, the missingness outputs, the session snapshot | The four borrowed functions: Table 1 is stratified and its stratum sizes reconcile with the cohort; `safe_join()` blocks a duplicated sidecar key, preserves row count, and still creates columns from an empty-but-typed sidecar; missingness counts match the dataset; the MCAR row records what it did not test; `best_score` is labelled definitional; the snapshot records version, platform and seed |
 | `test-gender_nppes_tier.R` *(added 2026-09-04)* | 6 | contract | Gate 3 | Partially | `gender_from_nppes.csv`, `npi_matches.csv`, `gender_resolution_policy.csv`, `abstracts_with_matches.csv` | The NPPES registry tier: population identity with the high-confidence NPI set, vocabulary, resolution rate, NPPES/ABOG agreement floor, that the policy file puts NPPES first and matches the coalesce order in the code, and that every row labelled `nppes` carries the sidecar's value |
 | `test-shiny_bundle_currency.R` *(added by this pass)* | 9 | contract + end-to-end | Gate 3 | Yes — the bundle is gitignored | `shiny/adjudication_app/bundle/**`, `abstracts_cleaned.csv`, `match_scores.csv`, `pubmed_candidates.csv` | Whether the adjudication app serves the data the analysis was run on: md5 equality for the five verbatim files, cohort identity, no abstract under-served candidates, every winning PMID displayable, the candidate-to-score join resolves, and `deploy.R` gates publication behind `SHINY_DEPLOY`. Two tests drive the real server through `shiny::testServer()`. |
@@ -112,6 +114,8 @@ described in [PUBLICATION_SEARCH.md](PUBLICATION_SEARCH.md) §1.
 | Human-adjudication completeness | **No** | — | **GAP.** Nothing asserts that every cohort abstract has a decision, nor that decisions with no matching abstract are accounted for (47 video orphans). |
 | One publication per abstract | **Yes** | `test-cycle06_scoring_composite.R:116` | **Strong, and currently violated by design** — 3 PMIDs are credited to 6 abstracts. Surfaced in `final_pmid_shared`. F17. |
 | Final dataset grain | Partial | `test-pipeline_semantics.R:18` | Moderate — row count and year set, on `abstracts_with_matches.csv` |
+| Model specification is recorded, not inferred | **Yes** | `test-model_stability.R` | **Strong.** `output/model_variable_screen.csv` gives a decision and a reason for every candidate, and the test asserts the kept set equals the fitted terms. |
+| Regression findings are sample- and congress-robust | **Yes** | `test-model_stability.R` | Moderate. 500 bootstrap refits and 84 leave-one-congress-out refits; the test pins the two robust terms. |
 | Model cohort reconciliation | **Yes** | `test-cycle03_model_contracts.R`, `test-remediation_invariants.R` | Moderate. `aim3_logistic_regression.csv` now exports `n_obs` (1,010 against a denominator of 1,051), and publication-date coverage among the published is asserted at ≥ 95% — it is now 178/178, was 104/178. |
 | Manuscript numbers match generated output | Partial → **now yes** | `test-docs_drift.R` | Moderate — see §4 |
 | Every congress year has a config date | Yes | `test-cycle01_thresholds_contracts.R:175` | Strong |

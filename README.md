@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![R >= 4.4](https://img.shields.io/badge/R-%3E%3D%204.4-blue.svg)](https://www.r-project.org/)
-[![Tests](https://img.shields.io/badge/tests-878%20passing%2C%203%20failing-yellow.svg)](docs/VALIDATION.md)
+[![Tests](https://img.shields.io/badge/tests-900%20passing%2C%204%20failing-yellow.svg)](docs/VALIDATION.md)
 [![Shiny App](https://img.shields.io/badge/Shiny-Live%20App-orange.svg)](https://mufflyt.shinyapps.io/aagl-adjudication/)
 
 **Publication Rate, Time to Publication, and Predictors of Full Publication
@@ -66,10 +66,15 @@ is associated with *slower* publication (HR 0.62, 0.44–0.88). US location
 conduct (HR 1.39, 0.81–2.38) and reported funding (HR 1.76, 0.43–7.17) are not
 statistically distinguishable from no effect.
 
-Two cautions. The proportional-hazards assumption is only marginally supported
-(global p = 0.056 on 171 events); and the academic-affiliation estimate rests on
-a covariate whose ascertainment changed substantially in the 2026-09-03
-correction pass (148 → 371 abstracts flagged), so treat it as provisional.
+Three cautions. The proportional-hazards assumption is now **violated**
+(global p = 0.043 on 171 events). Only two terms are robust to resampling:
+across 500 bootstrap refits, `n_authors` is retained 97.2% of the time and
+`is_rct` 93.6%, while `is_academic` survives only 67.4% — it is significant in
+all twelve leave-one-congress-out refits, so it is not driven by any single
+congress, but it is not sampling-robust either. And `has_funding` is now
+excluded from both models by a near-zero-variance rule (TRUE for 7 of 1,051).
+See `output/model_predictor_stability.csv` and
+`output/model_variable_screen.csv`.
 Author gender is **registry-reported for 267 of 1,066 abstracts and inferred
 from a name for the rest**, 287 of those from a single first initial; 231 carry
 a cross-source disagreement recorded in `gender_conflict`.
@@ -209,13 +214,14 @@ Rscript scripts/rebuild_candidate_pool.R
 
 ## Test status
 
-26 test files. As of 2026-09-04: **878 passing, 3 failing, 1 skipped**
+27 test files. As of 2026-09-04: **900 passing, 4 failing, 1 skipped**
 (from 519 passing / 1 failing at the start of the day). Every failure is
 deliberately left red, each marking a decision that belongs to the author rather
 than to code:
 
 | Failing test | What it reports | Why it stays red |
 |---|---|---|
+| `test-pipeline_semantics.R:247` | Cox proportional hazards is violated (global p = 0.043) | The fix is a modelling decision — stratify, use time-varying coefficients, or report the HRs as averages over follow-up |
 | `test-cycle04_validation_sensitivity.R:179` | `search_strategy_efficacy.csv` still carries the pre-correction `title`-strategy yield of 0.2% | Regenerating it means re-running the whole search layer, which would change candidate sets and invalidate the human adjudication |
 | `test-cycle06_scoring_composite.R:83` | `keyword_pts` fires on 0 of 1,106 abstracts, so the "10-component" score has nine live components | Fixing the component changes every score and therefore every classification |
 | `test-cycle06_scoring_composite.R:116` | 3 PMIDs are credited to 6 published abstracts | Deciding which abstract owns each PMID is adjudication; surfaced in `final_pmid_shared` |
@@ -265,8 +271,9 @@ Full inventory and the list of invariants that have **no** test:
     `study_design` (p = 0.0004) and `n_authors` (p = 0.013), the latter a
     significant predictor in both models. Bounds: 16.1% if all unpublished,
     21.1% if all published. See `output/unresolved_vs_evaluated.csv`.
-11. The proportional-hazards assumption is only marginally supported
-    (global p = 0.056).
+11. The proportional-hazards assumption is **violated** (global p = 0.043); the
+    constant-hazard-ratio reading of the Cox table needs a stratified or
+    time-varying check.
 12. **Three publications are each credited to two abstracts**, so six of the 178
     numerator rows rest on three papers. The numerator is not deduplicated —
     two abstracts can legitimately merge into one paper — but the affected rows

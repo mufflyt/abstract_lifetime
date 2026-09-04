@@ -759,6 +759,7 @@ stages:
       - output/aim4_strategy_performance.csv
       - output/sensitivity_analyses.csv
       - output/cox_ph_assumption.csv
+      - output/model_variable_screen.csv
       - data/processed/km_fit.rds
       - data/processed/cox_model.rds
       - data/processed/logistic_model.rds
@@ -778,6 +779,35 @@ stages:
       Model terms are selected at run time by a missingness and level screen,
       so the specification is data-dependent. Aim 5 no longer runs because
       result_positivity is not carried into abstracts_with_matches.csv.
+
+  - id: "06d"
+    name: Model stability - bootstrap retention and leave-one-congress-out
+    script: R/06d_model_stability.R
+    in_run_all: true
+    functions:
+      - mysterycall::mysterycall_bootstrap_predictor_stability
+      - mysterycall::mysterycall_leave_one_out
+    inputs:
+      - output/final_analytical_dataset.csv
+      - output/model_variable_screen.csv
+    outputs:
+      - output/model_predictor_stability.csv
+      - output/model_leave_one_congress_out.csv
+    external_sources: []
+    grain_in: one evaluated abstract
+    grain_out: one model term / one (term x excluded congress) refit
+    primary_key: predictor
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: [tests/testthat/test-model_stability.R]
+    notes: >
+      Reads the specification back from model_variable_screen.csv so it cannot
+      drift from the model it describes. 500 bootstrap refits find only
+      n_authors (97.2%) and is_rct (93.6%) robust; is_academic survives 67.4%.
+      84 leave-one-congress-out refits all converge and no term changes
+      direction, which matters because 2017 and 2018 have no abstract text.
+      Seeded from config.yml pipeline$seed. No-op without mysterycall.
 
   - id: "06b"
     name: Missing-data analysis and the MAR assumption for the unresolved
