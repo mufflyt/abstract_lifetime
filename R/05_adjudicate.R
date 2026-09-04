@@ -97,6 +97,14 @@ results_out <- results |>
              "has_numeric_results", "is_database_study", "has_industry",
              "has_trial_registration", "has_irb_statement",
              "abstract_word_count",
+             # authors_truncated is computed at 02_clean_abstracts.R:54 and used
+             # there to suppress last-author credit, then was dropped here. With
+             # it gone nothing downstream can tell a censored author list from a
+             # genuinely short one, so author_count and n_authors read as real
+             # distributions rather than values capped by the ScienceDirect
+             # listing. Same omission-from-this-select failure as
+             # result_positivity below.
+             "authors_truncated",
              # result_positivity was dropped from this select at some point, so
              # the Aim 5 publication-bias block in 06_analyze_results.R has been
              # gated off since 2026-04-17 and output/aim5_publication_bias.csv

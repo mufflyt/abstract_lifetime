@@ -747,3 +747,75 @@ git log --notes 0bd4541 238651e c50f3de
 
 **Prevention.** From cycle 9 onward every commit stages named paths. The loop
 prompt carries the instruction so it survives a session restart.
+
+## Cycle 11 - 2026-09-04
+
+Mix required: 3 BVA / 4 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle11_authors_and_queue.R` (14 assertions).
+Targets: author-list truncation and the manual review queue. Neither touched by
+cycles 1-10 or by the concurrent remediation suite.
+
+| # | Category | Target | Assumption challenged |
+|---|---|---|---|
+| 11.1 | BVA | author_count | zero authors only for withdrawn abstracts |
+| 11.2 | BVA | author variables | no hard ceiling with mass piled on it |
+| 11.3 | BVA | review queue | every queued abstract is probable, possible or tied |
+| 11.4 | semantic | n_authors | the team-size predictor spans a usable range |
+| 11.5 | semantic | authors_truncated | the flag survives adjudication |
+| 11.6 | semantic | last-author guard | withheld exactly when the list was truncated |
+| 11.7 | semantic | review queue | contents match the stated rule |
+| 11.8 | adversarial | queue | no_match reaches it only through a tie |
+| 11.9 | adversarial | queue | no duplicates, subset of the cohort |
+| 11.10 | adversarial | first_author_normalized | present wherever authors parsed |
+
+### Defect fixed - the truncation flag was dropped at adjudication
+`02_clean_abstracts.R:54` computes `authors_truncated` by detecting the ellipsis
+ScienceDirect inserts, and correctly uses it to suppress last-author credit so a
+truncated list cannot award credit to whoever happens to be visible last (11.6
+now locks that guard).
+
+`R/05_adjudicate.R:91` then dropped the flag: the select is an explicit column
+list and `authors_truncated` was not on it. Nothing downstream could tell a
+censored author list from a genuinely short one.
+
+This is the **second** documented failure caused by omission from that same
+select. The file's own comment records the first: `result_positivity` was
+dropped the same way, which gated off the Aim 5 publication-bias block in
+`06_analyze_results.R` and left `aim5_publication_bias.csv` stale since
+2026-04-17 (FAILURE_MODES F15).
+
+Added `authors_truncated` to the select and regenerated stage 05. Verified the
+regenerated file differs from the committed one by exactly that one column, with
+no value changes in any of the other 87. Also confirmed stage 05 is
+byte-idempotent across consecutive runs, so the earlier md5 movement was a stale
+file on disk rather than non-determinism.
+
+### PENDING REGISTRATION - two findings, manifest not editable right now
+`tests/expected_failures.yaml` currently carries the concurrent agent's
+uncommitted 13-line deletion (removing the PH entry). Committing the manifest
+would take their in-flight change with it, so these two entries are recorded
+here and must be added once that edit lands.
+
+**11.2 and 11.4 - the team-size predictor is censored.**
+
+    n_authors     max 5, 532 of 1,106 rows (48.1%) sitting exactly at the cap
+    author_count  max 5, 197 of 1,106 rows (17.8%) at the cap
+
+Half the mass on the maximum is the signature of a display cap, not a
+distribution. `authors_truncated` confirms the mechanism: the ScienceDirect
+listing elides long author lists and the parser counts only what is visible.
+
+This is not a cosmetic problem. `aim3_logistic_regression.csv` reports
+`n_authors` at OR 1.325 per author, p < 0.001, and the draft abstract states
+that "the likelihood of publication increased significantly with team size
+(OR 1.32 per additional author; p<0.001)". That coefficient is estimated over a
+variable that cannot exceed 5, with 48% of observations at the boundary. "Per
+additional author" has no meaning past the cap.
+
+Unlike the funding term in cycle 3, this one is **significant and reported as a
+headline finding**. Decision needed: recover full author lists at ingestion, or
+model team size as censored, or restate the claim. All three change what the
+manuscript may say.
+
+**Result:** 11/14 assertions passed on the first run, 12/14 after the fix. Two
+failures are the finding above.
