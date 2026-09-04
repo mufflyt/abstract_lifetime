@@ -100,65 +100,10 @@ jobs:
         shell: Rscript {0}
 
       # Gate 3. Everything else, measured against tests/expected_failures.yaml.
-      #
-      # This repository preserves failing tests on purpose - each marks an open
-      # decision that belongs to the author. Failing the build on all of them
-      # meant CI had never been green and could not signal anything. This gate
-      # fails when a test fails that is NOT on the manifest, and equally when a
-      # test ON the manifest passes, so the manifest cannot quietly rot.
+      # The gate lives in tests/run_suite_gate.R so this workflow and
+      # R-CMD-check.yaml cannot drift apart on what "green" means.
       - name: Full test suite
-        run: |
-          library(testthat)
-          res <- test_dir("tests/testthat", reporter = "summary",
-                          stop_on_failure = FALSE)
-          df <- as.data.frame(res)
-
-          cat("\n--- suite summary ---\n")
-          cat("files:", length(unique(df$file)), " passed:", sum(df$passed),
-              " failed:", sum(df$failed), " errors:", sum(df$error),
-              " skipped:", sum(df$skipped), "\n")
-
-          manifest <- yaml::read_yaml("tests/expected_failures.yaml")$expected_failures
-          expected <- data.frame(
-            file = vapply(manifest, `[[`, character(1), "file"),
-            test = vapply(manifest, `[[`, character(1), "test"),
-            stringsAsFactors = FALSE
-          )
-          key <- function(f, t) paste(f, t, sep = " :: ")
-          expected_keys <- key(expected$file, expected$test)
-
-          failed <- df[df$failed > 0 | df$error > 0, ]
-          failed_keys <- key(failed$file, failed$test)
-
-          unexpected <- failed[!failed_keys %in% expected_keys, , drop = FALSE]
-          passing_df <- df[df$failed == 0 & df$error == 0, ]
-          stale <- expected_keys[expected_keys %in% key(passing_df$file, passing_df$test)]
-
-          if (nrow(failed) > 0) {
-            cat("\n--- failures ---\n")
-            for (i in seq_len(nrow(failed))) {
-              tag <- if (failed_keys[i] %in% expected_keys) "EXPECTED" else "UNEXPECTED"
-              cat(sprintf("  [%s] %s :: %s\n", tag, failed$file[i], failed$test[i]))
-            }
-          }
-
-          problems <- character()
-          if (nrow(unexpected) > 0) {
-            problems <- c(problems, sprintf(
-              "%d unexpected failure(s). Fix them, or add them to tests/expected_failures.yaml with a reason and the decision they are waiting on.",
-              nrow(unexpected)))
-          }
-          if (length(stale) > 0) {
-            cat("\n--- stale manifest entries (these now PASS) ---\n")
-            cat(paste0("  ", stale, collapse = "\n"), "\n")
-            problems <- c(problems, sprintf(
-              "%d expected-failure entr(y/ies) now pass. Remove them from tests/expected_failures.yaml.",
-              length(stale)))
-          }
-          if (length(problems) > 0) stop(paste(problems, collapse = " | "))
-
-          cat("\nSuite green:", nrow(failed), "failure(s), all on the expected-failure manifest.\n")
-        shell: Rscript {0}
+        run: Rscript tests/run_suite_gate.R
 
       - name: Lint
         run: |

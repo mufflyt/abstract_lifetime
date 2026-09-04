@@ -37,10 +37,11 @@ jobs:
             any::cli
             mufflyt/mysterycall@42d66d92ef52a0f85d1f7c61208c2ddd79d9c06e
 
+      # Same gate as tests.yaml: green when the only failures are the ones
+      # listed in tests/expected_failures.yaml, red on anything else and red if
+      # one of those starts passing.
       - name: Run tests
-        run: |
-          testthat::test_dir("tests/testthat", reporter = "summary")
-        shell: Rscript {0}
+        run: Rscript tests/run_suite_gate.R
 
       - name: Lint R files
         run: |
