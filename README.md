@@ -249,7 +249,11 @@ than to code:
 | `test-cycle06_scoring_composite.R:116` | 3 PMIDs are credited to 6 published abstracts | Deciding which abstract owns each PMID is adjudication; surfaced in `final_pmid_shared` |
 
 CI runs three gates: decision-logic boundary contracts, then mutation tests
-(every planted defect must still be killed), then the full suite.
+(every planted defect must still be killed), then the full suite measured
+against [`tests/expected_failures.yaml`](tests/expected_failures.yaml). CI is
+green only when the failures are *exactly* the four listed there — it fails on
+any other failure, and also if one of the four starts passing, so the manifest
+cannot outlive its reason.
 Full inventory and the list of invariants that have **no** test:
 [docs/VALIDATION.md](docs/VALIDATION.md).
 

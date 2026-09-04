@@ -35,6 +35,7 @@ jobs:
             any::stringr
             any::stringi
             any::cli
+            mufflyt/mysterycall@42d66d92ef52a0f85d1f7c61208c2ddd79d9c06e
 
       - name: Run tests
         run: |
