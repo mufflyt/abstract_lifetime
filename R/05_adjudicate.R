@@ -55,13 +55,36 @@ score_component_cols <- c("title_sim", "title_pts", "abstract_pts",
 # Only include score columns that exist
 available_score_cols <- intersect(score_component_cols, names(results))
 
-# Exclude pre-conference publications entirely per study protocol.
-# These are papers published BEFORE the conference date — they represent
-# pre-existing work, not conference-to-publication conversions.
+# Pre-conference publications: the CANDIDATE is invalid, the ABSTRACT is not.
+#
+# A classification of "excluded" means the best-scoring candidate was published
+# BEFORE the conference, so it cannot be that abstract's conference-to-
+# publication conversion. That is a fact about the candidate. It says nothing
+# about the abstract's eligibility for the study.
+#
+# This previously dropped the abstract from the cohort entirely:
+#
+#   results <- results |> filter(classification != "excluded")
+#
+# Those abstracts are non-events — no valid post-conference publication was
+# found for them — so removing them took non-events out of the denominator and
+# inflated the reported publication rate (17.2% against 16.6% retained). The
+# Cochrane MR000005 denominator is abstracts PRESENTED, not abstracts for which
+# a valid candidate was located, so they are now retained and counted as
+# unpublished. Every downstream consumer already maps "excluded" to
+# published = FALSE (06_analyze_results.R, 07_make_tables.R, 08_make_figures.R,
+# and the Shiny app), so retention is what those scripts were written to expect.
+#
+# Publication fields are left populated for these rows. They describe the
+# pre-conference paper that triggered the exclusion, which is the evidence for
+# the decision, and months_to_pub is negative by construction. Nothing consumes
+# months_to_pub without first gating on the published flag.
 n_excluded <- sum(results$classification == "excluded", na.rm = TRUE)
 if (n_excluded > 0) {
-  cli_alert_info("Excluding {n_excluded} pre-conference publications")
-  results <- results |> filter(classification != "excluded")
+  cli_alert_info(
+    "Retaining {n_excluded} abstracts whose best candidate predates the \\
+     conference; counted as unpublished"
+  )
 }
 
 results_out <- results |>
@@ -74,6 +97,12 @@ results_out <- results |>
              "has_numeric_results", "is_database_study", "has_industry",
              "has_trial_registration", "has_irb_statement",
              "abstract_word_count",
+             # result_positivity was dropped from this select at some point, so
+             # the Aim 5 publication-bias block in 06_analyze_results.R has been
+             # gated off since 2026-04-17 and output/aim5_publication_bias.csv
+             # went stale rather than being regenerated. See
+             # docs/FAILURE_MODES.md F15.
+             "result_positivity",
              "research_category", "primary_procedure")),
     best_pmid, best_score, classification, has_tie, n_candidates,
     all_of(available_score_cols),
@@ -91,7 +120,35 @@ for (col in intersect(pub_cols, names(results_out))) {
 }
 cli_alert_info("Blanked pub fields for {sum(wrong)} no_match/possible abstracts")
 
-write_csv(results_out, here("output", "abstracts_with_matches.csv"))
+# Carry forward enrichment columns.
+#
+# This script REBUILDS output/abstracts_with_matches.csv from scratch with the
+# 45 columns above. Six later stages (09b, 09_enrich_authors, 09c, 09d, 09e,
+# 10e) add ~40 more to the same file in place. Re-running step 5 alone - the
+# obvious thing to do after changing a threshold - therefore used to delete
+# every publication-type, author, citation, ORCID and demographic column, and
+# 06_analyze_results.R would then silently drop those terms from the Cox and
+# logistic models because it selects predictors with intersect(). See
+# docs/FAILURE_MODES.md F10.
+#
+# Columns the enrichment stages own are re-joined here on abstract_id. They are
+# refreshed by those stages on a full run; this only stops a partial run from
+# destroying them.
+matches_path <- here("output", "abstracts_with_matches.csv")
+if (file.exists(matches_path)) {
+  previous <- read_csv(matches_path, show_col_types = FALSE)
+  carry <- setdiff(names(previous), names(results_out))
+  if ("abstract_id" %in% names(previous) && length(carry) > 0) {
+    results_out <- results_out |>
+      left_join(previous |> select(abstract_id, all_of(carry)), by = "abstract_id")
+    cli_alert_info(
+      "Carried forward {length(carry)} enrichment column{?s} from the previous \
+       run: {.field {utils::head(carry, 6)}}{if (length(carry) > 6) ', ...' else ''}"
+    )
+  }
+}
+
+write_csv(results_out, matches_path)
 cli_alert_success("Full results: output/abstracts_with_matches.csv")
 
 # 2. Manual review queue (probable + possible + ties need human adjudication)

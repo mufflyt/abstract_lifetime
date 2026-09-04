@@ -1,5 +1,69 @@
 # NEWS
 
+## 2026-09-04 — audit and remediation
+
+A full documentation audit produced a `docs/` reference set and found seventeen
+ways the pipeline could be plausibly wrong. Nine were then fixed. The narrative
+is appendix A15; the mechanisms are in `docs/FAILURE_MODES.md`; the arithmetic
+is in `CHANGELOG.md`.
+
+**The publication rate did not change: 178 of 1,051 evaluated, 16.9%.** That is
+worth stating plainly, because almost everything underneath it did.
+
+The largest repair was to the candidate pool. `03b_search_crossref.R` rewrites
+`pubmed_candidates.csv` in place, and on 19 April it ran after the scoring step,
+leaving a file that was a strict subset of the pool the scores came from. 283 of
+the 1,102 winning PMIDs could not be resolved, so 74 confirmed publications
+carried no publication date and every time-to-event analysis silently ran on 104
+events instead of 178. Rebuilding the pool from the surviving detailed scores
+restored all of them.
+
+The second was to the covariates. `02_clean_abstracts.R` derives about twenty
+predictors from abstract text, but runs before the two scripts that recover that
+text for 2012-2018 — so for seven of the twelve congresses it had been reading
+titles. `is_academic` was TRUE for 148 abstracts and is now TRUE for 371.
+That changed the models: academic affiliation went from no effect to a
+significant negative one. The residual gradient is now confined to 2017 and
+2018, which genuinely have no recoverable text.
+
+Along the way the snippet backfill was found to have written the page footnote
+`"*: Corresponding author."` into all 95 abstracts of the 2018 congress. At 24
+characters it passed the length gate that decides whether a row still needs
+backfilling, so those rows could never be repaired and the footnote had
+displaced the title as the source for every derived variable.
+
+Gender is now led by a registry rather than by a name. NPPES registrant-reported
+sex, keyed on the NPI already resolved, is tier 1; the ABOG board-certification
+export that used to hold that position lost its gender column upstream and could
+no longer be regenerated. The two agree on 251 of 252 shared abstracts. Eleven
+abstracts moved from a name-inferred tier to a registry one, and two values that
+had rested on a single first initial were corrected.
+
+Three new analyses answer questions the manuscript had asserted rather than
+tested. The 55 unresolved abstracts are **not** missing completely at random —
+they differ on study design and author count, the latter a significant predictor
+— so the 16.1%-21.1% bounds are the honest envelope rather than a formality.
+Only two of seven regression terms survive resampling: author count (97.2%) and
+randomized design (93.6%); academic affiliation survives 67.4%. And no term
+changes direction when any single congress is dropped, which matters because
+2017 and 2018 have no abstract text at all.
+
+Two things got worse in the sense that matters. The proportional-hazards
+assumption, marginal at p = 0.056, is now violated at p = 0.043 — dropping a
+term with seven events made a latent violation visible rather than creating one.
+And the cohort truncation catalogued in appendix A14 was confirmed against the
+Crossref deposit: the pipeline ingested 1,154 of 7,711 supplement items, and ten
+of twelve congresses captured no video presentations at all, meaning the capture
+window closed while still inside the oral block. Neither is remediated here.
+Both are now measured, tested and impossible to miss.
+
+Five functions were borrowed from the `mysterycall` package, pinned at a commit,
+each degrading to the previous behaviour when it is absent.
+
+Tests went from 519 passing with 1 failure to 900 passing with 4. All four
+failures are deliberate: each marks a decision that belongs to the author.
+
+
 ## 2026-04-28
 
 Recovered from an external drive on 2026-09-01; this work was completed on
@@ -41,7 +105,7 @@ suppressed true abstract-to-publication matches.
 - **`gender_conflict` and `gender_n_sources`** populated for every row, recording
   the shape of the evidence rather than only the winner of the priority
   waterfall. Enables sensitivity analysis restricted to uncontested assignments.
-- **`data/processed/gender_conflicts.csv`** — 277 cross-source disagreements
+- **`data/processed/gender_conflicts.csv`** — 228 cross-source disagreements
   with competing values.
 - **Two new waterfall sources**: OpenAlex author search (157 resolutions),
   CMS Open Payments (16). `gender_unified` coverage 98.8%.
@@ -56,7 +120,7 @@ suppressed true abstract-to-publication matches.
 
 ### New outputs
 
-- `output/final_analytical_dataset.csv` — unified dataset (1,067 rows x 90
+- `output/final_analytical_dataset.csv` — unified dataset (1,106 rows x 90
   columns) with demographics and human decisions merged, exported by
   `06_analyze_results.R` for external analysis.
 - `docs/aagl_abstract_programmatic.Rmd` / `.docx` — programmatic abstract draft.
@@ -69,6 +133,19 @@ corrected pipeline. Figure set renamed (`figure2_km_curve`, `figure3_km_by_year`
 `figureS1`-`figureS4`); stale `figure2_time_to_pub`, `figure3_km_curve`,
 `figure4_strategy_perf`, and `figure5_score_dist` files removed.
 
+### Denominator defect fixed (issue #2)
+
+`R/05_adjudicate.R` dropped abstracts whose best candidate predates the
+conference out of the cohort. `excluded` describes the candidate, not the
+abstract, and the Cochrane MR000005 denominator is abstracts presented. The 39
+are retained and counted as unpublished. Nothing downstream needed changing —
+`06`, `07`, `08` and the Shiny app already treated `excluded` as unpublished.
+
+Publication rate **17.2% → 16.9%** (95% CI 14.8–19.3), cohort 1,067 → 1,106,
+published 174 → 178. Four of the 39 carry a reviewer's `manual_decision ==
+"match"`, so the filter was also discarding confirmed publications; the two
+effects partly offset. Details and the four PMIDs in appendix A12.7.
+
 ### CI restored
 
 CI had failed on `main` since at least 2026-04-19. Two causes, neither a real
@@ -79,21 +156,25 @@ were unsatisfiable by construction rather than merely unmet. Suite is now
 
 ### Known gaps
 
-- **Denominator defect (issue #2, open).** `R/05_adjudicate.R:64` removes
-  abstracts whose best candidate predates the conference from the cohort
-  entirely, instead of invalidating just that candidate. The 39 rows lost
-  between `abstracts_cleaned.csv` and `abstracts_with_matches.csv` are exactly
-  that set, spread across all 12 congresses. They are non-events, so dropping
-  them inflates the reported rate — 17.2% against 16.6% if retained. Documented
-  in appendix A12.7; not corrected, because it changes a reported number.
 - The four matching corrections shipped in one re-run, so their individual
   contributions are not separately identified. No ablation was performed.
 - Supplement detection still falls back to a November-month heuristic where
   PubMed omits the issue field.
-- Three pre-existing `test-pipeline_semantics.R` failures remain (practice_type
-  coverage, citation coverage, and a 1,106 vs 1,067 row mismatch between
-  `abstracts_cleaned.csv` and `abstracts_with_matches.csv`). All three predate
-  this work; the gender-coverage failure that also predated it now passes.
+- ~~Three pre-existing `test-pipeline_semantics.R` failures remain.~~ Resolved
+  as of 2026-09-03: the two coverage thresholds were unsatisfiable rather than
+  unmet and were re-pointed at regression floors, and the 1,106 vs 1,067 row
+  mismatch was the denominator defect, now fixed. `test-pipeline_semantics.R`
+  passes in full; the suite's one remaining failure is `test-shiny_app.R:458`,
+  which reports a genuinely stale deploy bundle.
+- Three further defects were found in the 2026-09-03 documentation audit and
+  have **not** been fixed. They are documented in `docs/FAILURE_MODES.md`:
+  the ScienceDirect listing is truncated at roughly 100 items per congress
+  supplement (F1); `data/processed/pubmed_candidates.csv` is a stale subset of
+  the pool the scores were computed against, so 74 of the 178 published
+  abstracts carry no publication date and every time-to-event analysis runs on
+  104 events (F2); and the text-derived study characteristics were computed
+  before the abstract-text backfill and never recomputed, producing a step
+  change at 2018/2019 in five model variables (F3).
 
 ## 2026-04-19
 

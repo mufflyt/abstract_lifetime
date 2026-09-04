@@ -75,12 +75,19 @@ sensitivity <- tp / (tp + fn)
 specificity <- tn / (tn + fp)
 ppv <- tp / (tp + fp)
 npv <- tn / (tn + fn)
-accuracy <- (tp + tn) / nrow(validation)
+# Rows carrying NA in truth or predicted are dropped from all four cells by
+# na.rm above, so the confusion matrix rests on n_classified, not nrow().
+# Dividing accuracy by nrow() mixed a numerator measured on one population with
+# a denominator from another. Caught by
+# tests/testthat/test-cycle04_validation_sensitivity.R.
+n_classified <- tp + fp + fn + tn
+accuracy <- (tp + tn) / n_classified
 
 metrics <- tibble::tibble(
-  metric = c("n", "true_positives", "false_positives", "false_negatives", "true_negatives",
+  metric = c("n", "n_classified", "true_positives", "false_positives",
+             "false_negatives", "true_negatives",
              "sensitivity", "specificity", "ppv", "npv", "accuracy"),
-  value = c(nrow(validation), tp, fp, fn, tn,
+  value = c(nrow(validation), n_classified, tp, fp, fn, tn,
             round(sensitivity, 3), round(specificity, 3),
             round(ppv, 3), round(npv, 3), round(accuracy, 3))
 )

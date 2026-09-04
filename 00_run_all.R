@@ -44,6 +44,14 @@ source(here("R", "02b_backfill_abstract_text.R"))
 cli_h2("Step 2c: Abstract Text Backfill (ScienceDirect snippets)")
 source(here("scripts", "backfill_sciencedirect_snippets.R"))
 
+# Step 2d: Re-derive the study characteristics now that the text exists.
+# 02 computes them from `search_text`, which for 2012-2018 is the title alone
+# because the backfills above had not yet run. Without this step the covariates
+# carry a step change at 2018/2019 that is a measurement artefact, not a trend.
+# See docs/FAILURE_MODES.md F3.
+cli_h2("Step 2d: Re-derive Study Characteristics")
+source(here("R", "02d_rederive_predictors.R"))
+
 # Step 3: Search PubMed
 cli_h2("Step 3: PubMed Search")
 source(here("R", "03_search_pubmed.R"))
@@ -112,6 +120,13 @@ source(here("R", "09i_gender_from_openalex.R"))
 cli_h2("Step 5h6: Gender from Open Payments")
 source(here("R", "09j_gender_from_open_payments.R"))
 
+# Step 5h6b: Gender from the NPPES registry (tier 1 of the waterfall).
+# Registrant-reported sex keyed on the NPI that 10_npi_matching.R resolved. Not
+# inferred from a name, and regenerable from a public registry - which the ABOG
+# gender column it supersedes no longer is. See docs/FAILURE_MODES.md F16.
+cli_h2("Step 5h6b: Gender from NPPES")
+source(here("R", "09k_gender_from_nppes.R"))
+
 # Step 5h7: Consolidate all recovered first names into first_author_first
 cli_h2("Step 5h7: Consolidate first_author_first")
 local({
@@ -140,6 +155,19 @@ local({
   readr::write_csv(matches, here("output", "abstracts_with_matches.csv"))
 })
 
+# Step 5h8: Demographics merge. R/10e_merge_demographics.R resolves the ten-tier
+# gender waterfall and joins the NPI and ORCID sidecars onto
+# output/abstracts_with_matches.csv. It was previously reachable only through
+# R/run_demographics.R, so a clean run of this pipeline produced a dataset with
+# no gender_unified, npi_* or state_unified columns, and 06_analyze_results.R
+# then dropped those model terms without warning. See docs/FAILURE_MODES.md F8.
+cli_h2("Step 5h8: Demographics Merge")
+source(here("R", "10b_resolve_names_openalex.R"))
+source(here("R", "10d_orcid_demographics.R"))
+source(here("R", "10f_senior_author_triangulation.R"))
+source(here("R", "10g_second_author_triangulation.R"))
+source(here("R", "10e_merge_demographics.R"))
+
 # Step 5i: Fidelity checks (abstract vs published paper comparison)
 cli_h2("Step 5i: Fidelity Checks")
 source(here("R", "09e_fidelity_checks.R"))
@@ -147,6 +175,18 @@ source(here("R", "09e_fidelity_checks.R"))
 # Step 6: Analyze
 cli_h2("Step 6: Analysis")
 source(here("R", "06_analyze_results.R"))
+
+# Step 6a2: Model stability. Bootstrap predictor retention and
+# leave-one-congress-out refits, so the regression findings carry a measure of
+# how much they depend on the particular sample and the particular congresses.
+cli_h2("Step 6a2: Model Stability")
+source(here("R", "06d_model_stability.R"))
+
+# Step 6b0: Missing-data analysis. Reports item-level missingness, Little's
+# MCAR test, and whether the 55 unresolved abstracts differ from the evaluated
+# set - the assumption the publication-rate denominator rests on.
+cli_h2("Step 6b0: Missing-Data Analysis")
+source(here("R", "06b_missingness.R"))
 
 # Step 6b: Gold standard validation
 cli_h2("Step 6b: Gold Standard Validation")
@@ -164,6 +204,11 @@ source(here("R", "07_make_tables.R"))
 cli_h2("Step 8: Figures")
 source(here("R", "08_make_figures.R"))
 
+# Step 8b: STROBE cohort flow chart. Derives every count from the pipeline files
+# and asserts the arithmetic with stopifnot() before drawing.
+cli_h2("Step 8b: STROBE Flow Chart")
+source(here("R", "strobe_flowchart.R"))
+
 # Step 9: Deploy Shiny adjudication app
 cli_h2("Step 9: Deploy Shiny App")
 deploy_script <- here("shiny", "adjudication_app", "deploy.R")
@@ -172,6 +217,10 @@ if (file.exists(deploy_script)) {
 } else {
   cli_alert_warning("Deploy script not found — skipping Shiny deploy")
 }
+
+# Step 10: Record the environment this run was produced in.
+cli_h2("Step 10: Session Snapshot")
+source(here("R", "06c_session_snapshot.R"))
 
 cli_h1("Pipeline Complete")
 cli_alert_success("Results in: {here('output')}")

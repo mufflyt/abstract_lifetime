@@ -1,11 +1,12 @@
 tier,source,column,resolution,description
-1,npi,gender_npi,full_name,ABOG board certification records (authoritative identity)
-2,openalex,gender_oa,full_name,Full name from abstract DOI via OpenAlex works API
-3,pubmed_fullname,gender_pubmed,full_name,Full name from PubMed author+affiliation search
-4,obgyn_pubs,gender_obgyn,full_name,Full name from OB/GYN journal author search
-5,openalex_search,gender_oax,full_name,Full name from OpenAlex works search (journal ISSN filter)
-6,orcid,gender_orcid,full_name,Full name from ORCID person profile
-7,open_payments,gender_opm,full_name,Full name from CMS Open Payments physician records
-8,senior_triangulation,gender_tri_sr,full_name,Full name from PubMed senior coauthor co-publication
-9,second_triangulation,gender_tri_2nd,full_name,Full name from PubMed second coauthor co-publication
-10,ssa,first_author_gender,initial_only,SSA baby names / genderize.io from first initial (low resolution)
+1,nppes,gender_nppes,registry,"NPPES registrant-reported sex, keyed on the resolved NPI (not inferred)"
+2,npi,gender_npi,registry,ABOG board certification records (authoritative identity)
+3,openalex,gender_oa,full_name,Full name from abstract DOI via OpenAlex works API
+4,pubmed_fullname,gender_pubmed,full_name,Full name from PubMed author+affiliation search
+5,obgyn_pubs,gender_obgyn,full_name,Full name from OB/GYN journal author search
+6,openalex_search,gender_oax,full_name,Full name from OpenAlex works search (journal ISSN filter)
+7,orcid,gender_orcid,full_name,Full name from ORCID person profile
+8,open_payments,gender_opm,full_name,Full name from CMS Open Payments physician records
+9,senior_triangulation,gender_tri_sr,full_name,Full name from PubMed senior coauthor co-publication
+10,second_triangulation,gender_tri_2nd,full_name,Full name from PubMed second coauthor co-publication
+11,ssa,first_author_gender,initial_only,SSA baby names / genderize.io from first initial (low resolution)

@@ -9,6 +9,7 @@ library(broom)
 library(cli)
 library(config)
 source(here("R", "utils_congresses.R"))
+source(here("R", "utils_decisions.R"))
 
 cfg <- config::get(file = here("config.yml"))
 
@@ -23,28 +24,12 @@ if (file.exists(manual_review_path)) {
   decisions <- read_csv(manual_review_path, show_col_types = FALSE)
   cli_alert_info("Incorporating {nrow(decisions)} manual review decisions")
 
-  # Deduplicate to latest decision per abstract (multi-reviewer abstracts would
-  # otherwise duplicate rows in results, inflating all downstream counts).
-  decisions_deduped <- decisions |>
-    filter(!is.na(reviewer)) |>
-    group_by(abstract_id) |>
-    arrange(desc(review_timestamp)) |>
-    slice(1) |>
-    ungroup()
+  # Precedence and status assignment live in R/utils_decisions.R so they can be
+  # tested directly. See tests/testthat/test-decision_precedence_bva.R and
+  # test-decision_mutation.R.
+  decisions_deduped <- dedup_decisions_for_analysis(decisions)
 
-  results <- results |>
-    left_join(decisions_deduped |> select(abstract_id, manual_decision, manual_pmid),
-              by = "abstract_id") |>
-    mutate(
-      final_published = case_when(
-        classification == "definite" ~ TRUE,
-        manual_decision == "match" ~ TRUE,
-        manual_decision == "no_match" ~ FALSE,
-        classification %in% c("no_match", "no_candidates", "excluded") ~ FALSE,
-        TRUE ~ NA  # Still pending review (probable/possible)
-      ),
-      final_pmid = coalesce(manual_pmid, best_pmid)
-    )
+  results <- assign_final_published(results, decisions_deduped)
 } else {
   cli_alert_warning("No manual review decisions found — using auto-classification only")
   results <- results |>
@@ -54,9 +39,283 @@ if (file.exists(manual_review_path)) {
     )
 }
 
+# ------------------------------------------------------------------
+# Refresh the publication fields against final_pmid.
+#
+# R/05_adjudicate.R joins publication metadata on best_pmid, and it runs BEFORE
+# the reviewer decisions are read. Two consequences it could not avoid:
+#
+#   1. Where a reviewer supplied a different PMID, the publication fields and
+#      months_to_pub still described the algorithm's candidate, not the
+#      reviewer's paper (docs/FAILURE_MODES.md F12).
+#   2. Where a reviewer confirmed a match on an abstract classified `possible`
+#      or `no_match`, 05 had already blanked the publication fields, so a
+#      confirmed publication carried no date at all.
+#
+# Both are fixed here by re-joining on final_pmid. This is a file operation
+# against the candidate pool - no network call - so 06 stays offline.
+# ------------------------------------------------------------------
+candidates_path <- here("data", "processed", "pubmed_candidates.csv")
+if (file.exists(candidates_path)) {
+  pool <- read_csv(candidates_path, show_col_types = FALSE,
+                   col_types = cols(.default = col_character()))
+
+  refreshed <- results |>
+    transmute(abstract_id, .fp = as.character(final_pmid)) |>
+    filter(!is.na(.fp)) |>
+    left_join(
+      pool |>
+        transmute(abstract_id, .fp = as.character(pmid),
+                  .pub_title = pub_title, .pub_journal = pub_journal,
+                  .pub_year = pub_year, .pub_month = pub_month,
+                  .pub_doi = pub_doi, .pub_first_author = pub_first_author) |>
+        distinct(abstract_id, .fp, .keep_all = TRUE),
+      by = c("abstract_id", ".fp")
+    )
+
+  results <- results |>
+    left_join(select(refreshed, -.fp), by = "abstract_id") |>
+    mutate(
+      .pub_month_num = case_when(
+        !is.na(suppressWarnings(as.integer(.pub_month))) ~ as.integer(.pub_month),
+        .pub_month %in% month.abb ~ match(.pub_month, month.abb),
+        TRUE ~ 1L
+      ),
+      .pub_date = if_else(!is.na(.pub_year),
+                          as.Date(sprintf("%s-%02d-01", .pub_year, .pub_month_num)),
+                          as.Date(NA)),
+      # Only fill where the outcome is TRUE: a publication field on an abstract
+      # counted unpublished would describe a rejected candidate.
+      .fill = !is.na(final_published) & final_published & !is.na(.pub_year),
+      pub_title        = if_else(.fill, .pub_title, pub_title),
+      pub_journal      = if_else(.fill, .pub_journal, pub_journal),
+      pub_doi          = if_else(.fill, .pub_doi, pub_doi),
+      pub_first_author = if_else(.fill, .pub_first_author, pub_first_author),
+      pub_year         = if_else(.fill, as.numeric(.pub_year), as.numeric(pub_year)),
+      months_to_pub    = if_else(
+        .fill,
+        as.numeric(difftime(.pub_date, conference_date_for(congress_year, cfg),
+                            units = "days")) / 30.44,
+        months_to_pub
+      )
+    )
+
+  n_pub   <- sum(results$final_published, na.rm = TRUE)
+  n_dated <- sum(results$final_published & !is.na(results$months_to_pub), na.rm = TRUE)
+  cli_alert_info("Publication dates available for {n_dated}/{n_pub} published abstracts")
+  if (n_dated < n_pub) {
+    cli_alert_warning("{n_pub - n_dated} published abstract{?s} still lack a \
+                       publication date; time-to-event analyses use {n_dated} events")
+  }
+  results <- results |> select(-starts_with(".pub"), -.fill)
+} else {
+  cli_alert_warning("No candidate pool found - publication fields not refreshed")
+}
+
+# ------------------------------------------------------------------
+# One publication credited to more than one abstract.
+#
+# The publication rate is a per-abstract quantity, and two abstracts from the
+# same group can legitimately resolve to one paper - companion analyses merged
+# before submission, or a preliminary and a final report of one study. Cochrane
+# MR000005 counts these per abstract, so the numerator is NOT deduplicated here.
+#
+# But a shared PMID is also what a wrong match looks like, so it must be visible
+# rather than buried. `final_pmid_shared` flags every published abstract whose
+# credited publication is also credited to another, and the count is reported at
+# run time. Found by tests/testthat/test-cycle06_scoring_composite.R.
+# ------------------------------------------------------------------
+shared_pmids <- results |>
+  filter(!is.na(final_published), final_published, !is.na(final_pmid)) |>
+  count(final_pmid, name = ".n") |>
+  filter(.n > 1)
+
+results <- results |>
+  mutate(final_pmid_shared = !is.na(final_published) & final_published &
+           !is.na(final_pmid) & final_pmid %in% shared_pmids$final_pmid)
+
+if (nrow(shared_pmids) > 0) {
+  n_rows <- sum(results$final_pmid_shared)
+  cli_alert_warning(
+    "{nrow(shared_pmids)} publication{?s} {?is/are} credited to {n_rows} \
+     abstracts. The numerator is not deduplicated - see final_pmid_shared."
+  )
+  results |>
+    filter(final_pmid_shared) |>
+    select(abstract_id, congress_year, classification, manual_decision,
+           final_pmid, title) |>
+    arrange(final_pmid) |>
+    write_csv(here("output", "shared_publication_matches.csv"))
+  cli_alert_info("Detail: output/shared_publication_matches.csv")
+}
+
 # Export the fully unified dataset with all demographics + human decisions for external analysis
 write_csv(results, here("output", "final_analytical_dataset.csv"))
 cli_alert_success("Exported unified dataset to output/final_analytical_dataset.csv")
+
+
+# ------------------------------------------------------------------
+# Subgroup rates, with a guard against stratifiers that are themselves
+# a function of the outcome.
+#
+# practice_type, subspecialty and career_stage are parsed from the MATCHED
+# PUBLICATION's PubMed affiliation string, so they can only exist for an
+# abstract that has a matched publication: 145 of 178 published abstracts carry
+# a practice_type against 21 of 873 unpublished. Grouping the publication rate
+# by such a variable returns ~90-100% in every stratum by construction. The
+# tables were being written with no indication of this. See
+# docs/FAILURE_MODES.md F4.
+#
+# The rate is still emitted, because it is the correct conditional quantity and
+# the manuscript reads these files, but every row now carries the availability
+# split that produced it and an explicit flag.
+# ------------------------------------------------------------------
+subgroup_rate <- function(data, var) {
+  present <- !is.na(data[[var]])
+  pub <- !is.na(data$final_published) & data$final_published
+  unpub <- !is.na(data$final_published) & !data$final_published
+
+  avail_pub   <- if (sum(pub) > 0) mean(present[pub]) else NA_real_
+  avail_unpub <- if (sum(unpub) > 0) mean(present[unpub]) else NA_real_
+  conditional <- !is.na(avail_pub) && !is.na(avail_unpub) &&
+    avail_unpub > 0 && (avail_pub / avail_unpub) > 3
+
+  if (isTRUE(conditional)) {
+    cli_alert_warning(
+      "{var} is available for {round(avail_pub * 100, 1)}% of published and \
+       {round(avail_unpub * 100, 1)}% of unpublished abstracts. It is a \
+       function of the outcome; the rates below are conditional on a match \
+       having been found and are NOT publication rates."
+    )
+  }
+
+  data |>
+    filter(!is.na(final_published), !is.na(.data[[var]])) |>
+    group_by(across(all_of(var))) |>
+    summarise(n = n(), n_published = sum(final_published),
+              rate = round(mean(final_published) * 100, 1), .groups = "drop") |>
+    mutate(
+      availability_among_published   = round(avail_pub * 100, 1),
+      availability_among_unpublished = round(avail_unpub * 100, 1),
+      outcome_conditional_stratifier = conditional
+    ) |>
+    arrange(desc(rate))
+}
+
+
+# ------------------------------------------------------------------
+# Model variable screen.
+#
+# Both models previously selected their terms with an inline rule - "< 50%
+# missing and >= 2 distinct values" - written out twice, once for the Cox model
+# and once for the logistic. docs/STATISTICAL_ANALYSIS.md flagged that as a
+# data-dependent specification: the model changes with the data and nothing
+# records what was dropped or why.
+#
+# This makes the screen a single function, adds a near-zero-variance criterion,
+# and writes the decision for every candidate to
+# output/model_variable_screen.csv so the specification is reconstructible from
+# the outputs alone.
+#
+# The near-zero-variance rule is the conventional one (Kuhn's, as used by
+# caret::nearZeroVar): a variable is near-zero-variance when the ratio of its
+# most to second-most common value exceeds `freq_cut` AND its share of distinct
+# values is below `unique_cut`. `has_funding` is TRUE for 7 of 1,051 evaluated
+# abstracts - a frequency ratio of 149:1 - and its interval spans an order of
+# magnitude in both models. "Not significant" and "not estimable" are different
+# claims, and the screen now makes that call by rule rather than by judgement.
+#
+# mysterycall::mysterycall_remove_near_zero() is used when available; the
+# fallback below implements the identical rule so the specification does not
+# depend on whether the package is installed.
+# ------------------------------------------------------------------
+NZV_FREQ_CUT <- 19
+NZV_UNIQUE_CUT <- 10
+
+#' Is a vector near-zero-variance?
+#' @param x A vector.
+#' @return Logical scalar.
+#' @keywords internal
+is_near_zero_var <- function(x) {
+  v <- x[!is.na(x)]
+  if (length(v) == 0) return(TRUE)
+  tab <- sort(table(v), decreasing = TRUE)
+  if (length(tab) == 1) return(TRUE)
+  freq_ratio <- as.numeric(tab[1]) / as.numeric(tab[2])
+  pct_unique <- 100 * length(tab) / length(v)
+  freq_ratio > NZV_FREQ_CUT && pct_unique < NZV_UNIQUE_CUT
+}
+
+#' Screen candidate model terms and record every decision
+#'
+#' @param data Model frame.
+#' @param candidates Character vector of candidate column names.
+#' @param model_label Character; which model this screen is for.
+#' @return Character vector of the terms that pass.
+#' @keywords internal
+screen_model_vars <- function(data, candidates, model_label) {
+  rows <- lapply(candidates, function(v) {
+    if (!v %in% names(data)) {
+      return(tibble::tibble(model = model_label, variable = v, kept = FALSE,
+                            pct_missing = NA_real_, n_levels = NA_integer_,
+                            reason = "absent from the model frame"))
+    }
+    vals <- data[[v]]
+    pct_na <- mean(is.na(vals))
+    n_lv <- length(unique(vals[!is.na(vals)]))
+    nzv <- is_near_zero_var(vals)
+    reason <- if (pct_na >= 0.5) {
+      "more than 50% missing"
+    } else if (n_lv < 2) {
+      "fewer than 2 distinct values"
+    } else if (nzv) {
+      sprintf("near-zero variance (freq ratio > %g, distinct < %g%%)",
+              NZV_FREQ_CUT, NZV_UNIQUE_CUT)
+    } else {
+      "kept"
+    }
+    tibble::tibble(model = model_label, variable = v, kept = reason == "kept",
+                  pct_missing = round(100 * pct_na, 1), n_levels = n_lv,
+                  reason = reason)
+  })
+  report <- dplyr::bind_rows(rows)
+
+  # Cross-check against the package implementation where it is available, so a
+  # divergence between the two is visible rather than silent.
+  if (requireNamespace("mysterycall", quietly = TRUE)) {
+    present <- report$variable[report$variable %in% names(data)]
+    if (length(present) > 0) {
+      kept_pkg <- tryCatch(
+        names(suppressMessages(
+          mysterycall::mysterycall_remove_near_zero(as.data.frame(data[, present, drop = FALSE]))
+        )),
+        error = function(e) NULL
+      )
+      if (!is.null(kept_pkg)) {
+        dropped_pkg <- setdiff(present, kept_pkg)
+        dropped_local <- report$variable[!report$kept &
+                                           grepl("near-zero", report$reason)]
+        if (!setequal(dropped_pkg, dropped_local)) {
+          cli_alert_warning(
+            "near-zero screen disagrees with mysterycall: local dropped \
+             {.val {dropped_local}}, package dropped {.val {dropped_pkg}}"
+          )
+        }
+      }
+    }
+  }
+
+  dropped <- report |> dplyr::filter(!kept)
+  if (nrow(dropped) > 0) {
+    for (i in seq_len(nrow(dropped))) {
+      cli_alert_info("{model_label}: dropping {.field {dropped$variable[i]}} - {dropped$reason[i]}")
+    }
+  }
+  .screen_log[[model_label]] <<- report
+  report$variable[report$kept]
+}
+
+.screen_log <- list()
 
 # ============================================================
 # AIM 1: Publication rate
@@ -79,9 +338,9 @@ if (n_evaluated == 0) {
 }
 
 aim1 <- tibble::tibble(
-  metric = c("total_abstracts", "published", "not_published", "pending_review",
-             "publication_rate", "ci_lower", "ci_upper"),
-  value = c(n_total, n_published, n_total - n_pending - n_published, n_pending,
+  metric = c("total_abstracts", "n_evaluated", "published", "not_published",
+             "pending_review", "publication_rate", "ci_lower", "ci_upper"),
+  value = c(n_total, n_evaluated, n_published, n_total - n_pending - n_published, n_pending,
             round(pub_rate * 100, 1),
             round(prop_test$conf.int[1] * 100, 1),
             round(prop_test$conf.int[2] * 100, 1))
@@ -117,12 +376,7 @@ if ("pub_type_canonical" %in% names(results)) {
 
 # Publication rate by practice type
 if ("practice_type" %in% names(results)) {
-  aim1_by_practice <- results |>
-    filter(!is.na(final_published), !is.na(practice_type)) |>
-    group_by(practice_type) |>
-    summarise(n = n(), n_published = sum(final_published),
-              rate = round(mean(final_published) * 100, 1), .groups = "drop") |>
-    arrange(desc(rate))
+  aim1_by_practice <- subgroup_rate(results, "practice_type")
   write_csv(aim1_by_practice, here("output", "aim1_by_practice_type.csv"))
   cli_alert_info("Publication rate by practice type:")
   print(aim1_by_practice)
@@ -130,12 +384,7 @@ if ("practice_type" %in% names(results)) {
 
 # Publication rate by subspecialty
 if ("subspecialty" %in% names(results)) {
-  aim1_by_subspec <- results |>
-    filter(!is.na(final_published), !is.na(subspecialty)) |>
-    group_by(subspecialty) |>
-    summarise(n = n(), n_published = sum(final_published),
-              rate = round(mean(final_published) * 100, 1), .groups = "drop") |>
-    arrange(desc(rate))
+  aim1_by_subspec <- subgroup_rate(results, "subspecialty")
   write_csv(aim1_by_subspec, here("output", "aim1_by_subspecialty.csv"))
   cli_alert_info("Publication rate by subspecialty:")
   print(aim1_by_subspec)
@@ -165,18 +414,37 @@ cli_h3("Aim 2: Time to Publication")
 published <- results |> filter(final_published)
 
 if (nrow(published) > 0 && "months_to_pub" %in% names(published)) {
-  ttp <- published$months_to_pub[!is.na(published$months_to_pub)]
+  # Time to publication is only defined for a publication that follows the
+  # congress. A handful of confirmed publications appeared shortly BEFORE their
+  # meeting - four are pre-conference candidates a reviewer confirmed anyway,
+  # and one is an online-first paper that appeared two weeks before the 2015
+  # congress. They belong in the numerator, because a reviewer ruled they are
+  # the abstract's publication, but a negative interval is not a time to
+  # publication and must not enter the median or the IQR.
+  dated  <- published$months_to_pub[!is.na(published$months_to_pub)]
+  ttp    <- dated[dated > 0]
+  n_pre  <- sum(dated <= 0)
+  n_none <- sum(is.na(published$months_to_pub))
+
+  if (n_pre > 0) {
+    cli_alert_info("{n_pre} confirmed publication{?s} predate their congress and \
+                    are excluded from the time-to-publication summary")
+  }
+  if (n_none > 0) {
+    cli_alert_warning("{n_none} confirmed publication{?s} have no resolvable date")
+  }
 
   aim2 <- tibble::tibble(
-    metric = c("n_with_dates", "median_months", "q1_months", "q3_months",
+    metric = c("n_published", "n_with_dates", "n_pre_congress", "n_undated",
+               "median_months", "q1_months", "q3_months",
                "mean_months", "min_months", "max_months"),
-    value = c(length(ttp),
+    value = c(nrow(published), length(ttp), n_pre, n_none,
               round(median(ttp), 1), round(quantile(ttp, 0.25), 1),
               round(quantile(ttp, 0.75), 1), round(mean(ttp), 1),
               round(min(ttp), 1), round(max(ttp), 1))
   )
 
-  cli_alert_info("Median time to publication: {round(median(ttp), 1)} months (IQR: {round(quantile(ttp, 0.25), 1)}-{round(quantile(ttp, 0.75), 1)})")
+  cli_alert_info("Median time to publication: {round(median(ttp), 1)} months (IQR: {round(quantile(ttp, 0.25), 1)}-{round(quantile(ttp, 0.75), 1)}) on {length(ttp)}/{nrow(published)} published")
 
   # Kaplan-Meier analysis
   # Create survival object: event = publication, time = months since conference
@@ -207,21 +475,14 @@ if (nrow(published) > 0 && "months_to_pub" %in% names(published)) {
     cli_alert_success("Kaplan-Meier model saved")
 
     # Cox proportional hazards model (Cochrane MR000005 requirement)
-    cox_vars <- intersect(
-      c("is_rct", "log_sample_size", "is_academic", "is_us_based",
-        "session_type", "n_authors", "gender_unified",
-        "practice_type", "is_multicenter", "has_funding"),
-      names(km_data)
-    )
-    # Only include variables with >=2 levels and <50% missing
-    cox_formula_parts <- character()
-    for (v in cox_vars) {
-      vals <- km_data[[v]]
-      if (is.null(vals)) next
-      pct_na <- mean(is.na(vals))
-      n_levels <- length(unique(vals[!is.na(vals)]))
-      if (pct_na < 0.5 && n_levels >= 2) cox_formula_parts <- c(cox_formula_parts, v)
-    }
+    # NOT pre-intersected with names(km_data): a candidate that never exists
+    # must be recorded as absent rather than vanish. `log_sample_size` is the
+    # standing example - it is listed as a Cox candidate but is only ever
+    # created inside the Aim 3 block, so it has never entered the Cox model.
+    cox_vars <- c("is_rct", "log_sample_size", "is_academic", "is_us_based",
+                  "session_type", "n_authors", "gender_unified",
+                  "practice_type", "is_multicenter", "has_funding")
+    cox_formula_parts <- screen_model_vars(km_data, cox_vars, "cox")
 
     if (length(cox_formula_parts) >= 2) {
       cox_formula <- as.formula(paste("Surv(time, event) ~",
@@ -279,18 +540,11 @@ model_data <- results |>
 if (nrow(model_data) >= 20 && length(unique(model_data$published_int)) >= 2) {
   # Expanded logistic regression (Cochrane MR000005: include presentation type,
   # author demographics, result direction, and temporal effects)
-  extra_vars <- intersect(
-    c("session_type", "n_authors", "gender_unified",
-      "practice_type", "is_multicenter", "has_funding", "subspecialty"),
-    names(model_data)
-  )
-  # Filter to variables with enough variation
-  usable_extras <- character()
-  for (v in extra_vars) {
-    vals <- model_data[[v]]
-    if (!is.null(vals) && mean(is.na(vals)) < 0.5 &&
-        length(unique(vals[!is.na(vals)])) >= 2) usable_extras <- c(usable_extras, v)
-  }
+  extra_vars <- c("session_type", "n_authors", "gender_unified",
+                  "practice_type", "is_multicenter", "has_funding", "subspecialty")
+  # The four core terms are pre-specified and are NOT screened out; only the
+  # optional extras go through the screen.
+  usable_extras <- screen_model_vars(model_data, extra_vars, "logistic")
   logit_formula <- as.formula(paste(
     "published_int ~ is_rct + log_sample_size + is_academic + is_us_based",
     if (length(usable_extras) > 0) paste("+", paste(usable_extras, collapse = " + ")) else ""
@@ -310,8 +564,13 @@ if (nrow(model_data) >= 20 && length(unique(model_data$published_int)) >= 2) {
       tidy(model, exponentiate = TRUE, conf.int = FALSE)
     }
   )
+  # The model is complete-case, so its N is smaller than the publication-rate
+  # denominator and cannot be recovered from a coefficient table alone. Carry it
+  # on every row so an odds ratio is never reported without the sample it was
+  # estimated from. Caught by tests/testthat/test-cycle03_model_contracts.R.
   aim3 <- model_tidy |>
-    mutate(across(where(is.numeric), ~ round(.x, 3)))
+    mutate(across(where(is.numeric), ~ round(.x, 3))) |>
+    mutate(n_obs = stats::nobs(model))
 
   write_csv(aim3, here("output", "aim3_logistic_regression.csv"))
   saveRDS(model, here("data", "processed", "logistic_model.rds"))
@@ -415,6 +674,11 @@ cli_alert_success("Strategy ablation analysis complete")
 # ============================================================
 # Save all aim summaries
 # ============================================================
+if (length(.screen_log) > 0) {
+  write_csv(bind_rows(.screen_log), here("output", "model_variable_screen.csv"))
+  cli_alert_success("Model variable screen: output/model_variable_screen.csv")
+}
+
 write_csv(aim1, here("output", "aim1_publication_rate.csv"))
 write_csv(aim2, here("output", "aim2_time_to_pub.csv"))
 if (exists("aim3")) write_csv(aim3, here("output", "aim3_logistic_regression.csv"))
@@ -478,18 +742,25 @@ sens_rows <- list()
 # Definite-only publication rate
 n_def <- sum(results$classification == "definite", na.rm = TRUE)
 sens_rows[[1]] <- tibble(scenario = "Definite only",
+                         denominator = "cohort",
                          n = n_total, n_published = n_def,
                          rate = round(n_def / n_total * 100, 1))
 
 # Definite + probable (treats all probable as published)
 n_prob <- sum(results$classification %in% c("definite", "probable"), na.rm = TRUE)
 sens_rows[[2]] <- tibble(scenario = "Definite + probable",
+                         denominator = "cohort",
                          n = n_total, n_published = n_prob,
                          rate = round(n_prob / n_total * 100, 1))
 
 # Definite + reviewer-confirmed
 n_confirmed <- sum(results$final_published, na.rm = TRUE)
+# Scenarios 1-2 are decidable without a reviewer, so they divide by the cohort.
+# Scenario 3 onward require an adjudicated outcome and divide by the evaluated
+# set. The `denominator` column states which, because a reader comparing 11.8%
+# with 16.9% is otherwise comparing two different populations.
 sens_rows[[3]] <- tibble(scenario = "Definite + reviewer-confirmed",
+                         denominator = "evaluated",
                          n = n_total - sum(is.na(results$final_published)),
                          n_published = n_confirmed,
                          rate = round(n_confirmed / (n_total - sum(is.na(results$final_published))) * 100, 1))
@@ -508,6 +779,7 @@ for (window_mo in c(12, 24, 36, 48)) {
   if (nrow(sub) > 0) {
     sens_rows[[length(sens_rows) + 1]] <- tibble(
       scenario = paste0("Published within ", window_mo, " months"),
+      denominator = "evaluated with sufficient follow-up",
       n = nrow(sub), n_published = sum(sub$pub_in_window),
       rate = round(mean(sub$pub_in_window) * 100, 1))
   }

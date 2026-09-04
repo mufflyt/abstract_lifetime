@@ -1,0 +1,71 @@
+# expected_failures.yaml — tests that are deliberately left failing.
+#
+# This repository preserves failing tests on purpose. Each one marks an open
+# scientific or methodological decision that belongs to the author, and
+# weakening the assertion would hide the question. See tests/loop/LEDGER.md and
+# docs/VALIDATION.md.
+#
+# The consequence, until now, was that CI had never once been green, so it could
+# not signal anything: a genuine regression looked exactly like the standing
+# four. This manifest restores the signal. The `Full test suite` gate in
+# .github/workflows/tests.yaml fails when
+#
+#   * any test fails that is NOT listed here, or
+#   * any test listed here PASSES.
+#
+# The second rule matters as much as the first. It stops the list from rotting:
+# when a decision is finally taken and the assertion starts holding, CI goes red
+# until the entry is removed, so the manifest cannot quietly outlive its reason.
+#
+# Adding an entry is a deliberate act. It needs a reason and the decision it is
+# waiting on. It is not a way to make a red test go away.
+
+expected_failures:
+
+  - file: test-pipeline_semantics.R
+    test: PH assumption holds
+    reason: >
+      Cox proportional hazards is violated, global cox.zph p = 0.043. It was
+      0.32 when the model had 104 events, 0.056 once the candidate-pool repair
+      raised that to 171, and 0.043 once the variable screen dropped
+      has_funding. Removing a near-constant term made a latent violation
+      visible rather than creating one.
+    decision_needed: >
+      Stratify the Cox model, allow time-varying coefficients, or report the
+      hazard ratios explicitly as averages over follow-up.
+    documented_in: docs/STATISTICAL_ANALYSIS.md, appendix A15.4
+
+  - file: test-cycle06_scoring_composite.R
+    test: no scoring component is structurally dead
+    reason: >
+      keyword_pts is 0 for all 1,106 abstracts, so the composite described as
+      ten-component has nine live components. The abstract side holds TF tokens
+      and the PubMed side holds MeSH-style phrases; they never intersect at the
+      required threshold of three.
+    decision_needed: >
+      Repairing the component changes every composite score and therefore every
+      classification, which invalidates the human adjudication recorded against
+      the current scores.
+    documented_in: docs/MATCHING_ALGORITHM.md section 1
+
+  - file: test-cycle06_scoring_composite.R
+    test: no PMID is counted as the publication of more than one abstract
+    reason: >
+      Three PMIDs are each credited to two published abstracts, so six of the
+      178 numerator rows rest on three papers. One of the three is counted
+      published against an explicit reviewer no_match.
+    decision_needed: >
+      Deciding which abstract owns each PMID is adjudication, not code. The
+      evidence is in output/shared_publication_matches.csv.
+    documented_in: docs/FAILURE_MODES.md F17
+
+  - file: test-cycle04_validation_sensitivity.R
+    test: no search strategy is silently contributing nothing
+    reason: >
+      output/search_strategy_efficacy.csv still records the title strategy
+      hitting 3 of 1,742 queries (0.2%). That is a pre-correction measurement:
+      the April 2026 fix to the title phrase search invalidated it.
+    decision_needed: >
+      Regenerating it means re-running the whole search layer, which would
+      change candidate sets and invalidate the human adjudication.
+    documented_in: docs/PUBLICATION_SEARCH.md section 8

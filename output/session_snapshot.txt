@@ -1,0 +1,61 @@
+============================================================
+=== REPRODUCIBILITY SNAPSHOT ===
+============================================================
+Date/Time: 2026-09-03 20:10:04 MDT
+R Version: R version 4.4.2 (2024-10-31)
+Platform:  x86_64-apple-darwin20
+
+=== SEEDS ===
+NA                             42
+
+=== LOADED PACKAGES ===
+cli                            3.6.6
+config                         0.3.2
+here                           1.0.2
+
+=== FULL SESSION INFO ===
+R version 4.4.2 (2024-10-31)
+Platform: x86_64-apple-darwin20
+Running under: macOS Ventura 13.7.8
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/Denver
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] config_0.3.2 cli_3.6.6    here_1.0.2  
+
+loaded via a namespace (and not attached):
+ [1] gt_1.3.0               generics_0.1.4         xml2_1.6.0            
+ [4] stringi_1.8.7          lattice_0.22-6         npi_0.3.0             
+ [7] hms_1.1.4              lme4_2.0-6             digest_0.6.39         
+[10] magrittr_2.0.5         grid_4.4.2             timechange_0.4.0      
+[13] RColorBrewer_1.1-3     fastmap_1.2.0          rprojroot_2.1.1       
+[16] Matrix_1.7-1           backports_1.5.1        httr_1.4.8            
+[19] scales_1.4.0           reformulas_0.4.4       Rdpack_2.6.6          
+[22] rlang_1.3.0            rbibutils_2.4.1        performance_0.17.1    
+[25] splines_4.4.2          yaml_2.3.12            tools_4.4.2           
+[28] tzdb_0.5.0             nloptr_2.2.1           checkmate_2.3.4       
+[31] minqa_1.2.8            dplyr_1.2.1            ggplot2_4.0.3         
+[34] boot_1.3-31            vctrs_0.7.3            R6_2.6.1              
+[37] lifecycle_1.0.5        lubridate_1.9.5        snakecase_0.11.1      
+[40] stringr_1.6.0          fs_2.1.0               MASS_7.3-61           
+[43] insight_1.5.2          janitor_2.2.1          pkgconfig_2.0.3       
+[46] pillar_1.11.1          gtable_0.3.6           Rcpp_1.1.2            
+[49] glue_1.8.1             tibble_3.3.1           tidyselect_1.2.1      
+[52] dichromat_2.0-0.1      farver_2.1.2           mysterycall_1.6.3.9000
+[55] htmltools_0.5.9        nlme_3.1-166           readr_2.2.0           
+[58] compiler_4.4.2         S7_0.2.2              
+
+=== NOTES ===
+abstract_lifetime pipeline. Cohort and outputs under output/. mysterycall pinned at 42d66d92 (see docs/REPRODUCIBILITY.md).
+

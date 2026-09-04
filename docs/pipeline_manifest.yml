@@ -1,0 +1,1042 @@
+# pipeline_manifest.yml — machine-readable description of the pipeline as it
+# actually exists in this repository. Prose form: docs/PIPELINE.md.
+#
+# Verified against the working tree on 2026-09-03 at commit 665c551.
+# tests/testthat/test-docs_drift.R asserts that every `script` and every
+# `inputs`/`outputs` path marked authoritative resolves on disk.
+#
+# `in_run_all` records whether 00_run_all.R sources the script. Ten pipeline
+# scripts are not reachable from it; see PIPELINE.md.
+
+meta:
+  repository: abstract_lifetime
+  commit: 665c551b74f4c6b2796de03b23596f27e6f7ac9d
+  branch: fix/denominator-excluded-abstracts
+  verified: 2026-09-03
+  cohort_n: 1106
+  denominator_n: 1051
+  published_n: 178
+  unresolved_n: 55
+  publication_rate: 0.1694
+
+stages:
+
+  - id: "01b"
+    name: Parse JMIG AAGL supplements from ScienceDirect
+    script: R/01b_parse_web.R
+    in_run_all: true
+    functions: [scrape_listing_page, parse_sd_item, sd_pii_from_url,
+                fetch_sd_html_cached, fetch_article_abstract]
+    inputs:
+      - "config.yml#congresses[*].sciencedirect_url"
+    outputs:
+      - data/processed/abstracts_parsed_web.csv
+      - data/processed/abstracts_parsed.csv
+    external_sources: [ScienceDirect issue listing, ScienceDirect article pages]
+    grain_in: one ScienceDirect listing item
+    grain_out: one congress presentation
+    primary_key: abstract_id
+    cache: data/cache/sd_html/ (1154 files, gitignored, currently unrefetchable - HTTP 403)
+    manual_step: false
+    reproducible: false
+    tests: []
+    notes: >
+      Short-circuits when the parsed CSV already covers every configured
+      congress with >= 80 rows each, so the scrape has not run since
+      2026-04-19. Captures only the first ~100 listing items per congress
+      against 392-852 supplement items in Crossref. See FAILURE_MODES.md F1.
+
+  - id: "01_pdf"
+    name: PDF fallback parser
+    script: R/01_parse_pdf.R
+    in_run_all: conditional
+    functions: []
+    inputs: [data/raw/ (does not exist)]
+    outputs: [data/processed/abstracts_parsed_pdf.csv]
+    external_sources: [AAGL supplement PDF]
+    grain_in: one PDF page
+    grain_out: one congress presentation
+    primary_key: abstract_id
+    cache: null
+    manual_step: true
+    reproducible: false
+    tests: []
+    notes: Sourced only when abstracts_parsed.csv is absent. Has never run.
+
+  - id: "01c"
+    name: Compare web and PDF sources
+    script: R/01c_compare_sources.R
+    in_run_all: conditional
+    functions: []
+    inputs: [data/processed/abstracts_parsed_web.csv, data/processed/abstracts_parsed_pdf.csv]
+    outputs: []
+    external_sources: []
+    grain_in: one congress presentation
+    grain_out: comparison report
+    primary_key: abstract_id
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: Gated on a PDF file that has never existed; never fires.
+
+  - id: "01d"
+    name: Tag programme section (Oral / Video / Poster)
+    script: R/01d_tag_session_type.R
+    in_run_all: true
+    functions: [tag_one_congress, pii_from_url, merge_session]
+    inputs:
+      - "config.yml#congresses[*].sciencedirect_url"
+      - data/processed/abstracts_parsed_web.csv
+    outputs:
+      - data/processed/abstracts_parsed_web.csv
+      - data/processed/abstracts_parsed.csv
+      - data/processed/abstracts_cleaned.csv
+      - output/abstracts_with_matches.csv
+    external_sources: [ScienceDirect supplement table of contents]
+    grain_in: one TOC node
+    grain_out: one congress presentation
+    primary_key: abstract_id
+    cache: null
+    manual_step: false
+    reproducible: false
+    tests: [tests/testthat/test-pipeline_semantics.R]
+    notes: >
+      Writes session_type in place into four files. Walks h3.section-title and
+      li.js-article-list-item in DOM order.
+
+  - id: "02"
+    name: Clean abstracts, define the cohort, derive predictors
+    script: R/02_clean_abstracts.R
+    in_run_all: true
+    functions: [normalize_title, normalize_author, normalize_authors,
+                extract_keywords, classify_result_positivity]
+    inputs: [data/processed/abstracts_parsed.csv]
+    outputs: [data/processed/abstracts_cleaned.csv]
+    external_sources: []
+    grain_in: one congress presentation (1154)
+    grain_out: one eligible oral presentation (1106)
+    primary_key: abstract_id
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests:
+      - tests/testthat/test-pipeline_semantics.R
+      - tests/testthat/test-utils_text.R
+      - tests/testthat/test-utils_classify.R
+      - tests/testthat/test-utils_positivity.R
+    notes: >
+      Applies the only cohort exclusion (48 videos). Derives ~20 predictors by
+      regex over search_text, which is title-only for 2012-2018 because the
+      text backfill runs afterwards. See FAILURE_MODES.md F3.
+
+  - id: "02b"
+    name: Backfill abstract text from PubMed XML
+    script: R/02b_backfill_abstract_text.R
+    in_run_all: true
+    functions: [fetch_pubmed_by_doi, parse_abstract_from_xml]
+    inputs: [data/processed/abstracts_cleaned.csv]
+    outputs: [data/processed/abstracts_cleaned.csv]
+    external_sources: [NCBI E-utilities]
+    grain_in: one abstract with a DOI and no text
+    grain_out: one abstract with abstract_text patched
+    primary_key: abstract_id
+    cache: data/cache/pubmed_xml/
+    manual_step: false
+    reproducible: true
+    tests: [tests/testthat/test-shiny_app.R]
+    notes: Patches abstract_text only. Section columns and predictors are untouched.
+
+  - id: "02c"
+    name: Backfill abstract text from cached ScienceDirect snippets
+    script: scripts/backfill_sciencedirect_snippets.R
+    in_run_all: true
+    functions: []
+    inputs: [data/processed/abstracts_cleaned.csv, data/cache/sd_html/]
+    outputs: [data/processed/abstracts_cleaned.csv]
+    external_sources: ["ScienceDirect #preview-section-snippets"]
+    grain_in: one abstract with no text
+    grain_out: one abstract with abstract_text patched
+    primary_key: abstract_id
+    cache: data/cache/sd_html/
+    manual_step: false
+    reproducible: false
+    tests: [tests/testthat/test-shiny_app.R]
+    notes: Same limitation as 02b.
+
+  - id: "02d"
+    name: Re-derive study characteristics after the text backfill
+    script: R/02d_rederive_predictors.R
+    in_run_all: true
+    functions: [classify_result_positivity]
+    inputs: [data/processed/abstracts_cleaned.csv]
+    outputs: [data/processed/abstracts_cleaned.csv]
+    external_sources: []
+    grain_in: one eligible oral presentation
+    grain_out: one eligible oral presentation
+    primary_key: abstract_id
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: [tests/testthat/test-docs_drift.R]
+    notes: >
+      Recomputes the ~20 text-derived covariates over the post-backfill
+      abstract_text, using the same rules as 02. Covariates only - it does not
+      touch title, authors or keywords, which feed the search and the score.
+      Also clears 96 degenerate abstract_text values (the footnote
+      "*: Corresponding author." written into every 2018 row by the snippet
+      backfill). Fixes docs/FAILURE_MODES.md F3.
+
+  - id: "03"
+    name: Six-strategy PubMed search
+    script: R/03_search_pubmed.R
+    in_run_all: true
+    functions: [build_search_strategies, build_date_filter, rate_limited_search,
+                search_abstract, fetch_pubmed_details, parse_pubmed_xml,
+                is_supplement_article]
+    inputs: [data/processed/abstracts_cleaned.csv]
+    outputs:
+      - data/processed/pubmed_candidates.csv
+      - data/processed/pubmed_strategy_results.csv
+      - output/search_strategy_efficacy.csv
+    external_sources: [NCBI E-utilities]
+    grain_in: one abstract
+    grain_out: one (abstract_id x pmid) candidate pair
+    primary_key: [abstract_id, pmid]
+    cache: data/cache/checkpoints/pubmed_search_checkpoint.rds
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: >
+      A failed API call is indistinguishable from a zero result
+      (FAILURE_MODES.md F5). The checkpoint resumes but never invalidates (F6).
+
+  - id: "03b"
+    name: Supplementary search - CrossRef, Europe PMC, OpenAlex, Semantic Scholar
+    script: R/03b_search_crossref.R
+    in_run_all: true
+    functions: [search_crossref, search_europmc, search_openalex,
+                search_semantic_scholar, fetch_pubmed_details]
+    inputs:
+      - data/processed/abstracts_cleaned.csv
+      - data/processed/pubmed_candidates.csv
+      - data/processed/doi_chain_candidates.csv
+    outputs:
+      - data/processed/crossref_candidates.csv
+      - data/processed/europmc_candidates.csv
+      - data/processed/openalex_candidates.csv
+      - data/processed/semantic_scholar_candidates.csv
+      - data/processed/pubmed_candidates.csv
+    external_sources: [CrossRef REST, Europe PMC REST, OpenAlex, Semantic Scholar Graph]
+    grain_in: one abstract
+    grain_out: one (abstract_id x pmid) candidate pair
+    primary_key: [abstract_id, pmid]
+    cache:
+      - data/cache/checkpoints/europmc_search_checkpoint.rds
+      - data/cache/checkpoints/openalex_search_checkpoint.rds
+      - data/cache/checkpoints/semantic_scholar_checkpoint.rds
+    manual_step: false
+    reproducible: true
+    tests: [tests/testthat/test-utils_crossref.R]
+    notes: >
+      Rewrites pubmed_candidates.csv in place - the mechanism behind
+      FAILURE_MODES.md F2. Its inline JMIG supplement filter and
+      search_europmc() still use the pre-April-2026 over-broad rule.
+
+  - id: "03c"
+    name: DOI-chain reverse-citation search
+    script: R/03c_doi_chain_search.R
+    in_run_all: true
+    functions: []
+    inputs: [data/processed/abstracts_cleaned.csv]
+    outputs: [data/processed/doi_chain_candidates.csv]
+    external_sources: [OpenAlex cited-by]
+    grain_in: one abstract DOI
+    grain_out: one citing work
+    primary_key: [abstract_id, pmid]
+    cache: data/cache/checkpoints/doi_chain_checkpoint.rds
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: Merged into the candidate pool by stage 03b on the following run.
+
+  - id: "04"
+    name: Composite scoring and classification
+    script: R/04_score_matches.R
+    in_run_all: true
+    functions: [score_abstract_candidates, score_match, classify_match,
+                jaccard_similarity, compute_text_similarity]
+    inputs:
+      - data/processed/abstracts_cleaned.csv
+      - data/processed/pubmed_candidates.csv
+    outputs:
+      - data/processed/match_scores.csv
+      - data/processed/match_scores_detailed.rds
+    external_sources: []
+    grain_in: one (abstract x candidate) pair
+    grain_out: one abstract with its best candidate
+    primary_key: abstract_id
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests:
+      - tests/testthat/test-utils_scoring.R
+      - tests/testthat/test-cycle01_thresholds_contracts.R
+      - tests/testthat/test-pipeline_semantics.R
+    notes: >
+      64718 pairs scored. keyword_pts is 0 for every abstract, so the
+      "10-component" score is functionally nine-component.
+
+  - id: "05"
+    name: Adjudication join and review queue
+    script: R/05_adjudicate.R
+    in_run_all: true
+    functions: [conference_date_for]
+    inputs:
+      - data/processed/abstracts_cleaned.csv
+      - data/processed/match_scores.csv
+      - data/processed/pubmed_candidates.csv
+    outputs:
+      - output/abstracts_with_matches.csv
+      - output/manual_review_queue.csv
+    external_sources: []
+    grain_in: one abstract
+    grain_out: one abstract with publication metadata
+    primary_key: abstract_id
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: [tests/testthat/test-pipeline_semantics.R]
+    notes: >
+      Creates output/abstracts_with_matches.csv from scratch with 45 columns;
+      re-running it alone destroys every enrichment column (F10). 283 of 1102
+      best_pmid values do not resolve against the stale candidate file (F2).
+
+  - id: adjudication
+    name: Human adjudication (Shiny + Google Sheets)
+    script: shiny/adjudication_app/app.R
+    in_run_all: deploy only
+    functions: [gs_read_decisions, gs_append_decision, gs_dedup_sheet, dedup_decisions]
+    inputs:
+      - output/manual_review_queue.csv
+      - output/abstracts_with_matches.csv
+      - data/processed/abstracts_cleaned.csv
+      - data/processed/match_scores_detailed.rds
+      - data/processed/pubmed_candidates.csv
+    outputs:
+      - output/manual_review_decisions.csv
+    external_sources:
+      - Google Sheet 1d2YAsndMxCPK0AQMHw4bgKp3glFg_znGj8Riq5YpfaI, worksheet "decisions"
+    grain_in: one abstract in the review queue
+    grain_out: one decision by one reviewer at one time
+    primary_key: [abstract_id, reviewer, review_timestamp]
+    cache: shiny/adjudication_app/bundle/ (135 days stale)
+    manual_step: true
+    reproducible: false
+    tests:
+      - tests/testthat/test-shiny_app.R
+      - tests/testthat/test-shiny_e2e.R
+    notes: >
+      Decision vocabulary is exactly match / no_match / skip. Review is not
+      blinded to the algorithm. The Google Sheet is the live store; the CSV is
+      a manual export.
+
+  - id: "09b"
+    name: Publication-type enrichment
+    script: R/09b_enrich_pub_types.R
+    in_run_all: true
+    functions: [canonical_pub_type]
+    inputs: [output/abstracts_with_matches.csv, output/manual_review_decisions.csv]
+    outputs: [data/processed/matched_pub_types.csv, output/abstracts_with_matches.csv]
+    external_sources: [NCBI E-utilities]
+    grain_in: one abstract with a matched PMID
+    grain_out: one abstract with pub_types and pub_type_canonical
+    primary_key: abstract_id
+    cache: data/cache/pubmed_xml/
+    manual_step: false
+    reproducible: true
+    tests: [tests/testthat/test-utils_pub_types.R]
+    notes: null
+
+  - id: "09"
+    name: Author names and affiliations from PubMed XML
+    script: R/09_enrich_authors.R
+    in_run_all: true
+    functions: [fetch_pubmed_xml]
+    inputs: [output/abstracts_with_matches.csv, output/manual_review_decisions.csv]
+    outputs: [data/processed/authors_pubmed.csv]
+    external_sources: [NCBI E-utilities]
+    grain_in: one matched publication
+    grain_out: one author of one matched publication
+    primary_key: [abstract_id, author_position]
+    cache: data/cache/pubmed_xml/
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: null
+
+  - id: "09c"
+    name: First-author characteristics and SSA/genderize gender
+    script: R/09c_author_characteristics.R
+    in_run_all: true
+    functions: [parse_us_state, parse_country, acog_district_for_state,
+                classify_practice_type, classify_subspecialty, classify_career_stage]
+    inputs:
+      - data/processed/authors_pubmed.csv
+      - output/abstracts_with_matches.csv
+      - data/processed/abstracts_cleaned.csv
+      - data/validation/international_gender_lookup.csv
+      - data/validation/teaching_hospital_names.txt
+    outputs: [data/processed/author_characteristics.csv]
+    external_sources: [SSA name data via the gender package, genderize.io]
+    grain_in: one author of one matched publication
+    grain_out: one abstract, first-author characteristics
+    primary_key: abstract_id
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests:
+      - tests/testthat/test-utils_affiliation.R
+      - tests/testthat/test-utils_states.R
+      - tests/testthat/test-utils_acog.R
+    notes: >
+      practice_type and subspecialty exist only for abstracts with a matched
+      publication, so they are outcome-conditional (F4).
+
+  - id: "09d"
+    name: Citation counts and journal impact proxy
+    script: R/09d_enrich_metrics.R
+    in_run_all: true
+    functions: [oa_get]
+    inputs: [output/abstracts_with_matches.csv]
+    outputs: [data/processed/publication_metrics.csv, output/abstracts_with_matches.csv]
+    external_sources: [OpenAlex works and sources endpoints]
+    grain_in: one matched DOI
+    grain_out: one abstract with cited_by_count and journal_impact_proxy
+    primary_key: abstract_id
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: [tests/testthat/test-pipeline_semantics.R]
+    notes: null
+
+  - id: 09e_orcid
+    name: ORCID profile enrichment
+    script: R/09e_enrich_orcid.R
+    in_run_all: true
+    functions: [classify_career_stage, classify_subspecialty]
+    inputs: [output/abstracts_with_matches.csv]
+    outputs: [data/processed/orcid_enrichment.csv, output/abstracts_with_matches.csv]
+    external_sources: [ORCID public API]
+    grain_in: one first author
+    grain_out: one abstract with orcid_* columns
+    primary_key: abstract_id
+    cache: data/cache/orcid/
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: null
+
+  - id: 09e_fidelity
+    name: Abstract-versus-paper fidelity checks
+    script: R/09e_fidelity_checks.R
+    in_run_all: true
+    functions: []
+    inputs: [output/abstracts_with_matches.csv]
+    outputs: [data/processed/fidelity_checks.csv]
+    external_sources: []
+    grain_in: one matched pair
+    grain_out: one comparison
+    primary_key: abstract_id
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: Descriptive only; nothing in the outcome definition consults it.
+
+  - id: "09f"
+    name: Gender from PubMed author search (waterfall tier 3)
+    script: R/09f_enrich_gender_from_pubmed.R
+    in_run_all: true
+    functions: []
+    inputs: [output/abstracts_with_matches.csv]
+    outputs: [data/processed/gender_from_pubmed.csv]
+    external_sources: [NCBI E-utilities]
+    grain_in: one first author
+    grain_out: one abstract with a recovered given name
+    primary_key: abstract_id
+    cache: data/cache/pubmed_author/
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: null
+
+  - id: "09g"
+    name: Gender from ORCID person records (waterfall tier 6)
+    script: R/09g_gender_from_orcid.R
+    in_run_all: true
+    functions: []
+    inputs: [output/abstracts_with_matches.csv]
+    outputs: [data/processed/gender_from_orcid.csv]
+    external_sources: [ORCID public API]
+    grain_in: one first author
+    grain_out: one abstract with a recovered given name
+    primary_key: abstract_id
+    cache: data/cache/orcid/
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: null
+
+  - id: "09h"
+    name: Gender from OB/GYN journal author search (waterfall tier 4)
+    script: R/09h_gender_from_obgyn_pubs.R
+    in_run_all: true
+    functions: []
+    inputs: [output/abstracts_with_matches.csv]
+    outputs: [data/processed/gender_from_obgyn_pubs.csv]
+    external_sources: [NCBI E-utilities]
+    grain_in: one first author
+    grain_out: one abstract with a recovered given name
+    primary_key: abstract_id
+    cache: data/cache/pubmed_obgyn/
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: null
+
+  - id: "09i"
+    name: Gender from OpenAlex works search (waterfall tier 5)
+    script: R/09i_gender_from_openalex.R
+    in_run_all: true
+    functions: []
+    inputs: [output/abstracts_with_matches.csv]
+    outputs: [data/processed/gender_from_openalex.csv]
+    external_sources: [OpenAlex]
+    grain_in: one first author
+    grain_out: one abstract with a recovered given name
+    primary_key: abstract_id
+    cache: data/cache/openalex_author/
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: null
+
+  - id: "09j"
+    name: Gender from CMS Open Payments (waterfall tier 7)
+    script: R/09j_gender_from_open_payments.R
+    in_run_all: true
+    functions: []
+    inputs: [output/abstracts_with_matches.csv]
+    outputs: [data/processed/gender_from_open_payments.csv]
+    external_sources: [CMS Open Payments API]
+    grain_in: one first author
+    grain_out: one abstract with a recovered given name
+    primary_key: abstract_id
+    cache: data/cache/open_payments/
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: null
+
+  - id: "09k"
+    name: Gender from the NPPES registry (waterfall tier 1)
+    script: R/09k_gender_from_nppes.R
+    in_run_all: true
+    functions: [mysterycall::mysterycall_nppes_gender]
+    inputs: [data/processed/npi_matches.csv]
+    outputs:
+      - data/processed/gender_from_nppes.csv
+      - data/processed/gender_nppes_abog_conflicts.csv
+    external_sources: [NPPES registry via the npi package]
+    grain_in: one high-confidence NPI match
+    grain_out: one abstract with a registrant-reported sex
+    primary_key: abstract_id
+    cache: data/cache/nppes_gender/ (one file per NPI, failures not cached)
+    manual_step: false
+    reproducible: true
+    tests: [tests/testthat/test-gender_nppes_tier.R]
+    notes: >
+      Replaces the ABOG gender column as tier 1 of the waterfall. Not because
+      it is more accurate - they agree on 251 of 252 - but because it is
+      regenerable from a public registry, whereas the ABOG export lost its
+      gender column upstream (docs/FAILURE_MODES.md F16), and because it
+      resolves 263 of 265 against ABOG's 252 over the same population.
+      Requires the mysterycall package, pinned in docs/REPRODUCIBILITY.md.
+
+  - id: "10b"
+    name: Full-name resolution via OpenAlex DOI lookup (waterfall tier 2)
+    script: R/10b_resolve_names_openalex.R
+    in_run_all: false
+    functions: []
+    inputs: [output/abstracts_with_matches.csv]
+    outputs: [data/processed/openalex_author_names.csv]
+    external_sources: [OpenAlex]
+    grain_in: one abstract DOI
+    grain_out: one abstract with a resolved first-author name
+    primary_key: abstract_id
+    cache: data/cache/openalex_author/
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: Run by R/run_demographics.R only.
+
+  - id: "10"
+    name: NPI identity resolution (waterfall tier 1)
+    script: R/10_npi_matching.R
+    in_run_all: true
+    functions: [acog_district_for_state]
+    inputs:
+      - output/abstracts_with_matches.csv
+      - config.yml#external_data.abog_npi_path (env ABOG_NPI_PATH)
+      - config.yml#external_data.nppes_duckdb_path (env NPPES_DUCKDB_PATH)
+    outputs: [data/processed/npi_matches.csv]
+    external_sources: [ABOG NPI file, NPPES DuckDB mirror, Physician Compare]
+    grain_in: one US first author
+    grain_out: one abstract with its best NPI candidate
+    primary_key: abstract_id
+    cache: null
+    manual_step: false
+    reproducible: false
+    tests: []
+    notes: >
+      Both external paths now come from config.yml and are overridable by
+      environment variable. On this machine the ABOG pool is present but its
+      LATEST symlink points at a workforce export with renamed columns, no
+      gender and NPIs on 411 of 79,400 rows; the script maps the renames,
+      completes, and refuses to overwrite the richer shipped sidecar. The NPPES
+      mirror exists under a different volume name and the fallback is skipped
+      with a warning. See docs/REPRODUCIBILITY.md category 4.
+
+  - id: "10c"
+    name: Coauthor triangulation
+    script: R/10c_coauthor_triangulation.R
+    in_run_all: false
+    functions: []
+    inputs: [output/abstracts_with_matches.csv]
+    outputs: []
+    external_sources: [NCBI E-utilities]
+    grain_in: one first author
+    grain_out: one abstract with a resolved name
+    primary_key: abstract_id
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: Not called by 00_run_all.R or run_demographics.R. Reported at ceiling (0 additional matches).
+
+  - id: "10d"
+    name: ORCID demographics
+    script: R/10d_orcid_demographics.R
+    in_run_all: false
+    functions: []
+    inputs: [output/abstracts_with_matches.csv]
+    outputs: [data/processed/orcid_demographics.csv]
+    external_sources: [ORCID public API]
+    grain_in: one first author
+    grain_out: one abstract with ORCID country and institution
+    primary_key: abstract_id
+    cache: data/cache/orcid/, data/cache/orcid_demographics_checkpoint.rds
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: Run by R/run_demographics.R only.
+
+  - id: "10f"
+    name: Senior-coauthor triangulation (waterfall tier 8)
+    script: R/10f_senior_author_triangulation.R
+    in_run_all: false
+    functions: []
+    inputs: [output/abstracts_with_matches.csv]
+    outputs: [data/processed/senior_triangulation.csv]
+    external_sources: [NCBI E-utilities]
+    grain_in: one first author
+    grain_out: one abstract with a resolved name
+    primary_key: abstract_id
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: 2 rows.
+
+  - id: "10g"
+    name: Second-coauthor triangulation (waterfall tier 9)
+    script: R/10g_second_author_triangulation.R
+    in_run_all: false
+    functions: []
+    inputs: [output/abstracts_with_matches.csv]
+    outputs: [data/processed/second_author_triangulation.csv]
+    external_sources: [NCBI E-utilities]
+    grain_in: one first author
+    grain_out: one abstract with a resolved name
+    primary_key: abstract_id
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: 0 rows. Contributes nothing.
+
+  - id: "10e"
+    name: Demographics merge and ten-tier gender waterfall
+    script: R/10e_merge_demographics.R
+    in_run_all: false
+    functions: [assert_rows, assert_unique_keys]
+    inputs:
+      - output/abstracts_with_matches.csv
+      - data/processed/author_characteristics.csv
+      - data/processed/npi_matches.csv
+      - data/processed/openalex_author_names.csv
+      - data/processed/orcid_demographics.csv
+      - data/processed/orcid_enrichment.csv
+      - data/processed/publication_metrics.csv
+      - data/processed/matched_pub_types.csv
+      - data/processed/gender_from_pubmed.csv
+      - data/processed/gender_from_orcid.csv
+      - data/processed/gender_from_obgyn_pubs.csv
+      - data/processed/gender_from_openalex.csv
+      - data/processed/gender_from_open_payments.csv
+      - data/processed/senior_triangulation.csv
+      - data/processed/second_author_triangulation.csv
+    outputs:
+      - output/abstracts_with_matches.csv
+      - data/processed/gender_resolution_policy.csv
+      - data/processed/gender_conflicts.csv
+    external_sources: []
+    grain_in: one abstract per sidecar
+    grain_out: one abstract with unified demographics
+    primary_key: abstract_id
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: >
+      NOT CALLED BY 00_run_all.R. Without it the analytical dataset has no
+      gender_unified, npi_*, state_unified or subspecialty_unified, and
+      06_analyze_results.R silently drops those model terms. See F8.
+
+  - id: demographics_runner
+    name: Demographics orchestrator
+    script: R/run_demographics.R
+    in_run_all: false
+    functions: []
+    inputs: []
+    outputs: []
+    external_sources: []
+    grain_in: n/a
+    grain_out: n/a
+    primary_key: null
+    cache: null
+    manual_step: true
+    reproducible: true
+    tests: []
+    notes: >
+      Sources 09c, 10b, 10, 10d, 10f, 10g, 09f-09j, 10e in dependency order.
+      Wraps each step in tryCatch and only warns on failure, so a partial merge
+      is silent.
+
+  - id: "06"
+    name: Decisions, outcome assignment and all five aims
+    script: R/06_analyze_results.R
+    in_run_all: true
+    functions: [dedup_decisions_for_analysis, assign_final_published,
+                publication_rate_summary, conference_date_for]
+    inputs:
+      - output/abstracts_with_matches.csv
+      - output/manual_review_decisions.csv
+      - data/processed/pubmed_strategy_results.csv
+      - data/processed/pubmed_candidates.csv
+      - "data/processed/{crossref,europmc,openalex,semantic_scholar}_candidates.csv"
+    outputs:
+      - output/final_analytical_dataset.csv
+      - output/aim1_publication_rate.csv
+      - output/aim1_by_congress_year.csv
+      - output/aim1_by_practice_type.csv
+      - output/aim1_by_subspecialty.csv
+      - output/aim1_by_pub_type.csv
+      - output/aim2_time_to_pub.csv
+      - output/aim2b_cox_regression.csv
+      - output/aim3_logistic_regression.csv
+      - output/aim4_strategy_performance.csv
+      - output/sensitivity_analyses.csv
+      - output/cox_ph_assumption.csv
+      - output/model_variable_screen.csv
+      - data/processed/km_fit.rds
+      - data/processed/cox_model.rds
+      - data/processed/logistic_model.rds
+    external_sources: []
+    grain_in: one abstract
+    grain_out: one abstract (dataset) / one metric or model term (aims)
+    primary_key: abstract_id
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests:
+      - tests/testthat/test-decision_precedence_bva.R
+      - tests/testthat/test-decision_mutation.R
+      - tests/testthat/test-cycle01_thresholds_contracts.R
+      - tests/testthat/test-pipeline_semantics.R
+    notes: >
+      Model terms are selected at run time by a missingness and level screen,
+      so the specification is data-dependent. Aim 5 no longer runs because
+      result_positivity is not carried into abstracts_with_matches.csv.
+
+  - id: "06d"
+    name: Model stability - bootstrap retention and leave-one-congress-out
+    script: R/06d_model_stability.R
+    in_run_all: true
+    functions:
+      - mysterycall::mysterycall_bootstrap_predictor_stability
+      - mysterycall::mysterycall_leave_one_out
+    inputs:
+      - output/final_analytical_dataset.csv
+      - output/model_variable_screen.csv
+    outputs:
+      - output/model_predictor_stability.csv
+      - output/model_leave_one_congress_out.csv
+    external_sources: []
+    grain_in: one evaluated abstract
+    grain_out: one model term / one (term x excluded congress) refit
+    primary_key: predictor
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: [tests/testthat/test-model_stability.R]
+    notes: >
+      Reads the specification back from model_variable_screen.csv so it cannot
+      drift from the model it describes. 500 bootstrap refits find only
+      n_authors (97.2%) and is_rct (93.6%) robust; is_academic survives 67.4%.
+      84 leave-one-congress-out refits all converge and no term changes
+      direction, which matters because 2017 and 2018 have no abstract text.
+      Seeded from config.yml pipeline$seed. No-op without mysterycall.
+
+  - id: "06b"
+    name: Missing-data analysis and the MAR assumption for the unresolved
+    script: R/06b_missingness.R
+    in_run_all: true
+    functions: [mysterycall::build_missingness_mcar_table]
+    inputs: [output/final_analytical_dataset.csv]
+    outputs:
+      - output/missingness_by_variable.csv
+      - output/missingness_mcar.csv
+      - output/missingness_interpretation.txt
+      - output/unresolved_vs_evaluated.csv
+    external_sources: []
+    grain_in: one abstract
+    grain_out: one variable (missingness) / one covariate (comparison)
+    primary_key: variable
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: [tests/testthat/test-mysterycall_integrations.R]
+    notes: >
+      The manuscript reported no missingness table and no mechanism test.
+      Section 1 is mysterycall's; Little's MCAR covers the numeric block only
+      (p < 0.001) and vars_tested records which. Section 2 is specific to this
+      study: it compares the 55 unresolved against the 1,051 evaluated on every
+      model covariate, which is the assumption the denominator rests on. Two
+      substantive differences found - study_design and n_authors - so the 55 are
+      not missing completely at random. best_score and n_candidates differ by
+      construction and are labelled definitional.
+
+  - id: "06c"
+    name: Session snapshot
+    script: R/06c_session_snapshot.R
+    in_run_all: true
+    functions: [mysterycall::mysterycall_session_snapshot]
+    inputs: [config.yml]
+    outputs: [output/session_snapshot.txt]
+    external_sources: []
+    grain_in: n/a
+    grain_out: free text
+    primary_key: null
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: [tests/testthat/test-mysterycall_integrations.R]
+    notes: >
+      Records R version, platform, seed and loaded package versions. Records the
+      environment; does not pin it. renv.lock remains the recommendation in
+      docs/REPRODUCIBILITY.md.
+
+  - id: audit_cohort
+    name: Cohort completeness against the Crossref deposit
+    script: scripts/audit_cohort_completeness.R
+    in_run_all: false
+    functions: []
+    inputs: [data/processed/abstracts_parsed_web.csv]
+    outputs: [output/cohort_completeness_audit.csv]
+    external_sources: [Crossref REST API]
+    grain_in: one parsed presentation
+    grain_out: one congress year
+    primary_key: congress_year
+    cache: data/cache/crossref_supplements/ (one JSON per congress)
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: >
+      Measures the gap catalogued as F1 and appendix A14. ScienceDirect returns
+      403, so the truncation cannot be measured against the source it came from;
+      Crossref holds the complete deposit and can. 1,154 of 7,711 supplement
+      items captured. Run by hand, not part of 00_run_all.R.
+
+  - id: build_docs_metadata
+    name: Regenerate the machine-readable documentation
+    script: scripts/build_docs_metadata.R
+    in_run_all: false
+    functions: []
+    inputs:
+      - docs/_meta/data_inventory_meta.csv
+      - docs/_meta/data_dictionary_meta.csv
+      - output/final_analytical_dataset.csv
+    outputs:
+      - docs/data_inventory.csv
+      - docs/data_dictionary.csv
+      - docs/DATA_DICTIONARY.md
+    external_sources: []
+    grain_in: one file / one variable
+    grain_out: one file / one variable
+    primary_key: path / variable
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: [tests/testthat/test-docs_drift.R]
+    notes: >
+      These three files were previously committed with no producer, which is the
+      orphan-artefact pattern recorded as F15. Joins hand-authored prose in
+      docs/_meta/ to counts recomputed from the live tree and FAILS if the two
+      disagree about which files or columns exist.
+
+  - id: validation
+    name: Gold-standard validation
+    script: R/validation_gold_standard.R
+    in_run_all: true
+    functions: []
+    inputs: [data/validation/gold_standard.csv, data/processed/match_scores.csv]
+    outputs: [data/validation/gold_standard_results.csv, output/validation_metrics.csv]
+    external_sources: []
+    grain_in: one manually verified abstract
+    grain_out: one performance metric
+    primary_key: metric
+    cache: null
+    manual_step: true
+    reproducible: partly
+    tests: [tests/testthat/test-pipeline_semantics.R]
+    notes: n = 50. The manual labels cannot be regenerated by code.
+
+  - id: interrater
+    name: Interrater agreement
+    script: R/10_interrater.R
+    in_run_all: true
+    functions: []
+    inputs: [output/manual_review_decisions.csv]
+    outputs: [output/interrater_agreement.csv]
+    external_sources: []
+    grain_in: one decision
+    grain_out: one agreement metric
+    primary_key: metric
+    cache: null
+    manual_step: false
+    reproducible: partly
+    tests: []
+    notes: cohens_kappa is NA because the irr package is not installed.
+
+  - id: "07"
+    name: Manuscript tables
+    script: R/07_make_tables.R
+    in_run_all: true
+    functions: []
+    inputs: [output/abstracts_with_matches.csv, output/manual_review_decisions.csv,
+             output/aim3_logistic_regression.csv, output/aim4_strategy_performance.csv]
+    outputs:
+      - output/tables/table1_characteristics.csv
+      - output/tables/table1_column_ns.csv
+      - output/tables/table2_pub_rate_subgroups.csv
+      - output/tables/table3_logistic_regression.csv
+      - output/tables/table4_search_strategies.csv
+    external_sources: []
+    grain_in: one abstract
+    grain_out: one table row
+    primary_key: varies
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: >
+      Table 1 comes from mysterycall::mysterycall_table1(): stratified, with
+      median [IQR] and mean (SD) for continuous variables and a p-value per
+      variable, replacing a five-variable summarise with no test. Falls back to
+      the reduced form when the package is absent. final_published now comes
+      from R/utils_decisions.R rather than an inline case_when (F9).
+
+  - id: "08"
+    name: Figures
+    script: R/08_make_figures.R
+    in_run_all: true
+    functions: []
+    inputs: [output/abstracts_with_matches.csv, output/manual_review_decisions.csv,
+             data/processed/km_fit.rds, data/processed/cox_model.rds,
+             output/aim2b_cox_regression.csv, output/aim4_strategy_performance.csv]
+    outputs:
+      - output/figures/figure1_flow_diagram.png
+      - output/figures/figure1_flow_data.csv
+      - "output/figures/figure2_km_curve.{png,pdf}"
+      - "output/figures/figure3_km_by_year.{png,pdf}"
+      - "output/figures/figure4_subgroup_rates.{png,pdf}"
+      - "output/figures/figure5_cox_forest.{png,pdf}"
+      - "output/figures/figure6_time_to_pub.{png,pdf}"
+      - "output/figures/figureS1_pub_rate_by_year.{png,pdf}"
+      - "output/figures/figureS2_strategy_perf.{png,pdf}"
+      - "output/figures/figureS3_score_dist.{png,pdf}"
+      - "output/figures/figureS4_class_by_year.{png,pdf}"
+    external_sources: []
+    grain_in: one abstract
+    grain_out: one figure
+    primary_key: null
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: >
+      Re-derives final_published with its own inline case_when (F9).
+      figure4 includes two outcome-conditional subgroup panels (F4).
+
+  - id: strobe
+    name: STROBE cohort flow chart
+    script: R/strobe_flowchart.R
+    in_run_all: false
+    functions: []
+    inputs:
+      - data/processed/abstracts_parsed.csv
+      - data/processed/abstracts_cleaned.csv
+      - output/final_analytical_dataset.csv
+    outputs:
+      - output/figures/figure1_strobe_flowchart.png
+      - output/figures/figure1_strobe_flowchart.pdf
+    external_sources: []
+    grain_in: one abstract
+    grain_out: one figure
+    primary_key: null
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: >
+      Derives every count from the data and asserts the arithmetic with
+      stopifnot() before drawing. Supersedes R/strobe_flow_diagram.R.
+
+  - id: deploy
+    name: Shiny bundle and deploy
+    script: shiny/adjudication_app/deploy.R
+    in_run_all: true
+    functions: []
+    inputs: [data/processed/*, output/*]
+    outputs: [shiny/adjudication_app/bundle/]
+    external_sources: [shinyapps.io]
+    grain_in: n/a
+    grain_out: deployed application
+    primary_key: null
+    cache: shiny/adjudication_app/bundle/
+    manual_step: true
+    reproducible: false
+    tests: [tests/testthat/test-shiny_app.R]
+    notes: Bundle is currently 135 days stale; test-shiny_app.R:458 fails on it.

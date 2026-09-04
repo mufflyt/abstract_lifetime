@@ -1,12 +1,12 @@
 step,n
-Total abstracts parsed,1115
+Total abstracts parsed,1154
 Video excluded,48
-Oral included,1067
-Searched,1067
-With candidates,1063
+Oral included,1106
+Searched,1106
+With candidates,1102
 No candidates,4
 Definite,131
 Probable,81
 Possible,142
-Excluded,0
-No match,713
+Excluded,39
+No match or no candidates,713

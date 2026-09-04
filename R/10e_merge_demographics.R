@@ -73,6 +73,59 @@ assert_unique_keys <- function(tbl, source_label) {
   invisible(tbl)
 }
 
+#' Left join that refuses to change the left table's row count
+#'
+#' Every join in this script is one-to-one on \code{abstract_id}: a sidecar
+#' must contribute at most one row per abstract. A sidecar carrying a duplicate
+#' key silently multiplies rows and inflates every downstream count. That is not
+#' hypothetical - the same defect reached \code{assign_final_published()} and
+#' was only found by a test.
+#'
+#' \code{assert_rows()} below catches the symptom after the fact.
+#' \code{mysterycall::mysterycall_safe_left_join()} catches the cause: it
+#' validates key uniqueness on the right table BEFORE joining and names the
+#' offending keys. It is used when available; otherwise this falls back to a
+#' plain join plus the local uniqueness check, so a machine without the package
+#' is guarded, just less informatively.
+#'
+#' @param left,right Tibbles to join.
+#' @param by Character. Join key. Defaults to \code{"abstract_id"}.
+#' @param label Character. Name of the right table, for error messages.
+#' @return \code{left} with \code{right}'s columns, same row count.
+#' @keywords internal
+safe_join <- function(left, right, by = "abstract_id", label = "sidecar") {
+  # A right table with no columns carries nothing to join. A right table with
+  # columns but zero rows still must be joined: it contributes the columns as
+  # all-NA, which downstream coalesce() calls rely on. 10g second-author
+  # triangulation is exactly that case - it has never returned a row.
+  if (length(names(right)) == 0) return(left)
+  n_before <- nrow(left)
+  if (nrow(right) == 0) return(dplyr::left_join(left, right, by = by))
+
+  out <- if (requireNamespace("mysterycall", quietly = TRUE)) {
+    mysterycall::mysterycall_safe_left_join(
+      left, right, by = by,
+      expect_unique_right = TRUE,
+      # Low coverage is the norm here, not a fault: a sidecar such as the NPPES
+      # registry only covers abstracts with a resolved NPI (24%). The guard we
+      # want is key uniqueness on the right, not a coverage floor, so the
+      # package default of 98% is switched off deliberately.
+      min_coverage = 0,
+      label_left = "abstracts_with_matches", label_right = label
+    )
+  } else {
+    assert_unique_keys(right, label)
+    dplyr::left_join(left, right, by = by)
+  }
+
+  if (nrow(out) != n_before) {
+    stop(sprintf("Join with %s changed the row count: %d -> %d",
+                 label, n_before, nrow(out)), call. = FALSE)
+  }
+  out
+}
+
+
 #' Assert that a tibble has exactly the expected number of rows
 #'
 #' Stops with an informative error if a left join introduced row
@@ -137,6 +190,7 @@ g_orc   <- read_sidecar(here("data", "processed", "gender_from_orcid.csv"), "09g
 g_obg   <- read_sidecar(here("data", "processed", "gender_from_obgyn_pubs.csv"), "09h gender from OB/GYN pubs")
 g_oax   <- read_sidecar(here("data", "processed", "gender_from_openalex.csv"), "09i gender from OpenAlex search")
 g_opm   <- read_sidecar(here("data", "processed", "gender_from_open_payments.csv"), "09j gender from Open Payments")
+g_npp   <- read_sidecar(here("data", "processed", "gender_from_nppes.csv"), "09k gender from NPPES")
 
 # ── 1. Merge author characteristics (09c) ────────────────────────────────────
 cli_h2("1. Author characteristics from 09c")
@@ -149,7 +203,7 @@ if (nrow(char) > 0) {
                  "practice_type", "subspecialty", "career_stage")
   char_slim <- char |> select(any_of(char_cols)) |> assert_unique_keys("09c author_characteristics")
   matches <- matches |>
-    left_join(char_slim, by = "abstract_id") |>
+    safe_join(char_slim, label = "09c author characteristics") |>
     assert_rows("09c author_characteristics")
 
   # Reversible blanking: flag rows where demographics came from wrong match
@@ -175,9 +229,26 @@ if (nrow(char) > 0) {
 }
 
 # ── 2. Build gender waterfall ────────────────────────────────────────────────
-cli_h2("2. Gender waterfall (10 tiers)")
+cli_h2("2. Gender waterfall (11 tiers)")
 
-# Tier 1: NPI gender (authoritative identity)
+# Tier 1: NPPES registry sex, keyed on the NPI already resolved by 10_npi.
+#
+# This outranks the ABOG value below it for two reasons, neither of which is
+# about accuracy - they agree on 251 of 252 shared abstracts. First, NPPES is
+# regenerable from a public registry given an NPI, whereas the ABOG export's
+# gender column has disappeared upstream, so tier 2 alone cannot be rebuilt on
+# another machine (docs/FAILURE_MODES.md F16). Second, NPPES resolves 263 of the
+# 265 high-confidence NPIs against ABOG's 252 over the same population, so
+# putting it first gains 11 abstracts rather than losing any - tier 2 still
+# covers the handful NPPES leaves blank.
+nppes_gender_tbl <- if (nrow(g_npp) > 0 && "nppes_gender" %in% names(g_npp)) {
+  g_npp |>
+    filter(!is.na(nppes_gender)) |>
+    transmute(abstract_id, gender_nppes = nppes_gender) |>
+    distinct(abstract_id, .keep_all = TRUE)
+} else tibble(abstract_id = character(), gender_nppes = character())
+
+# Tier 2: ABOG board-certification gender, from the NPI match.
 npi_gender_tbl <- if (nrow(npi) > 0) {
   npi |>
     filter(npi_match_confidence == "high") |>
@@ -263,17 +334,51 @@ g8 <- extract_gender(tri_sr, "tri_gender", "gender_tri_sr")
 g9 <- extract_gender(tri_2nd, "tri_gender", "gender_tri_2nd")
 
 # Join all gender sources (extract_gender already deduplicates by abstract_id)
-matches <- matches |>
-  left_join(npi_gender_tbl, by = "abstract_id") |>
-  left_join(oa_gender_tbl, by = "abstract_id") |>
-  left_join(g3, by = "abstract_id") |>
-  left_join(g4, by = "abstract_id") |>
-  left_join(g5, by = "abstract_id") |>
-  left_join(g6, by = "abstract_id") |>
-  left_join(g7, by = "abstract_id") |>
-  left_join(g8, by = "abstract_id") |>
-  left_join(g9, by = "abstract_id") |>
-  assert_rows("gender waterfall joins")
+gender_tables <- list(
+  "09k NPPES registry"          = nppes_gender_tbl,
+  "10 NPI (ABOG)"               = npi_gender_tbl,
+  "10b OpenAlex names"          = oa_gender_tbl,
+  "09f PubMed full name"        = g3,
+  "09h OB/GYN publications"     = g4,
+  "09i OpenAlex works search"   = g5,
+  "09g ORCID"                   = g6,
+  "09j Open Payments"           = g7,
+  "10f senior triangulation"    = g8,
+  "10g second triangulation"    = g9
+)
+for (lbl in names(gender_tables)) {
+  matches <- safe_join(matches, gender_tables[[lbl]], label = lbl)
+}
+matches <- matches |> assert_rows("gender waterfall joins")
+
+
+#' Collapse the two subspecialty vocabularies onto one set of labels
+#'
+#' `npi_subspecialty` uses ABOG's spelled-out certification names and
+#' `subspecialty` uses the short codes emitted by
+#' \code{\link{classify_subspecialty}()}. Both feed `subspecialty_unified`.
+#' This maps every known spelling to the short code.
+#'
+#' @param x Character vector of subspecialty labels from either vocabulary.
+#' @return Character vector using the short-code vocabulary. Unrecognised values
+#'   are returned unchanged so a new upstream label is visible rather than
+#'   silently dropped.
+#' @keywords internal
+harmonise_subspecialty <- function(x) {
+  map <- c(
+    "Female Pelvic Medicine & Reconstructive Surgery" = "FPMRS",
+    "Female Pelvic Medicine and Reconstructive Surgery" = "FPMRS",
+    "Generalist"                                     = "general_OBGYN",
+    "Gynecologic Oncology"                           = "GYN_ONC",
+    "Maternal-Fetal Medicine"                        = "MFM",
+    "Reproductive Endocrinology and Infertility"     = "REI",
+    "MIG"                                            = "MIGS",
+    "Critical Care Medicine"                         = "critical_care",
+    "CRI"                                            = "critical_care"
+  )
+  out <- unname(map[x])
+  ifelse(is.na(out), x, out)
+}
 
 # ── Gender resolution policy (explicit, not implicit) ────────────────────────
 # Priority order for gender inference. Higher-ranked sources are preferred.
@@ -283,17 +388,18 @@ matches <- matches |>
 # initial maps to hundreds of names spanning both genders, leading to
 # higher misclassification risk compared to full-name sources.
 GENDER_PRIORITY <- tibble::tibble(
-  tier = 1:10,
-  source = c("npi", "openalex", "pubmed_fullname", "obgyn_pubs",
+  tier = 1:11,
+  source = c("nppes", "npi", "openalex", "pubmed_fullname", "obgyn_pubs",
              "openalex_search", "orcid", "open_payments",
              "senior_triangulation", "second_triangulation", "ssa"),
-  column = c("gender_npi", "gender_oa", "gender_pubmed", "gender_obgyn",
-             "gender_oax", "gender_orcid", "gender_opm",
+  column = c("gender_nppes", "gender_npi", "gender_oa", "gender_pubmed",
+             "gender_obgyn", "gender_oax", "gender_orcid", "gender_opm",
              "gender_tri_sr", "gender_tri_2nd", "first_author_gender"),
-  resolution = c("full_name", "full_name", "full_name", "full_name",
-                  "full_name", "full_name", "full_name",
-                  "full_name", "full_name", "initial_only"),
+  resolution = c("registry", "registry", "full_name", "full_name", "full_name",
+                 "full_name", "full_name", "full_name",
+                 "full_name", "full_name", "initial_only"),
   description = c(
+    "NPPES registrant-reported sex, keyed on the resolved NPI (not inferred)",
     "ABOG board certification records (authoritative identity)",
     "Full name from abstract DOI via OpenAlex works API",
     "Full name from PubMed author+affiliation search",
@@ -361,11 +467,12 @@ if ("first_author_state" %in% names(matches) && nrow(npi) > 0) {
 matches <- matches |>
   mutate(
     gender_unified = coalesce(
-      gender_npi, gender_oa, gender_pubmed, gender_obgyn,
+      gender_nppes, gender_npi, gender_oa, gender_pubmed, gender_obgyn,
       gender_oax, gender_orcid, gender_opm,
       gender_tri_sr, gender_tri_2nd, first_author_gender
     ),
     gender_source = case_when(
+      !is.na(gender_nppes)   ~ "nppes",
       !is.na(gender_npi)     ~ "npi",
       !is.na(gender_oa)      ~ "openalex",
       !is.na(gender_pubmed)  ~ "pubmed_fullname",
@@ -384,7 +491,7 @@ matches <- matches |>
     gender_conflict = abstract_id %in% conflicts$abstract_id
   ) |>
   # Drop intermediate columns — keep unified + source + conflict metadata
-  select(-any_of(c("gender_npi", "gender_oa", "gender_pubmed", "gender_obgyn",
+  select(-any_of(c("gender_nppes", "gender_npi", "gender_oa", "gender_pubmed", "gender_obgyn",
                     "gender_oax", "gender_orcid", "gender_opm",
                     "gender_tri_sr", "gender_tri_2nd",
                     "first_author_gender", "first_author_gender_p")))
@@ -412,7 +519,7 @@ if (nrow(npi) > 0) {
            npi_full_name, npi_acog_district) |>
     assert_unique_keys("NPI sidecar")
   matches <- matches |>
-    left_join(npi_cols, by = "abstract_id") |>
+    safe_join(npi_cols, label = "10 NPI columns") |>
     assert_rows("NPI columns")
   cli_alert_info("NPI by confidence:")
   print(table(matches$npi_match_confidence, useNA = "ifany"))
@@ -425,7 +532,7 @@ if (nrow(orcid) > 0 && "orcid_country" %in% names(orcid)) {
     select(abstract_id, any_of(c("orcid_country", "orcid_institution"))) |>
     assert_unique_keys("ORCID sidecar")
   matches <- matches |>
-    left_join(orcid_slim, by = "abstract_id") |>
+    safe_join(orcid_slim, label = "10d ORCID demographics") |>
     assert_rows("ORCID columns")
   cli_alert_info("ORCID country: {sum(!is.na(matches$orcid_country))}")
 }
@@ -435,7 +542,15 @@ cli_h2("5. Unified state & subspecialty")
 matches <- matches |>
   mutate(
     state_unified = coalesce(npi_state, first_author_state),
-    subspecialty_unified = coalesce(npi_subspecialty, subspecialty)
+    # Both inputs use two-letter USPS codes, so state needs no harmonisation.
+    # Subspecialty does: npi_subspecialty carries ABOG's spelled-out labels and
+    # `subspecialty` carries classify_subspecialty()'s short codes, so a plain
+    # coalesce() produced 13 levels for 8 concepts (MIG vs MIGS, FPMRS vs the
+    # spelled-out form, Generalist vs general_OBGYN, ...). Any subgroup analysis
+    # on the unharmonised column split real categories in two.
+    subspecialty_unified = harmonise_subspecialty(
+      coalesce(npi_subspecialty, subspecialty)
+    )
   )
 cli_alert_info("State coverage: {sum(!is.na(matches$state_unified))} / {nrow(matches)}")
 cli_alert_info("Subspecialty coverage: {sum(!is.na(matches$subspecialty_unified))} / {nrow(matches)}")

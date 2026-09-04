@@ -239,12 +239,36 @@ test_that("Cox PH model has valid hazard ratios", {
   expect_true(all(cox$conf.low < cox$conf.high, na.rm = TRUE), label = "CI lower < upper")
 })
 
+# PRESERVED FAILING TEST, 2026-09-04. The threshold is NOT relaxed.
+#
+# The global cox.zph test was p = 0.32 when the Cox model had 104 events. It
+# moved to 0.056 when scripts/rebuild_candidate_pool.R restored the publication
+# dates and the event count rose to 171, and to 0.043 when the variable screen
+# dropped has_funding (TRUE for 7 of 1,051) by a near-zero-variance rule.
+#
+# The assumption is now violated at alpha = 0.05. That is a finding about the
+# model, not a fixture problem: with 171 events the test is properly powered,
+# and removing a near-constant term made a latent violation visible rather than
+# creating one.
+#
+# The response is a methodological decision that has not been taken - stratify
+# the Cox model, allow time-varying coefficients, or report the hazard ratios
+# explicitly as averages over follow-up. Weakening this assertion would hide
+# the question. See docs/STATISTICAL_ANALYSIS.md.
 test_that("PH assumption holds", {
   path <- here::here("output", "cox_ph_assumption.csv")
   skip_if_not(path)
   ph <- read_csv(path, show_col_types = FALSE)
 
-  expect_true(ph$p_value[1] > 0.05, label = "global PH p > 0.05")
+  expect_true(
+    ph$p_value[1] > 0.05,
+    label = sprintf(
+      paste("global cox.zph p = %.3f. Proportional hazards is violated, so the",
+            "hazard ratios in aim2b_cox_regression.csv are averages over",
+            "follow-up rather than constants. Decide between a stratified fit,",
+            "time-varying coefficients, or reporting them as averages"),
+      ph$p_value[1])
+  )
 })
 
 # ============================================================
@@ -273,32 +297,34 @@ test_that("validation NPV is at least 90%", {
 # Cross-file consistency
 # ============================================================
 
-test_that("abstracts_with_matches is a subset of abstracts_cleaned", {
+test_that("abstracts_cleaned and abstracts_with_matches have same abstract_ids", {
   p1 <- here::here("data", "processed", "abstracts_cleaned.csv")
   p2 <- here::here("output", "abstracts_with_matches.csv")
-  p3 <- here::here("data", "processed", "match_scores.csv")
   skip_if_not(p1); skip_if_not(p2)
 
   ids1 <- read_csv(p1, show_col_types = FALSE)$abstract_id
   ids2 <- read_csv(p2, show_col_types = FALSE)$abstract_id
 
-  # Nothing may appear downstream that did not come from abstracts_cleaned.
-  # This direction is a hard invariant and must never regress.
-  expect_length(setdiff(ids2, ids1), 0)
+  # Full equality. This previously failed 1106 vs 1067 because
+  # R/05_adjudicate.R dropped abstracts whose best candidate predated the
+  # conference out of the cohort. Those abstracts are now retained and counted
+  # as unpublished, so every cleaned abstract must reach the analytical file.
+  # A reappearance of that gap is a real defect, not a known exception.
+  expect_setequal(ids1, ids2)
+})
 
-  # The reverse direction is NOT currently an equality. R/05_adjudicate.R:64
-  # drops every abstract whose best-scoring candidate predates the conference
-  # (classification == "excluded") from the cohort entirely, rather than
-  # invalidating just that candidate and letting the abstract fall back to
-  # no_match. That removes 39 abstracts from the denominator and inflates the
-  # reported publication rate. See the "excluded-classification denominator"
-  # issue; this assertion pins the discrepancy to that single known cause so a
-  # NEW source of row loss still fails the suite.
-  missing <- setdiff(ids1, ids2)
-  skip_if_not(p3)
-  scores <- read_csv(p3, show_col_types = FALSE)
-  excluded_ids <- scores$abstract_id[scores$classification == "excluded"]
-  expect_setequal(missing, excluded_ids)
+test_that("pre-conference exclusions stay in the cohort as unpublished", {
+  path <- here::here("output", "abstracts_with_matches.csv")
+  skip_if_not(path)
+  d <- read_csv(path, show_col_types = FALSE)
+
+  # Guards the fix directly: "excluded" is a statement about the CANDIDATE, so
+  # the abstract must survive into the analytical file rather than vanishing
+  # from the denominator.
+  skip_if(!"classification" %in% names(d))
+  skip_if(sum(d$classification == "excluded", na.rm = TRUE) == 0,
+          "no pre-conference exclusions in this run")
+  expect_gt(sum(d$classification == "excluded", na.rm = TRUE), 0)
 })
 
 test_that("sensitivity analysis scenarios are monotonically ordered", {

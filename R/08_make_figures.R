@@ -11,6 +11,7 @@ library(config)
 library(survival)
 library(tidyr)
 source(here("R", "utils_congresses.R"))
+source(here("R", "utils_decisions.R"))
 
 cfg <- config::get(file = here("config.yml"))
 
@@ -20,24 +21,12 @@ cli_h2("Generating Figures")
 
 results <- read_csv(here("output", "abstracts_with_matches.csv"), show_col_types = FALSE)
 
-# Determine final published status
+# Determine final published status.
+# Precedence and the outcome cascade live in R/utils_decisions.R so that this
+# script cannot drift from R/06_analyze_results.R. See docs/FAILURE_MODES.md F9.
 if (file.exists(here("output", "manual_review_decisions.csv"))) {
   decisions <- read_csv(here("output", "manual_review_decisions.csv"), show_col_types = FALSE)
-  decisions <- decisions |>
-    filter(!is.na(reviewer)) |>
-    group_by(abstract_id) |>
-    arrange(desc(review_timestamp)) |>
-    slice(1) |>
-    ungroup()
-  results <- results |>
-    left_join(decisions |> select(abstract_id, manual_decision), by = "abstract_id") |>
-    mutate(final_published = case_when(
-      classification == "definite" ~ TRUE,
-      manual_decision == "match" ~ TRUE,
-      manual_decision == "no_match" ~ FALSE,
-      classification %in% c("no_match", "no_candidates", "excluded") ~ FALSE,
-      TRUE ~ NA
-    ))
+  results <- assign_final_published(results, dedup_decisions_for_analysis(decisions))
 } else {
   results <- results |>
     mutate(final_published = classification == "definite")
@@ -47,7 +36,12 @@ n_congresses <- length(unique(results$congress_year))
 year_range <- paste0(min(results$congress_year, na.rm = TRUE), "-",
                      max(results$congress_year, na.rm = TRUE))
 n_total <- nrow(results)
-n_probable <- sum(results$classification == "probable", na.rm = TRUE)
+# Count abstracts that are GENUINELY unresolved, not ones the algorithm merely
+# labelled "probable". Every probable/possible abstract has since been human
+# adjudicated, so the old count reported 81 "pending" when nothing was pending.
+# What remains unresolved is the set a reviewer marked "skip", which leaves
+# final_published as NA and drops the abstract from the rate denominator.
+n_unresolved <- sum(is.na(results$final_published))
 
 theme_pub <- theme_minimal(base_size = 12) +
   theme(
@@ -80,7 +74,12 @@ n_excluded_fig <- sum(results$classification == "excluded", na.rm = TRUE)
 flow <- tibble::tibble(
   step = c("Total abstracts parsed", "Video excluded", "Oral included",
            "Searched", "With candidates", "No candidates",
-           "Definite", "Probable", "Possible", "Excluded", "No match"),
+           # n_no_match_fig folds classification == "no_candidates" into
+           # classification == "no_match". Naming the step "No match" made the
+           # label disagree with the quantity and double-counted the
+           # no-candidate abstracts against the separate step above.
+           "Definite", "Probable", "Possible", "Excluded",
+           "No match or no candidates"),
   n = c(n_scraped, n_video_excluded, n_total, n_total,
         n_with_candidates, n_total - n_with_candidates,
         n_definite_fig, n_probable_fig, n_possible_fig,
@@ -108,7 +107,7 @@ tryCatch({
       def [label="Definite match\\n(score >= 7, text evidence)\\nn = %d", fillcolor="#D5E8D4", color="#82B366"]
       prob [label="Probable match\\n(score 3-7, text evidence)\\nn = %d", fillcolor="#FFF2CC", color="#D6B656"]
       poss [label="Possible match\\n(weak evidence or ties)\\nn = %d", fillcolor="#FFE6CC", color="#D79B00"]
-      nomatch [label="No match\\n(score < 3)\\nn = %d", fillcolor="#F8CECC", color="#B85450"]
+      nomatch [label="No match or no candidates\\nn = %d", fillcolor="#F8CECC", color="#B85450"]
       excl [label="Excluded\\n(pre-conference\\npublication)\\nn = %d", fillcolor="#E1D5E7", color="#9673A6"]
 
       id -> inc
@@ -176,8 +175,8 @@ if (nrow(km_data) > 0) {
     scale_x_continuous(breaks = seq(0, 120, by = 12)) +
     labs(
       title = "Cumulative Publication Rate Over Time",
-      subtitle = sprintf("AAGL %s - %d definite matches; %d probable pending review",
-                         year_range, sum(km_data$event == 1), n_probable),
+      subtitle = sprintf("AAGL %s - %d published; %d unresolved (excluded from denominator)",
+                         year_range, sum(km_data$event == 1), n_unresolved),
       x = "Months Since Conference",
       y = "Cumulative Publication Rate"
     ) +
@@ -414,8 +413,8 @@ if (nrow(published) > 0) {
                color = "#B2182B", linewidth = 1) +
     labs(
       title = "Time from Conference Presentation to Full Publication",
-      subtitle = sprintf("AAGL %s (n = %d definite matches; %d probable pending review)",
-                         year_range, nrow(published), n_probable),
+      subtitle = sprintf("AAGL %s (n = %d published; %d unresolved, excluded from denominator)",
+                         year_range, nrow(published), n_unresolved),
       x = "Months to Publication",
       y = "Number of Abstracts"
     ) +
@@ -542,3 +541,74 @@ if ("congress_year" %in% names(results)) {
 }
 
 cli_alert_success("All figures generated in output/figures/")
+
+# ============================================================
+# Figure 7: Predictor stability
+# ============================================================
+# The regression tables report point estimates and intervals. Neither says how
+# much a term depends on which abstracts happened to be sampled. This plots the
+# bootstrap retention frequencies from R/06d_model_stability.R so the reader can
+# see that only two of the seven terms are robust.
+stab_path <- here("output", "model_predictor_stability.csv")
+if (file.exists(stab_path)) {
+  stab <- read_csv(stab_path, show_col_types = FALSE)
+
+  LABELS <- c(
+    n_authors       = "Number of authors",
+    is_rct          = "Randomized trial",
+    is_academic     = "Academic affiliation",
+    is_us_based     = "US-based",
+    log_sample_size = "log(sample size)",
+    is_multicenter  = "Multicenter",
+    gender_unified  = "First-author gender (inferred)"
+  )
+
+  stab_plot <- stab |>
+    mutate(
+      label = ifelse(predictor %in% names(LABELS), LABELS[predictor], predictor),
+      label = factor(label, levels = label[order(retention_frequency)]),
+      band = case_when(retention_frequency >= 90 ~ "Robust (>=90%)",
+                       retention_frequency >= 70 ~ "Moderate (70-89%)",
+                       TRUE ~ "Unstable (<70%)"),
+      band = factor(band, levels = c("Robust (>=90%)", "Moderate (70-89%)",
+                                     "Unstable (<70%)"))
+    )
+
+  p7 <- ggplot(stab_plot, aes(x = retention_frequency, y = label, fill = band)) +
+    geom_col(width = 0.68) +
+    geom_vline(xintercept = c(70, 90), linetype = "dashed",
+               colour = "grey40", linewidth = 0.4) +
+    geom_text(aes(label = sprintf("%.1f%%", retention_frequency)),
+              hjust = -0.15, size = 3.4, colour = "grey20") +
+    scale_x_continuous(limits = c(0, 108), breaks = seq(0, 100, 25),
+                       labels = function(x) paste0(x, "%"),
+                       expand = expansion(mult = c(0, 0))) +
+    scale_fill_manual(values = c("Robust (>=90%)" = "#1B5E20",
+                                 "Moderate (70-89%)" = "#F9A825",
+                                 "Unstable (<70%)" = "#B71C1C"),
+                      drop = FALSE) +
+    labs(
+      title = "Only two predictors survive resampling",
+      subtitle = sprintf(
+        "Share of %s bootstrap refits in which each term stays significant at p < 0.05",
+        format(stab$n_boot[1], big.mark = ",")),
+      x = "Retention frequency", y = NULL, fill = NULL,
+      caption = "Logistic model of publication. Source: output/model_predictor_stability.csv"
+    ) +
+    theme_minimal(base_size = 11) +
+    theme(
+      panel.grid.major.y = element_blank(),
+      panel.grid.minor = element_blank(),
+      legend.position = "top",
+      plot.title = element_text(face = "bold"),
+      plot.caption = element_text(colour = "grey45", size = 8)
+    )
+
+  ggsave(here("output", "figures", "figure7_predictor_stability.png"), p7,
+         width = 8, height = 4.6, dpi = 300, bg = "white")
+  ggsave(here("output", "figures", "figure7_predictor_stability.pdf"), p7,
+         width = 8, height = 4.6)
+  cli_alert_success("Figure 7 saved: predictor stability")
+} else {
+  cli_alert_info("No model_predictor_stability.csv - skipping figure 7")
+}
