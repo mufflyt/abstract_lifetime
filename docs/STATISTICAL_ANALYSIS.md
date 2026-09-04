@@ -376,11 +376,11 @@ for adaptation into Methods.
 | Proportional hazards | `cox.zph(cox_model)`, global test written to `output/cox_ph_assumption.csv` | global p = **0.056**. It was 0.32 on 104 events; with 171 events the test is far better powered and the assumption is now only marginally supported. A stratified or time-varying specification is worth considering before the hazard ratios are reported as constant. |
 | Collinearity | **not implemented** | — |
 | Goodness of fit (Hosmer–Lemeshow, calibration, AUC) | **not implemented** | — |
-| Sparse-category handling | Implicit only: the < 50% missing and ≥ 2 level screen. No minimum cell count. | `has_funding` is TRUE for 3 of 1,106 abstracts; its Cox CI spans 0.48–25.7 and its logistic CI 0.12–29.0 |
+| Sparse-category handling | Implicit only: the < 50% missing and ≥ 2 level screen. No minimum cell count. | `has_funding` is TRUE for 7 of 1,106 abstracts (it was 3 before `02d` re-derived the predictors from the backfilled text); its Cox CI spans 0.43–7.17 and its logistic CI 0.29–11.3. `mysterycall_remove_near_zero()` flags it automatically at a frequency ratio of 1044:7 |
 | Influence / outliers | **not implemented** | — |
 | Overdispersion | not applicable (binomial with n = 1 trials) | — |
 
-`has_funding` (**3** abstracts TRUE cohort-wide) and `is_multicenter` (38 TRUE)
+`has_funding` (**7** abstracts TRUE cohort-wide) and `is_multicenter` (65 TRUE)
 are sparse enough that their estimates are unstable; the funding CI spanning two
 orders of magnitude is the visible symptom. Neither is dropped by the automatic
 screen because the screen tests *missingness and level count*, not cell counts.

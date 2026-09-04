@@ -16,9 +16,12 @@ that belongs to the author rather than to code.
 `test-cycle03_model_contracts.R:57` — which asserts that no reported odds ratio
 spans a 100-fold interval — now passes, because the `has_funding` interval
 narrowed from 0.117–29.04 to 0.293–11.345 when the event count rose from 104 to
-171. The underlying concern has not gone away: `has_funding` is TRUE for **3 of
-1,106** abstracts, and an estimate from three events is not interpretable
-whatever its interval width. It should be reported as not estimable, or dropped.
+171. The underlying concern has not gone away: `has_funding` is TRUE for **7 of
+1,106** abstracts (it was 3 before `02d` re-derived the predictors from the
+backfilled text), and an estimate from seven events is not interpretable
+whatever its interval width. It should be reported as not estimable, or
+dropped — `mysterycall_remove_near_zero()` identifies it automatically at a
+frequency ratio of 1044:7, above the conventional 19:1 cutoff.
 
 | Failing test | Reports | Why it is not fixed |
 |---|---|---|
