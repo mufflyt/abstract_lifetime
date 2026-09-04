@@ -580,3 +580,68 @@ is tracked in `docs/FAILURE_MODES.md`, not here.
 - 4 findings preserved as failing tests pending a decision
 - 8 defects in my own tests found and corrected
 - Suite: 743 passing at cycle 8
+
+---
+
+# LOOP RESTARTED 2026-09-04
+
+State on restart had moved. The concurrent agent added an expected-failure gate
+(`tests/expected_failures.yaml` + `tests/run_suite_gate.R`), six test files
+(docs drift, model stability, remediation invariants, gender NPPES tier,
+mysterycall integrations, shiny bundle currency), and adopted
+`mufflyt/mysterycall` as a pinned dependency in CI. Suite was 28 files / 907
+passing / 4 expected failures, gate green.
+
+Two of my four preserved failures had resolved on their own after their
+candidate-pool repair (Cox events 104 -> 171): 3.2 `has_funding` now passes, and
+the shiny mtime test was replaced by a proper byte-identical manifest check. The
+remaining two of mine (4.9 search-strategy yield, 6.5 dead component, 6.7
+duplicate PMIDs) are now registered on the manifest.
+
+**Cohort unchanged: still 1,106, still 93-100 per congress.** The truncation in
+A14 has not been remediated. Documented and set aside per instruction.
+
+Process change: stage file-by-file. `git add -A` is what pulled 26 of the other
+agent's files into three of my commits.
+
+## Cycle 9 - 2026-09-04
+
+Mix required: 3 BVA / 3 semantic / 4 adversarial. File:
+`tests/testthat/test-cycle09_encoding_locale_seed.R` (19 assertions).
+Ground chosen to avoid both cycles 1-8 and the concurrent suite: encoding,
+locale, seeding, timestamp ambiguity, CSV round-trip fidelity. These are the
+failures that reproduce differently on another machine rather than failing here.
+
+| # | Category | Target | Assumption challenged |
+|---|---|---|---|
+| 9.1 | BVA | pubmed$date_end | the censor date sits beyond every congress, with real follow-up |
+| 9.2 | BVA | CSV round trip | scores survive write/read at tolerance 0 |
+| 9.3 | BVA | encoding | non-ASCII text is preserved, no mojibake signatures |
+| 9.4 | semantic | config seed | a seed is declared AND the runner calls set.seed() |
+| 9.5 | semantic | review_timestamp | parses to one instant and carries a timezone |
+| 9.6 | semantic | candidate pools | rows reference known abstracts; cohort orphans are explained |
+| 9.7 | adversarial | collation | ordering is stable between C and native locale |
+| 9.8 | adversarial | column types | numeric columns are not read back as character |
+| 9.9 | adversarial | candidate pools | no source record listed twice for one abstract |
+| 9.10 | adversarial | shipped CSVs | no BOM to rename the first column |
+
+**Result:** 8/10 pass on first run. No implementation defects. Two premises of
+my own were wrong and were corrected:
+
+- **9.6** required every candidate to map into the CLEANED cohort. Wrong: the
+  searches run against the parsed set, so candidates legitimately survive for
+  abstracts the video filter later removes. All 145 orphans across five pools
+  are Video abstracts. Rewritten to assert no candidate references an id the
+  pipeline has never seen, and that every cohort orphan is explained by the
+  documented exclusion.
+- **9.9** keyed duplicates on (abstract_id, pmid, doi). That is not a key for
+  the OpenAlex and Semantic Scholar pools, where most records carry neither;
+  it flagged 2,159 "duplicates" in one file that were distinct works with
+  distinct oa_id/s2_id, titles and authors. Rewritten to key on the source's own
+  identifier.
+
+Both corrections matter beyond this cycle: they are the same error, assuming a
+key without checking it holds.
+
+**Suite after cycle 9:** 29 files, 926 passed (+19), 4 failed, all on the
+manifest. Gate green.
