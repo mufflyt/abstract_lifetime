@@ -1381,3 +1381,79 @@ The range is 16.1% to 17.2%. All four are defensible; none can be inferred by a 
 The counts in this section describe the pipeline state before the April 2026 matching corrections in A12 were executed against a fresh search. The PubMed candidate pool was last retrieved on 19 April 2026 and the corrections were written on 28 April 2026; all downstream stages have since been regenerated from that pre-correction pool. Every figure in this section will move when the search is re-run, and the year-over-year publication rates in particular should not be interpreted until it is.
 
 The audit in A13.6 verified publication dates against PubMed for the 39 pre-congress candidates only. The same date-granularity defect may affect candidates elsewhere in the cohort that were not classified `excluded`, and that has not been quantified.
+
+## A14. Cohort Truncation at Ingestion (verified, not remediated here)
+
+Sections A12 and A13 document defects in matching, adjudication and reporting.
+All of them assume the cohort is what it claims to be: the oral presentations of
+twelve AAGL Global Congresses. That assumption does not hold. This section
+records an independent verification of the failure catalogued as F1 in
+`docs/FAILURE_MODES.md`, and states plainly what it does to the rest of this
+appendix.
+
+### A14.1 What was verified
+
+`R/01b_parse_web.R` fetches one issue-listing page per congress from
+ScienceDirect. The capture stops after roughly one page of results. Two
+signatures identify this as a page-size limit rather than a real distribution:
+every congress yields between 93 and 100 presentations, and the 2022 congress
+yields **exactly 100**.
+
+Each captured set is contiguous from page S1 and stops between S26 and S60. The
+supplements themselves are far longer. Counts below come from the Crossref REST
+API for the *Journal of Minimally Invasive Gynecology* (ISSN 1553-4650),
+restricted to each congress's November issue and to records carrying
+`S`-prefixed pagination, retrieved 3 September 2026.
+
+| Congress | Captured | Last captured page | Supplement items | Supplement extent |
+|---|---|---|---|---|
+| 2012 | 95 | S33-S34 | 663 | S1-S191 |
+| 2013 | 96 | S31 | 698 | S1-S195 |
+| 2014 | 93 | S26 | 762 | S1-S237 |
+| 2015 | 95 | S38 | 852 | S1-S262 |
+| 2016 | 96 | S40 | 793 | S1-S261 |
+| 2017 | 97 | S59-S60 | 614 | S1-S208 |
+| 2018 | 95 | S60 | 745 | S1-S286 |
+| 2019 | 96 | S30 | 744 | S1-S239 |
+| 2020 | 95 | S33 | 453 | S1-S152 |
+| 2021 | 98 | S34 | 498 | S1-S169 |
+| 2022 | 100 | S40 | 497 | S1-S167 |
+| 2023 | 98 | S38 | 392 | S1-S141 |
+
+### A14.2 The cutoff is mid-block, not at a section boundary
+
+If the capture happened to stop where the oral block ends, the cohort would
+still be a valid census of oral presentations. It does not. The 2012 capture
+ends at S33-S34; the records immediately following are ordinary scientific
+abstracts of the same kind already in the cohort:
+
+> S33 Endoscopic Midurethral Circumferential Injection of Calcium Hydroxylapatite
+> for Urethral Bulking; S34 Sling Failures: Does the Adjustable Suburethral Sling
+> (Remeex) Bring Hope; S35 Interest of the 3D Ultrasound Evaluation of Suburethral
+> Tape after TVT-O Procedure; S37 The Outcomes of Elderly Patients in the Treatment
+> of Gynecological Malignancy with Robotics.
+
+Ingestion stopped part-way through the material, not at the end of a category.
+
+### A14.3 Consequence for this appendix
+
+Each supplement mixes oral presentations, posters and videos, so the item counts
+above are not counts of missing *orals*. Establishing the true oral denominator
+per congress requires the section headers that `R/01b_parse_web.R` reads, which
+is the same code path that truncates. The size of the shortfall is therefore not
+established here; only its existence is.
+
+What is established is that the captured cohort is a **contiguous prefix** of
+each supplement rather than a sample of it. It is systematically the
+earliest-paginated material, which corresponds to particular sessions and topic
+blocks rather than to a random draw.
+
+Every quantity reported in this appendix and in the manuscript is arithmetically
+correct **for the 1,106 abstracts that were captured**. None of them describes
+"all oral presentations at the AAGL Global Congress, 2012-2023". The corrections
+in A12 and A13, the denominator chain in A13.1, and the open decisions recorded
+in A13.6 and A13.7 all sit downstream of a cohort that has not yet been
+correctly assembled.
+
+Remediation is tracked in `docs/FAILURE_MODES.md` and is out of scope for this
+appendix.

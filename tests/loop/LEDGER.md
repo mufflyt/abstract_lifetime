@@ -509,3 +509,74 @@ data. All four are currently true; they will fail if either side moves.
 
 **Suite after cycle 7:** 22 files, 704 passed (+19), 5 failed, 0 errors.
 Failures unchanged from cycle 6: four open decisions and one pre-existing.
+
+---
+
+## Cycle 8 — 2026-09-03 23:15 MDT
+
+Mix required: 3 BVA / 4 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle08_reproducibility_contracts.R` (30 assertions).
+Targets: identifier contracts, pipeline dependency order, document rendering,
+environment independence, artifact vintage, Shiny bundle schema.
+
+**Result:** 10/10 pass. No implementation defects. Three defects in my own tests
+were found and corrected:
+
+- **8.5** asserted the runner sources stages in ascending numeric order. Wrong
+  premise: the 09* and 10* enrichment stages deliberately run before
+  `06_analyze_results`, because the analysis consumes the demographics they
+  produce. Rewritten to assert the seven dependency relationships that actually
+  hold.
+- **8.6** guarded the knit test with `Sys.which("pandoc")`, which misses the copy
+  rmarkdown bundles. The test skipped on a machine where rendering demonstrably
+  works. A permanently skipping test is a hole, not a safeguard. Now uses
+  `rmarkdown::pandoc_available()` and runs.
+- **8.7** shelled out to `06_analyze_results.R` and skipped whenever that call
+  failed, which is the same hole. Rewritten as a property test: the transform is
+  a pure function of its inputs, so it must be idempotent and invariant to row
+  order. Always runs.
+
+Also re-rendered `docs/technical_appendix.docx`, which predated its source by 91
+minutes and therefore reported pre-cycle-4 numbers.
+
+---
+
+# LOOP STOPPED AFTER CYCLE 8
+
+## Reason 1: concurrent agent in the same working tree
+
+A test file I did not write, `tests/testthat/test-remediation_invariants.R`,
+appeared at 17:06 between cycles 7 and 8, alongside `docs/FAILURE_MODES.md`,
+`docs/SOURCE_OF_TRUTH.md`, `scripts/rebuild_candidate_pool.R` and edits to
+`00_run_all.R`, `config.yml` and several `R/` stages.
+
+**My `git add -A` swept 26 files I did not author into three of my commits**
+(`0bd4541`, `238651e`, `c50f3de`), all already pushed. Those commit messages
+describe only my test work and therefore misrepresent the contents. This is my
+error: `add -A` is unsafe in a tree I do not have exclusively. Not unpicked;
+rewriting pushed history would destroy the other agent's work.
+
+## Reason 2: the cohort is truncated at ingestion
+
+Verified independently against Crossref, then documented in technical appendix
+**A14**. Every congress captures 93-100 presentations, 2022 captures exactly
+100, and each capture is a contiguous prefix from page S1 stopping between S26
+and S60 while the supplements run to S141-S286. The 2012 cutoff falls mid-block:
+the records immediately after it are ordinary abstracts of the same kind already
+in the cohort.
+
+The captured cohort is a contiguous prefix of each supplement, not a sample of
+it. Every number validated across cycles 0-8 is arithmetically correct for the
+1,106 abstracts captured and does not describe "all oral presentations at the
+AAGL Global Congress, 2012-2023".
+
+Per the user's instruction, this is documented and then set aside. Remediation
+is tracked in `docs/FAILURE_MODES.md`, not here.
+
+## Loop totals, cycles 1-8
+
+- 80 tests added across 8 files; 30 BVA, 27 semantic, 23 adversarial
+- 7 real defects found and fixed
+- 4 findings preserved as failing tests pending a decision
+- 8 defects in my own tests found and corrected
+- Suite: 743 passing at cycle 8
