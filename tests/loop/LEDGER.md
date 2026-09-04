@@ -897,3 +897,49 @@ appear in `aim3_logistic_regression.csv`. Also collapsed five `expect_*` plus
 
 **Result:** 10/17 assertions passed on the first run, 11/14 after correcting my
 own test. Three failures are the findings above.
+
+### Fix applied on request: first_author_country contained US states
+
+**Root cause.** `R/09_enrich_authors.R:96`, inside `parse_affiliation()`:
+
+```r
+country <- if (length(parts) >= 1) tail(parts, 1) else NA_character_
+```
+
+The last comma-delimited token of an affiliation is not the country. US
+addresses end in a state, so "Department of OB/GYN, Mayo Clinic, Phoenix,
+Arizona." produced `"Arizona."`, trailing period included.
+
+`parse_country()` in `R/utils_states.R:308` already solves this properly: it
+resolves US signals to `"USA"` first, then matches a canonical country list, and
+returns NA when neither applies. A second, weaker rule had been written beside
+it. Replaced the tail-token grab with a `parse_country()` call.
+
+**Correcting the shipped data without a network re-run.** Stage 09 uses
+`rentrez` against PubMed and caches no XML, so re-running it would mean ~1,100
+network calls and would regenerate data the concurrent agent may be mid-analysis
+on. Instead `R/09c_author_characteristics.R` now re-derives the column from the
+affiliation text it already holds, using the same canonical parser it already
+calls a few lines later for ACOG district.
+
+**Result.**
+
+    before   178 non-NA values, 161 of 178 disagreeing with is_us_based,
+             values including "Arizona.", "Illinois.", "Massachusetts."
+    after    976 non-NA values in author_characteristics.csv, zero states,
+             zero trailing periods
+             USA 438, China 61, Italy 51, United Kingdom 44, Canada 42
+
+Coverage rose because the canonical parser recognises country names the
+tail-token rule missed, not only because bad values were removed.
+
+**Propagation.** Ran `09c` then `10e_merge_demographics.R`, both local. The
+correction now reaches `author_characteristics.csv` (0 states) and
+`abstracts_with_matches.csv` (0 states). `final_analytical_dataset.csv` still
+carries 18 states because it is written by `06_analyze_results.R`, which is
+mid-edit by the concurrent agent and must not be run. Test 12.5 now verifies the
+fix at the stage it landed and keeps asserting on the final dataset, so it goes
+green on the next full run.
+
+Bundle refreshed again, since `abstracts_with_matches.csv` changed. Their 55
+bundle-currency assertions pass.

@@ -93,7 +93,12 @@ parse_affiliation <- function(aff) {
     return(list(city = NA_character_, state = NA_character_, country = NA_character_))
   }
   parts <- str_split(aff, ",\\s*")[[1]] |> str_squish()
-  country <- if (length(parts) >= 1) tail(parts, 1) else NA_character_
+  # The last comma-delimited token is NOT the country. US affiliations end in a
+  # state ("..., Phoenix, Arizona."), so taking the tail verbatim wrote states
+  # into a country field. parse_country() in utils_states.R already resolves US
+  # signals to "USA", matches a canonical country list, and returns NA when
+  # neither applies. Use it rather than a second, weaker rule.
+  country <- parse_country(aff)
 
   # Use the improved multi-strategy state parser
   state <- parse_us_state(aff)

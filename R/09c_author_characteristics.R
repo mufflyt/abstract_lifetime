@@ -186,6 +186,14 @@ first_auth <- authors |>
     first_author_all_aff = all_affiliations,
     first_author_country = affiliation_country
   ) |>
+  # Re-derive country with the canonical parser. The upstream column was built
+  # by taking the last comma-delimited token of the affiliation, which yields a
+  # US state ("Arizona.", "Illinois.") for domestic affiliations. Fixed at the
+  # root in 09_enrich_authors.R; re-derived here so the shipped data is correct
+  # without re-running the networked PubMed stage.
+  mutate(
+    first_author_country = vapply(first_author_aff, parse_country, character(1))
+  ) |>
   # Re-parse state with the improved multi-strategy parser if raw is NA
   mutate(
     first_author_state = if_else(

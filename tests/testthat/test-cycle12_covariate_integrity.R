@@ -112,6 +112,22 @@ test_that("every aim3 term maps to a column in the exported dataset", {
 # ============================================================
 test_that("is_us_based agrees with first_author_country", {
   need(P_FINAL)
+  # Verify the fix where it landed first. parse_affiliation() in
+  # 09_enrich_authors.R took the last comma-delimited token of the affiliation as
+  # the country, which yields a US state for domestic addresses. Fixed at the
+  # root and re-derived through parse_country() in 09c. The final analytical
+  # dataset is written by 06_analyze_results.R and will not carry the correction
+  # until that stage next runs, so the assertion below tracks that staleness.
+  awm <- here::here("output", "abstracts_with_matches.csv")
+  if (file.exists(awm)) {
+    a <- readr::read_csv(awm, show_col_types = FALSE)
+    if ("first_author_country" %in% names(a)) {
+      v <- a$first_author_country[!is.na(a$first_author_country)]
+      expect_false(any(grepl("^(Arizona|Illinois|Massachusetts|California|Texas|Florida|New York|Ohio|Michigan|Colorado|Pennsylvania)\\.?$",
+                             v, ignore.case = TRUE)),
+                   label = "a US state is still being written into the country field")
+    }
+  }
   ev <- evaluated()
   skip_if(!all(c("is_us_based", "first_author_country") %in% names(ev)), "columns absent")
   both <- ev |> filter(!is.na(is_us_based), !is.na(first_author_country))
