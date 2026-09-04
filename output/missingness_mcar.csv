@@ -1,0 +1,2 @@
+test,statistic,df,p_value,n_patterns,n_rows,vars_tested,note
+little_mcar,28.849221602438966,7,1.5413830170774023e-4,6,1106,sample_size; months_to_pub; cited_by_count; journal_impact_proxy,"non-numeric item vars excluded from test: gender_unified, state_unified, subspecialty_unified, practice_type, subspecialty, first_author_first"

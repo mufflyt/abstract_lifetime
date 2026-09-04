@@ -176,6 +176,12 @@ source(here("R", "09e_fidelity_checks.R"))
 cli_h2("Step 6: Analysis")
 source(here("R", "06_analyze_results.R"))
 
+# Step 6b0: Missing-data analysis. Reports item-level missingness, Little's
+# MCAR test, and whether the 55 unresolved abstracts differ from the evaluated
+# set - the assumption the publication-rate denominator rests on.
+cli_h2("Step 6b0: Missing-Data Analysis")
+source(here("R", "06b_missingness.R"))
+
 # Step 6b: Gold standard validation
 cli_h2("Step 6b: Gold Standard Validation")
 source(here("R", "validation_gold_standard.R"))
@@ -205,6 +211,10 @@ if (file.exists(deploy_script)) {
 } else {
   cli_alert_warning("Deploy script not found — skipping Shiny deploy")
 }
+
+# Step 10: Record the environment this run was produced in.
+cli_h2("Step 10: Session Snapshot")
+source(here("R", "06c_session_snapshot.R"))
 
 cli_h1("Pipeline Complete")
 cli_alert_success("Results in: {here('output')}")

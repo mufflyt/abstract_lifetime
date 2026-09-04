@@ -1,0 +1,11 @@
+variable,label,missingness_type,n_total,n_missing,pct_missing,n_unknown,n_informative,pct_informative
+subspecialty,subspecialty,item-level,1106,927,83.8,0,179,16.2
+practice_type,practice_type,item-level,1106,913,82.5,0,193,17.5
+cited_by_count,cited_by_count,item-level,1106,900,81.4,0,206,18.6
+journal_impact_proxy,journal_impact_proxy,item-level,1106,900,81.4,0,206,18.6
+first_author_first,first_author_first,item-level,1106,895,80.9,0,211,19.1
+months_to_pub,months_to_pub,item-level,1106,837,75.7,0,269,24.3
+state_unified,state_unified,item-level,1106,770,69.6,0,336,30.4
+subspecialty_unified,subspecialty_unified,item-level,1106,719,65,0,387,35
+sample_size,sample_size,item-level,1106,407,36.8,0,699,63.2
+gender_unified,gender_unified,item-level,1106,40,3.6,0,1066,96.4

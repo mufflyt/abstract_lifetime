@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![R >= 4.4](https://img.shields.io/badge/R-%3E%3D%204.4-blue.svg)](https://www.r-project.org/)
-[![Tests](https://img.shields.io/badge/tests-837%20passing%2C%203%20failing-yellow.svg)](docs/VALIDATION.md)
+[![Tests](https://img.shields.io/badge/tests-878%20passing%2C%203%20failing-yellow.svg)](docs/VALIDATION.md)
 [![Shiny App](https://img.shields.io/badge/Shiny-Live%20App-orange.svg)](https://mufflyt.shinyapps.io/aagl-adjudication/)
 
 **Publication Rate, Time to Publication, and Predictors of Full Publication
@@ -131,8 +131,13 @@ install.packages(c(
   "tidyverse", "here", "config", "cli", "rentrez", "xml2", "httr",
   "jsonlite", "survival", "broom", "gender", "stringdist", "digest",
   "rvest", "purrr", "yaml", "flowchart", "DiagrammeR", "htmlwidgets",
-  "webshot2", "scales"
+  "webshot2", "scales", "npi", "naniar"
 ))
+
+# Optional but recommended: supplies NPPES registry gender (waterfall tier 1),
+# Table 1 with p-values, join safety in the demographics merge, Little's MCAR
+# test, and the session snapshot. Every use degrades gracefully without it.
+remotes::install_github("mufflyt/mysterycall@42d66d92ef52a0f85d1f7c61208c2ddd79d9c06e")
 ```
 
 **Reproduce the reported numbers from tracked files** (works from a clean clone,
@@ -204,7 +209,7 @@ Rscript scripts/rebuild_candidate_pool.R
 
 ## Test status
 
-25 test files. As of 2026-09-04: **837 passing, 3 failing, 1 skipped**
+26 test files. As of 2026-09-04: **878 passing, 3 failing, 1 skipped**
 (from 519 passing / 1 failing at the start of the day). Every failure is
 deliberately left red, each marking a decision that belongs to the author rather
 than to code:
@@ -255,8 +260,11 @@ Full inventory and the list of invariants that have **no** test:
 9. The composite score is described as ten-component but `keyword_pts` is 0 for
    every abstract, so nine are live. Fixing it has the same re-scoring
    consequence as above.
-10. The 55 unresolved abstracts are removed from the denominator. Bounds:
-    16.1% if all unpublished, 21.1% if all published.
+10. The 55 unresolved abstracts are removed from the denominator, and they are
+    **not** missing completely at random — they differ from the evaluated set on
+    `study_design` (p = 0.0004) and `n_authors` (p = 0.013), the latter a
+    significant predictor in both models. Bounds: 16.1% if all unpublished,
+    21.1% if all published. See `output/unresolved_vs_evaluated.csv`.
 11. The proportional-hazards assumption is only marginally supported
     (global p = 0.056).
 12. **Three publications are each credited to two abstracts**, so six of the 178

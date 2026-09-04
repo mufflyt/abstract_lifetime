@@ -4,10 +4,10 @@ Inventory of the test suite, plus an audit of which scientific claims are and
 are not protected by a test.
 
 **Current status** (`testthat::test_dir("tests/testthat")`, 2026-09-04,
-25 test files):
+26 test files):
 
 ```
-[ FAIL 3 | WARN 18 | SKIP 1 | PASS 837 ]
+[ FAIL 3 | WARN 18 | SKIP 1 | PASS 878 ]
 ```
 
 All three remaining failures are **deliberately left red**: each marks a decision
@@ -73,6 +73,7 @@ shinyapps.io.
 | `test-cycle03_model_contracts.R` | 10 | BVA + semantic + adversarial | Gate 3 | Partially | model RDS, `aim2b`/`aim3` CSVs | Logistic and Cox output contracts; the ≥50%-missing exclusion rule; complete-case attrition; determinism; artefact vintage. Added `n_obs` to `aim3_logistic_regression.csv` (1,010 against a denominator of 1,051 — 41 abstracts leave through complete-case deletion, previously invisible). |
 | `test-cycle04_validation_sensitivity.R` | 10 | semantic + adversarial | Gate 3 | Partially | `validation_metrics.csv`, `sensitivity_analyses.csv`, `interrater_agreement.csv`, `search_strategy_efficacy.csv` | Gold-standard confusion-cell partition; sensitivity-scenario denominator consistency; interrater completeness; search-efficacy vintage |
 | `test-docs_drift.R` *(added by this pass)* | 12 | contract | Gate 3 | Partially | `docs/*.csv`, the analytical outputs | Documentation-to-data agreement; see §4 |
+| `test-mysterycall_integrations.R` *(added 2026-09-04)* | 9 | contract | Gate 3 | Partially | Table 1 outputs, `10e` helpers, the missingness outputs, the session snapshot | The four borrowed functions: Table 1 is stratified and its stratum sizes reconcile with the cohort; `safe_join()` blocks a duplicated sidecar key, preserves row count, and still creates columns from an empty-but-typed sidecar; missingness counts match the dataset; the MCAR row records what it did not test; `best_score` is labelled definitional; the snapshot records version, platform and seed |
 | `test-gender_nppes_tier.R` *(added 2026-09-04)* | 6 | contract | Gate 3 | Partially | `gender_from_nppes.csv`, `npi_matches.csv`, `gender_resolution_policy.csv`, `abstracts_with_matches.csv` | The NPPES registry tier: population identity with the high-confidence NPI set, vocabulary, resolution rate, NPPES/ABOG agreement floor, that the policy file puts NPPES first and matches the coalesce order in the code, and that every row labelled `nppes` carries the sidecar's value |
 | `test-shiny_bundle_currency.R` *(added by this pass)* | 9 | contract + end-to-end | Gate 3 | Yes — the bundle is gitignored | `shiny/adjudication_app/bundle/**`, `abstracts_cleaned.csv`, `match_scores.csv`, `pubmed_candidates.csv` | Whether the adjudication app serves the data the analysis was run on: md5 equality for the five verbatim files, cohort identity, no abstract under-served candidates, every winning PMID displayable, the candidate-to-score join resolves, and `deploy.R` gates publication behind `SHINY_DEPLOY`. Two tests drive the real server through `shiny::testServer()`. |
 | `test-remediation_invariants.R` *(added by this pass)* | 8 | contract | Gate 3 | Partially | `abstracts_cleaned.csv`, `final_analytical_dataset.csv`, `pubmed_candidates.csv`, the aim CSVs | The defects fixed on 2026-09-03: no scraper footnote in `abstract_text`; no covariate structurally zero across a congress outside 2017–2018; `abstract_word_count` nonzero wherever text exists; the enrichment block survives a step-5 re-run; one subspecialty vocabulary; subgroup tables carry their availability split; sensitivity scenarios name their denominator; every winning PMID resolves; every published abstract carries a date; pre-congress publications are confined and excluded from Aim 2 |
@@ -104,6 +105,7 @@ described in [PUBLICATION_SEARCH.md](PUBLICATION_SEARCH.md) §1.
 | Exported rate is reconstructible from exported counts | Yes | `test-decision_precedence_bva.R:223` | Strong — this is the test that forced `n_evaluated` into `aim1_publication_rate.csv` |
 | Candidate score in range | Partial | `test-pipeline_semantics.R:68, 79` | Moderate — asserts definite ≥ 7 and no_match < 3; no explicit `[-5, 14]` bound |
 | Publication-date validity | Partial | `test-pipeline_semantics.R:129, 139` | Moderate — bounds the median at 6–36 months and forbids negative times among the published |
+| Missing-data mechanism | **Yes** | `test-mysterycall_integrations.R`, `R/06b_missingness.R` | Moderate. Little's MCAR is run and recorded, and the 55 unresolved are compared against the evaluated on every model covariate. Two substantive differences found. |
 | Human-adjudication completeness | **No** | — | **GAP.** Nothing asserts that every cohort abstract has a decision, nor that decisions with no matching abstract are accounted for (47 video orphans). |
 | One publication per abstract | **Yes** | `test-cycle06_scoring_composite.R:116` | **Strong, and currently violated by design** — 3 PMIDs are credited to 6 abstracts. Surfaced in `final_pmid_shared`. F17. |
 | Final dataset grain | Partial | `test-pipeline_semantics.R:18` | Moderate — row count and year set, on `abstracts_with_matches.csv` |

@@ -21,7 +21,7 @@ All models are fitted on `output/abstracts_with_matches.csv` joined to
 | **Origin date** | `conference_date_for(congress_year, cfg)` — the congress start date in `config.yml` (2012-11-06 … 2023-11-07) |
 | **Administrative censoring date** | `cfg$pubmed$date_end` = **2026-04-01**, the end of the PubMed search window |
 | **Time scale** | months, days ÷ 30.44 |
-| **Missing-data handling** | complete-case throughout. No imputation anywhere in the pipeline. |
+| **Missing-data handling** | complete-case throughout. No imputation anywhere in the pipeline. Missingness is now *reported* rather than only stated — see the section below. |
 | **Seed** | `set.seed(42)` in `00_run_all.R`; no analysis step is stochastic. |
 
 ---
@@ -307,6 +307,67 @@ treatment of the 55 unresolved.
 
 The follow-up-window rows are the closest thing to a lead-time sensitivity
 analysis. ---
+
+## Missing data
+
+`R/06b_missingness.R` produces what the Methods previously asserted without
+evidence.
+
+**Item-level missingness** (`output/missingness_by_variable.csv`), highest first:
+
+| variable | % missing |
+|---|---:|
+| `subspecialty` | 83.8 |
+| `practice_type` | 82.5 |
+| `cited_by_count`, `journal_impact_proxy` | 81.4 |
+| `first_author_first` | 80.9 |
+| `months_to_pub` | 75.7 |
+| `state_unified` | 69.6 |
+| `subspecialty_unified` | 65.0 |
+| `sample_size` | 36.8 |
+| `gender_unified` | 3.6 |
+
+Most of these are structural rather than accidental: a citation count or a
+practice type can only exist for an abstract with a matched publication.
+
+**Little's MCAR test** (`output/missingness_mcar.csv`): chi-square 28.8, df 7,
+**p = 0.00015** — MCAR is rejected. Two caveats travel with that number and are
+recorded in the output file rather than left implicit. It covers only the
+**numeric block** (`sample_size`, `months_to_pub`, `cited_by_count`,
+`journal_impact_proxy`); the six categorical variables were described but not
+tested. And at N = 1,106 the test is highly powered and rejects on minor
+deviations, so rejection here is consistent with weak, non-systematic item
+missingness rather than evidence of substantial bias.
+
+### The assumption the denominator rests on
+
+The publication rate divides by the 1,051 evaluated abstracts and drops the 55
+whose adjudication never resolved. That is an available-case analysis assuming
+the 55 do not differ systematically. `output/unresolved_vs_evaluated.csv` tests
+it across every model covariate:
+
+| covariate | unresolved | evaluated | p | reading |
+|---|---:|---:|---:|---|
+| `best_score` | 4.72 | 3.23 | <0.001 | **definitional** — the unresolved are the mid-score band by construction, and the comparison group contains 709 `no_match` abstracts |
+| `study_design` | — | — | 0.0004 | **substantive** |
+| `n_authors` | 3.51 | 3.90 | 0.013 | **substantive** |
+| `sample_size` | 332 | 3,082 | 0.13 | ns |
+| `is_rct` | 3.6% | 9.1% | 0.16 | ns |
+| `congress_year` | 2017.9 | 2017.3 | 0.19 | ns |
+| `n_candidates` | 94.6 | 56.6 | 0.22 | definitional |
+| everything else | | | > 0.4 | ns |
+
+**The 55 are not missing completely at random.** Two substantive covariates
+differ, and `n_authors` is a significant predictor in both models. Dropping them
+therefore assumes missing-at-random *given the observed data*, which is weaker
+and untestable. The bounds in [COHORT_ASSEMBLY.md](COHORT_ASSEMBLY.md) §8 —
+16.1% if all were unpublished, 21.1% if all were published — remain the honest
+envelope, and this result is the reason to quote them.
+
+`output/missingness_interpretation.txt` carries a generated paragraph suitable
+for adaptation into Methods.
+
+---
 
 ## Diagnostics
 

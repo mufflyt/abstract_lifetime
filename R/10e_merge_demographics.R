@@ -73,6 +73,59 @@ assert_unique_keys <- function(tbl, source_label) {
   invisible(tbl)
 }
 
+#' Left join that refuses to change the left table's row count
+#'
+#' Every join in this script is one-to-one on \code{abstract_id}: a sidecar
+#' must contribute at most one row per abstract. A sidecar carrying a duplicate
+#' key silently multiplies rows and inflates every downstream count. That is not
+#' hypothetical - the same defect reached \code{assign_final_published()} and
+#' was only found by a test.
+#'
+#' \code{assert_rows()} below catches the symptom after the fact.
+#' \code{mysterycall::mysterycall_safe_left_join()} catches the cause: it
+#' validates key uniqueness on the right table BEFORE joining and names the
+#' offending keys. It is used when available; otherwise this falls back to a
+#' plain join plus the local uniqueness check, so a machine without the package
+#' is guarded, just less informatively.
+#'
+#' @param left,right Tibbles to join.
+#' @param by Character. Join key. Defaults to \code{"abstract_id"}.
+#' @param label Character. Name of the right table, for error messages.
+#' @return \code{left} with \code{right}'s columns, same row count.
+#' @keywords internal
+safe_join <- function(left, right, by = "abstract_id", label = "sidecar") {
+  # A right table with no columns carries nothing to join. A right table with
+  # columns but zero rows still must be joined: it contributes the columns as
+  # all-NA, which downstream coalesce() calls rely on. 10g second-author
+  # triangulation is exactly that case - it has never returned a row.
+  if (length(names(right)) == 0) return(left)
+  n_before <- nrow(left)
+  if (nrow(right) == 0) return(dplyr::left_join(left, right, by = by))
+
+  out <- if (requireNamespace("mysterycall", quietly = TRUE)) {
+    mysterycall::mysterycall_safe_left_join(
+      left, right, by = by,
+      expect_unique_right = TRUE,
+      # Low coverage is the norm here, not a fault: a sidecar such as the NPPES
+      # registry only covers abstracts with a resolved NPI (24%). The guard we
+      # want is key uniqueness on the right, not a coverage floor, so the
+      # package default of 98% is switched off deliberately.
+      min_coverage = 0,
+      label_left = "abstracts_with_matches", label_right = label
+    )
+  } else {
+    assert_unique_keys(right, label)
+    dplyr::left_join(left, right, by = by)
+  }
+
+  if (nrow(out) != n_before) {
+    stop(sprintf("Join with %s changed the row count: %d -> %d",
+                 label, n_before, nrow(out)), call. = FALSE)
+  }
+  out
+}
+
+
 #' Assert that a tibble has exactly the expected number of rows
 #'
 #' Stops with an informative error if a left join introduced row
@@ -150,7 +203,7 @@ if (nrow(char) > 0) {
                  "practice_type", "subspecialty", "career_stage")
   char_slim <- char |> select(any_of(char_cols)) |> assert_unique_keys("09c author_characteristics")
   matches <- matches |>
-    left_join(char_slim, by = "abstract_id") |>
+    safe_join(char_slim, label = "09c author characteristics") |>
     assert_rows("09c author_characteristics")
 
   # Reversible blanking: flag rows where demographics came from wrong match
@@ -281,18 +334,22 @@ g8 <- extract_gender(tri_sr, "tri_gender", "gender_tri_sr")
 g9 <- extract_gender(tri_2nd, "tri_gender", "gender_tri_2nd")
 
 # Join all gender sources (extract_gender already deduplicates by abstract_id)
-matches <- matches |>
-  left_join(nppes_gender_tbl, by = "abstract_id") |>
-  left_join(npi_gender_tbl, by = "abstract_id") |>
-  left_join(oa_gender_tbl, by = "abstract_id") |>
-  left_join(g3, by = "abstract_id") |>
-  left_join(g4, by = "abstract_id") |>
-  left_join(g5, by = "abstract_id") |>
-  left_join(g6, by = "abstract_id") |>
-  left_join(g7, by = "abstract_id") |>
-  left_join(g8, by = "abstract_id") |>
-  left_join(g9, by = "abstract_id") |>
-  assert_rows("gender waterfall joins")
+gender_tables <- list(
+  "09k NPPES registry"          = nppes_gender_tbl,
+  "10 NPI (ABOG)"               = npi_gender_tbl,
+  "10b OpenAlex names"          = oa_gender_tbl,
+  "09f PubMed full name"        = g3,
+  "09h OB/GYN publications"     = g4,
+  "09i OpenAlex works search"   = g5,
+  "09g ORCID"                   = g6,
+  "09j Open Payments"           = g7,
+  "10f senior triangulation"    = g8,
+  "10g second triangulation"    = g9
+)
+for (lbl in names(gender_tables)) {
+  matches <- safe_join(matches, gender_tables[[lbl]], label = lbl)
+}
+matches <- matches |> assert_rows("gender waterfall joins")
 
 
 #' Collapse the two subspecialty vocabularies onto one set of labels
@@ -462,7 +519,7 @@ if (nrow(npi) > 0) {
            npi_full_name, npi_acog_district) |>
     assert_unique_keys("NPI sidecar")
   matches <- matches |>
-    left_join(npi_cols, by = "abstract_id") |>
+    safe_join(npi_cols, label = "10 NPI columns") |>
     assert_rows("NPI columns")
   cli_alert_info("NPI by confidence:")
   print(table(matches$npi_match_confidence, useNA = "ifany"))
@@ -475,7 +532,7 @@ if (nrow(orcid) > 0 && "orcid_country" %in% names(orcid)) {
     select(abstract_id, any_of(c("orcid_country", "orcid_institution"))) |>
     assert_unique_keys("ORCID sidecar")
   matches <- matches |>
-    left_join(orcid_slim, by = "abstract_id") |>
+    safe_join(orcid_slim, label = "10d ORCID demographics") |>
     assert_rows("ORCID columns")
   cli_alert_info("ORCID country: {sum(!is.na(matches$orcid_country))}")
 }

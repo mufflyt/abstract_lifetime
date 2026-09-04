@@ -779,6 +779,55 @@ stages:
       so the specification is data-dependent. Aim 5 no longer runs because
       result_positivity is not carried into abstracts_with_matches.csv.
 
+  - id: "06b"
+    name: Missing-data analysis and the MAR assumption for the unresolved
+    script: R/06b_missingness.R
+    in_run_all: true
+    functions: [mysterycall::build_missingness_mcar_table]
+    inputs: [output/final_analytical_dataset.csv]
+    outputs:
+      - output/missingness_by_variable.csv
+      - output/missingness_mcar.csv
+      - output/missingness_interpretation.txt
+      - output/unresolved_vs_evaluated.csv
+    external_sources: []
+    grain_in: one abstract
+    grain_out: one variable (missingness) / one covariate (comparison)
+    primary_key: variable
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: [tests/testthat/test-mysterycall_integrations.R]
+    notes: >
+      The manuscript reported no missingness table and no mechanism test.
+      Section 1 is mysterycall's; Little's MCAR covers the numeric block only
+      (p < 0.001) and vars_tested records which. Section 2 is specific to this
+      study: it compares the 55 unresolved against the 1,051 evaluated on every
+      model covariate, which is the assumption the denominator rests on. Two
+      substantive differences found - study_design and n_authors - so the 55 are
+      not missing completely at random. best_score and n_candidates differ by
+      construction and are labelled definitional.
+
+  - id: "06c"
+    name: Session snapshot
+    script: R/06c_session_snapshot.R
+    in_run_all: true
+    functions: [mysterycall::mysterycall_session_snapshot]
+    inputs: [config.yml]
+    outputs: [output/session_snapshot.txt]
+    external_sources: []
+    grain_in: n/a
+    grain_out: free text
+    primary_key: null
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: [tests/testthat/test-mysterycall_integrations.R]
+    notes: >
+      Records R version, platform, seed and loaded package versions. Records the
+      environment; does not pin it. renv.lock remains the recommendation in
+      docs/REPRODUCIBILITY.md.
+
   - id: validation
     name: Gold-standard validation
     script: R/validation_gold_standard.R
@@ -822,6 +871,7 @@ stages:
              output/aim3_logistic_regression.csv, output/aim4_strategy_performance.csv]
     outputs:
       - output/tables/table1_characteristics.csv
+      - output/tables/table1_column_ns.csv
       - output/tables/table2_pub_rate_subgroups.csv
       - output/tables/table3_logistic_regression.csv
       - output/tables/table4_search_strategies.csv
@@ -833,7 +883,12 @@ stages:
     manual_step: false
     reproducible: true
     tests: []
-    notes: Re-derives final_published with its own inline case_when (F9).
+    notes: >
+      Table 1 comes from mysterycall::mysterycall_table1(): stratified, with
+      median [IQR] and mean (SD) for continuous variables and a p-value per
+      variable, replacing a five-variable summarise with no test. Falls back to
+      the reduced form when the package is absent. final_published now comes
+      from R/utils_decisions.R rather than an inline case_when (F9).
 
   - id: "08"
     name: Figures
