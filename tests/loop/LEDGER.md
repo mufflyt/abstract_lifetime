@@ -706,3 +706,44 @@ implementing the fix the entry was waiting on.
 Category (d) under the protocol: pre-existing, external, unrelated to this
 cycle. Not touched, and deliberately NOT re-added to the manifest, since that
 would undo their removal. All three of my registered entries still behave.
+
+---
+
+## Commit pollution: resolved by annotation, not rewrite (2026-09-04)
+
+Three commits carry messages describing only my test work while also containing
+files authored by the concurrent agent, because I staged them with
+`git add -A` in a tree I did not have exclusively.
+
+**Why history was not rewritten.** All three are ancestors of `origin/main`,
+which is the default branch, and four of the other agent's commits sit on top of
+them. Rewriting would mean force-pushing `main`, invalidating their clone and
+any other checkout. That is a destructive fix for a descriptive problem.
+
+**What was done instead.** A `git notes` annotation is attached to each commit
+naming, file by file, which paths belong to the stated work and which were swept
+in. Notes are additive, travel with the repository, and appear in `git log`
+without altering any commit.
+
+| Commit | Stated work | Files actually mine | Swept in |
+|---|---|---|---|
+| `0bd4541` | Cycle 3 | 4 | 8 |
+| `238651e` | Cycle 6 | 2 | 8 |
+| `c50f3de` | Cycle 7 | 4 | 11 |
+
+Two entries matter beyond attribution, because the commit messages give no hint
+that the data moved: `238651e` changed `config.yml` and
+`data/processed/abstracts_cleaned.csv`, and `c50f3de` changed
+`output/abstracts_with_matches.csv`. Anyone bisecting a change in the cohort or
+the analytical dataset would not find it from those subject lines.
+
+**Reading the notes.** They are on `refs/notes/commits` and are not fetched by
+default:
+
+```
+git fetch origin refs/notes/commits:refs/notes/commits
+git log --notes 0bd4541 238651e c50f3de
+```
+
+**Prevention.** From cycle 9 onward every commit stages named paths. The loop
+prompt carries the instruction so it survives a session restart.
