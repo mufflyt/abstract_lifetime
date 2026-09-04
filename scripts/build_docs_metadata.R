@@ -53,7 +53,10 @@ inventory_paths <- function() {
     list.files(here("data", "cache", "checkpoints"), full.names = TRUE),
     list.files(here("output"), pattern = "\\.(csv|txt)$", full.names = TRUE),
     list.files(here("output", "tables"), full.names = TRUE),
-    list.files(here("output", "figures"), pattern = "\\.csv$", full.names = TRUE)
+    list.files(here("output", "figures"), pattern = "\\.csv$", full.names = TRUE),
+    # Tracked companion to the gitignored deploy bundle. It is the only thing
+    # under shiny/ that the inventory covers.
+    here("shiny", "adjudication_app", "bundle_manifest.csv")
   )
 }
 

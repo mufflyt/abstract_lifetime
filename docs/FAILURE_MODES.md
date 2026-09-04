@@ -391,6 +391,15 @@ that the candidate-to-score join resolves. The last of those matters: before the
 pool was rebuilt the app showed 26 candidates for `AAGL2012_001` where 35 had
 been scored.
 
+**CI coverage added 2026-09-04.** `bundle/` is gitignored, so the tests above
+skip on a fresh checkout and this failure mode had no CI protection.
+`deploy.R` now also writes `shiny/adjudication_app/bundle_manifest.csv`, which
+is tracked and records each source's checksum at build time. Three tests compare
+it against the current tracked sources and fail with "the deployed app is
+serving older data than the analysis", naming the files that moved. Verified
+both ways: appending one byte to a source makes them fail, and hiding `bundle/`
+leaves them running (9 assertions) while the rest skip.
+
 **Still outstanding — needs the author.** A verified bundle is not a deployed
 one. Until `SHINY_DEPLOY=true Rscript shiny/adjudication_app/deploy.R` is run,
 reviewers on shinyapps.io continue to see the April data. That is an

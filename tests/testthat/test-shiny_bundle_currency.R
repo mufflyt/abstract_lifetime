@@ -27,6 +27,92 @@ need_bundle <- function(...) {
   p
 }
 
+# ── Bundle manifest: the only part of this file that runs in CI ──────────────
+#
+# Everything below the manifest block inspects bundle/, which is gitignored, so
+# in CI all of it SKIPS - 48 assertions that never run where it matters. The
+# defect they guard against (a bundle 135 days behind the analysis) therefore
+# had no CI protection at all.
+#
+# shiny/adjudication_app/bundle_manifest.csv IS tracked. deploy.R writes it with
+# the checksum of every source at the moment the bundle was built, which lets
+# CI answer the question that actually matters - have the sources moved since
+# the last deploy? - from files it already has.
+
+MANIFEST <- here("shiny", "adjudication_app", "bundle_manifest.csv")
+
+test_that("the bundle manifest lists exactly the sources deploy.R copies", {
+  skip_if_not(file.exists(MANIFEST), "no bundle_manifest.csv - run deploy.R")
+  m <- read_csv(MANIFEST, show_col_types = FALSE)
+
+  expect_true(all(c("source", "md5", "bytes", "git_tracked",
+                    "bundle_built_utc") %in% names(m)))
+  expect_gt(nrow(m), 0)
+  expect_equal(anyDuplicated(m$source), 0L)
+
+  # Read the verbatim list straight out of deploy.R so the manifest cannot
+  # silently stop covering a file the deploy still ships.
+  deploy_src <- readLines(here("shiny", "adjudication_app", "deploy.R"),
+                          warn = FALSE)
+  i <- grep("^verbatim <- list\\(", deploy_src)
+  skip_if(length(i) == 0, "verbatim list not found in deploy.R")
+  j <- min(grep("^\\)$", deploy_src)[grep("^\\)$", deploy_src) > i])
+  quoted <- unlist(regmatches(deploy_src[i:j],
+                              gregexpr('"[^"]+"', deploy_src[i:j])))
+  copied <- unique(gsub('"', "", quoted))
+
+  missing_from_manifest <- setdiff(copied, m$source)
+  expect_equal(missing_from_manifest, character(0),
+               info = "deploy.R copies a file the manifest does not record")
+})
+
+test_that("no bundle source has changed since the last deploy", {
+  skip_if_not(file.exists(MANIFEST), "no bundle_manifest.csv - run deploy.R")
+  m <- read_csv(MANIFEST, show_col_types = FALSE) |> filter(git_tracked)
+  skip_if(nrow(m) == 0, "no git-tracked sources in the manifest")
+
+  drifted <- character()
+  for (i in seq_len(nrow(m))) {
+    src <- here(m$source[i])
+    if (!file.exists(src)) {
+      drifted <- c(drifted, paste0(m$source[i], " (missing)"))
+      next
+    }
+    if (!identical(unname(tools::md5sum(src)), m$md5[i])) {
+      drifted <- c(drifted, m$source[i])
+    }
+  }
+
+  expect_equal(
+    drifted, character(0),
+    label = paste0(
+      "sources changed since the bundle was built on ", m$bundle_built_utc[1],
+      " UTC: ", paste(drifted, collapse = ", "),
+      ". The deployed app is serving older data than the analysis. ",
+      "Run: Rscript shiny/adjudication_app/deploy.R"
+    )
+  )
+})
+
+test_that("the manifest records which sources CI cannot check", {
+  skip_if_not(file.exists(MANIFEST), "no bundle_manifest.csv - run deploy.R")
+  m <- read_csv(MANIFEST, show_col_types = FALSE)
+
+  # pubmed_candidates.csv is ~130 MB and gitignored, so its checksum is recorded
+  # but unverifiable in CI. That is a known limit, and it must stay visible
+  # rather than being quietly dropped from the manifest.
+  unchecked <- m |> filter(!git_tracked)
+  expect_true(all(!is.na(unchecked$md5) | !file.exists(here(unchecked$source))),
+              info = "an untracked source was recorded with no checksum")
+  if (nrow(unchecked) > 0) {
+    expect_true(all(unchecked$source %in% "data/processed/pubmed_candidates.csv"),
+                info = paste("a new untracked source entered the bundle:",
+                             paste(setdiff(unchecked$source,
+                                           "data/processed/pubmed_candidates.csv"),
+                                   collapse = ", ")))
+  }
+})
+
 # Files the deploy copies verbatim. Anything other than an exact match means
 # the app and the analysis disagree about the data.
 VERBATIM <- list(

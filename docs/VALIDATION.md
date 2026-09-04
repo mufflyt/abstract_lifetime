@@ -46,6 +46,18 @@ Before this work the suite stood at
 **Note on the deploy-bundle tests.** They measure whether `bundle/` matches the
 analysis, not whether the *deployed* application does. A green result means the
 next deploy will ship current data; it does not mean reviewers are seeing it.
+
+**And most of them do not run in CI.** `bundle/` is gitignored, so eight of the
+eleven tests in `test-shiny_bundle_currency.R` skip on a fresh checkout — the
+guard against the defect that actually happened had no CI protection at all.
+`shiny/adjudication_app/bundle_manifest.csv` closes that: `deploy.R` writes the
+checksum of every source at build time, the file is tracked, and three tests
+compare the recorded checksums against the current tracked sources. Those three
+(9 assertions) run everywhere. They answer the question that matters — *have the
+sources moved since the last deploy?* — without needing the bundle itself.
+`pubmed_candidates.csv` is ~130 MB and gitignored, so its row is recorded but
+unverifiable in CI; a third test asserts that it is the *only* such row, so a
+new unverifiable source cannot slip in unnoticed.
 The pre-existing check in `test-shiny_app.R:458` compared modification times,
 which a `touch` satisfies; `test-shiny_bundle_currency.R` compares content and
 adds functional completeness checks. Nothing in the suite can reach

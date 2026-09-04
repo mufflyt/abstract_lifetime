@@ -11,6 +11,7 @@
 #   3. Deploy to shinyapps.io via rsconnect
 
 suppressPackageStartupMessages({
+  library(purrr)
   library(here); library(readr); library(dplyr); library(stringr); library(cli)
 })
 
@@ -143,6 +144,45 @@ if (length(verify_problems) > 0) {
        call. = FALSE)
 }
 cli_alert_success("Bundle verified against the current analysis")
+
+# ── Step 4b: Record what this bundle was built from ──────────────────────────
+# bundle/ is gitignored, so every test that inspects it SKIPS in CI - the whole
+# of tests/testthat/test-shiny_bundle_currency.R, 48 assertions, never runs
+# there. The guard against the defect that actually happened (a bundle 135 days
+# behind the analysis) therefore had no CI protection at all.
+#
+# This manifest is tracked. It records the checksum of every source at the
+# moment the bundle was built, so CI can answer the question that matters -
+# "have the sources moved since the last deploy?" - using only files it has.
+# pubmed_candidates.csv is listed too, marked untracked, so the record is
+# complete even though CI cannot check that row.
+manifest_sources <- c(
+  vapply(verbatim, `[`, character(1), 1),
+  "data/processed/pubmed_candidates.csv"
+)
+tracked_files <- tryCatch(
+  system("git ls-files", intern = TRUE),
+  error = function(e) character(0)
+)
+
+bundle_manifest <- purrr::map_dfr(manifest_sources, function(rel) {
+  src <- here(rel)
+  tibble::tibble(
+    source = rel,
+    md5 = if (file.exists(src)) unname(tools::md5sum(src)) else NA_character_,
+    bytes = if (file.exists(src)) file.size(src) else NA_real_,
+    git_tracked = rel %in% tracked_files
+  )
+}) |>
+  dplyr::mutate(bundle_built_utc = format(Sys.time(), tz = "UTC",
+                                          "%Y-%m-%d %H:%M:%S"))
+
+manifest_path <- file.path(app_dir, "bundle_manifest.csv")
+readr::write_csv(bundle_manifest, manifest_path)
+cli_alert_success(
+  "Wrote {.path {manifest_path}} - {sum(bundle_manifest$git_tracked)} of \
+   {nrow(bundle_manifest)} sources are git-tracked and checkable in CI"
+)
 
 # ── Step 5: Report bundle size ───────────────────────────────────────────────
 bundle_files <- list.files(bundle_dir, recursive = TRUE, full.names = TRUE)
