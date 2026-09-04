@@ -9,6 +9,130 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-04]
+
+Documentation audit, then remediation. Full narrative in
+`docs/technical_appendix.Rmd` section A15; mechanism for each entry in
+`docs/FAILURE_MODES.md`.
+
+**The headline did not move.** 178 / 1,051 = 16.9% (95% CI 14.8–19.3) before and
+after. What moved is the evidence beneath the time-to-event and regression
+results, and how much of the pipeline can be rebuilt on another machine.
+
+### Added
+
+- `docs/` reference set: `COHORT_ASSEMBLY`, `PIPELINE`, `PUBLICATION_SEARCH`,
+  `MATCHING_ALGORITHM`, `OUTCOME_DEFINITION`, `ADJUDICATION`, `DATA_DICTIONARY`,
+  `DATA_INVENTORY`, `AUTHOR_ENRICHMENT`, `STATISTICAL_ANALYSIS`,
+  `RESULTS_PROVENANCE`, `SOURCE_OF_TRUTH`, `REPRODUCIBILITY`, `FAILURE_MODES`,
+  `VALIDATION`, `METHODOLOGICAL_HISTORY`, plus `data_inventory.csv` (83 files),
+  `data_dictionary.csv` (92 variables) and `pipeline_manifest.yml` (44 stages).
+- `scripts/build_docs_metadata.R` — the producer for `data_inventory.csv`,
+  `data_dictionary.csv` and `DATA_DICTIONARY.md`, which were previously
+  committed with no producer at all. Joins hand-authored prose in `docs/_meta/`
+  to counts recomputed from the live tree, and fails if the two disagree about
+  which files or columns exist.
+- `scripts/rebuild_candidate_pool.R` — repairs `pubmed_candidates.csv` from
+  `match_scores_detailed.rds` plus reviewer-supplied PMIDs. Resumable.
+- `scripts/audit_cohort_completeness.R` — measures ingestion against the
+  Crossref deposit. The evidence behind appendix A14.
+- `R/02d_rederive_predictors.R` — recomputes the text-derived covariates after
+  the backfills.
+- `R/06b_missingness.R` — item-level missingness, Little's MCAR test, and a
+  comparison of the 55 unresolved abstracts against the evaluated set.
+- `R/06c_session_snapshot.R` — records R version, platform, seed and package
+  versions.
+- `R/06d_model_stability.R` — bootstrap predictor retention and
+  leave-one-congress-out refits.
+- `R/09k_gender_from_nppes.R` — registrant-reported sex from NPPES, the new
+  tier 1 of the gender waterfall.
+- `output/model_variable_screen.csv` — a decision and a reason for every model
+  candidate, so the specification is reconstructible from the outputs.
+- `output/shared_publication_matches.csv`, `unresolved_vs_evaluated.csv`,
+  `missingness_*`, `model_predictor_stability.csv`,
+  `model_leave_one_congress_out.csv`, `session_snapshot.txt`,
+  `cohort_completeness_audit.csv`.
+- Figure 7, predictor stability; figure 1 STROBE flow chart and supplementary
+  figure S1 now tracked and embedded in the README.
+- Six test files: `test-docs_drift`, `test-remediation_invariants`,
+  `test-shiny_bundle_currency`, `test-gender_nppes_tier`,
+  `test-mysterycall_integrations`, `test-model_stability`.
+- `mysterycall` as an optional dependency, pinned at `42d66d92`. Every use
+  degrades to the previous behaviour without it.
+
+### Fixed
+
+- **Stale candidate pool.** `03b` rewrote `pubmed_candidates.csv` after `04` had
+  scored, leaving 283 of 1,102 winning PMIDs unresolvable. Published abstracts
+  with a publication date **104/178 → 178/178**; Kaplan–Meier and Cox events
+  **104 → 171**; median time to publication 13.8 mo (IQR 6.3–25.0) →
+  **13.7 mo (IQR 5.7–22.6)**.
+- **Covariates derived before the abstract text existed.** `02` ran before the
+  backfills, so 2012–2018 predictors came from the title alone. Cohort counts
+  TRUE: `is_academic` 148 → 371, `is_us_based` 689 → 907, `is_rct` 71 → 98,
+  `is_multicenter` 38 → 65, `has_numeric_results` 276 → 622. The residual
+  gradient is now confined to 2017 and 2018, which have no recoverable text.
+- **96 degenerate `abstract_text` values** cleared — the footnote
+  `"*: Corresponding author."` written into all 95 abstracts of the 2018
+  congress, which passed the `nchar >= 10` gate that decides a row needs no
+  backfill. Score-neutral: all 96 already scored `abstract_pts == 0`.
+- **`05_adjudicate.R` no longer deletes 41 enrichment columns** when re-run.
+- **`00_run_all.R` now runs the demographics merge**, which was reachable only
+  through `run_demographics.R`.
+- **`07` and `08` source `utils_decisions.R`** rather than each carrying an
+  inline outcome cascade missing the human-over-AUTO rule.
+- **`result_positivity` restored** to `05`'s select; the Aim 5 block had been
+  silently gated off since 2026-04-17.
+- **`subspecialty_unified` harmonised** from 13 levels to 8.
+- **NPI paths moved to `config.yml: external_data`**; the missing-file guard
+  called `invisible(NULL)`, which does not stop a sourced script, so a missing
+  pool aborted the pipeline.
+- **Shiny deploy verifies before publishing** and is opt-in behind
+  `SHINY_DEPLOY`. The bundle was 135 days stale.
+- **`technical_appendix.Rmd` knits again** after `sensitivity_analyses.csv`
+  gained a column that broke a hard-coded `kable()` header.
+
+### Changed
+
+- **Gender waterfall is 11 tiers led by a registry.** NPPES registrant-reported
+  sex is tier 1; ABOG is tier 2. They agree on 251 of 252. Coverage 1,065 →
+  1,066, but **11 abstracts moved from a name-inferred tier to a registry
+  tier** and four values changed, three replacing a name inference and two of
+  those resting on a single first initial.
+- **Model variable screen is recorded, not inferred.** A near-zero-variance
+  criterion was added; `has_funding` (TRUE for 7 of 1,051) is now excluded by
+  rule. `log_sample_size` is recorded as **absent** from the Cox model frame —
+  it has always been a listed candidate and has never once entered the model.
+- **Table 1** is now stratified with p-values: 35 rows over 10 variables,
+  against two rows over five with no test.
+- **Sensitivity scenarios name their denominator**; rows 1–2 divide by the
+  cohort and 3 onward by the evaluated set.
+- Subgroup tables carry `availability_among_published` /
+  `availability_among_unpublished` and an `outcome_conditional_stratifier` flag.
+
+### Known issues
+
+- **Cohort truncation.** ScienceDirect ingestion captured 1,154 of 7,711
+  supplement items (15%); every congress is at or below 100. Ten congresses
+  captured no video presentations at all, meaning the window closed inside the
+  oral block and an unknown number of oral presentations were never ingested.
+  Verified against Crossref. Not remediated: re-ingesting requires redoing the
+  search and the human adjudication.
+- **Proportional hazards is violated** (global p = 0.043, from 0.056 when
+  `has_funding` was dropped and 0.32 when the model had 104 events). Needs a
+  stratified or time-varying fit, or the hazard ratios reported as averages.
+- **The 55 unresolved abstracts are not missing completely at random** — they
+  differ on `study_design` (p = 0.0004) and `n_authors` (p = 0.013). Bounds
+  16.1%–21.1%.
+- **Only two predictors are robust to resampling** — `n_authors` (97.2%) and
+  `is_rct` (93.6%). `is_academic` survives 67.4%.
+- **Three PMIDs are credited to two abstracts each.** One is counted published
+  against an explicit reviewer `no_match`.
+- `keyword_pts` is 0 for every abstract, so the "10-component" score has nine
+  live components. Fixing it would invalidate the adjudication.
+- The live Shiny app still serves April data until someone deploys.
+
+
 ### Added
 
 - `pub_issue` extracted from `JournalIssue/Issue` in PubMed XML, required by the

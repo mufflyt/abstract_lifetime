@@ -1457,3 +1457,306 @@ correctly assembled.
 
 Remediation is tracked in `docs/FAILURE_MODES.md` and is out of scope for this
 appendix.
+
+---
+
+## A15. Remediation, September 2026
+
+Sections A12–A14 catalogue defects. This section records what was done about
+them on 3–4 September 2026, what it changed, and what was deliberately left
+alone. It is the counterpart to `docs/FAILURE_MODES.md`, which holds the
+mechanism for each entry; this is the narrative and the arithmetic.
+
+The headline did not move. The publication rate is `r n_pub_a13` / `r format(n_eval_a13, big.mark = ",")` = **`r rate_a13`%** before and after. What
+moved is the evidence beneath the time-to-event and regression results, and
+the amount of the pipeline that can be rebuilt on another machine.
+
+### A15.1 The candidate pool (F2)
+
+`R/03b_search_crossref.R` rewrites `data/processed/pubmed_candidates.csv` in
+place at the end of every supplementary-search run. On 19 April 2026 it ran at
+09:47, after `R/04_score_matches.R` had scored at 09:21. The file left on disk
+was a strict subset of the pool the scores were computed against.
+
+`scripts/rebuild_candidate_pool.R` reconstructs it from
+`data/processed/match_scores_detailed.rds` — the surviving record of every
+scored pair — plus every reviewer-supplied `manual_pmid`, refetching the missing
+metadata from PubMed in batches of 100. It is resumable and drops rows keyed to
+`abstract_id`s outside the 1,154 parsed presentations.
+
+| | before | after |
+|---|---:|---:|
+| Rows in the pool | 48,984 | 65,697 |
+| Cohort pairs vs `sum(n_candidates)` | 48,984 vs 64,718 | 64,728 vs 64,718 |
+| Winning PMIDs unresolvable | 283 | **0** |
+| Published abstracts with a date | 104 / 178 | **178 / 178** |
+| Kaplan–Meier events | 104 | **171** |
+| Median time to publication | 13.8 mo (IQR 6.3–25.0) | **13.7 mo (IQR 5.7–22.6)** |
+
+One limit is permanent. The `strategies` provenance for a recovered pair lived
+only in the overwritten file. Recovered rows carry `strategies = "unrecovered"`
+so Aim 4's attribution excludes rather than miscounts them.
+
+Seven confirmed publications appeared *before* their congress. They belong in
+the numerator — a reviewer ruled they are the abstract's publication — but a
+negative interval is not a time to publication, so Aim 2 now reports
+`n_published`, `n_with_dates`, `n_pre_congress` and `n_undated` and computes the
+median on post-congress publications only.
+
+### A15.2 Covariates derived before the text existed (F3)
+
+`R/02_clean_abstracts.R` derives roughly twenty predictors by regular expression
+over `search_text`, but runs *before* the two text backfills. For congress years
+2012–2018 it therefore saw the title alone, and nothing recomputed the
+variables afterwards.
+
+`R/02d_rederive_predictors.R` re-runs the identical rules over the backfilled
+text as step 2d. It touches covariates only — not `title`, the author columns or
+`keywords_str`, which feed the search and the score and whose change would
+invalidate the scores and the human adjudication recorded against them.
+
+| variable (cohort TRUE) | before | after |
+|---|---:|---:|
+| `is_rct` | 71 | 98 |
+| `is_academic` | 148 | 371 |
+| `is_us_based` | 689 | 907 |
+| `is_multicenter` | 38 | 65 |
+| `has_numeric_results` | 276 | 622 |
+
+Two rules were widened deliberately and are marked as such in the script:
+`has_numeric_results` and `result_positivity` now fall back to `abstract_text`
+where the structured section columns are absent, which is every 2012–2018
+abstract.
+
+The same script clears **96 degenerate `abstract_text` values**. The
+ScienceDirect snippet backfill had written the page footnote
+`"*: Corresponding author."` into all 95 abstracts of the 2018 congress and a
+co-first-author footnote into one 2017 abstract. At 24 characters those passed
+the `nchar >= 10` gate that `02b`/`02c` use to decide a row needs no backfill,
+so the rows could never be repaired, and they displaced the title as the source
+for every derived covariate. Clearing them is score-neutral: all 96 already
+carried `abstract_pts == 0`, verified before the change.
+
+The residual year gradient is now confined to 2017 and 2018, which have no
+recoverable abstract text at all (1 of 97 and 0 of 95) — a true absence of
+evidence rather than a derivation-ordering artefact.
+
+**This changed the models.** `is_academic` moved from HR 0.87 (p = 0.62) to
+HR 0.62 (p = 0.007) and from OR 0.86 (p = 0.57) to OR 0.60 (p = 0.011). That
+estimate rests on a covariate whose ascertainment more than doubled and should
+be read with A15.5 alongside it.
+
+### A15.3 Registry gender, and a dependency that moved
+
+Tier 1 of the gender waterfall read `npi_gender` from the ABOG
+board-certification export. That export's `LATEST` symlink was repointed
+upstream to a workforce file with **no gender column**, 79,400 rows using
+`first`/`last`/`middle` instead of `first_name`/`last_name`/`middle_name`, and
+an NPI on only 411 rows. The shipped 256 tier-1 genders could be used but not
+regenerated.
+
+`R/09k_gender_from_nppes.R` reads registrant-reported sex from NPPES keyed on
+the NPI that `R/10_npi_matching.R` already resolved, and is the new tier 1;
+ABOG is tier 2 and still covers the four abstracts NPPES leaves blank. NPPES
+resolves **263 of 265** high-confidence NPIs against ABOG's 252, and the two
+agree on **251 of 252** (99.6%).
+
+The reordering is justified on reproducibility, not accuracy. Coverage moved
+only 1,065 → 1,066, but **11 abstracts moved from a name-inferred tier to a
+registry tier**, and four values changed — three of them replacing a name
+inference, two of those resting on a single first initial:
+
+| abstract | was | from | now |
+|---|---|---|---|
+| `AAGL2018_021` | male | `ssa` (single initial) | female |
+| `AAGL2021_053` | female | `openalex_search` | male |
+| `AAGL2022_003` | male | `ssa` (single initial) | female |
+| `AAGL2022_031` | female | `npi` (ABOG) | male |
+
+The last is the only NPPES/ABOG disagreement and is logged to
+`data/processed/gender_nppes_abog_conflicts.csv` rather than resolved silently.
+267 of the 1,066 resolved genders now come from a registry; 287 still rest on a
+single initial.
+
+`R/10_npi_matching.R` was hardened at the same time. Its missing-file guard
+called `invisible(NULL)`, which does not stop a sourced script, so a missing
+pool aborted the whole pipeline at that step; the body is now conditional. The
+loader maps the renamed ABOG columns and **refuses to overwrite a richer sidecar
+with a poorer one**, writing `npi_matches_nogender.csv` instead. Both external
+paths moved from hard-coded absolutes into `config.yml: external_data`,
+overridable by `ABOG_NPI_PATH` and `NPPES_DUCKDB_PATH`.
+
+### A15.4 The model variable screen
+
+Both models selected their terms with an inline "< 50% missing and >= 2 distinct
+values" rule, written out twice and recording nothing. `screen_model_vars()` in
+`R/06_analyze_results.R` now applies one rule to both and writes a decision and
+a reason for every candidate to `output/model_variable_screen.csv`, so the
+specification is reconstructible from the outputs alone.
+
+Three criteria, in order: more than 50% missing; fewer than two distinct values;
+and **near-zero variance** by the conventional rule (frequency ratio above 19
+and distinct values below 10%). A candidate absent from the model frame is
+recorded as `absent` rather than silently removed — the candidate list is no
+longer pre-intersected with `names(km_data)`.
+
+Two things this surfaced:
+
+- **`has_funding` is dropped from both models.** TRUE for 7 of 1,051 evaluated
+  abstracts, a frequency ratio of about 149:1. Its interval spanned an order of
+  magnitude in both models.
+- **`log_sample_size` is recorded as absent from the Cox model frame.** It has
+  always been listed as a Cox candidate and has never once entered the model,
+  because it is created inside the Aim 3 block only. That was invisible while
+  the candidate list was pre-intersected.
+
+Every other coefficient moved by less than 0.03. But the Cox proportional
+hazards global test moved from p = 0.056 to **p = 0.043**, so the assumption is
+now violated at α = 0.05. Removing a near-constant term made a latent violation
+visible rather than creating one: the test was already only marginal at 171
+events, against p = 0.32 when it had 104. The response — stratify, allow
+time-varying coefficients, or report the hazard ratios explicitly as averages
+over follow-up — is a methodological decision and has not been taken.
+`tests/testthat/test-pipeline_semantics.R` is left failing with an explanatory
+message rather than relaxed.
+
+### A15.5 How stable are the findings?
+
+Neither model previously carried an influence, leave-one-out or stability
+diagnostic. `R/06d_model_stability.R` adds two, seeded from
+`config.yml: pipeline$seed`.
+
+**Bootstrap predictor retention**, 500 refits of the logistic model
+(n = 1,011), counting how often each term stays significant at p < 0.05:
+
+| predictor | retained |
+|---|---:|
+| `n_authors` | **97.2%** |
+| `is_rct` | **93.6%** |
+| `is_academic` | 67.4% |
+| `is_us_based` | 42.4% |
+| `log_sample_size` | 27.4% |
+| `is_multicenter` | 25.0% |
+| `gender_unified` | 17.0% |
+
+**Leave-one-congress-out**, the model refitted twelve times dropping each
+congress in turn, for all seven terms — 84 refits, all converged, no term
+changing direction. This matters specifically because 2017 and 2018 have no
+recoverable abstract text and their covariates are near-constant; a finding
+resting on either would be an artefact.
+
+| term | ratio range | significant in |
+|---|---|---:|
+| `is_rctTRUE` | 2.12 – 3.21 | 12 / 12 |
+| `n_authors` | 1.27 – 1.38 | 12 / 12 |
+| `is_academicTRUE` | 0.55 – 0.66 | 12 / 12 |
+| `is_us_basedTRUE` | 1.15 – 5.31 | 3 / 12 |
+| `is_multicenterTRUE` | 1.28 – 1.82 | 0 / 12 |
+| `gender_unifiedmale` | 0.78 – 0.90 | 0 / 12 |
+| `log_sample_size` | 0.92 – 0.97 | 1 / 12 |
+
+The two diagnostics disagree about `is_academic`, and the disagreement is the
+useful part. It is significant in **all twelve** congress-drop refits, so it is
+not driven by any single congress, but survives only **67.4%** of bootstrap
+resamples, so it is sensitive to which *abstracts* are drawn. They measure
+different things. `is_academic` should be reported with that qualification
+rather than as a headline. `is_rct` and `n_authors` pass both.
+
+### A15.6 Missing data
+
+The Methods stated "complete-case throughout, no imputation" and reported no
+missingness table and no mechanism test. `R/06b_missingness.R` produces both.
+
+Little's MCAR test over the numeric block gives chi-square 28.8, df 7,
+**p = 0.00015** — MCAR is rejected. Two caveats travel with that and are written
+into `output/missingness_mcar.csv` rather than left implicit: the test covers
+only the numeric variables, and at N = 1,106 it is powered enough to reject on
+minor deviations.
+
+More consequentially, the script tests the assumption the denominator rests on
+by comparing the 55 unresolved abstracts against the 1,051 evaluated across
+every model covariate:
+
+| covariate | unresolved | evaluated | p | |
+|---|---:|---:|---:|---|
+| `study_design` | — | — | 0.0004 | **substantive** |
+| `n_authors` | 3.51 | 3.90 | 0.013 | **substantive** |
+| `best_score` | 4.72 | 3.23 | <0.001 | definitional |
+| `n_candidates` | 94.6 | 56.6 | 0.22 | definitional |
+
+`best_score` and `n_candidates` must differ: the unresolved are the mid-score
+band by construction and the comparison group holds 709 `no_match` abstracts.
+They are labelled definitional and excluded from the verdict.
+
+**The 55 are not missing completely at random.** They differ on `study_design`
+and on `n_authors`, and `n_authors` is a significant predictor in both models.
+Dropping them from the denominator assumes missing-at-random *given the observed
+data*, which is weaker and untestable. The bounds in A13 — 16.1% if all were
+unpublished, 21.1% if all were published — are the honest envelope, and this
+result is the reason to quote them.
+
+### A15.7 Structural fixes with no effect on the numbers
+
+- **`R/05_adjudicate.R` no longer destroys the enrichment columns.** It rebuilds
+  `output/abstracts_with_matches.csv` from scratch with 46 columns while six
+  later stages add the rest in place, so re-running step 5 alone used to delete
+  41 columns and `06` would then silently drop those model terms. It now
+  re-joins any column it does not own.
+- **`00_run_all.R` runs the demographics merge.** `R/10e_merge_demographics.R`
+  and its four upstream scripts were reachable only through
+  `R/run_demographics.R`, so a clean run of the master pipeline produced a
+  dataset with no `gender_unified`, no `npi_*` and no `state_unified`.
+- **`07` and `08` source `R/utils_decisions.R`** instead of each carrying an
+  inline copy of the outcome cascade that omitted the human-outranks-AUTO rule.
+- **`result_positivity` restored** to `05`'s `select()`, so the Aim 5
+  publication-bias block runs again after being silently gated off since
+  17 April 2026.
+- **`subspecialty_unified` harmonised** from 13 levels to 8. `MIG`/`MIGS`,
+  `FPMRS` and its spelled-out form, `Generalist`/`general_OBGYN` were splitting
+  real categories in two.
+- **Thirteen joins in `10e`** now validate key uniqueness on the right table
+  before joining rather than checking the row count afterwards.
+- **The Shiny deploy verifies before it can publish** and is opt-in behind
+  `SHINY_DEPLOY`. The bundle had been 135 days stale, so reviewers were
+  adjudicating against a pre-denominator-fix cohort and a candidate pool missing
+  283 winning PMIDs.
+
+### A15.8 Borrowed code
+
+Five functions come from the `mysterycall` package, pinned at commit
+`42d66d92` in `docs/REPRODUCIBILITY.md`. Every use degrades to the previous
+behaviour if the package is absent.
+
+| function | what it replaced |
+|---|---|
+| `mysterycall_nppes_gender()` | the unregenerable ABOG gender column (A15.3) |
+| `mysterycall_table1()` | a five-variable summarise with no test, now 35 rows over 10 variables with p-values |
+| `mysterycall_safe_left_join()` | a row-count assertion after the fact |
+| `build_missingness_mcar_table()` | nothing — there was no missingness reporting (A15.6) |
+| `mysterycall_bootstrap_predictor_stability()`, `mysterycall_leave_one_out()` | nothing — there were no stability diagnostics (A15.5) |
+| `mysterycall_remove_near_zero()` | a judgement call about sparse terms, now a rule (A15.4) |
+| `mysterycall_session_snapshot()` | nothing — the environment was unrecorded |
+
+Assessed and **not** taken: `model_metrics()` returns only MAE and RMSE;
+`parse_physician_name()` is no better than `normalize_author()` on these author
+strings; the `utils-logging` functions are not exported; `verify_artifact()`
+requires the package's own audit JSON; `exclusion_summary()` and
+`reconcile_inclusion()` are hard-wired to mystery-caller exclusion codes.
+
+One useful negative: `mysterycall_flag_near_duplicate_keys()` over all 1,106
+titles found **zero** near-duplicate pairs. The cohort holds no duplicate
+submissions, and the two 2019 "Occult Uterine Malignancy" abstracts that share a
+publication are genuinely different abstracts rather than a duplication error.
+
+### A15.9 What was deliberately not fixed
+
+| | why |
+|---|---|
+| **Cohort truncation (A14, F1)** | Re-ingesting the supplements would expand the cohort several-fold and require the entire search and human adjudication to be redone. |
+| **The inert `keyword_pts` component** | `keyword_pts` is 0 for all 1,106 abstracts, so the "10-component" score has nine live components. Fixing it changes every score and therefore every classification, invalidating the adjudication. |
+| **`ArticleDate` for publication dating (F14)** | Same re-scoring consequence. Eleven pre-congress exclusions rest on year-only dates resolved to 1 January. |
+| **Three PMIDs credited to two abstracts each (F17)** | Deciding which abstract owns each PMID is adjudication. Surfaced in `final_pmid_shared` and `output/shared_publication_matches.csv`. One is counted published against an explicit reviewer `no_match`. |
+| **The proportional-hazards violation (A15.4)** | A modelling decision. |
+| **`search_strategy_efficacy.csv`** | Regenerating it means re-running the whole search layer. |
+| **The branch order in `assign_final_published()`** | `classification == "definite"` precedes every reviewer branch, so four reviewer `no_match` and 44 reviewer `skip` decisions are recorded as published. Reordering moves 48 abstracts. |
+| **The live Shiny deployment** | An outward-facing publish to an application reviewers are using. |

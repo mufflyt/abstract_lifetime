@@ -858,6 +858,54 @@ stages:
       environment; does not pin it. renv.lock remains the recommendation in
       docs/REPRODUCIBILITY.md.
 
+  - id: audit_cohort
+    name: Cohort completeness against the Crossref deposit
+    script: scripts/audit_cohort_completeness.R
+    in_run_all: false
+    functions: []
+    inputs: [data/processed/abstracts_parsed_web.csv]
+    outputs: [output/cohort_completeness_audit.csv]
+    external_sources: [Crossref REST API]
+    grain_in: one parsed presentation
+    grain_out: one congress year
+    primary_key: congress_year
+    cache: data/cache/crossref_supplements/ (one JSON per congress)
+    manual_step: false
+    reproducible: true
+    tests: []
+    notes: >
+      Measures the gap catalogued as F1 and appendix A14. ScienceDirect returns
+      403, so the truncation cannot be measured against the source it came from;
+      Crossref holds the complete deposit and can. 1,154 of 7,711 supplement
+      items captured. Run by hand, not part of 00_run_all.R.
+
+  - id: build_docs_metadata
+    name: Regenerate the machine-readable documentation
+    script: scripts/build_docs_metadata.R
+    in_run_all: false
+    functions: []
+    inputs:
+      - docs/_meta/data_inventory_meta.csv
+      - docs/_meta/data_dictionary_meta.csv
+      - output/final_analytical_dataset.csv
+    outputs:
+      - docs/data_inventory.csv
+      - docs/data_dictionary.csv
+      - docs/DATA_DICTIONARY.md
+    external_sources: []
+    grain_in: one file / one variable
+    grain_out: one file / one variable
+    primary_key: path / variable
+    cache: null
+    manual_step: false
+    reproducible: true
+    tests: [tests/testthat/test-docs_drift.R]
+    notes: >
+      These three files were previously committed with no producer, which is the
+      orphan-artefact pattern recorded as F15. Joins hand-authored prose in
+      docs/_meta/ to counts recomputed from the live tree and FAILS if the two
+      disagree about which files or columns exist.
+
   - id: validation
     name: Gold-standard validation
     script: R/validation_gold_standard.R

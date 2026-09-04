@@ -475,7 +475,11 @@ negative), on 415 classifiable abstracts.
 pre-correction measurement and will stay stale until the search layer is re-run;
 `tests/testthat/test-cycle04_validation_sensitivity.R:179` holds it visible.
 `output/excluded_pre_congress_publications.csv` still has **no producer in the
-repository**.
+repository**. Three other orphans were closed on 2026-09-04:
+`docs/data_inventory.csv`, `docs/data_dictionary.csv` and
+`docs/DATA_DICTIONARY.md` now come from `scripts/build_docs_metadata.R`, and the
+cohort-truncation evidence behind appendix A14 from
+`scripts/audit_cohort_completeness.R`.
 
 ---
 

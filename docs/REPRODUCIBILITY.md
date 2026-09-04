@@ -224,6 +224,26 @@ current cohort — you should build a larger one.
 
 ---
 
+## 5b. Regenerating the documentation itself
+
+`docs/data_inventory.csv`, `docs/data_dictionary.csv` and
+`docs/DATA_DICTIONARY.md` are produced by `scripts/build_docs_metadata.R`. They
+join hand-authored prose in `docs/_meta/` to counts recomputed from the live
+tree, and the script **fails** if the two halves disagree about which files or
+columns exist. Before 2026-09-04 they were committed with no producer at all —
+the orphan-artefact pattern recorded as [FAILURE_MODES.md](FAILURE_MODES.md)
+F15.
+
+```r
+Rscript scripts/build_docs_metadata.R      # docs/*.csv and DATA_DICTIONARY.md
+Rscript scripts/audit_cohort_completeness.R # ingestion vs the Crossref deposit
+```
+
+The second needs network access to Crossref (public, unauthenticated) and caches
+one JSON per congress under `data/cache/crossref_supplements/`.
+
+---
+
 ## 6. Recommendations, in order of cost
 
 1. Commit an `renv.lock`. Nothing else in this list is verifiable without one.

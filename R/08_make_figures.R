@@ -541,3 +541,74 @@ if ("congress_year" %in% names(results)) {
 }
 
 cli_alert_success("All figures generated in output/figures/")
+
+# ============================================================
+# Figure 7: Predictor stability
+# ============================================================
+# The regression tables report point estimates and intervals. Neither says how
+# much a term depends on which abstracts happened to be sampled. This plots the
+# bootstrap retention frequencies from R/06d_model_stability.R so the reader can
+# see that only two of the seven terms are robust.
+stab_path <- here("output", "model_predictor_stability.csv")
+if (file.exists(stab_path)) {
+  stab <- read_csv(stab_path, show_col_types = FALSE)
+
+  LABELS <- c(
+    n_authors       = "Number of authors",
+    is_rct          = "Randomized trial",
+    is_academic     = "Academic affiliation",
+    is_us_based     = "US-based",
+    log_sample_size = "log(sample size)",
+    is_multicenter  = "Multicenter",
+    gender_unified  = "First-author gender (inferred)"
+  )
+
+  stab_plot <- stab |>
+    mutate(
+      label = ifelse(predictor %in% names(LABELS), LABELS[predictor], predictor),
+      label = factor(label, levels = label[order(retention_frequency)]),
+      band = case_when(retention_frequency >= 90 ~ "Robust (>=90%)",
+                       retention_frequency >= 70 ~ "Moderate (70-89%)",
+                       TRUE ~ "Unstable (<70%)"),
+      band = factor(band, levels = c("Robust (>=90%)", "Moderate (70-89%)",
+                                     "Unstable (<70%)"))
+    )
+
+  p7 <- ggplot(stab_plot, aes(x = retention_frequency, y = label, fill = band)) +
+    geom_col(width = 0.68) +
+    geom_vline(xintercept = c(70, 90), linetype = "dashed",
+               colour = "grey40", linewidth = 0.4) +
+    geom_text(aes(label = sprintf("%.1f%%", retention_frequency)),
+              hjust = -0.15, size = 3.4, colour = "grey20") +
+    scale_x_continuous(limits = c(0, 108), breaks = seq(0, 100, 25),
+                       labels = function(x) paste0(x, "%"),
+                       expand = expansion(mult = c(0, 0))) +
+    scale_fill_manual(values = c("Robust (>=90%)" = "#1B5E20",
+                                 "Moderate (70-89%)" = "#F9A825",
+                                 "Unstable (<70%)" = "#B71C1C"),
+                      drop = FALSE) +
+    labs(
+      title = "Only two predictors survive resampling",
+      subtitle = sprintf(
+        "Share of %s bootstrap refits in which each term stays significant at p < 0.05",
+        format(stab$n_boot[1], big.mark = ",")),
+      x = "Retention frequency", y = NULL, fill = NULL,
+      caption = "Logistic model of publication. Source: output/model_predictor_stability.csv"
+    ) +
+    theme_minimal(base_size = 11) +
+    theme(
+      panel.grid.major.y = element_blank(),
+      panel.grid.minor = element_blank(),
+      legend.position = "top",
+      plot.title = element_text(face = "bold"),
+      plot.caption = element_text(colour = "grey45", size = 8)
+    )
+
+  ggsave(here("output", "figures", "figure7_predictor_stability.png"), p7,
+         width = 8, height = 4.6, dpi = 300, bg = "white")
+  ggsave(here("output", "figures", "figure7_predictor_stability.pdf"), p7,
+         width = 8, height = 4.6)
+  cli_alert_success("Figure 7 saved: predictor stability")
+} else {
+  cli_alert_info("No model_predictor_stability.csv - skipping figure 7")
+}
