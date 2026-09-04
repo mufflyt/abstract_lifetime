@@ -196,22 +196,36 @@ test_that("numeric columns are not read back as character", {
 # ============================================================
 # ADVERSARIAL 9.9 - candidate pools carry no duplicate rows
 # ============================================================
-test_that("no candidate file contains duplicate abstract/identifier pairs", {
+test_that("no candidate file lists the same source record twice for one abstract", {
   cand <- list.files(here::here("data", "processed"),
-                     pattern = "candidates\\.csv$", full.names = TRUE)
+                     pattern = "candidates[.]csv$", full.names = TRUE)
   skip_if(length(cand) == 0, "no candidate files")
+  # An earlier draft keyed on (abstract_id, pmid, doi). That is not a key for
+  # the OpenAlex and Semantic Scholar pools, where most records carry neither a
+  # PMID nor a DOI; it flagged 2,159 "duplicates" in one file that were distinct
+  # works with distinct oa_id/s2_id, titles and authors. Key on the source's own
+  # identifier where it has one.
+  offenders <- character(0)
   for (p in cand) {
     d <- readr::read_csv(p, show_col_types = FALSE, n_max = 50000)
-    key <- intersect(c("abstract_id", "pmid", "doi"), names(d))
-    if (length(key) < 2) next
-    n_dup <- sum(duplicated(d[, key, drop = FALSE]))
-    # A duplicated candidate is counted twice by anything that aggregates the
-    # pool before scoring, including tie detection.
-    expect_equal(n_dup, 0L,
-                 label = paste(basename(p), "has", n_dup, "duplicate",
-                               paste(key, collapse = "/"), "rows"))
+    if (!"abstract_id" %in% names(d)) next
+    src_id <- intersect(c("oa_id", "s2_id", "pmid", "doi", "candidate_id"), names(d))
+    if (length(src_id) == 0) next
+    key <- c("abstract_id", src_id[1])
+    sub <- d[, key, drop = FALSE]
+    sub <- sub[!is.na(sub[[src_id[1]]]), , drop = FALSE]
+    if (nrow(sub) == 0) next
+    n_dup <- sum(duplicated(sub))
+    # A repeated (abstract, source record) pair is counted twice by anything
+    # that aggregates the pool before scoring, including tie detection.
+    if (n_dup > 0) {
+      offenders <- c(offenders,
+                     paste0(basename(p), ": ", n_dup, " repeated ",
+                            paste(key, collapse = "/"), " rows"))
+    }
   }
-  succeed()
+  expect_length(offenders, 0L)
+  if (length(offenders)) fail(paste(offenders, collapse = "; "))
 })
 
 # ============================================================
