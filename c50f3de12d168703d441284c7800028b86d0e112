@@ -1,0 +1,30 @@
+ATTRIBUTION CORRECTION (added 2026-09-04).
+
+This commit's message describes only the cycle-7 test work. The commit was
+staged with 'git add -A' while a second agent was working in the same tree, so
+it also contains that agent's unrelated files.
+
+Authored by this commit's stated work (cycle 7, manuscript consistency):
+  docs/abstract_results_section.Rmd   (corrected the mislabelled median population)
+  docs/abstract_results_section.docx
+  tests/testthat/test-cycle07_manuscript_consistency.R
+  tests/loop/LEDGER.md
+
+Swept in from the concurrent agent, NOT part of the cycle-7 work:
+  R/05_adjudicate.R
+  R/06_analyze_results.R
+  R/10_npi_matching.R
+  R/10e_merge_demographics.R
+  docs/AUTHOR_ENRICHMENT.md
+  docs/DATA_DICTIONARY.md
+  docs/DATA_INVENTORY.md
+  docs/REPRODUCIBILITY.md
+  docs/aagl_abstract_programmatic.Rmd
+  docs/pipeline_manifest.yml
+  output/abstracts_with_matches.csv
+
+Note in particular that output/abstracts_with_matches.csv changed here. The
+cycle-7 work did not touch the analytical dataset, and the commit message gives
+no indication that it moved.
+
+History is not rewritten: see the note on 0bd4541.
