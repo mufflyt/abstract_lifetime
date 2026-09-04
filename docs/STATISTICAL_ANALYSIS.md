@@ -181,21 +181,25 @@ spanning an order of magnitude. Every other coefficient moved by less than 0.03
 (Cox `is_rct` 2.205 → 2.227; logistic `is_rct` 2.552 → 2.563).
 
 **One consequence to note.** The Cox proportional-hazards global test moved from
-p = 0.056 to **p = 0.043** when the term was dropped, so the assumption is now
-formally violated at α = 0.05 rather than marginally supported. The
-constant-hazard-ratio reading of the Cox table should be checked against a
-stratified or time-varying specification before the hazard ratios are reported
-as such.
+p = 0.056 to **p = 0.043** when the term was dropped, so the assumption became
+formally violated at α = 0.05. That was an open question until 2026-09-04 and
+is now resolved: the violation is confined to `n_authors` and is modelled
+explicitly. See *Proportional hazards* below.
 
 **The formula that actually ran** (read back from
 `data/processed/cox_model.rds`):
 
 ```r
 Surv(time, event) ~ is_rct + is_academic + is_us_based + n_authors +
-                    gender_unified + is_multicenter + has_funding
+                    gender_unified + is_multicenter
 ```
 
-`cox_data <- km_data |> drop_na(all_of(cox_formula_parts))` → **n = 1,004,
+`has_funding` is no longer a term: the near-zero-variance screen above removes
+it before the formula is built. (This document listed it here until 2026-09-04,
+which contradicted the screen table two sections up. The formula shown is now
+the one read back from `data/processed/cox_model.rds`.)
+
+`cox_data <- km_data |> drop_na(all_of(cox_formula_parts))` → **n = 1,005,
 events = 170**. Reference categories are the `FALSE` level for each logical and
 `female` for `gender_unified` (alphabetical, R default). `n_authors` enters as a
 continuous count.
@@ -205,13 +209,16 @@ confidence intervals from `broom::tidy(exponentiate = TRUE, conf.int = TRUE)`:
 
 | term | HR | 95% CI | p |
 |---|---:|---|---:|
-| `is_rctTRUE` | 2.212 | 1.473 – 3.323 | <0.001 |
-| `is_academicTRUE` | **0.621** | 0.440 – 0.876 | **0.007** |
-| `is_us_basedTRUE` | 1.419 | 0.887 – 2.270 | 0.145 |
+| `is_rctTRUE` | 2.227 | 1.484 – 3.342 | <0.001 |
+| `is_academicTRUE` | **0.620** | 0.439 – 0.874 | **0.006** |
+| `is_us_basedTRUE` | 1.404 | 0.879 – 2.242 | 0.156 |
 | `n_authors` | 1.257 | 1.093 – 1.445 | 0.001 |
-| `gender_unifiedmale` | 0.811 | 0.596 – 1.103 | 0.181 |
-| `is_multicenterTRUE` | 1.387 | 0.809 – 2.377 | 0.234 |
-| `has_fundingTRUE` | 1.757 | 0.431 – 7.169 | 0.432 |
+| `gender_unifiedmale` | 0.814 | 0.599 – 1.108 | 0.191 |
+| `is_multicenterTRUE` | 1.371 | 0.800 – 2.350 | 0.251 |
+
+The `n_authors` row is a hazard ratio **averaged over follow-up** and should not
+be quoted on its own; that term violates proportional hazards and the effect it
+summarises is not constant. The time-specific estimates are below.
 
 These moved substantially on 2026-09-03. The event count rose from 104 to 171
 (F2) and five covariates were re-derived from text that had not been available
@@ -221,6 +228,92 @@ publication — while `is_us_based` and `gender_unified` lost significance. Both
 changes are consequences of measurement corrections, not of new data, and the
 `is_academic` estimate in particular rests on a variable whose ascertainment
 just tripled (148 → 371 TRUE). Treat it as provisional.
+
+### Proportional hazards
+
+**Resolved 2026-09-04.** This was an open methodological decision, recorded as a
+preserved failing test, from 2026-09-03 until the diagnosis below was run.
+
+The global Schoenfeld test is significant (`cox.zph`, global χ² = 13.01 on 6 df,
+**p = 0.043**), but a global test cannot say which covariate is responsible and
+the remedy depends entirely on that answer. `R/06_analyze_results.R` now writes
+the per-term tests to `output/cox_ph_terms.csv`:
+
+| term | χ² | df | p |
+|---|---:|---:|---:|
+| `is_rct` | 2.303 | 1 | 0.129 |
+| `is_academic` | 0.105 | 1 | 0.745 |
+| `is_us_based` | 0.873 | 1 | 0.350 |
+| **`n_authors`** | **9.391** | 1 | **0.002** |
+| `gender_unified` | 0.039 | 1 | 0.844 |
+| `is_multicenter` | 0.286 | 1 | 0.593 |
+| GLOBAL | 13.012 | 6 | 0.043 |
+
+The violation is **entirely attributable to `n_authors`**. Every other term sits
+between p = 0.13 and p = 0.84, and refitting without `n_authors` returns the
+global test to **p = 0.497**. The Schoenfeld residuals for `n_authors` correlate
+positively with time (Spearman ρ = +0.256): the effect of team size *grows* over
+follow-up rather than being constant.
+
+**What was chosen, and why.** Three responses were available and all three were
+fitted before choosing.
+
+| option | global p after | consequence |
+|---|---:|---|
+| Report the HRs as averages over follow-up | 0.043 (unchanged) | Honest but uninformative — it names the problem without measuring it, and leaves `n_authors` = 1.257 to be read as a constant anyway |
+| Stratify on `n_authors` | 0.688 | Restores the assumption but **discards the estimate**. `n_authors` is one of only two predictors that survive bootstrap resampling (97.2% retention, `R/06d_model_stability.R`); stratifying it away deletes a real finding to fix a diagnostic |
+| **Time-varying coefficient** (chosen) | — | Keeps the term and estimates its drift. AIC 2276.2 vs 2284.1 for the PH fit; the log-time interaction is significant at p = 0.002 |
+
+The model is `coxph(..., + tt(n_authors), tt = function(x, t, ...) x * log(t))`,
+written to `data/processed/cox_model_timevarying.rds` and
+`output/aim2b_cox_regression_timevarying.csv`. The log-time form was chosen
+because it is the transform the Schoenfeld residuals are plotted against by
+default in `cox.zph`, so the remedy tests the same alternative the diagnostic
+raised, rather than a different one chosen after the fact.
+
+**What the constant hazard ratio was hiding**
+(`output/cox_time_varying_hr.csv`, HR per additional author):
+
+| follow-up | HR | 95% CI |
+|---:|---:|---|
+| 3 months | 1.007 | 0.837 – 1.212 |
+| 6 months | 1.154 | 0.997 – 1.334 |
+| 12 months | 1.322 | 1.138 – 1.535 |
+| 24 months | 1.514 | 1.246 – 1.840 |
+| 36 months | 1.640 | 1.301 – 2.067 |
+| 48 months | 1.735 | 1.337 – 2.251 |
+
+Team size has **no detectable effect on early publication** and a substantial
+one later. The single PH estimate of 1.257 was averaging a null first six months
+against an effect that reaches ~1.7 by four years. Substantively this is a
+statement about persistence rather than speed: larger teams are not faster to
+first publication, they are the ones still converting abstracts to papers years
+afterwards, while small-team abstracts go dead.
+
+**Sensitivity.** `output/aim2b_cox_regression_stratified.csv` stratifies on
+`n_authors` instead, which restores the assumption (global p = 0.688) and lets
+the other five hazard ratios be read as constants. They barely move — every one
+is within 2% of the primary fit:
+
+| term | primary (PH) | stratified | time-varying |
+|---|---:|---:|---:|
+| `is_rctTRUE` | 2.227 | 2.268 | 2.218 |
+| `is_academicTRUE` | 0.620 | 0.607 | 0.615 |
+| `is_us_basedTRUE` | 1.404 | 1.404 | 1.402 |
+| `gender_unifiedmale` | 0.814 | 0.817 | 0.811 |
+| `is_multicenterTRUE` | 1.371 | 1.355 | 1.355 |
+
+So the reported covariate effects do not depend on how `n_authors` is handled.
+`tests/testthat/test-pipeline_semantics.R` asserts this as a contract: any
+non-violating hazard ratio that moved by more than 15% under stratification, or
+changed direction, fails the suite.
+
+**Limitation, stated plainly.** `n_authors` is **censored at 5** — 489 of the
+1,005 abstracts in the model frame (48.7%) sit at that ceiling, an artefact of
+the ScienceDirect ingest recording at most five authors. The time-varying
+pattern is therefore estimated on a compressed covariate, which biases the
+effect toward the null rather than creating it, but the *magnitude* of the
+per-author hazard ratio should not be read as if the count were complete.
 
 ---
 
@@ -463,7 +556,7 @@ for adaptation into Methods.
 
 | Check | Implemented | Result |
 |---|---|---|
-| Proportional hazards | `cox.zph(cox_model)`, global test written to `output/cox_ph_assumption.csv` | global p = **0.043** — now violated, having moved from 0.056 when `has_funding` was dropped by the screen. It was 0.32 on 104 events; with 171 events the test is far better powered and the assumption is now only marginally supported. A stratified or time-varying specification is worth considering before the hazard ratios are reported as constant. |
+| Proportional hazards | `cox.zph(cox_model)`; global test and remediation in `output/cox_ph_assumption.csv`, per-term tests in `output/cox_ph_terms.csv` | global p = **0.043**, violated. **Diagnosed and remediated 2026-09-04**: the violation is confined to `n_authors` (p = 0.002; every other term p ≥ 0.13), which now carries a log-time interaction. Stratifying on it instead restores global p = **0.688** and moves no other HR by more than 2%. See *Proportional hazards* under Aim 2b. |
 | Collinearity | **not implemented** | — |
 | Predictor stability | `R/06d_model_stability.R`, 500 bootstrap refits | Only `n_authors` (97.2%) and `is_rct` (93.6%) are robust |
 | Leave-one-congress-out | `R/06d_model_stability.R`, 84 refits | No term changes direction; `is_us_based` significant in only 3 of 12 |

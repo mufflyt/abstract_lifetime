@@ -10,11 +10,15 @@
 # could not signal anything: a genuine regression looked exactly like the
 # standing set. This gate fails when
 #
-#   * any test fails that is NOT in tests/expected_failures.yaml, or
-#   * any test IN that manifest passes.
+#   * any test fails that is NOT in tests/expected_failures.yaml,
+#   * any test IN that manifest passes, or
+#   * any entry IN that manifest names a test the suite never ran.
 #
-# The second rule stops the manifest rotting. When a decision is finally taken
-# and the assertion starts holding, CI goes red until the entry is removed.
+# The last two rules stop the manifest rotting. When a decision is finally
+# taken and the assertion starts holding, CI goes red until the entry is
+# removed. And when a test is renamed or deleted, its entry would otherwise sit
+# there forever describing a decision that no longer has an assertion behind
+# it, which is how a manifest quietly turns into a list of excuses.
 #
 # Both .github/workflows/tests.yaml and .github/workflows/R-CMD-check.yaml call
 # this, so the two cannot drift apart on what "green" means.
@@ -55,6 +59,10 @@ failed_keys <- key(failed$file, failed$test)
 passing <- df[df$failed == 0 & df$error == 0, , drop = FALSE]
 stale <- expected_keys[expected_keys %in% key(passing$file, passing$test)]
 
+# An entry naming a test that did not run at all: renamed, deleted, or a typo.
+# Skipped tests still appear in `df`, so this does not fire on a skip.
+orphaned <- expected_keys[!expected_keys %in% key(df$file, df$test)]
+
 if (nrow(failed) > 0) {
   cat("\n--- failures ---\n")
   for (i in seq_len(nrow(failed))) {
@@ -78,6 +86,14 @@ if (length(stale) > 0) {
   problems <- c(problems, sprintf(
     "%d expected-failure entr%s now pass. Remove them from %s.",
     length(stale), if (length(stale) == 1) "y" else "ies", manifest_path))
+}
+
+if (length(orphaned) > 0) {
+  cat("\n--- orphaned manifest entries (no such test ran) ---\n")
+  cat(paste0("  ", orphaned, collapse = "\n"), "\n")
+  problems <- c(problems, sprintf(
+    "%d manifest entr%s name a test that never ran. Re-point it at the renamed test, or remove it from %s.",
+    length(orphaned), if (length(orphaned) == 1) "y does" else "ies", manifest_path))
 }
 
 if (length(problems) > 0) {

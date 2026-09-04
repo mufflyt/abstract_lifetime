@@ -69,17 +69,33 @@ zero for them — see [Known limitations](#known-limitations).
 
 ### Predictors of time to publication
 
-![Cox proportional hazards forest plot showing hazard ratios with 95% confidence intervals for randomized design, academic affiliation, US location, author count, inferred male first author, multicenter conduct and reported funding.](output/figures/figure5_cox_forest.png)
+![Cox proportional hazards forest plot showing hazard ratios with 95% confidence intervals for randomized design, academic affiliation, US location, author count, inferred male first author and multicenter conduct.](output/figures/figure5_cox_forest.png)
 
-Randomized design (HR 2.21, 95% CI 1.47–3.32) and author count (HR 1.26 per
-author, 1.09–1.45) are associated with faster publication. Academic affiliation
-is associated with *slower* publication (HR 0.62, 0.44–0.88). US location
-(HR 1.42, 0.89–2.27), male first authorship (HR 0.81, 0.60–1.10), multicenter
-conduct (HR 1.39, 0.81–2.38) and reported funding (HR 1.76, 0.43–7.17) are not
-statistically distinguishable from no effect.
+Randomized design (HR 2.23, 95% CI 1.48–3.34) is associated with faster
+publication and academic affiliation with *slower* publication (HR 0.62,
+0.44–0.87). US location (HR 1.40, 0.88–2.24), male first authorship (HR 0.81,
+0.60–1.11) and multicenter conduct (HR 1.37, 0.80–2.35) are not statistically
+distinguishable from no effect. `has_funding` is not a term in this model — the
+near-zero-variance screen removes it (TRUE for 7 of 1,051).
 
-Three cautions. The proportional-hazards assumption is now **violated**
-(global p = 0.043 on 171 events). Only two terms are robust to resampling:
+Author count is reported separately below, because its effect is not constant.
+
+#### Author count: the hazard ratio changes with follow-up
+
+![Line chart of the hazard ratio per additional author against months since congress, rising from about 1.0 at three months to about 1.7 at 48 months with a widening confidence band, against a flat dashed line at 1.26 marking the constant hazard ratio from the main Cox model.](output/figures/figure8_timevarying_n_authors.png)
+
+The Cox model reports HR 1.26 per additional author (1.09–1.45, p = 0.001), and
+that single number is the **only** proportional-hazards violation in the model
+(`cox.zph` p = 0.002 for this term; every other term p ≥ 0.13). Refitting it
+with a log-time interaction shows what the constant was averaging: no detectable
+effect at three months (HR 1.01, 0.84–1.21), rising to 1.32 (1.14–1.54) at one
+year and 1.51 (1.25–1.84) at two. Team size does not buy speed to first
+publication — it predicts which abstracts are still becoming papers years later.
+
+Read this with the ceiling in mind: `n_authors` is truncated at 5 by the source
+ingest, and 48.7% of the model frame sits at that cap.
+
+Two cautions. Only two terms are robust to resampling:
 across 500 bootstrap refits, `n_authors` is retained 97.2% of the time and
 `is_rct` 93.6%, while `is_academic` survives only 67.4% — it is significant in
 all twelve leave-one-congress-out refits, so it is not driven by any single
@@ -236,14 +252,13 @@ Rscript scripts/rebuild_candidate_pool.R
 
 ## Test status
 
-27 test files. As of 2026-09-04: **900 passing, 4 failing, 1 skipped**
-(from 519 passing / 1 failing at the start of the day). Every failure is
-deliberately left red, each marking a decision that belongs to the author rather
-than to code:
+30 test files. As of 2026-09-04: **959 passing, 3 failing, 0 skipped**
+(from 519 passing / 1 failing at the start of the day). Every remaining failure
+is deliberately left red, each marking a decision that belongs to the author
+rather than to code:
 
 | Failing test | What it reports | Why it stays red |
 |---|---|---|
-| `test-pipeline_semantics.R:247` | Cox proportional hazards is violated (global p = 0.043) | The fix is a modelling decision — stratify, use time-varying coefficients, or report the HRs as averages over follow-up |
 | `test-cycle04_validation_sensitivity.R:179` | `search_strategy_efficacy.csv` still carries the pre-correction `title`-strategy yield of 0.2% | Regenerating it means re-running the whole search layer, which would change candidate sets and invalidate the human adjudication |
 | `test-cycle06_scoring_composite.R:83` | `keyword_pts` fires on 0 of 1,106 abstracts, so the "10-component" score has nine live components | Fixing the component changes every score and therefore every classification |
 | `test-cycle06_scoring_composite.R:116` | 3 PMIDs are credited to 6 published abstracts | Deciding which abstract owns each PMID is adjudication; surfaced in `final_pmid_shared` |
@@ -251,9 +266,16 @@ than to code:
 CI runs three gates: decision-logic boundary contracts, then mutation tests
 (every planted defect must still be killed), then the full suite measured
 against [`tests/expected_failures.yaml`](tests/expected_failures.yaml). CI is
-green only when the failures are *exactly* the four listed there — it fails on
-any other failure, and also if one of the four starts passing, so the manifest
-cannot outlive its reason.
+green only when the failures are *exactly* the three listed there. It fails on
+any other failure, if one of the three starts passing, and — since 2026-09-04 —
+if an entry names a test that no longer runs at all, so a renamed or deleted
+test cannot leave its excuse behind in the manifest.
+
+The proportional-hazards entry was the fourth. It was **resolved on 2026-09-04**
+and removed: the violation was traced to a single term and modelled, and the
+assertion that replaced it is stronger than the one it retired — it now requires
+that any violation be diagnosed per term, remedied, and that the remedy actually
+restore the assumption. See [docs/STATISTICAL_ANALYSIS.md](docs/STATISTICAL_ANALYSIS.md#proportional-hazards).
 Full inventory and the list of invariants that have **no** test:
 [docs/VALIDATION.md](docs/VALIDATION.md).
 
@@ -297,9 +319,12 @@ Full inventory and the list of invariants that have **no** test:
     `study_design` (p = 0.0004) and `n_authors` (p = 0.013), the latter a
     significant predictor in both models. Bounds: 16.1% if all unpublished,
     21.1% if all published. See `output/unresolved_vs_evaluated.csv`.
-11. The proportional-hazards assumption is **violated** (global p = 0.043); the
-    constant-hazard-ratio reading of the Cox table needs a stratified or
-    time-varying check.
+11. The proportional-hazards assumption is **violated** (global p = 0.043), and
+    the violation is confined to `n_authors` (p = 0.002). That term is fitted
+    with a log-time interaction and reported as a time-varying hazard ratio;
+    the other five are unchanged when `n_authors` is stratified out instead
+    (global p = 0.688, no HR moving more than 2%). `n_authors` is separately
+    limited by a ceiling at 5 authors covering 48.7% of the model frame.
 12. **Three publications are each credited to two abstracts**, so six of the 178
     numerator rows rest on three papers. The numerator is not deduplicated —
     two abstracts can legitimately merge into one paper — but the affected rows

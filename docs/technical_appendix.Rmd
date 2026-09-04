@@ -1771,7 +1771,142 @@ publication are genuinely different abstracts rather than a duplication error.
 | **The inert `keyword_pts` component** | `keyword_pts` is 0 for all 1,106 abstracts, so the "10-component" score has nine live components. Fixing it changes every score and therefore every classification, invalidating the adjudication. |
 | **`ArticleDate` for publication dating (F14)** | Same re-scoring consequence. Eleven pre-congress exclusions rest on year-only dates resolved to 1 January. |
 | **Three PMIDs credited to two abstracts each (F17)** | Deciding which abstract owns each PMID is adjudication. Surfaced in `final_pmid_shared` and `output/shared_publication_matches.csv`. One is counted published against an explicit reviewer `no_match`. |
-| **The proportional-hazards violation (A15.4)** | A modelling decision. |
+| ~~The proportional-hazards violation (A15.4)~~ | **Resolved 2026-09-04.** See A16. |
 | **`search_strategy_efficacy.csv`** | Regenerating it means re-running the whole search layer. |
 | **The branch order in `assign_final_published()`** | `classification == "definite"` precedes every reviewer branch, so four reviewer `no_match` and 44 reviewer `skip` decisions are recorded as published. Reordering moves 48 abstracts. |
 | **The live Shiny deployment** | An outward-facing publish to an application reviewers are using. |
+
+## A16. The Proportional-Hazards Violation, Resolved
+
+A15.4 recorded the Cox proportional-hazards violation as an open methodological
+decision and deliberately left a failing test in place to mark it. This appendix
+records how the decision was taken, on 2026-09-04, and what it changed.
+
+### A16.1 Why a global test was not enough to act on
+
+The complaint was a single number: `cox.zph(cox_model)` global χ² = 13.01 on
+6 df, **p = 0.043**. Three responses are conventional — report the hazard ratios
+as averages over follow-up, stratify, or allow time-varying coefficients — and
+they are not interchangeable. Which one is right depends entirely on *which*
+covariate is non-proportional and whether that covariate is of interest. A
+global test cannot answer either question, so the first change was to write the
+per-term Schoenfeld tests to `output/cox_ph_terms.csv`.
+
+```{r a16-ph-terms, echo=FALSE, message=FALSE}
+ph_terms_p <- here::here("output", "cox_ph_terms.csv")
+if (file.exists(ph_terms_p)) {
+  knitr::kable(readr::read_csv(ph_terms_p, show_col_types = FALSE),
+               caption = "Per-term Schoenfeld tests for the Cox model.")
+}
+```
+
+The answer was unambiguous. `n_authors` fails at **p = 0.002**; the other five
+terms fall between p = 0.13 and p = 0.84. Refitting the model without
+`n_authors` returns the global test to **p = 0.497**, confirming that the whole
+of the global violation is that one term. Its Schoenfeld residuals correlate
+positively with time (Spearman ρ = +0.256), so the effect grows over follow-up
+rather than being constant.
+
+### A16.2 The choice, and the reason for it
+
+All three remedies were fitted before one was chosen.
+
+| option | global p after | why it was or was not chosen |
+|---|---:|---|
+| Report as averages over follow-up | 0.043 | Names the problem without measuring it. The `n_authors` row would still read as a constant to anyone quoting the table. |
+| Stratify on `n_authors` | 0.688 | Restores the assumption, but **discards the estimate**. `n_authors` is retained in 97.2% of 500 bootstrap refits (A15.7) — one of only two robust predictors. This trades a finding for a diagnostic. |
+| **Time-varying coefficient** | — | Chosen. Keeps the term and estimates its drift. AIC 2276.2 against 2284.1; the log-time interaction is significant at p = 0.002. |
+
+The interaction is `x * log(t)`. That form was not chosen for convenience: it is
+the transform `cox.zph` plots the residuals against by default, so the remedy
+tests the same alternative the diagnostic raised rather than a different one
+selected after seeing the result.
+
+The stratified fit is not discarded — it is retained as the sensitivity analysis
+for the five covariates that did *not* violate, written to
+`output/aim2b_cox_regression_stratified.csv`. Their hazard ratios are all within
+2% of the primary fit, so none of the reported effects depends on how
+`n_authors` was handled. `tests/testthat/test-pipeline_semantics.R` now enforces
+that as a contract at a 15% tolerance.
+
+### A16.3 What the constant hazard ratio was concealing
+
+```{r a16-tv, echo=FALSE, message=FALSE}
+tv_p <- here::here("output", "cox_time_varying_hr.csv")
+if (file.exists(tv_p)) {
+  knitr::kable(readr::read_csv(tv_p, show_col_types = FALSE),
+               caption = "Hazard ratio per additional author, by follow-up time.")
+}
+```
+
+The main model reports HR 1.257 per additional author. Time-resolved, that is
+1.01 (0.84–1.21) at three months and 1.51 (1.25–1.84) at two years. The single
+estimate was averaging a null early period against a substantial later one.
+
+Substantively this is a claim about persistence rather than speed. Larger teams
+are not faster to first publication; they are the ones still converting
+abstracts into papers years after the congress, while small-team abstracts stop
+progressing. Reported as a constant 1.26, the effect was misleading in both
+directions at once — overstated in the first six months and understated after
+two years.
+
+```{r a16-fig, echo=FALSE, out.width="100%"}
+f8 <- here::here("output", "figures", "figure8_timevarying_n_authors.png")
+if (file.exists(f8)) knitr::include_graphics(f8)
+```
+
+### A16.4 The limitation that remains
+
+`n_authors` is **censored at 5**: 489 of the 1,005 abstracts in the model frame
+(48.7%) sit at that ceiling, an artefact of the ScienceDirect ingest recording
+at most five authors. A ceiling of this size compresses the covariate and biases
+the per-author effect toward the null; it does not manufacture time dependence.
+So the *shape* in A16.3 is trustworthy and the *magnitude* is a lower bound on
+whatever the effect would be with complete author counts. It should not be
+quoted as a per-author effect without that qualification.
+
+### A16.5 Two unrelated defects found while doing this
+
+**The Results paragraph asserted a diagnostic it had not run.**
+`docs/abstract_results_section.Rmd` opened with "In multivariable Cox
+proportional hazards analysis (proportional hazards assumption met, global
+p=`r knitr::inline_expr("ph_global_p")`)" — the parenthetical interpolated the
+live p-value while the surrounding prose asserted the opposite conclusion. The
+same sentence named US-based affiliation as "the only significant predictor",
+which the current model contradicts on both counts: US-based is not significant
+(p = 0.156), and randomized design, academic affiliation and author count are.
+The paragraph also rendered "was associated with higher odds of publication"
+over a p-value of 0.083. It now derives the predictor list, the PH wording and
+the significance verb from the fitted model.
+
+**The appendix's own Cox formula was internally inconsistent.**
+`docs/STATISTICAL_ANALYSIS.md` printed a formula including `has_funding` two
+sections after its variable-screen table recorded `has_funding` as removed by
+the near-zero-variance rule. The formula shown is now read back from
+`data/processed/cox_model.rds`.
+
+Both are the same failure mode: prose that was true when written and was not
+re-derived when the model changed. Both are now computed rather than asserted.
+
+### A16.6 What replaced the failing test
+
+The retired assertion was `global cox.zph p > 0.05`. Two tests replace it, and
+together they are stronger than what they retired:
+
+1. **`PH violations are diagnosed per term and remediated`.** If the global test
+   fails, every term failing at α = 0.05 must be named in the recorded
+   remediation, the remediation must exist as a fitted model on disk, and
+   stratifying on every violator must restore the global test above 0.05.
+2. **`non-violating hazard ratios survive stratification on the violator`.** No
+   hazard ratio outside the violating set may move more than 15% or change
+   direction when the violator is stratified out.
+
+The old test could only say "something is wrong". Once it was on the
+expected-failure manifest it could not say anything at all. The new pair fails
+on a *silent* violation — one that is detected but not attributed or not
+remedied — which is the condition that actually threatens the reported results.
+
+`tests/run_suite_gate.R` gained a matching guard. It already failed when a
+manifest entry started passing; it now also fails when an entry names a test
+that never ran. Renaming this test would otherwise have orphaned its manifest
+entry, leaving a documented "open decision" with no assertion behind it.

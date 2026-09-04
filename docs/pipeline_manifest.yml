@@ -759,9 +759,15 @@ stages:
       - output/aim4_strategy_performance.csv
       - output/sensitivity_analyses.csv
       - output/cox_ph_assumption.csv
+      - output/cox_ph_terms.csv
+      - output/aim2b_cox_regression_timevarying.csv
+      - output/aim2b_cox_regression_stratified.csv
+      - output/cox_time_varying_hr.csv
       - output/model_variable_screen.csv
       - data/processed/km_fit.rds
       - data/processed/cox_model.rds
+      - data/processed/cox_model_timevarying.rds
+      - data/processed/cox_model_stratified.rds
       - data/processed/logistic_model.rds
     external_sources: []
     grain_in: one abstract

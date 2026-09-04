@@ -28,14 +28,18 @@ misread · ❌ stale or wrong.
 | Median months to publication | **13.7** (was 13.8) | `output/aim2_time_to_pub.csv` | `R/06_analyze_results.R` | ✅ computed on **171 of 178** published; the other 7 published before their congress and are excluded |
 | p25 | **5.7** (was 6.3) | same | | ✅ |
 | p75 | **22.6** (was 25.0) | same | | ✅ |
-| RCT → time to publication | HR **2.212** (1.473–3.323), p < 0.001 | `output/aim2b_cox_regression.csv` | `coxph` | ✅ 170 events, was 104 |
+| RCT → time to publication | HR **2.227** (1.484–3.342), p < 0.001 | `output/aim2b_cox_regression.csv` | `coxph` | ✅ 170 events, was 104. Proportional hazards holds for this term (p = 0.13) |
 | RCT → publication | OR **2.556** (1.551–4.156), p < 0.001 | `output/aim3_logistic_regression.csv` | `glm` | ✅ n = 1,010 |
-| Multicenter → time to publication | HR **1.387** (0.809–2.377), p = 0.234 | `output/aim2b_cox_regression.csv` | | ✅ not significant; the README claim of HR ≈ 2.3 has been removed |
+| Multicenter → time to publication | HR **1.371** (0.800–2.350), p = 0.251 | `output/aim2b_cox_regression.csv` | | ✅ not significant; the README claim of HR ≈ 2.3 has been removed |
 | Multicenter → publication | OR **1.482** (0.769–2.718), p = 0.218 | `output/aim3_logistic_regression.csv` | | ✅ the programmatic abstract now derives its significance wording from the p-value |
-| Author count → time to publication | HR **1.257** (1.093–1.445), p = 0.001 | `output/aim2b_cox_regression.csv` | | ⚠️ `n_authors` is censored at 5 |
+| Author count → time to publication | HR **1.257** (1.093–1.445), p = 0.001 | `output/aim2b_cox_regression.csv` | | ⚠️ **an average over follow-up, not a constant.** This term violates proportional hazards (p = 0.002); do not quote it alone. `n_authors` is also censored at 5 |
+| Author count, 12 months | HR **1.322** (1.138–1.535) | `output/cox_time_varying_hr.csv` | `coxph(+ tt())` | ✅ time-varying fit, resolved 2026-09-04 |
+| Author count, 24 months | HR **1.514** (1.246–1.840) | same | | ✅ |
+| Author count, 3 months | HR **1.007** (0.837–1.212) | same | | ✅ no detectable early effect — this is what the constant 1.257 was averaging |
+| Cox PH global test | p = **0.043**, violated; **0.688** after stratifying on `n_authors` | `output/cox_ph_assumption.csv`, `output/cox_ph_terms.csv` | `cox.zph` | ✅ diagnosed per term and remediated |
 | Author count → publication | OR **1.336** (1.154–1.560), p < 0.001 | `output/aim3_logistic_regression.csv` | | ⚠️ same |
-| Male first author → time to publication | HR **0.811** (0.596–1.103), p = 0.181 | `output/aim2b_cox_regression.csv` | | ⚠️ not significant. Moved again on 2026-09-04 when NPPES registry gender became tier 1; 231 abstracts carry a cross-source conflict |
-| US-based → time to publication | HR **1.419** (0.887–2.270), p = 0.145 | same | | ⚠️ **no longer significant** after `is_us_based` was re-derived from the backfilled text (689 → 907 TRUE) |
+| Male first author → time to publication | HR **0.814** (0.599–1.108), p = 0.191 | `output/aim2b_cox_regression.csv` | | ⚠️ not significant. Moved again on 2026-09-04 when NPPES registry gender became tier 1; 231 abstracts carry a cross-source conflict |
+| US-based → time to publication | HR **1.404** (0.879–2.242), p = 0.156 | same | | ⚠️ **no longer significant** after `is_us_based` was re-derived from the backfilled text (689 → 907 TRUE) |
 | Academic → time to publication | HR **0.621** (0.440–0.876), p = **0.007** | `output/aim2b_cox_regression.csv` | | ⚠️ **newly significant and negative**; `is_academic` went from 148 to 371 TRUE when re-derived. Provisional. |
 | PH assumption, global | p = **0.056** (was 0.32) | `output/cox_ph_assumption.csv` | `cox.zph()` | ⚠️ only marginally supported now that the test has 170 events |
 | Gold-standard sensitivity | 1.00 | `output/validation_metrics.csv` | `R/validation_gold_standard.R` | ⚠️ n = 50, of which **49 classified** (`n_classified`); PPV is **0.50** and accuracy 0.735 |

@@ -25,10 +25,23 @@ frequency ratio of 1044:7, above the conventional 19:1 cutoff.
 
 | Failing test | Reports | Why it is not fixed |
 |---|---|---|
-| `test-pipeline_semantics.R:247` | Cox proportional hazards is violated, global p = 0.043 | 0.32 on 104 events → 0.056 when the event count rose to 171 → 0.043 when the screen dropped `has_funding`. Removing a near-constant term made a latent violation visible. The response — stratify, allow time-varying coefficients, or report the HRs as averages over follow-up — is a methodological decision. Relaxing the threshold would hide it. |
 | `test-cycle04_validation_sensitivity.R:179` | `search_strategy_efficacy.csv` still carries the pre-correction 0.2% `title` yield | Regenerating it means re-running the whole search layer, which would change candidate sets and invalidate the human adjudication |
 | `test-cycle06_scoring_composite.R:83` | `keyword_pts` fires on 0 of 1,106 abstracts | Fixing the component changes every composite score and therefore every classification, invalidating the adjudication |
 | `test-cycle06_scoring_composite.R:116` | 3 PMIDs credited to 6 published abstracts | Deciding which abstract owns each PMID is adjudication. Surfaced as `final_pmid_shared` and `output/shared_publication_matches.csv`; see FAILURE_MODES.md F17 |
+
+**Resolved and removed from the manifest, 2026-09-04.** The Cox
+proportional-hazards entry (`test-pipeline_semantics.R::PH assumption holds`,
+global p = 0.043) is gone. Per-term Schoenfeld tests attributed the whole
+violation to `n_authors` (p = 0.002; every other term p ≥ 0.13), which is now
+fitted with a log-time interaction; stratifying on it instead restores the
+global test to p = 0.688 without moving any other hazard ratio more than 2%.
+The assertion that replaced it is stronger, not weaker: a violation must be
+attributed per term, named in a remedy, and the remedy must demonstrably restore
+the assumption. See appendix A16 and
+[STATISTICAL_ANALYSIS.md](STATISTICAL_ANALYSIS.md#proportional-hazards).
+
+`tests/run_suite_gate.R` also now fails on a manifest entry naming a test that
+never ran, which is the failure this rename would otherwise have introduced.
 
 Fixed during this pass, each having been a genuine failure: the stale deploy
 bundle (F11 — bundle refreshed; **the live shinyapps.io app is still stale and

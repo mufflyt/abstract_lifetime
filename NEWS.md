@@ -1,5 +1,63 @@
 # NEWS
 
+## 2026-09-04 (later) — the proportional-hazards question, answered
+
+Yesterday's audit left four open decisions parked in an expected-failure
+manifest. This is the first of them closed, and it is closed on evidence rather
+than by picking a convention.
+
+The complaint was that the Cox model's proportional-hazards assumption failed a
+global test at p = 0.043. A global test says the model is wrong somewhere; it
+does not say where, and the three standard remedies point in different
+directions. So the first thing added was the per-term Schoenfeld tests, which
+turn out to be unambiguous: `n_authors` fails at p = 0.002 and **nothing else
+comes close** — the other five terms sit between p = 0.13 and p = 0.84, and
+refitting without `n_authors` puts the global test back at p = 0.497.
+
+That reframed the decision. Stratifying on `n_authors` does restore the
+assumption (global p = 0.688) and it moves no other hazard ratio by more than
+2%, which is genuinely reassuring — but `n_authors` is one of only two terms
+that survive bootstrap resampling, so stratifying it away would have deleted a
+real finding in order to fix a diagnostic. It is fitted with a log-time
+interaction instead, and the stratified model is kept as the sensitivity
+analysis it should always have been.
+
+What the constant hazard ratio was hiding is the interesting part. The Cox table
+reports HR 1.26 per additional author. Time-resolved, that is HR 1.01
+(0.84–1.21) at three months and 1.51 (1.25–1.84) at two years. **Team size does
+not make publication faster; it makes it keep happening.** Larger teams are not
+quicker to first publication — they are the ones still converting abstracts into
+papers years after the congress, while small-team abstracts go quiet. A single
+averaged number could not have said that, and read as a constant it was
+misleading in both directions at once.
+
+One caveat is not resolved and should not be glossed: `n_authors` is truncated
+at five by the source ingest, and 48.7% of the model frame sits at that ceiling.
+The time-varying *shape* is not an artefact of the cap, but the per-author
+magnitude is estimated on a compressed covariate.
+
+Two things were found while doing this that had nothing to do with hazards. The
+Results paragraph in `docs/abstract_results_section.Rmd` still asserted
+"proportional hazards assumption met" and named US-based affiliation as the only
+significant predictor — stale on both counts, and it rendered "was associated
+with higher odds" over a p-value of 0.083. That paragraph now derives its
+numbers *and* its significance wording from the fitted model. And
+`docs/STATISTICAL_ANALYSIS.md` printed a Cox formula containing `has_funding`
+two sections after its own table recorded `has_funding` as screened out.
+
+The test that guarded this is not deleted, it is replaced by a stronger one. The
+old assertion was "the global test passes". The new pair requires that any
+violation be attributed to specific terms, that every violating term be named in
+a remedy, that the remedy actually restore the assumption, and that no
+non-violating hazard ratio move more than 15% or change direction under
+stratification. A future model that violates PH silently will fail, which the
+old test could not detect once it had been added to the manifest.
+
+The manifest gate learned something too. It already failed when a listed test
+started passing. It now also fails when an entry names a test that no longer
+runs — which is exactly what would have happened here, since the test was
+renamed. Three entries remain.
+
 ## 2026-09-04 — audit and remediation
 
 A full documentation audit produced a `docs/` reference set and found seventeen
@@ -51,7 +109,7 @@ changes direction when any single congress is dropped, which matters because
 Two things got worse in the sense that matters. The proportional-hazards
 assumption, marginal at p = 0.056, is now violated at p = 0.043 — dropping a
 term with seven events made a latent violation visible rather than creating one.
-And the cohort truncation catalogued in appendix A14 was confirmed against the
+(Resolved later the same day; see the entry above.) And the cohort truncation catalogued in appendix A14 was confirmed against the
 Crossref deposit: the pipeline ingested 1,154 of 7,711 supplement items, and ten
 of twelve congresses captured no video presentations at all, meaning the capture
 window closed while still inside the oral block. Neither is remediated here.

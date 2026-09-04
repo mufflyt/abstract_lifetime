@@ -22,19 +22,6 @@
 
 expected_failures:
 
-  - file: test-pipeline_semantics.R
-    test: PH assumption holds
-    reason: >
-      Cox proportional hazards is violated, global cox.zph p = 0.043. It was
-      0.32 when the model had 104 events, 0.056 once the candidate-pool repair
-      raised that to 171, and 0.043 once the variable screen dropped
-      has_funding. Removing a near-constant term made a latent violation
-      visible rather than creating one.
-    decision_needed: >
-      Stratify the Cox model, allow time-varying coefficients, or report the
-      hazard ratios explicitly as averages over follow-up.
-    documented_in: docs/STATISTICAL_ANALYSIS.md, appendix A15.4
-
   - file: test-cycle06_scoring_composite.R
     test: no scoring component is structurally dead
     reason: >

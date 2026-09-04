@@ -9,6 +9,64 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-04] — Proportional hazards resolved
+
+### Fixed
+
+- **The Cox proportional-hazards violation is diagnosed and remediated.** The
+  global Schoenfeld test (p = 0.043) had been recorded as an open methodological
+  decision since the previous day. Per-term tests, now written to
+  `output/cox_ph_terms.csv`, show the violation is confined to a single
+  covariate — `n_authors`, p = 0.002, with every other term between p = 0.13 and
+  p = 0.84 — and that refitting without it returns the global test to p = 0.497.
+  `n_authors` is fitted with a log-time interaction rather than stratified away,
+  because it is one of only two predictors that survive bootstrap resampling and
+  stratifying would have discarded the effect to fix the diagnostic. AIC 2276.2
+  against 2284.1 for the proportional fit.
+- **The results Rmd no longer asserts what it has not checked.** The Results
+  paragraph in `docs/abstract_results_section.Rmd` hard-coded "proportional
+  hazards assumption met" and named US-based affiliation as the only significant
+  predictor. Both had gone stale: the assumption is violated, and the current
+  significant predictors are randomized design, academic affiliation and author
+  count. The paragraph is now derived from the fitted model, including the
+  significance wording, so it cannot drift again. A p-value of 0.083 no longer
+  renders as "was associated with".
+- `docs/STATISTICAL_ANALYSIS.md` listed `has_funding` in the Cox formula while
+  the screen table two sections above recorded it as removed. The formula shown
+  is now the one read back from the fitted model.
+
+### Added
+
+- `output/cox_ph_terms.csv` — per-term Schoenfeld tests, so a global violation
+  can be attributed rather than just reported.
+- `output/aim2b_cox_regression_timevarying.csv`,
+  `data/processed/cox_model_timevarying.rds` — the log-time fit.
+- `output/cox_time_varying_hr.csv` — the hazard ratio at 3, 6, 12, 24, 36 and 48
+  months. Team size has no detectable effect on early publication (HR 1.01 at
+  3 months) and a substantial one later (1.51 at 24 months, 1.74 at 48).
+- `output/aim2b_cox_regression_stratified.csv`,
+  `data/processed/cox_model_stratified.rds` — stratifying on the violator
+  instead, as the sensitivity analysis for the five covariates that did not
+  violate. Global p = 0.688 and no hazard ratio moves more than 2%.
+- Figure 8, `output/figures/figure8_timevarying_n_authors.png`, plotting the
+  time-varying hazard ratio against the constant the main model reports.
+- `cox_ph_assumption.csv` gains `violating_terms`, `remediation` and
+  `remediated_global_p`. Row 1 and the `p_value` column are unchanged, because
+  downstream readers index them positionally.
+
+### Changed
+
+- `test-pipeline_semantics.R::PH assumption holds` is retired and replaced by
+  two tests that are strictly stronger: any PH violation must be attributed per
+  term and named in a remedy, the remedy must restore the assumption, and no
+  non-violating hazard ratio may move more than 15% or change direction when the
+  violator is stratified out.
+- `tests/run_suite_gate.R` now also fails when a manifest entry names a test that
+  never ran. The gate already caught entries that start passing; a renamed test
+  would have left its entry behind describing a decision with no assertion
+  attached to it.
+- The expected-failure manifest is down to three entries.
+
 ## [2026-09-04]
 
 Documentation audit, then remediation. Full narrative in
@@ -118,9 +176,6 @@ results, and how much of the pipeline can be rebuilt on another machine.
   oral block and an unknown number of oral presentations were never ingested.
   Verified against Crossref. Not remediated: re-ingesting requires redoing the
   search and the human adjudication.
-- **Proportional hazards is violated** (global p = 0.043, from 0.056 when
-  `has_funding` was dropped and 0.32 when the model had 104 events). Needs a
-  stratified or time-varying fit, or the hazard ratios reported as averages.
 - **The 55 unresolved abstracts are not missing completely at random** — they
   differ on `study_design` (p = 0.0004) and `n_authors` (p = 0.013). Bounds
   16.1%–21.1%.

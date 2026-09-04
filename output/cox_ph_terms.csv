@@ -1,0 +1,8 @@
+term,chisq,df,p
+is_rct,2.3029,1,0.1291
+is_academic,0.1054,1,0.7454
+is_us_based,0.8733,1,0.35
+n_authors,9.3913,1,0.0022
+gender_unified,0.0387,1,0.844
+is_multicenter,0.2859,1,0.5929
+GLOBAL,13.0117,6,0.0429

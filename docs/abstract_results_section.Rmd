@@ -80,6 +80,67 @@ specificity <- val$value[val$metric == "specificity"]
 ph_csv <- read_csv(here::here("output", "cox_ph_assumption.csv"), show_col_types = FALSE)
 ph_global_p <- ph_csv$p_value[1]
 
+# The Results text used to assert "proportional hazards assumption met" and name
+# US-based affiliation as the only significant predictor. Both were hard-coded
+# and both had gone stale. Everything below is read off the fitted model so the
+# prose cannot drift from it again.
+ph_violated <- ph_global_p < 0.05
+ph_terms_path <- here::here("output", "cox_ph_terms.csv")
+ph_violators <- if (file.exists(ph_terms_path)) {
+  pt <- read_csv(ph_terms_path, show_col_types = FALSE)
+  pt$term[pt$term != "GLOBAL" & pt$p < 0.05]
+} else character(0)
+
+cox_label <- c(is_rctTRUE = "randomized design",
+               is_academicTRUE = "academic affiliation",
+               is_us_basedTRUE = "US-based affiliation",
+               n_authors = "author count",
+               gender_unifiedmale = "inferred male first author",
+               is_multicenterTRUE = "multicenter conduct",
+               has_fundingTRUE = "reported funding")
+pretty_term <- function(x) {
+  out <- unname(cox_label[x]); ifelse(is.na(out), x, out)
+}
+# Returns the comparator with the value ("<0.001" / "=0.006") so callers can
+# write "p%s" and never emit the malformed "p=<0.001".
+fmt_p <- function(p) ifelse(p < 0.001, "<0.001", sprintf("=%.3f", p))
+
+cox_terms <- cox |> filter(term != "(Intercept)")
+cox_sig <- cox_terms |> filter(p.value < 0.05)
+cox_sig_txt <- if (nrow(cox_sig) == 0) {
+  "no covariate reached significance"
+} else {
+  paste(sprintf("%s (HR %.2f, 95%% CI %.2f-%.2f, p%s)",
+                pretty_term(cox_sig$term), cox_sig$estimate,
+                cox_sig$conf.low, cox_sig$conf.high, fmt_p(cox_sig$p.value)),
+        collapse = "; ")
+}
+cox_ns_txt <- paste(pretty_term(setdiff(cox_terms$term, cox_sig$term)), collapse = ", ")
+
+ph_txt <- if (!ph_violated) {
+  sprintf("the proportional-hazards assumption was satisfied (global Schoenfeld p%s)",
+          fmt_p(ph_global_p))
+} else {
+  sprintf(paste("the global Schoenfeld test was significant (p%s), attributable to %s;",
+                "every other covariate satisfied proportional hazards"),
+          fmt_p(ph_global_p), paste(pretty_term(ph_violators), collapse = " and "))
+}
+
+tv_path <- here::here("output", "cox_time_varying_hr.csv")
+tv_txt <- if (file.exists(tv_path)) {
+  tv <- read_csv(tv_path, show_col_types = FALSE)
+  v <- tv$term[1]
+  a <- tv[tv$term == v & tv$months == 3, ]
+  b <- tv[tv$term == v & tv$months == 24, ]
+  sprintf(paste("The %s effect was therefore refitted with a log-time interaction,",
+                "under which the hazard ratio rose from %.2f (95%% CI %.2f-%.2f) at 3 months",
+                "to %.2f (95%% CI %.2f-%.2f) at 24 months, so the single hazard ratio",
+                "reported for it in the main model is an average over follow-up rather",
+                "than a constant."),
+          pretty_term(v), a$hazard_ratio, a$conf_low, a$conf_high,
+          b$hazard_ratio, b$conf_low, b$conf_high)
+} else ""
+
 title_changed_pct <- round(mean(fid$title_changed, na.rm = TRUE) * 100, 1)
 
 design_tbl <- table(d$study_design)
@@ -210,7 +271,7 @@ Among published abstracts with a resolvable publication date (n = `r ttp$value[t
 
 ### Predictors of Publication
 
-In multivariable Cox proportional hazards analysis (proportional hazards assumption met, global p=`r ph_global_p`), US-based affiliation was the only significant predictor of publication velocity (HR `r round(us_hr, 2)`, 95% CI `r round(us_ci_lo, 2)`-`r round(us_ci_hi, 2)`, p=`r round(us_p, 3)`). In logistic regression, US-based affiliation was similarly associated with higher odds of publication (OR `r round(us_or, 2)`, 95% CI `r round(us_or_lo, 2)`-`r round(us_or_hi, 2)`, p=`r round(us_or_p, 3)`). Neither study design (RCT vs non-RCT), sample size, academic affiliation, practice type, first-author gender, nor number of authors significantly predicted publication.
+In multivariable Cox regression, `r ph_txt`. `r tv_txt` Significant predictors of publication velocity were `r cox_sig_txt`. `r if (nchar(cox_ns_txt) > 0) sprintf("The remaining covariates -- %s -- were not significant.", cox_ns_txt)` In logistic regression, US-based affiliation was `r if (us_or_p < 0.05) "associated with higher odds of publication" else "not significantly associated with the odds of publication"` (OR `r round(us_or, 2)`, 95% CI `r round(us_or_lo, 2)`-`r round(us_or_hi, 2)`, p`r fmt_p(us_or_p)`).
 
 ### Subspecialty Variation
 

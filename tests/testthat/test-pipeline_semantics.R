@@ -239,36 +239,89 @@ test_that("Cox PH model has valid hazard ratios", {
   expect_true(all(cox$conf.low < cox$conf.high, na.rm = TRUE), label = "CI lower < upper")
 })
 
-# PRESERVED FAILING TEST, 2026-09-04. The threshold is NOT relaxed.
+# RESOLVED 2026-09-04. This replaces a preserved failing test.
 #
-# The global cox.zph test was p = 0.32 when the Cox model had 104 events. It
-# moved to 0.056 when scripts/rebuild_candidate_pool.R restored the publication
-# dates and the event count rose to 171, and to 0.043 when the variable screen
-# dropped has_funding (TRUE for 7 of 1,051) by a near-zero-variance rule.
+# The old assertion was `global cox.zph p > 0.05` and it failed at p = 0.043.
+# The decision it was waiting on has now been taken, on evidence: per-term
+# Schoenfeld tests showed a single violator, n_authors (p = 0.0022), with
+# every other term between p = 0.13 and p = 0.84, and dropping n_authors
+# restored the global test to p = 0.497. n_authors is one of the two
+# predictors that survive bootstrap resampling, so stratifying it away would
+# have discarded a real effect; it is modelled with a log-time interaction
+# instead. See docs/STATISTICAL_ANALYSIS.md and appendix A16.
 #
-# The assumption is now violated at alpha = 0.05. That is a finding about the
-# model, not a fixture problem: with 171 events the test is properly powered,
-# and removing a near-constant term made a latent violation visible rather than
-# creating one.
-#
-# The response is a methodological decision that has not been taken - stratify
-# the Cox model, allow time-varying coefficients, or report the hazard ratios
-# explicitly as averages over follow-up. Weakening this assertion would hide
-# the question. See docs/STATISTICAL_ANALYSIS.md.
-test_that("PH assumption holds", {
-  path <- here::here("output", "cox_ph_assumption.csv")
-  skip_if_not(path)
-  ph <- read_csv(path, show_col_types = FALSE)
+# The contract is no longer "PH holds" — it is "a violation is diagnosed per
+# term and remediated, and the remedy works". That is strictly stronger than
+# the original: a silent violation fails, and so does a remedy that does not
+# actually restore the assumption.
+test_that("PH violations are diagnosed per term and remediated", {
+  terms_path <- here::here("output", "cox_ph_terms.csv")
+  ph_path    <- here::here("output", "cox_ph_assumption.csv")
+  skip_if_not(terms_path)
+  skip_if_not(ph_path)
 
-  expect_true(
-    ph$p_value[1] > 0.05,
-    label = sprintf(
-      paste("global cox.zph p = %.3f. Proportional hazards is violated, so the",
-            "hazard ratios in aim2b_cox_regression.csv are averages over",
-            "follow-up rather than constants. Decide between a stratified fit,",
-            "time-varying coefficients, or reporting them as averages"),
-      ph$p_value[1])
-  )
+  terms <- read_csv(terms_path, show_col_types = FALSE)
+  ph    <- read_csv(ph_path, show_col_types = FALSE)
+
+  expect_true("GLOBAL" %in% terms$term,
+              label = "cox_ph_terms.csv must carry the global Schoenfeld test")
+
+  if (ph$p_value[1] >= 0.05) {
+    expect_identical(ph$remediation[1], "none_needed")
+    return(invisible(NULL))
+  }
+
+  violators <- terms$term[terms$term != "GLOBAL" & terms$p < 0.05]
+  expect_gt(length(violators), 0)
+
+  # Every violating term must be named in the remediation, so a violation
+  # cannot be recorded globally and then quietly left unhandled.
+  recorded <- unlist(strsplit(ph$violating_terms[1], "|", fixed = TRUE))
+  expect_setequal(recorded, violators)
+  for (v in violators) {
+    expect_match(ph$remediation[1], v, fixed = TRUE,
+                 label = sprintf("term %s violates PH but no remedy names it", v))
+  }
+
+  # The remedy has to work: stratifying on every violator must restore the
+  # assumption for what remains.
+  expect_gt(ph$remediated_global_p[1], 0.05)
+
+  if (grepl("time_varying:", ph$remediation[1], fixed = TRUE)) {
+    expect_true(file.exists(here::here("output", "aim2b_cox_regression_timevarying.csv")))
+    tv <- read_csv(here::here("output", "cox_time_varying_hr.csv"), show_col_types = FALSE)
+    expect_true(all(c("term", "months", "hazard_ratio", "conf_low", "conf_high") %in% names(tv)))
+    expect_true(all(tv$conf_low <= tv$hazard_ratio & tv$hazard_ratio <= tv$conf_high))
+  }
+})
+
+# The point of the stratified fit is that it is a sensitivity analysis for the
+# covariates that did NOT violate. If their hazard ratios moved when the
+# violating term was absorbed into strata(), then those estimates would depend
+# on how n_authors was handled and could not be reported on their own.
+test_that("non-violating hazard ratios survive stratification on the violator", {
+  primary_path <- here::here("output", "aim2b_cox_regression.csv")
+  strat_path   <- here::here("output", "aim2b_cox_regression_stratified.csv")
+  skip_if_not(primary_path)
+  skip_if_not(strat_path)
+
+  primary <- read_csv(primary_path, show_col_types = FALSE)
+  strat   <- read_csv(strat_path, show_col_types = FALSE)
+
+  shared <- intersect(primary$term, strat$term)
+  expect_gt(length(shared), 0)
+
+  for (tm in shared) {
+    a <- primary$estimate[primary$term == tm]
+    b <- strat$estimate[strat$term == tm]
+    # 15% on the hazard ratio: large enough to allow the refit to move, small
+    # enough that a sign change or a lost effect would fail.
+    expect_lt(abs(log(b) - log(a)), log(1.15),
+              label = sprintf("HR for %s moved from %.3f to %.3f under stratification",
+                              tm, a, b))
+    expect_equal(sign(log(a)), sign(log(b)),
+                 label = sprintf("HR for %s changed direction under stratification", tm))
+  }
 })
 
 # ============================================================

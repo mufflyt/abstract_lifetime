@@ -612,3 +612,61 @@ if (file.exists(stab_path)) {
 } else {
   cli_alert_info("No model_predictor_stability.csv - skipping figure 7")
 }
+
+# ---------------------------------------------------------------
+# Figure 8: The hazard ratio the PH model was averaging
+# ---------------------------------------------------------------
+# n_authors violates proportional hazards (cox.zph p = 0.002). The Cox table
+# reports a single HR of 1.257 for it, which is an average over follow-up. This
+# plots what that average conceals: a null effect early and a substantial one
+# later. The constant is drawn as a reference line so the gap is visible rather
+# than asserted.
+tv_path <- here("output", "cox_time_varying_hr.csv")
+ph_path <- here("output", "aim2b_cox_regression.csv")
+
+if (file.exists(tv_path) && file.exists(ph_path)) {
+  tv <- read_csv(tv_path, show_col_types = FALSE)
+  ph <- read_csv(ph_path, show_col_types = FALSE)
+
+  for (v in unique(tv$term)) {
+    d8 <- tv |> filter(term == v)
+    const <- ph$estimate[ph$term == v]
+
+    p8 <- ggplot(d8, aes(x = months, y = hazard_ratio)) +
+      geom_hline(yintercept = 1, linetype = "dotted", colour = "grey40") +
+      geom_ribbon(aes(ymin = conf_low, ymax = conf_high),
+                  fill = "#1B5E20", alpha = 0.15) +
+      geom_line(colour = "#1B5E20", linewidth = 0.9) +
+      geom_point(colour = "#1B5E20", size = 2) +
+      scale_x_continuous(breaks = d8$months) +
+      labs(
+        title = sprintf("The effect of %s is not constant over follow-up", v),
+        subtitle = if (length(const) == 1) sprintf(
+          paste("Time-varying hazard ratio with 95%% CI (green).",
+                "\nThe Cox model reports a single constant HR of %.3f (red dashed),",
+                "which is an average of these."), const)
+          else "Time-varying hazard ratio with 95% CI",
+        x = "Months since congress", y = "Hazard ratio per unit",
+        caption = paste("coxph with a log-time interaction; cox.zph p = 0.002 for this term.",
+                        "Source: output/cox_time_varying_hr.csv")
+      ) +
+      theme_minimal(base_size = 11) +
+      theme(
+        panel.grid.minor = element_blank(),
+        plot.title = element_text(face = "bold"),
+        plot.caption = element_text(colour = "grey45", size = 8)
+      )
+
+    if (length(const) == 1) {
+      p8 <- p8 + geom_hline(yintercept = const, linetype = "dashed",
+                            colour = "#B71C1C", linewidth = 0.7)
+    }
+
+    stem <- here("output", "figures", sprintf("figure8_timevarying_%s", v))
+    ggsave(paste0(stem, ".png"), p8, width = 8, height = 4.6, dpi = 300, bg = "white")
+    ggsave(paste0(stem, ".pdf"), p8, width = 8, height = 4.6)
+    cli_alert_success("Figure 8 saved: time-varying HR for {v}")
+  }
+} else {
+  cli_alert_info("No cox_time_varying_hr.csv - skipping figure 8")
+}
