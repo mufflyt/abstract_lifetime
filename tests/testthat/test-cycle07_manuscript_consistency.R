@@ -150,9 +150,15 @@ test_that("the Rmd documents do not read files that are missing", {
       parts <- gsub('"', '', unlist(regmatches(cc, gregexpr('"[^"]+"', cc))))
       do.call(file.path, as.list(c(here::here(), parts)))
     }, character(1))
-    missing <- unique(paths[!file.exists(paths)])
+    # data/cache/ is gitignored by design, so it is absent from a fresh
+    # checkout and from CI. Every consumer of it degrades - the appendix now
+    # reports "no cache in this checkout" rather than a confident "0 files".
+    # The invariant that matters is that the Rmd does not read a REQUIRED file
+    # that is missing, so optional cache paths are exempt.
+    optional <- grepl("/data/cache(/|$)", paths, fixed = FALSE)
+    missing <- unique(paths[!file.exists(paths) & !optional])
     expect_length(missing, 0L)
-    if (length(missing)) fail(paste(basename(p), "reads missing file(s):",
+    if (length(missing)) fail(paste(basename(p), "reads missing required file(s):",
                                     paste(basename(missing), collapse = ", ")))
   }
 })

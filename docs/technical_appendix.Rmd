@@ -26,8 +26,23 @@ yr_max <- max(d$congress_year)
 n_definite <- sum(d$classification == "definite")
 n_probable <- sum(d$classification == "probable")
 
-xml_cache <- length(list.files(here("data", "cache", "pubmed_xml")))
-html_cache <- length(list.files(here("data", "cache", "sd_html")))
+# data/cache/ is gitignored, so these directories are absent from a fresh
+# checkout. list.files() on a missing directory returns character(0), which
+# rendered as a confident "0 files" - wrong prose rather than a missing number.
+# Report the count when the cache is present and say so plainly when it is not.
+cache_count <- function(...) {
+  d <- here("data", "cache", ...)
+  if (!dir.exists(d)) return(NA_integer_)
+  length(list.files(d))
+}
+fmt_cache <- function(n, noun) {
+  if (is.na(n)) sprintf("no %s cache in this checkout (gitignored)", noun)
+  else sprintf("%s %s files", format(n, big.mark = ","), noun)
+}
+xml_cache_n  <- cache_count("pubmed_xml")
+html_cache_n <- cache_count("sd_html")
+xml_cache  <- fmt_cache(xml_cache_n, "PubMed XML")
+html_cache <- fmt_cache(html_cache_n, "ScienceDirect HTML")
 ```
 
 ## A0. Relationship to the `docs/` reference set
@@ -71,7 +86,7 @@ The abstract-to-publication matching pipeline is implemented as a modular, fully
 
 - R version `r paste(R.version$major, R.version$minor, sep = ".")`
 - 22 R packages (tidyverse core, rentrez, xml2, httr, jsonlite, survival, gender, shiny, bslib, googlesheets4)
-- Disk cache: `r xml_cache` PubMed XML files, `r html_cache` ScienceDirect HTML files
+- Disk cache: `r xml_cache`; `r html_cache`
 - External APIs: NCBI E-Utilities (PubMed), CrossRef, Europe PMC, OpenAlex, Semantic Scholar, genderize.io
 - Runtime: approximately 3-4 hours for a full pipeline execution on `r n_total` abstracts
 
@@ -95,7 +110,7 @@ The abstract-to-publication matching pipeline is implemented as a modular, fully
 
 ### A2.1 Abstract Ingestion
 
-Conference abstracts were identified from `r n_congresses` annual JMIG supplement issues (Volume 19 Issue 6 through Volume 30 Issue 11, Supplement S). The ScienceDirect supplement listing page was scraped programmatically with polite delays (2-3 seconds between requests) and user-agent rotation. Per-article HTML was cached to disk to avoid redundant fetches on re-runs. A total of `r html_cache` article pages were cached.
+Conference abstracts were identified from `r n_congresses` annual JMIG supplement issues (Volume 19 Issue 6 through Volume 30 Issue 11, Supplement S). The ScienceDirect supplement listing page was scraped programmatically with polite delays (2-3 seconds between requests) and user-agent rotation. Per-article HTML was cached to disk to avoid redundant fetches on re-runs. Article pages cached: `r html_cache`.
 
 Abstract text was available for congresses 2019-2023 only. Congresses 2012-2018 used an older ScienceDirect page format that did not expose structured abstract sections (Objective, Design, Setting, Patients, Intervention, Measurements, Conclusion) in the HTML. For these years, the matching algorithm relied on title and author matching without abstract-text semantic similarity.
 
@@ -118,7 +133,7 @@ A novel DOI-based reverse citation strategy queried OpenAlex for papers that cit
 
 ### A2.3 Rate Limiting and Caching
 
-NCBI E-Utilities requests were rate-limited to 3 requests/second (without API key) or 10 requests/second (with ENTREZ_KEY). PubMed XML responses were cached to disk (`r xml_cache` files). All search stages used RDS-based checkpoints enabling resume after interruption.
+NCBI E-Utilities requests were rate-limited to 3 requests/second (without API key) or 10 requests/second (with ENTREZ_KEY). PubMed XML responses were cached to disk (`r xml_cache`). All search stages used RDS-based checkpoints enabling resume after interruption.
 
 ## A3. Matching Algorithm
 
