@@ -39,15 +39,15 @@ fixture <- list(
     res("A9", "excluded")    # no reviewer at all; must resolve FALSE, not NA
   ),
   decisions = bind_rows(
-    dec("A1", "GW",   "no_match", "2026-04-20 10:00:00"),
-    dec("A2", "GW",   "match",    "2026-04-20 10:00:00"),
-    dec("A3", "GW",   "skip",     "2026-04-20 10:00:00"),
+    dec("A1", "R01",   "no_match", "2026-04-20 10:00:00"),
+    dec("A2", "R01",   "match",    "2026-04-20 10:00:00"),
+    dec("A3", "R01",   "skip",     "2026-04-20 10:00:00"),
     dec("A4", "AUTO", "no_match", "2026-04-17 12:00:00"),
-    dec("A6", "JM",   "match",    "2026-04-21 10:00:00"),
-    dec("A7", "GW",   "match",    "2026-04-14 09:00:00"),
+    dec("A6", "R02",   "match",    "2026-04-21 10:00:00"),
+    dec("A7", "R01",   "match",    "2026-04-14 09:00:00"),
     dec("A7", "AUTO", "no_match", "2099-01-01 00:00:00"),
-    dec("A8", "GW",   "no_match", "2026-04-18 10:00:00"),
-    dec("A8", "JM",   "match",    "2026-04-22 10:00:00")
+    dec("A8", "R01",   "no_match", "2026-04-18 10:00:00"),
+    dec("A8", "R02",   "match",    "2026-04-22 10:00:00")
   )
 )
 
@@ -68,7 +68,7 @@ check_invariants <- function(dedup_fn, assign_fn, summary_fn) {
   get <- function(id) fp$final_published[fp$abstract_id == id]
 
   note(nrow(dd) == length(unique(dd$abstract_id)), "one_row_per_abstract")
-  note(identical(dd$reviewer[dd$abstract_id == "A7"], "GW"), "human_beats_newer_auto")
+  note(identical(dd$reviewer[dd$abstract_id == "A7"], "R01"), "human_beats_newer_auto")
   note(identical(dd$reviewer[dd$abstract_id == "A4"], "AUTO"), "auto_kept_when_alone")
   note(isTRUE(get("A1")), "definite_wins")
   note(isTRUE(get("A2")), "human_match_promotes")
@@ -77,7 +77,7 @@ check_invariants <- function(dedup_fn, assign_fn, summary_fn) {
   note(isFALSE(get("A5")), "no_match_resolves_false")
   note(isTRUE(get("A6")), "human_match_overrides_excluded")
   note(isTRUE(get("A7")), "human_decision_survives")
-  note(identical(dd$reviewer[dd$abstract_id == "A8"], "JM"), "latest_human_wins")
+  note(identical(dd$reviewer[dd$abstract_id == "A8"], "R02"), "latest_human_wins")
   note(isTRUE(get("A8")), "latest_human_decision_applied")
   note(isFALSE(get("A9")), "excluded_without_reviewer_is_false")
   note(nrow(fp) == nrow(fixture$results), "no_row_duplication_after_join")
