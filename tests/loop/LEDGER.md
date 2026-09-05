@@ -1214,3 +1214,35 @@ comparable across rows of `search_strategy_efficacy.csv`.
 Contracts read from source, not assumed: the six strategy names are parsed out
 of `utils_pubmed.R` at test time rather than hard-coded, so the vocabulary
 cannot drift away from the builder.
+
+## Cycle 18 - 2026-09-05
+
+Mix required: 3 BVA / 3 semantic / 4 adversarial. File:
+`tests/testthat/test-cycle18_missingness_stability.R` (19 assertions).
+Target: `R/06b_missingness.R` and `R/06d_model_stability.R`, the two diagnostics
+that tell a reader how much to trust the regression. Both feed the manuscript's
+limitations and neither had a test. Cycle 3 covered the model's contracts and
+cycle 12 the covariates; nobody had asked whether the DIAGNOSTICS about them are
+internally coherent.
+
+The adversarial weighting was deliberate: these artefacts are expensive to
+regenerate (500 bootstrap resamples, a refit per congress) and therefore the
+most likely in the repository to survive a change to the data they describe.
+18.7 and 18.8 check exactly that, first on row count and then by recomputing
+every missing count from the shipped dataset, which is the stronger check
+because a dataset can keep its size while a column's missingness changes
+completely, as the gender and country corrections did.
+
+**Result: 19/19 pass. No implementation defects. Third clean cycle.**
+
+**One wrong assumption of my own, corrected.** 18.2 asserted
+`retention_frequency` was a proportion in [0, 1] and failed on every row: the
+column is a percentage, 494 of 500 recorded as 98.8. The name is ambiguous but
+the artefact is not, so the test now asserts the contract the file actually
+holds. Not registered as a finding, because a value above 1 read as a proportion
+announces itself rather than propagating silently.
+
+18.9 is worth keeping in mind for future cohort changes: it fails both if a
+congress appears in the leave-one-out table that is not in the dataset (a stale
+diagnostic) and if a congress in the dataset was never left out (a robustness
+claim covering less than it says).
