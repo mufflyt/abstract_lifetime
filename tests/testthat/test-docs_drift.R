@@ -68,7 +68,7 @@ test_that("the final analytical dataset has the documented dimensions", {
 
   # Documented in docs/DATA_DICTIONARY.md and docs/COHORT_ASSEMBLY.md.
   expect_equal(nrow(fad), 1106L)
-  expect_equal(ncol(fad), 92L)
+  expect_equal(ncol(fad), 93L)
   expect_equal(dplyr::n_distinct(fad$abstract_id), nrow(fad))
 })
 

@@ -4,7 +4,7 @@
 
 # Decisions pending
 
-This repository keeps 16 tests failing on purpose. Each one below is a question that code cannot answer: resolving it changes the estimand, the cohort, or an adjudication that a human already recorded. None is a defect awaiting a fix.
+This repository keeps 15 tests failing on purpose. Each one below is a question that code cannot answer: resolving it changes the estimand, the cohort, or an adjudication that a human already recorded. None is a defect awaiting a fix.
 
 CI is green while exactly these fail. If one of them starts passing, CI goes red until its entry is removed, so this list cannot quietly outlive its reasons.
 
@@ -94,15 +94,7 @@ Work an item by deciding the question in **Decision needed**, then either make t
 
 **Documented in.** tests/loop/LEDGER.md cycle 13
 
-### 10. practice_type reaches the community class its rules describe
-
-**What fails.** STALENESS TRACKER, not an open question. The community branch at utils_affiliation.R:173 is gated on is_us, which was computed from the broken country field, so it never fired. Fixing parse_country() repaired it: author_characteristics.csv now shows community=20 and practice_type coverage rose from 193 to 949 classified rows. final_analytical_dataset.csv is stale until 06_analyze_results.R re-runs.
-
-**Decision needed.** None. Remove this entry once 06_analyze_results.R runs.
-
-**Documented in.** tests/loop/LEDGER.md cycle 13
-
-### 11. orcid_false_positive is a live flag rather than a constant
+### 10. orcid_false_positive is a live flag rather than a constant
 
 **What fails.** orcid_false_positive is FALSE on all 1,102 rows it covers. A flag that never fires gives the same answer as no flag, so the ORCID false-positive check cannot currently distinguish anything.
 
@@ -110,7 +102,7 @@ Work an item by deciding the question in **Decision needed**, then either make t
 
 **Documented in.** tests/loop/LEDGER.md cycle 13
 
-### 12. career_stage resolves for a usable share of the cohort
+### 11. career_stage resolves for a usable share of the cohort
 
 **What fails.** career_stage resolves 15 of 1,106 rows (1.4%) even after the country fix improved every other classifier. subspecialty reaches 53% and ACOG district 88% on the same affiliations, so the input is not the limit.
 
@@ -118,7 +110,7 @@ Work an item by deciding the question in **Decision needed**, then either make t
 
 **Documented in.** tests/loop/LEDGER.md cycle 13
 
-### 13. no enrichment column is wholly missing or single-valued
+### 12. no enrichment column is wholly missing or single-valued
 
 **What fails.** orcid_subspecialty is the constant "obstetrics" on every row it covers, and orcid_false_positive is the constant FALSE. Neither carries information, but both appear in the published dataset as if they do.
 
@@ -128,7 +120,7 @@ Work an item by deciding the question in **Decision needed**, then either make t
 
 ## test-cycle14_text_flags_and_tables.R
 
-### 14. abstract_word_count is zero only for abstracts with no text
+### 13. abstract_word_count is zero only for abstracts with no text
 
 **What fails.** 280 of 1,106 abstracts (25.3%) carry no abstract text at all: abstract_text, abstract_objective and abstract_conclusion are all empty. Only 4 are the withdrawn abstracts. The loss concentrates almost entirely in two congresses, 2017 (97 of 90 evaluated) and 2018 (95 of 95), with the remainder spread thinly over 2012-2016. Every text-derived flag on those rows is a false negative rather than a measurement, abstract_pts can never contribute to their match score, and this is the mechanism behind the sample_size missingness recorded at cycle 12 (86.7% in 2017, 92.6% in 2018). Checked and NOT supported: this does not explain the year-over-year publication rate pattern. The correlation between percent-no-text and publication rate is -0.17, and the two fully text-free congresses sit at opposite extremes (2017 at 5.6%, 2018 at 27.4%).
 
@@ -136,7 +128,7 @@ Work an item by deciding the question in **Decision needed**, then either make t
 
 **Documented in.** tests/loop/LEDGER.md cycle 14
 
-### 15. stat_sig_reported implies has_numeric_results
+### 14. stat_sig_reported implies has_numeric_results
 
 **What fails.** 11 abstracts are flagged as reporting statistical significance while also being flagged as carrying no numeric results. An abstract cannot state that a result reached significance without presenting a number, so the two extractors disagree about the same text and at least one is wrong on those rows.
 
@@ -146,7 +138,7 @@ Work an item by deciding the question in **Decision needed**, then either make t
 
 ## test-cycle15_backfill_contract.R
 
-### 16. every eligible abstract was at least attempted by the backfill
+### 15. every eligible abstract was at least attempted by the backfill
 
 **What fails.** R/02b_backfill_abstract_text.R exists to repair exactly the gap cycle 14 measured, and all 280 text-free abstracts are eligible for it: every one has a usable DOI. Only 15 were ever fetched. The other 265 have no cached XML under the DOI-derived key the fetcher uses, so they were never attempted. The stage stopped at 5.4% of its own workload. Worth knowing before anyone finishes it: none of the 15 that WERE fetched returned an <AbstractText> element, so PubMed may simply not hold abstract bodies for these supplement entries. Completing the backfill may recover little. That is an argument for running it and finding out, not for leaving 265 rows in an unknown state.
 

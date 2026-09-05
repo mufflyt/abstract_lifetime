@@ -133,19 +133,6 @@ expected_failures:
     documented_in: tests/loop/LEDGER.md cycle 13
 
   - file: test-cycle13_enrichment_quality.R
-    test: practice_type reaches the community class its rules describe
-    reason: >
-      STALENESS TRACKER, not an open question. The community branch at
-      utils_affiliation.R:173 is gated on is_us, which was computed from the
-      broken country field, so it never fired. Fixing parse_country() repaired
-      it: author_characteristics.csv now shows community=20 and practice_type
-      coverage rose from 193 to 949 classified rows. final_analytical_dataset.csv
-      is stale until 06_analyze_results.R re-runs.
-    decision_needed: >
-      None. Remove this entry once 06_analyze_results.R runs.
-    documented_in: tests/loop/LEDGER.md cycle 13
-
-  - file: test-cycle13_enrichment_quality.R
     test: orcid_false_positive is a live flag rather than a constant
     reason: >
       orcid_false_positive is FALSE on all 1,102 rows it covers. A flag that

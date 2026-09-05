@@ -110,6 +110,33 @@ test_that("an author count above the ingest ceiling is caught", {
   expect_true("max" %in% v$check)
 })
 
+test_that("a missing authors_truncated value is caught", {
+  v <- with_corrupted(function(d) { d$authors_truncated[1] <- NA; d })
+  expect_true("required" %in% v$check)
+})
+
+test_that("collapsing authors_truncated to a constant trips its rule", {
+  # This is the regression that matters. The column was computed and then
+  # dropped from the R/05_adjudicate.R select once already; with it gone,
+  # nothing downstream could distinguish a censored author list from a short
+  # one. A flag that silently becomes constant is the same defect in a
+  # different form, so it has to fail rather than pass quietly.
+  v <- with_corrupted(function(d) { d$authors_truncated <- FALSE; d })
+  expect_true("truncation_flag_stays_informative" %in% v$check)
+})
+
+test_that("conflating truncation with the display cap trips its rule", {
+  # Truncated rows parse to author_count 4 because the ellipsis consumes a
+  # slot; capped rows show 5 and are not flagged. If a future parser change
+  # made the two coincide, every author-count result would quietly be measured
+  # over a different population.
+  v <- with_corrupted(function(d) {
+    d$author_count[d$authors_truncated] <- 5
+    d
+  })
+  expect_true("truncation_and_cap_are_distinct_signals" %in% v$check)
+})
+
 test_that("clearing the candidate PMIDs trips the semantics rule", {
   # final_pmid is a best-scoring CANDIDATE, present on 869 unpublished rows.
   # Someone "tidying" that apparent inconsistency would change what the column

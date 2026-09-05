@@ -1632,6 +1632,12 @@ visible rather than creating one: the test was already only marginal at 171
 events, against p = 0.32 when it had 104. The response — stratify, allow
 time-varying coefficients, or report the hazard ratios explicitly as averages
 over follow-up — is a methodological decision and has not been taken.
+
+> **Superseded.** That decision was taken on 2026-09-04 and is recorded in A16.
+> The p-values in this subsection are the values of 2026-09-04 and are left
+> unedited as the record of that day; every model term moved again on
+> 2026-09-05 when the author-gender waterfall was corrected. For current
+> figures see A16 and `output/`.
 `tests/testthat/test-pipeline_semantics.R` is left failing with an explanatory
 message rather than relaxed.
 
@@ -1642,7 +1648,11 @@ diagnostic. `R/06d_model_stability.R` adds two, seeded from
 `config.yml: pipeline$seed`.
 
 **Bootstrap predictor retention**, 500 refits of the logistic model
-(n = 1,011), counting how often each term stays significant at p < 0.05:
+(n = 1,011), counting how often each term stays significant at p < 0.05.
+These are the 2026-09-04 values, kept as the record of that run; the model was
+refitted on 2026-09-05 after the gender correction and the current retention
+figures are in `output/model_predictor_stability.csv` and
+docs/STATISTICAL_ANALYSIS.md:
 
 | predictor | retained |
 |---|---:|
@@ -1784,8 +1794,8 @@ records how the decision was taken, on 2026-09-04, and what it changed.
 
 ### A16.1 Why a global test was not enough to act on
 
-The complaint was a single number: `cox.zph(cox_model)` global χ² = 13.01 on
-6 df, **p = 0.043**. Three responses are conventional — report the hazard ratios
+The complaint was a single number: `cox.zph(cox_model)` global χ² = 13.13 on
+6 df, **p = 0.041**. Three responses are conventional — report the hazard ratios
 as averages over follow-up, stratify, or allow time-varying coefficients — and
 they are not interchangeable. Which one is right depends entirely on *which*
 covariate is non-proportional and whether that covariate is of interest. A
@@ -1801,10 +1811,10 @@ if (file.exists(ph_terms_p)) {
 ```
 
 The answer was unambiguous. `n_authors` fails at **p = 0.002**; the other five
-terms fall between p = 0.13 and p = 0.84. Refitting the model without
-`n_authors` returns the global test to **p = 0.497**, confirming that the whole
+terms fall between p = 0.15 and p = 0.89. Refitting the model without
+`n_authors` returns the global test to **p = 0.53**, confirming that the whole
 of the global violation is that one term. Its Schoenfeld residuals correlate
-positively with time (Spearman ρ = +0.256), so the effect grows over follow-up
+positively with time (Spearman ρ = +0.257), so the effect grows over follow-up
 rather than being constant.
 
 ### A16.2 The choice, and the reason for it
@@ -1813,9 +1823,9 @@ All three remedies were fitted before one was chosen.
 
 | option | global p after | why it was or was not chosen |
 |---|---:|---|
-| Report as averages over follow-up | 0.043 | Names the problem without measuring it. The `n_authors` row would still read as a constant to anyone quoting the table. |
-| Stratify on `n_authors` | 0.688 | Restores the assumption, but **discards the estimate**. `n_authors` is retained in 97.2% of 500 bootstrap refits (A15.7) — one of only two robust predictors. This trades a finding for a diagnostic. |
-| **Time-varying coefficient** | — | Chosen. Keeps the term and estimates its drift. AIC 2276.2 against 2284.1; the log-time interaction is significant at p = 0.002. |
+| Report as averages over follow-up | 0.041 | Names the problem without measuring it. The `n_authors` row would still read as a constant to anyone quoting the table. |
+| Stratify on `n_authors` | 0.71 | Restores the assumption, but **discards the estimate**. `n_authors` is retained in 98.8% of 500 bootstrap refits (A15.7) — one of only two robust predictors. This trades a finding for a diagnostic. |
+| **Time-varying coefficient** | — | Chosen. Keeps the term and estimates its drift. AIC 2295.4 against 2303.6; the log-time interaction is significant at p = 0.001. |
 
 The interaction is `x * log(t)`. That form was not chosen for convenience: it is
 the transform `cox.zph` plots the residuals against by default, so the remedy
@@ -1839,8 +1849,8 @@ if (file.exists(tv_p)) {
 }
 ```
 
-The main model reports HR 1.257 per additional author. Time-resolved, that is
-1.01 (0.84–1.21) at three months and 1.51 (1.25–1.84) at two years. The single
+The main model reports HR 1.266 per additional author. Time-resolved, that is
+1.01 (0.84–1.22) at three months and 1.53 (1.26–1.86) at two years. The single
 estimate was averaging a null early period against a substantial later one.
 
 Substantively this is a claim about persistence rather than speed. Larger teams
@@ -1857,8 +1867,8 @@ if (file.exists(f8)) knitr::include_graphics(f8)
 
 ### A16.4 The limitation that remains
 
-`n_authors` is **censored at 5**: 489 of the 1,005 abstracts in the model frame
-(48.7%) sit at that ceiling, an artefact of the ScienceDirect ingest recording
+`n_authors` is **censored at 5**: 499 of the 1,020 abstracts in the model frame
+(48.9%) sit at that ceiling, an artefact of the ScienceDirect ingest recording
 at most five authors. A ceiling of this size compresses the covariate and biases
 the per-author effect toward the null; it does not manufacture time dependence.
 So the *shape* in A16.3 is trustworthy and the *magnitude* is a lower bound on
@@ -1910,3 +1920,45 @@ remedied — which is the condition that actually threatens the reported results
 manifest entry started passing; it now also fails when an entry names a test
 that never ran. Renaming this test would otherwise have orphaned its manifest
 entry, leaving a documented "open decision" with no assertion behind it.
+
+### A16.7 Refit of 2026-09-05, after the gender correction
+
+A concurrent correction to the author-gender waterfall moved `gender_unified`
+on 74 of 1,106 abstracts — 58 male/female flips and 16 rows resolved from NA —
+which enlarged the complete-case frames and moved every model coefficient. The
+analysis was re-run and this appendix, `docs/STATISTICAL_ANALYSIS.md`, the
+README and `docs/manuscript_claims.csv` were updated to the refitted values.
+
+**The headline results did not move.** The publication rate is still 178 of
+1,051 evaluated (16.9%), the median time to publication is still 13.7 months
+(IQR 5.7–22.6), and every sensitivity scenario is unchanged. The estimand
+fingerprint is unchanged across all 18 components, so the analysis is answering
+the same question; only its estimates shifted.
+
+What did move:
+
+| quantity | before | after |
+|---|---:|---:|
+| Cox n / events | 1,005 / 170 | 1,020 / 171 |
+| Logistic n | 1,011 | 1,027 |
+| `is_rct` HR | 2.227 | 2.146 |
+| `is_academic` HR | 0.620 | 0.637 |
+| `n_authors` HR (averaged) | 1.257 | 1.266 |
+| `gender_unified` HR | 0.814 | 0.779 |
+| PH global p | 0.043 | 0.041 |
+| PH global p, stratified | 0.688 | 0.71 |
+
+The conclusion of A16 is unchanged and was reached without re-deciding
+anything: `n_authors` remains the only term violating proportional hazards
+(p = 0.002 against p ≥ 0.15 for every other term), and the remediation logic in
+`R/06_analyze_results.R` re-diagnosed and re-applied the log-time interaction on
+its own, because it reads the violation from `cox.zph` rather than naming the
+term. That is the property the generic implementation was written for.
+
+One reading did change and is worth flagging rather than burying. `is_academic`
+was significant in **all twelve** leave-one-congress-out refits before the
+correction and is now significant in **eleven of twelve**, while its bootstrap
+retention fell from 67.4% to 62.0%. It was already described as "not
+congress-driven but not sampling-robust"; it is now marginally less
+congress-independent as well. The qualification it carries should be read as
+having got slightly stronger, not weaker.
