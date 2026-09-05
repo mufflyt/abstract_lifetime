@@ -13,13 +13,26 @@ suppressPackageStartupMessages({
 })
 
 source(here("R", "utils_text.R"))
+source(here("R", "utils_external_paths.R"))
 
 cli_h1("Coauthor Triangulation")
 
 npi <- read_csv(here("data", "processed", "npi_matches.csv"), show_col_types = FALSE)
 abs <- read_csv(here("data", "processed", "abstracts_cleaned.csv"), show_col_types = FALSE)
-pool <- read_csv("/Users/tylermuffly/isochrones/data/canonical_abog/canonical_abog_npi_LATEST.csv",
-                 show_col_types = FALSE)
+# The ABOG export lives outside the repo; its path is operator-specific and is
+# resolved rather than hard-coded. See R/utils_external_paths.R.
+abog_path <- external_path("abog_npi_path", "ABOG_NPI_PATH")
+if (!external_available(abog_path)) {
+  cli_alert_warning("ABOG NPI export not configured or not found - skipping coauthor triangulation. Set ABOG_NPI_PATH to enable.")
+}
+
+# 00_run_all.R *sources* this script, so `quit()` would end the entire pipeline
+# run, and a bare `invisible(NULL)` at top level does not stop a script at all
+# (which is why the previous guard fell through to dbConnect). The remainder is
+# therefore wrapped in an explicit conditional. Inner lines keep their original
+# indentation so the diff stays reviewable.
+if (external_available(abog_path)) {
+pool <- read_csv(abog_path, show_col_types = FALSE)
 
 # Target: ambiguous + low-scoring authors with coauthors
 targets <- npi |>
@@ -173,3 +186,5 @@ if (n_resolved > 0) {
 # Final count
 n_high <- sum(npi$npi_match_confidence == "high")
 cli_alert_success("Total Tier A after triangulation: {n_high} / {nrow(npi)} ({round(n_high/nrow(npi)*100,1)}%)")
+
+} # end: external ABOG export available

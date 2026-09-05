@@ -527,7 +527,7 @@ NPIs and agrees with ABOG on 251 of 252 (99.6%). The remaining ABOG dependency
 is for `npi_state` and `npi_subspecialty`, neither of which is a model term.
 See [AUTHOR_ENRICHMENT.md](AUTHOR_ENRICHMENT.md) §4.
 
-The NPPES mirror is present at `/Volumes/MufflySamsung 1 1/DuckDB/` (84 GB); the
+The NPPES mirror is present at `$NPPES_DUCKDB_PATH` (84 GB); the
 configured path lacks the volume suffix macOS assigns when more than one copy of
 the drive is mounted, so the taxonomy fallback is skipped with a warning rather
 than failing.

@@ -108,7 +108,7 @@ reason.
 
 | Path | Referenced by | Status |
 |---|---|---|
-| `/Volumes/MufflySamsung/DuckDB/nber_my_duckdb.duckdb` | `config.yml: external_data$nppes_duckdb_path` | **Path wrong, file present.** The 84 GB mirror is at `/Volumes/MufflySamsung 1 1/DuckDB/`; the volume suffix depends on how many copies of the drive macOS has mounted. The taxonomy fallback is skipped with a warning. |
+| `$NPPES_DUCKDB_PATH` | `config.yml: external_data$nppes_duckdb_path` | **Path wrong, file present.** The 84 GB mirror is at `$NPPES_DUCKDB_PATH`; the volume suffix depends on how many copies of the drive macOS has mounted. The taxonomy fallback is skipped with a warning. |
 | `~/isochrones/data/canonical_abog/canonical_abog_npi_LATEST.csv` | `config.yml: external_data$abog_npi_path` | **Present, but schema-drifted.** The `LATEST` symlink now points at an ABOG *workforce* export (79,400 rows, `first`/`last`/`middle`/`subspecialty_name`, no gender column, NPI on only 411 rows). `R/10_npi_matching.R` maps the renamed columns and completes, but yields 1 NPI and no gender, so it refuses to overwrite the shipped sidecar. |
 | `data/processed/abstracts_parsed_pdf.csv` | `00_run_all.R:25`, `R/01c_compare_sources.R` | Never produced; the comparison step never fires. |
 | `data/raw/` | `.gitignore` | Directory does not exist. The PDF fallback has no input. |

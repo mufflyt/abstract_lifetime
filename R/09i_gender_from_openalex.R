@@ -30,7 +30,11 @@ dir.create(cache_dir, showWarnings = FALSE, recursive = TRUE)
 abstracts <- read_csv(here("data", "processed", "abstracts_cleaned.csv"),
                       show_col_types = FALSE)
 
-MAILTO <- Sys.getenv("OPENALEX_MAILTO", "tyler.muffly@dhha.org")
+# OpenAlex asks for a contact address to put callers in its "polite pool".
+# That address is the operator's, not a property of the study, so it is read
+# from the environment and never committed. Unset simply means the ordinary
+# request pool, which is slower but returns identical data.
+MAILTO <- Sys.getenv("OPENALEX_MAILTO", "")
 
 # ISSNs for 17 OB/GYN + minimally invasive surgery journals
 JOURNAL_ISSNS <- paste(c(
@@ -100,7 +104,7 @@ fetch_openalex_first_name <- function(last, init) {
     ",raw_author_name.search:", URLencode(last, reserved = TRUE),
     "&select=id,authorships",
     "&per_page=10",
-    "&mailto=", MAILTO
+    if (nzchar(MAILTO)) paste0("&mailto=", MAILTO) else ""
   )
 
   Sys.sleep(0.12)   # polite pool: ~8 req/sec
