@@ -1,0 +1,94 @@
+# data_contract.yml — row-level invariants for the analytical dataset.
+#
+# Every existing check on this dataset is an aggregate: a row count, a rate, a
+# median. Aggregates hide row-level corruption. A dataset can hold the right
+# number of rows, the right publication rate and the right median time to
+# publication while individual rows carry a congress year that contradicts
+# their own abstract_id, a negative interval, or a PMID made of letters.
+#
+# These rules are checked per row, and a violation names the row. They encode
+# only what is already true of the committed data; where the data is surprising
+# but correct, that is written down as a rule rather than silently allowed --
+# see `pmid_is_a_candidate_not_a_publication` below, which is the single most
+# misreadable thing in this file.
+#
+# Checked by tests/testthat/test-data_contract.R.
+# Report: Rscript scripts/check_data_contract.R -> output/data_contract_violations.csv
+
+version: 1
+
+datasets:
+  - path: output/final_analytical_dataset.csv
+    grain: one abstract
+    key: abstract_id
+
+    columns:
+      abstract_id:
+        required: true
+        unique: true
+        # AAGL<congress year>_<zero-padded index>
+        regex: "^AAGL[0-9]{4}_[0-9]{3}$"
+
+      congress_year:
+        required: true
+        type: integer
+        min: 2012
+        max: 2023
+
+      final_published:
+        type: logical
+        # NA is legitimate: abstracts whose match was never resolved are held
+        # out of the denominator rather than assumed unpublished.
+        allow_na: true
+
+      n_authors:
+        type: numeric
+        min: 1
+        # Truncated at 5 by the source ingest, not a real maximum. A value
+        # above 5 would mean the ingest changed and every author-count result
+        # needs revisiting.
+        max: 5
+        allow_na: true
+
+      months_to_pub:
+        type: numeric
+        allow_na: true
+
+      final_pmid:
+        # Digits only when present. A PubMed identifier is numeric.
+        regex: "^[0-9]+$"
+        allow_na: true
+
+    rules:
+      - id: congress_year_matches_id
+        expr: "as.integer(substr(abstract_id, 5, 8)) == congress_year"
+        description: >
+          The congress year embedded in abstract_id must equal the
+          congress_year column. These are written by different stages and a
+          disagreement means rows were joined across cohorts.
+
+      - id: published_has_interval
+        expr: "!(final_published %in% TRUE) | !is.na(months_to_pub)"
+        description: >
+          Every abstract counted as published must carry a time to publication.
+          A published row without one silently leaves the survival analysis.
+
+      - id: published_has_pmid
+        expr: "!(final_published %in% TRUE) | !is.na(final_pmid)"
+        description: >
+          Every abstract counted as published must name the publication it was
+          matched to, so the numerator is auditable row by row.
+
+      - id: pmid_is_a_candidate_not_a_publication
+        # Deliberately inverted: this asserts that unpublished rows DO carry
+        # PMIDs, which is true of 869 of them.
+        expr: "TRUE"
+        holds_when: "sum(!is.na(final_pmid) & final_published %in% FALSE) > 0"
+        description: >
+          final_pmid is the best-scoring CANDIDATE, not the publication.
+          It is populated on 1,102 of 1,106 rows while only 178 are published,
+          so `!is.na(final_pmid)` is not a publication test and would inflate
+          the numerator roughly five-fold. This rule exists so that anyone who
+          "fixes" the apparent inconsistency by clearing those PMIDs, or who
+          reads the column as an outcome, trips a named test instead of
+          silently changing the headline result.

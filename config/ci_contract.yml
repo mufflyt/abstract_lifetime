@@ -1,0 +1,79 @@
+# ci_contract.yml — what "green" means in this repository, as data.
+#
+# The definition of green was spread across two workflow files and one script.
+# tests.yaml ran three gates in a specific order for reasons recorded only in a
+# comment; run_suite_gate.R hard-coded the manifest path and the three rules it
+# enforces; R-CMD-check.yaml duplicated the third gate and had already drifted
+# once, when it used stop_on_failure = TRUE and disagreed with tests.yaml about
+# whether the preserved failures were fatal.
+#
+# Putting the contract in one file does not by itself stop drift, so it is
+# read at runtime by tests/run_suite_gate.R and checked by
+# tests/testthat/test-ci_contract.R. A gate listed here that does not exist, or
+# a workflow that stops calling the gate, fails the suite.
+#
+# It is a contract about PROCESS, not about science. Nothing here encodes a
+# scientific threshold; the estimand and its thresholds live in config.yml and
+# in the tests themselves.
+
+version: 1
+
+# Ordered. Each gate runs only if the previous one passed, so the cheapest and
+# most diagnostic failures surface first.
+gates:
+  - id: bva
+    name: Decision precedence and denominator contracts (BVA)
+    file: tests/testthat/test-decision_precedence_bva.R
+    policy: all_must_pass
+    rationale: >
+      These encode defects that actually reached the analysis outputs. They run
+      first so a failure stops the job before the slower suite runs.
+
+  - id: mutation
+    name: Mutation tests (every planted defect must be killed)
+    file: tests/testthat/test-decision_mutation.R
+    policy: all_must_pass
+    rationale: >
+      A surviving mutant means the suite has stopped detecting a defect it was
+      written to catch, which a passing test run alone cannot show.
+
+  - id: suite
+    name: Full test suite
+    runner: tests/run_suite_gate.R
+    policy: manifest
+    rationale: >
+      The suite preserves failing tests on purpose, each marking an open
+      decision that belongs to the author. Failing on all of them meant CI had
+      never been green and so could not signal anything.
+
+# How the manifest gate decides. run_suite_gate.R reads these rather than
+# hard-coding them.
+manifest:
+  path: tests/expected_failures.yaml
+
+  # A failure that is not on the manifest is a regression.
+  fail_on_unexpected_failure: true
+
+  # An entry that now passes means the decision was taken and the entry has
+  # outlived its reason.
+  fail_on_stale_entry: true
+
+  # An entry naming a test that never ran was renamed or deleted, and would
+  # otherwise sit there describing a decision with no assertion behind it.
+  fail_on_orphaned_entry: true
+
+  # Every entry must say why it fails and what decision it waits on, so the
+  # manifest cannot become a list of bare test names.
+  require_fields: [file, test, reason, decision_needed]
+
+  # Not a quality bar, a ratchet: the manifest is meant to shrink. Raising this
+  # should be a deliberate act with a reason in the commit message.
+  max_entries: 20
+
+# Workflows that must exist and must invoke the suite gate. Adding a workflow
+# that runs tests its own way is how the two files drifted the first time.
+workflows:
+  - path: .github/workflows/tests.yaml
+    must_invoke_gate: true
+  - path: .github/workflows/R-CMD-check.yaml
+    must_invoke_gate: true

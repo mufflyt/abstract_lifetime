@@ -152,7 +152,7 @@ test_that("dedup_decisions_for_analysis is invariant to input row order", {
   ts <- function(s) as.POSIXct(s, tz = "UTC")
   d <- tibble::tibble(
     abstract_id      = c("A1", "A1", "A2", "A2", "A3"),
-    reviewer         = c("AUTO", "GW", "JM", "GW", "AUTO"),
+    reviewer         = c("AUTO", "R01", "R02", "R01", "AUTO"),
     manual_decision  = c("no_match", "match", "match", "no_match", "no_match"),
     manual_pmid      = NA_character_,
     review_timestamp = ts(c("2099-01-01 00:00:00", "2026-04-14 09:00:00",

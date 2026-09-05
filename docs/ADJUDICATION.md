@@ -93,9 +93,9 @@ scripted sync; the CSV in the tree is a snapshot taken on 2026-09-01.
 | Reviewer | match | no_match | skip | total |
 |---|---:|---:|---:|---:|
 | AUTO | 78 | 828 | 203 | 1,109 |
-| GW | 135 | 330 | 179 | 644 |
-| JM | 104 | 275 | 151 | 530 |
-| TMM | 28 | 58 | 3 | 89 |
+| R01 | 135 | 330 | 179 | 644 |
+| R02 | 104 | 275 | 151 | 530 |
+| R03 | 28 | 58 | 3 | 89 |
 | **All** | **345** | **1,491** | **536** | **2,372** |
 
 `AUTO` is not a person. `scripts/prefill_algorithm_decisions.R` writes the

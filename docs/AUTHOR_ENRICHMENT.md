@@ -38,10 +38,10 @@ exists.
 to authors who appear to be US-based.
 
 **Candidate pool.** Primary pool is the ABOG board-certified OB/GYN file
-(`/Users/tylermuffly/isochrones/data/canonical_abog/canonical_abog_npi_LATEST.csv`,
+(`$ABOG_NPI_PATH`,
 ~60,800 records) — much smaller and more relevant than raw NPPES. Fallback pool
 is an NPPES mirror in DuckDB
-(`/Volumes/MufflySamsung/DuckDB/nber_my_duckdb.duckdb`), queried with an OB/GYN
+(`$NPPES_DUCKDB_PATH`), queried with an OB/GYN
 taxonomy filter (`taxonomy_1/2/3 LIKE '207V%'`), with Physician Compare as a
 second fallback.
 

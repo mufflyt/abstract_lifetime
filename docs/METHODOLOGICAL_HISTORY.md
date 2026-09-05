@@ -22,7 +22,7 @@ estimating one.
 | 2026-04-18–19 | many | Demographics build-out: NPI matching, ORCID, five gender sources |
 | 2026-04-19 | `ddd876b` | Gender resolution formalised as an explicit 10-tier policy object |
 | **2026-04-28** | *uncommitted at the time* | **The four matching corrections** (A12.1–A12.4). Worked on the external drive; not committed for four months. |
-| 2026-09-01 | `4e7da03` | April 28 work recovered from `/Volumes/MufflySamsung` and committed |
+| 2026-09-01 | `4e7da03` | April 28 work recovered from `an external volume` and committed |
 | 2026-09-01 | `69120a4`, `33a5ce3`, `961e244` | Corrections documented; the denominator defect logged as a known issue |
 | 2026-09-01 | `1781d59` (#2) | **Denominator defect fixed** — pre-conference exclusions retained |
 | 2026-09-01 | `e288259` | Steps 05–08 re-run with demographics restored |

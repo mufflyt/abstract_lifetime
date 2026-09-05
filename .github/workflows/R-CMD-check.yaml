@@ -27,6 +27,7 @@ jobs:
             any::testthat
             any::jsonlite
             any::renv
+            any::withr
             any::here
             any::config
             any::stringdist

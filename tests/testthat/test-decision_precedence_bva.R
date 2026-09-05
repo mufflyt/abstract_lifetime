@@ -32,32 +32,32 @@ res <- function(id, classification, best_pmid = NA_character_) {
 
 test_that("human beats AUTO when AUTO is one second older", {
   d <- bind_rows(dec("A1", "AUTO", "no_match", "2026-04-17 12:00:00"),
-                 dec("A1", "GW",   "match",    "2026-04-17 12:00:01"))
+                 dec("A1", "R01",   "match",    "2026-04-17 12:00:01"))
   out <- dedup_decisions_for_analysis(d)
   expect_equal(nrow(out), 1L)
-  expect_equal(out$reviewer, "GW")
+  expect_equal(out$reviewer, "R01")
 })
 
 test_that("human beats AUTO at the exact same timestamp (the tie boundary)", {
   d <- bind_rows(dec("A1", "AUTO", "no_match", "2026-04-17 12:00:00"),
-                 dec("A1", "GW",   "match",    "2026-04-17 12:00:00"))
-  expect_equal(dedup_decisions_for_analysis(d)$reviewer, "GW")
+                 dec("A1", "R01",   "match",    "2026-04-17 12:00:00"))
+  expect_equal(dedup_decisions_for_analysis(d)$reviewer, "R01")
 })
 
 test_that("human beats AUTO when AUTO is one second NEWER", {
   # This is the regression. Under timestamp-only precedence AUTO wins here.
-  d <- bind_rows(dec("A1", "GW",   "match",    "2026-04-17 12:00:00"),
+  d <- bind_rows(dec("A1", "R01",   "match",    "2026-04-17 12:00:00"),
                  dec("A1", "AUTO", "no_match", "2026-04-17 12:00:01"))
   out <- dedup_decisions_for_analysis(d)
-  expect_equal(out$reviewer, "GW")
+  expect_equal(out$reviewer, "R01")
   expect_equal(out$manual_decision, "match")
 })
 
 test_that("human survives an AUTO pass re-run far in the future", {
   # The re-run scenario: adjudication re-executes and stamps AUTO with today.
-  d <- bind_rows(dec("A1", "GW",   "match",    "2026-04-27 02:15:55"),
+  d <- bind_rows(dec("A1", "R01",   "match",    "2026-04-27 02:15:55"),
                  dec("A1", "AUTO", "no_match", "2099-01-01 00:00:00"))
-  expect_equal(dedup_decisions_for_analysis(d)$reviewer, "GW")
+  expect_equal(dedup_decisions_for_analysis(d)$reviewer, "R01")
 })
 
 test_that("AUTO is retained when it is the only decision for an abstract", {
@@ -71,27 +71,27 @@ test_that("AUTO is retained when it is the only decision for an abstract", {
 
 test_that("AUTO dropped only for the abstract that has a human decision", {
   d <- bind_rows(dec("A1", "AUTO", "no_match", "2026-04-17 12:00:00"),
-                 dec("A1", "GW",   "match",    "2026-04-14 09:00:00"),
+                 dec("A1", "R01",   "match",    "2026-04-14 09:00:00"),
                  dec("A2", "AUTO", "no_match", "2026-04-17 12:00:00"))
   out <- dedup_decisions_for_analysis(d)
   expect_equal(nrow(out), 2L)
-  expect_equal(out$reviewer[out$abstract_id == "A1"], "GW")
+  expect_equal(out$reviewer[out$abstract_id == "A1"], "R01")
   expect_equal(out$reviewer[out$abstract_id == "A2"], "AUTO")
 })
 
 test_that("latest human wins among humans; one row per abstract always", {
-  d <- bind_rows(dec("A1", "GW",  "no_match", "2026-04-20 10:00:00"),
-                 dec("A1", "JM",  "match",    "2026-04-21 10:00:00"),
-                 dec("A1", "TMM", "skip",     "2026-04-19 10:00:00"))
+  d <- bind_rows(dec("A1", "R01",  "no_match", "2026-04-20 10:00:00"),
+                 dec("A1", "R02",  "match",    "2026-04-21 10:00:00"),
+                 dec("A1", "R03", "skip",     "2026-04-19 10:00:00"))
   out <- dedup_decisions_for_analysis(d)
   expect_equal(nrow(out), 1L)
-  expect_equal(out$reviewer, "JM")
+  expect_equal(out$reviewer, "R02")
 })
 
 test_that("rows with NA reviewer are excluded entirely", {
   d <- bind_rows(dec("A1", NA_character_, "match", "2099-01-01 00:00:00"),
-                 dec("A1", "GW",          "no_match", "2026-04-14 09:00:00"))
-  expect_equal(dedup_decisions_for_analysis(d)$reviewer, "GW")
+                 dec("A1", "R01",          "no_match", "2026-04-14 09:00:00"))
+  expect_equal(dedup_decisions_for_analysis(d)$reviewer, "R01")
 })
 
 test_that("empty decision log yields zero rows, not an error", {
@@ -113,7 +113,7 @@ test_that("missing required columns fail loudly", {
 
 fp <- function(classification, decision) {
   d <- if (is.na(decision)) dec(character(0), character(0), character(0), character(0))
-       else dec("A1", "GW", decision, "2026-04-20 10:00:00")
+       else dec("A1", "R01", decision, "2026-04-20 10:00:00")
   assign_final_published(res("A1", classification),
                          dedup_decisions_for_analysis(d))$final_published
 }
@@ -164,8 +164,8 @@ test_that("skip on a resolved classification does NOT reach NA", {
 test_that("denominator is cohort minus pending, and the parts close", {
   r <- bind_rows(res("A1","definite"), res("A2","no_match"),
                  res("A3","probable"), res("A4","possible"))
-  d <- bind_rows(dec("A3","GW","skip","2026-04-20 10:00:00"),
-                 dec("A4","GW","skip","2026-04-20 10:00:00"))
+  d <- bind_rows(dec("A3","R01","skip","2026-04-20 10:00:00"),
+                 dec("A4","R01","skip","2026-04-20 10:00:00"))
   s <- publication_rate_summary(assign_final_published(r, dedup_decisions_for_analysis(d)))
   expect_equal(s$n_cohort, 4L)
   expect_equal(s$n_pending, 2L)
@@ -177,7 +177,7 @@ test_that("denominator is cohort minus pending, and the parts close", {
 test_that("rate divides by the denominator, never by the cohort", {
   # Boundary: exactly one pending abstract is enough to separate the two.
   r <- bind_rows(res("A1","definite"), res("A2","no_match"), res("A3","probable"))
-  d <- dec("A3","GW","skip","2026-04-20 10:00:00")
+  d <- dec("A3","R01","skip","2026-04-20 10:00:00")
   s <- publication_rate_summary(assign_final_published(r, dedup_decisions_for_analysis(d)))
   expect_equal(s$publication_rate, 1 / 2)      # denominator 2
   expect_false(isTRUE(all.equal(s$publication_rate, 1 / 3)))  # cohort 3

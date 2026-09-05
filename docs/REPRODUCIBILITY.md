@@ -157,8 +157,8 @@ site guards it with `skip_if_not_installed()`, so it is optional by design.
   overridden with `ABOG_NPI_PATH` / `NPPES_DUCKDB_PATH`. Neither resolves to a
   usable source on this machine today:
 
-  - The ABOG pool **is present** at
-    `~/isochrones/data/canonical_abog/canonical_abog_npi_LATEST.csv`, but the
+  - The ABOG pool **is present** at the location given by `ABOG_NPI_PATH`
+    (`.Renviron`, gitignored; it is no longer committed to `config.yml`), but the
     `LATEST` symlink has been repointed upstream since the shipped
     `npi_matches.csv` was built. The current target is an ABOG *workforce*
     export: 79,400 rows using `first`/`last`/`middle`/`subspecialty_name`
@@ -168,11 +168,13 @@ site guards it with `skip_if_not_installed()`, so it is optional by design.
     completion against it, but produces 1 NPI instead of 265 and no gender, so
     it refuses to overwrite the richer existing sidecar and writes
     `npi_matches_nogender.csv` instead.
-  - The NPPES DuckDB mirror **is present** at
-    `/Volumes/MufflySamsung 1 1/DuckDB/nber_my_duckdb.duckdb` (84 GB), but the
-    configured path says `/Volumes/MufflySamsung/DuckDB/...`. The volume name
-    depends on how many copies of that drive macOS has mounted, so the path is
-    not stable and the taxonomy fallback is skipped with a warning.
+  - The NPPES DuckDB mirror **is present** on an external volume (84 GB), but
+    its mount point is not stable: the volume name gains a numeric suffix
+    depending on how many copies of that drive macOS has mounted, so a path
+    that worked yesterday may not resolve today and the taxonomy fallback is
+    skipped with a warning. Since 2026-09-05 the path is no longer committed at
+    all — set `NPPES_DUCKDB_PATH` in `.Renviron` (see `.Renviron.example`) and
+    the stage picks it up; leave it unset and the stage skips cleanly.
 
   **Gender no longer depends on this file.** Since 2026-09-04 tier 1 of the
   waterfall is `R/09k_gender_from_nppes.R`, which reads registrant-reported sex

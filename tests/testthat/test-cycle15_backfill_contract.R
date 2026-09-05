@@ -84,18 +84,26 @@ test_that("every text-free abstract carries the DOI the backfill needs", {
 # SEMANTIC 15.4 - the backfill either fills a row or leaves evidence it tried
 # ============================================================
 test_that("every eligible abstract was at least attempted by the backfill", {
-  need(P_CLEAN)
-  skip_if(!dir.exists(CACHE), "no cache")
-  cl <- readr::read_csv(P_CLEAN, show_col_types = FALSE)
-  elig <- cl[no_text(cl) & has_doi(cl), ]
-  skip_if(nrow(elig) == 0, "nothing eligible")
-  attempted <- sum(file.exists(cache_path_of(elig$doi)))
-  # A row that is still empty AND has no cached fetch was never attempted. The
-  # distinction matters: PubMed genuinely lacking an abstract is a limit of the
-  # source, while never asking is unfinished work.
-  expect_true(attempted == nrow(elig),
+  cov_p <- here::here("output", "backfill_coverage.csv")
+  # Assert against a COMMITTED artifact, not the local cache. An earlier version
+  # of this test read data/cache/pubmed_xml directly. That directory is
+  # gitignored, so the test skipped in CI, the gate read the skip as a pass, and
+  # the manifest entry looked stale while the finding stayed real. A test that
+  # only runs on one machine is a hole, not a safeguard.
+  expect_true(file.exists(cov_p),
+              label = paste("output/backfill_coverage.csv is missing;",
+                            "R/02b_backfill_abstract_text.R writes it, and without it",
+                            "backfill coverage cannot be checked anywhere but the",
+                            "machine holding the cache"))
+  skip_if(!file.exists(cov_p), "coverage artifact absent")
+  cov <- readr::read_csv(cov_p, show_col_types = FALSE)
+  never <- sum(!cov$attempted)
+  # A row still empty AND never fetched was not attempted. The distinction
+  # matters: PubMed genuinely lacking an abstract is a limit of the source,
+  # while never asking is unfinished work.
+  expect_true(never == 0,
               label = sprintf("%d of %d eligible abstracts were never fetched (%d were, and none of those returned an AbstractText)",
-                              nrow(elig) - attempted, nrow(elig), attempted))
+                              never, nrow(cov), sum(cov$attempted)))
 })
 
 # ============================================================
