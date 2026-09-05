@@ -9,6 +9,35 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-05] - Unapproved-skip reporting fixed; F17 narrowed
+
+### Fixed
+
+- `tests/run_suite_gate.R` crashed with "subscript out of bounds" on exactly
+  the case the skip guard exists for. The reason lookup is a named character
+  vector, and `reasons[[k]]` throws for a key it does not hold, so an
+  unapproved skip errored out before reaching the `[NOT APPROVED]` branch,
+  which was unreachable dead code. The guard itself held -- an uncaught error
+  still exits non-zero, so nothing unapproved ever passed CI -- but the
+  operator was handed an R error instead of the name of the offending test.
+  The reporting is now `gate_skip_report()` in `tests/gate_rules.R`, unit
+  tested against synthetic skip sets, including the mixed case where an
+  unapproved skip appears alongside approved ones.
+
+### Changed
+
+- `docs/FAILURE_MODES.md` F17 and the matching entry in
+  `tests/expected_failures.yaml` described three shared PMIDs across six of 178
+  numerator rows. Two of the three remain, across four of 170 rows: the
+  numerator covers 168 distinct papers. The third, 38906210, resolved itself
+  when the reviewer `no_match` rule removed `AAGL2021_030`, and the
+  branch-order asymmetry F17 cited as outstanding is now fixed.
+- F17 now separates the reviewer disagreement from the `AUTO` prefills. Four
+  abstracts carry `definite` alongside `no_match` and three are still counted
+  published, but those three have no human review row -- the `no_match` is an
+  algorithm prefill, not a verdict. Only `AAGL2021_030` had named reviewers.
+  Counting all four as reviewer overrides overstates the disagreement fourfold.
+
 ## [2026-09-05] - Cohort truncation measured, not just recorded
 
 ### Added

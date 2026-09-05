@@ -34,7 +34,7 @@ Work an item by deciding the question in **Decision needed**, then either make t
 
 ### 3. no PMID is counted as the publication of more than one abstract
 
-**What fails.** Three PMIDs are each credited to two published abstracts, so six of the 178 numerator rows rest on three papers. One of the three is counted published against an explicit reviewer no_match.
+**What fails.** Two PMIDs are each credited to two published abstracts, so four of the 170 numerator rows rest on two papers, and the numerator covers 168 distinct papers rather than 170. A third shared PMID resolved itself: 38906210 left the numerator when the reviewer no_match on AAGL2021_030 took precedence over the machine definite.
 
 **Decision needed.** Deciding which abstract owns each PMID is adjudication, not code. The evidence is in output/shared_publication_matches.csv.
 

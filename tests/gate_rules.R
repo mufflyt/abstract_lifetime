@@ -6,6 +6,7 @@
 # and a bug in them (skips counted as passes) took main red with no true fix
 # available.
 
+`%||%` <- function(a, b) if (is.null(a)) b else a
 gate_key <- function(file, test) paste(file, test, sep = " :: ")
 
 #' Classify a testthat results data frame against the expected-failure manifest.
@@ -70,4 +71,37 @@ skip_classify <- function(df, approved) {
     unapproved   = setdiff(skipped_keys, approved),
     did_not_skip = setdiff(approved, skipped_keys)
   )
+}
+
+#' Render the skipped-test report.
+#'
+#' The report exists to make an unapproved skip visible by name. Indexing the
+#' reason lookup with [[ ]] defeated that: a named character vector throws
+#' "subscript out of bounds" for a key it does not hold, which is precisely the
+#' unapproved-skip case, so the [NOT APPROVED] branch below could never be
+#' reached and the operator got an R error instead of the offending test name.
+#' The gate still failed -- an uncaught error exits non-zero -- so the guard
+#' held, but it named nothing.
+#'
+#' @param skipped_keys character vector of "file :: test" keys that skipped
+#' @param skip_manifest list of manifest entries, each with $file, $test, $reason
+#' @return character vector of report lines, one per skipped key, sorted
+gate_skip_report <- function(skipped_keys, skip_manifest) {
+  if (!length(skipped_keys)) return(character(0))
+
+  reasons <- if (length(skip_manifest)) {
+    stats::setNames(
+      vapply(skip_manifest, function(e) e$reason %||% "", character(1)),
+      gate_key(vapply(skip_manifest, `[[`, character(1), "file"),
+               vapply(skip_manifest, `[[`, character(1), "test")))
+  } else {
+    stats::setNames(character(0), character(0))
+  }
+
+  vapply(sort(skipped_keys), function(k) {
+    r <- if (k %in% names(reasons)) reasons[[k]] else ""
+    sprintf("  %s%s", k,
+            if (!nzchar(r)) "  [NOT APPROVED]" else
+              paste0("\n      reason: ", trimws(gsub("\\s+", " ", r))))
+  }, character(1), USE.NAMES = FALSE)
 }

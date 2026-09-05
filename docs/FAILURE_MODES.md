@@ -191,35 +191,44 @@ decision for the author.
 
 ---
 
-## F17 🟠 One publication credited to two abstracts — **surfaced 2026-09-03, not resolved**
+## F17 🟠 One publication credited to two abstracts — **surfaced 2026-09-03, narrowed 2026-09-05**
 
-**Failure.** Three PMIDs are each credited to two abstracts counted as
-published, so six of the 178 numerator rows rest on three publications. Found by
+**Failure.** Two PMIDs are each credited to two abstracts counted as published,
+so four of the 170 numerator rows rest on two publications: the numerator covers
+168 distinct papers, not 170. Found by
 `tests/testthat/test-cycle06_scoring_composite.R:116`.
 
 | PMID | abstracts | what it is |
 |---|---|---|
 | 32604198 | `AAGL2019_036`, `AAGL2019_081` | Two companion systematic reviews of occult uterine malignancy presented at the same congress, both reviewer-confirmed to one paper. Plausibly a genuine merge. |
-| 38906210 | `AAGL2021_030`, `AAGL2023_023` | Two relugolix SPIRIT analyses. **The 2021 abstract carries `manual_decision == "no_match"`** and is counted published only because branch 1 of `assign_final_published()` puts `classification == "definite"` ahead of every reviewer branch. |
 | 39490893 | `AAGL2022_081`, `AAGL2023_027` | `AAGL2022_081` is about intrauterine anaesthesia and is matched to a paper on retained products of conception, which `AAGL2023_027` matches exactly. It looks like a reviewer error on a `possible` candidate. |
 
-**Detection.** `R/06_analyze_results.R` now computes `final_pmid_shared` for
-every published abstract whose credited publication is also credited to another,
-warns at run time, and writes the evidence to
+**A third case resolved itself.** 38906210 was credited to both `AAGL2021_030`
+and `AAGL2023_023`. When the PI ruled that a reviewer `no_match` supersedes a
+machine `definite`, `AAGL2021_030` left the numerator and the PMID is now
+credited to `AAGL2023_023` alone. That case is no longer a sharing conflict, and
+the branch-order asymmetry it demonstrated is fixed rather than outstanding.
+
+**Detection.** `R/06_analyze_results.R` computes `final_pmid_shared` for every
+published abstract whose credited publication is also credited to another, warns
+at run time, and writes the evidence to
 `output/shared_publication_matches.csv`.
 
-**Why the numerator was not deduplicated.** The publication rate is a
+**Why the numerator is not deduplicated.** The publication rate is a
 per-abstract quantity, and two abstracts from one group can legitimately resolve
 to one paper — companion analyses merged before submission. Cochrane MR000005
 counts these per abstract. Deciding which abstract owns each PMID is
-adjudication, not code, so 178 stands and the flag makes the exposure visible.
+adjudication, not code, so 170 stands and the flag makes the exposure visible.
 
-**What it demonstrates.** The 38906210 case is a concrete instance of the
-branch-order asymmetry documented in
-[ADJUDICATION.md](ADJUDICATION.md) §6: a reviewer explicitly said `no_match` and
-the abstract is counted published anyway. Four abstracts are in that position
-overall. Reordering the cascade is a methodological decision that moves 48
-abstracts and has not been taken.
+**Not to be confused with the AUTO prefills.** Four abstracts carry
+`classification == "definite"` alongside `manual_decision == "no_match"`, and
+three of them are still counted published. Those three
+(`AAGL2013_050`, `AAGL2014_053`, `AAGL2015_029`) have no human review row at
+all: the `no_match` is an `AUTO` prefill written by the algorithm, not a
+reviewer's verdict, so the human-precedence rule does not reach them. Only
+`AAGL2021_030` carried named reviewers, and only it flipped. A machine's own
+prefill is not a human disagreement, and reading all four as reviewer overrides
+overstates the disagreement rate by a factor of four.
 
 ---
 
