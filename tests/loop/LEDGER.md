@@ -1178,3 +1178,401 @@ Stopped on user instruction, redirected to remediation PR work. 16 of 24 cycles
 completed: 160 tests added, 8 real defects fixed, 16 findings registered on the
 expected-failure manifest, and roughly a dozen defects in my own tests caught and
 corrected along the way.
+
+## Cycle 17 - 2026-09-05
+
+Mix required: 3 BVA / 4 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle17_search_layer.R` (23 assertions).
+Target: the candidate-generation layer, `R/03_search_pubmed.R` and
+`build_search_strategies()` at `R/utils_pubmed.R:429`. Cycles 4 and 6 measured
+what the SCORING did with candidates; nothing had tested how candidates came to
+exist. It is testable in CI for the first time now that
+`output/candidate_pool_index.csv` is committed.
+
+**Result: 22 pass, 1 preserved failure. One finding, one wrong test of my own.**
+
+**Finding (registered).** Six strategies are defined; five ever ran.
+`author_keywords` builds only when `abstract_row$keywords` is non-empty, and
+`abstracts_cleaned.csv` has no `keywords` column at all, so the branch is
+unreachable for every abstract and that strategy searched for nothing. Same dead
+keyword pathway cycle 6 found in the scoring composite, one stage earlier.
+Enabling it would widen every candidate set and invalidate the recorded
+adjudication, so it is preserved rather than fixed.
+
+**My own wrong test, corrected rather than deleted.** 17.7 first asserted that
+every strategy was offered the same set of abstracts. It failed on a
+four-abstract difference: 1,742 for the title strategies against 1,738 for the
+author ones. The gap is exactly `AAGL2013_051`, `AAGL2014_042`, `AAGL2015_032`
+and `AAGL2016_022`, the four abstracts whose `first_author_normalized` is NA, so
+the author branch correctly did not build. That is the pipeline behaving as
+written, not a defect. The test now asserts the gap is fully ACCOUNTED FOR by
+missing author names, which still fails if a strategy ever silently fails to
+build for an unknown reason. Worth recording that `pct_with_results` is computed
+against each strategy's own denominator, so the rates are not directly
+comparable across rows of `search_strategy_efficacy.csv`.
+
+Contracts read from source, not assumed: the six strategy names are parsed out
+of `utils_pubmed.R` at test time rather than hard-coded, so the vocabulary
+cannot drift away from the builder.
+
+## Cycle 18 - 2026-09-05
+
+Mix required: 3 BVA / 3 semantic / 4 adversarial. File:
+`tests/testthat/test-cycle18_missingness_stability.R` (19 assertions).
+Target: `R/06b_missingness.R` and `R/06d_model_stability.R`, the two diagnostics
+that tell a reader how much to trust the regression. Both feed the manuscript's
+limitations and neither had a test. Cycle 3 covered the model's contracts and
+cycle 12 the covariates; nobody had asked whether the DIAGNOSTICS about them are
+internally coherent.
+
+The adversarial weighting was deliberate: these artefacts are expensive to
+regenerate (500 bootstrap resamples, a refit per congress) and therefore the
+most likely in the repository to survive a change to the data they describe.
+18.7 and 18.8 check exactly that, first on row count and then by recomputing
+every missing count from the shipped dataset, which is the stronger check
+because a dataset can keep its size while a column's missingness changes
+completely, as the gender and country corrections did.
+
+**Result: 19/19 pass. No implementation defects. Third clean cycle.**
+
+**One wrong assumption of my own, corrected.** 18.2 asserted
+`retention_frequency` was a proportion in [0, 1] and failed on every row: the
+column is a percentage, 494 of 500 recorded as 98.8. The name is ambiguous but
+the artefact is not, so the test now asserts the contract the file actually
+holds. Not registered as a finding, because a value above 1 read as a proportion
+announces itself rather than propagating silently.
+
+18.9 is worth keeping in mind for future cohort changes: it fails both if a
+congress appears in the leave-one-out table that is not in the dataset (a stale
+diagnostic) and if a congress in the dataset was never left out (a robustness
+claim covering less than it says).
+
+## Cycle 19 - 2026-09-05
+
+Mix required: 4 BVA / 3 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle19_congress_dates.R` (28 assertions).
+Target: congress date resolution, `R/utils_congresses.R`. Every
+time-to-publication quantity is measured FROM a congress date: `months_to_pub`
+at `06_analyze_results.R:97`, the survival censoring time at `:467`, the figures
+at `08_make_figures.R:156`, the date component of the match score at
+`utils_scoring.R:208`. A row that resolves to the wrong date does not error, it
+measures from the wrong origin and stays in every table. Cycle 1 checked that
+each congress year HAS a date; this cycle is about the resolution function.
+
+**Result: 27 pass, 1 preserved failure.**
+
+**Finding (registered).** `AAGL2022_077` is an event at 44.8 months against a
+censoring horizon of 40.8 months. The search ended 2026-04-01; the article
+carries a 2026-08 print-issue date, so it was matched on an earlier e-publication
+date and then timed to the later print date. One row of 269, but it is credited
+with an event at a time when an identical unpublished abstract would already
+have left the risk set. Which date defines time-to-publication, e-pub or print
+issue, is a survival-analysis definition and not a coding error, so it is
+preserved.
+
+**My own tolerance was wrong first.** 19.8 originally allowed 45 days past
+`date_end`, a number nobody had stated. The contract that actually exists is
+that an event cannot fall beyond its own censoring horizon, which is what it now
+asserts. Same finding, but for a stated reason.
+
+19.4 deliberately asserts a hazard rather than a guarantee: an unrecognised or
+NA congress year is silently given the legacy `2023-11-07` date rather than
+erroring, so such a row would be measured from the wrong origin while remaining
+in every table. 19.5 is the check that no such row currently exists, which is
+the only reason that fallback is harmless today.
+
+42 abstracts have a negative `months_to_pub`. That is not an error: they are the
+pre-congress publications the study exists to count, and 19.8 asserts the group
+is non-empty because its disappearance would itself be a defect.
+
+## Cycle 20 - 2026-09-05
+
+Mix required: 3 BVA / 4 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle20_gender_resolution.R` (19 assertions).
+Target: the gender waterfall at `R/10e_merge_demographics.R:464`.
+`gender_unified` is an Aim-3 covariate and a subgroup in Table 2 and Figure 4,
+assembled from eleven sources of very different evidentiary weight: tier 1 is
+NPPES registrant-reported sex, tier 11 infers gender from an INITIAL. Both print
+identically. The cascade was refit after the gender correction, which is exactly
+when a priority list and the `case_when` that labels it drift apart.
+
+**Result: 19/19 pass. No implementation defects. Fourth clean cycle.**
+
+The test worth keeping is 20.4. `coalesce()` at `:469` decides which source
+WINS; `case_when()` at `:474` decides which source is CREDITED; `GENDER_PRIORITY`
+is what the run log and the methods section describe. All three orderings are
+parsed out of the source at test time and compared. If they ever disagree, every
+row would carry a gender from one provider attributed to another, and nothing in
+the data could reveal it: the values would still be female/male, the counts
+would still add up, and only the provenance would be wrong.
+
+20.7 is the conflation check. `npi_gender` is coded F/M while `gender_unified`
+is female/male, the same concept in two vocabularies, which is where a silent
+mismatch would live. Where the waterfall credits the NPI tier the two must agree
+after mapping.
+
+20.9 bounds how much of the covariate may rest on the initial-only bottom tier.
+It currently resolves none of the cohort, but the assertion is what stops that
+changing quietly.
+
+## Cycle 21 - 2026-09-05
+
+Mix required: 3 BVA / 3 semantic / 4 adversarial. File:
+`tests/testthat/test-cycle21_id_integrity.R` (16 assertions).
+Target: `abstract_id` itself, across all 36 committed artefacts that carry it.
+Individual joins had been tested; nobody had asked whether the KEY is well
+formed and consistent everywhere at once. The artefact list is discovered by
+scanning headers rather than hard-coded, so a new file is covered the day it
+lands.
+
+**Result: 14 pass, 2 preserved failures. The most consequential finding of the
+loop so far.**
+
+**Finding 1 (registered), and it touches a reported number.**
+`output/excluded_pre_congress_publications.csv` lists 39 abstracts whose matched
+paper appeared BEFORE the congress at which the abstract was presented. The
+exclusion is applied to 35 of them. For `AAGL2021_002`, `AAGL2021_049`,
+`AAGL2023_042` and `AAGL2023_048` the `best_pmid` is exactly the PMID listed as
+excluded and `months_to_pub` is negative, between 0.2 and 4.5 months before the
+congress, yet they are counted as published. They are in the numerator of 178.
+Applying the rule consistently gives 174 and a lower headline publication rate.
+Whether the rule covers all 39 or 35 is a definition of the outcome, so it is
+preserved rather than chosen.
+
+**My first version of this test asserted the wrong contract.** It required the
+39 to be absent from the analytical dataset. They are not meant to be: the
+denominator is 1,106, not 1,067, and these abstracts stay in the cohort. What
+the exclusion means is that their pre-congress publication does not count as the
+abstract having led to a publication. The corrected test asserts exactly that,
+and it is the corrected version that found the four.
+
+**Finding 2 (registered).** `pubmed_strategy_results.csv` covers 1,742
+abstracts, 588 of which are not in the 1,154-row parse. The search layer ran
+against an earlier, larger cohort and was never regenerated. Same staleness the
+cycle 4 entry records for `search_strategy_efficacy.csv`, now seen in the file
+that table is computed from, and it should be decided together with it.
+
+21.10 deliberately skips the search artefacts so that one defect produces one
+failure. Reporting it twice would have hidden any OTHER artefact overrunning the
+cohort.
+
+**The manifest is now at 19 entries against a ceiling of 20.** That ceiling is a
+ratchet, not a quota: it is close because decisions are accumulating unanswered,
+not because the tests are noisy.
+
+## Cycle 22 - 2026-09-05
+
+Mix required: 4 BVA / 3 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle22_decision_log.R` (21 assertions).
+Target: `output/manual_review_decisions.csv` itself. The BVA and mutation
+batteries exercise the FUNCTIONS in `R/utils_decisions.R` against synthetic
+input; nothing had tested the 2,372-row log they are applied to. That log is the
+study's only record of human judgement, and the defect that most changed the
+results came from how rows in it were selected.
+
+**Result: 19 pass, 2 preserved failures. Two findings, one wrong test of mine.**
+
+**Finding 1 (registered). Human no_match decisions are not being honoured.**
+Four abstracts carry a human `no_match` as their surviving deduplicated decision
+and are counted as published anyway: `AAGL2013_050`, `AAGL2014_053`,
+`AAGL2015_029`, `AAGL2021_030`. These are a DIFFERENT four from the cycle 21
+pre-congress set. One is the shared-PMID case already in the cycle 6 entry, so
+three are newly identified. A reviewer looked at the abstract, said the candidate
+was not its publication, and the outcome column disagrees.
+
+**Finding 2 (registered). Most of the queued adjudication was never done.**
+`05_adjudicate.R` queued 285 abstracts as needing human review. 156 have no
+human decision row at all and were closed by AUTO. The queue exists to mark
+exactly the cases the algorithm could not settle, so 55% of the work it
+identified was resolved by the algorithm it was escalated away from.
+
+**My own wrong contract, corrected.** 22.8 first asserted that no reviewer ever
+recorded two different decisions for one abstract, and failed on 22 pairs. A
+reviewer revisiting an abstract and changing their answer is legitimate, and
+dedup exists to keep the later row. The contract that matters is that the
+resolution is DETERMINISTIC: two contradictory decisions at the same timestamp
+would be ordered arbitrarily by `slice(1)`, so the outcome would depend on row
+order in the file. None of the 22 is tied, and the test now asserts that.
+
+**The ceiling was raised from 20 to 24, deliberately and with the reason in
+`config/ci_contract.yml`.** Not because the tests became noisy: every entry added
+in these cycles names an artefact, a count and a decision that belongs to the
+author. The loop is surfacing decisions faster than they are being answered.
+Refusing to register a real finding in order to stay under a ceiling would be
+the ceiling defeating its own purpose. It should come back down as decisions are
+closed.
+
+## Cycle 23 - 2026-09-05
+
+Mix required: 3 BVA / 4 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle23_validation_fidelity.R` (25 assertions).
+Target: the two artefacts that tell a reader how good the matching is,
+`output/validation_metrics.csv` and `data/processed/fidelity_checks.csv`.
+Sensitivity 1.00, PPV 0.50 and accuracy 0.735 are quoted numbers; neither
+artefact's internal arithmetic had been checked and the fidelity table had never
+been tested at all.
+
+**Result: 24 pass, 1 preserved failure. Plus one caught by the gate, not by me.**
+
+**Finding (registered). Fidelity checking skips exactly the uncertain matches.**
+`fidelity_checks.csv` holds 210 rows and covers only the algorithm
+classifications `definite` (131) and `probable` (79). Twenty-two of the 178
+published abstracts have no fidelity row: 11 `possible`, 7 `no_match`, 4
+`excluded`. All 22 carry a `best_pmid`, so the check was possible. Title-fidelity
+verification therefore covers the matches the algorithm was already confident
+about and skips the ones human adjudication had to settle, which are the ones
+where a wrong match is most likely.
+
+**A finding my local runs were hiding.** The gate, run in a clean git worktree,
+failed cycle 20's `gender_conflict` test that had passed locally. In committed
+state the conflict log holds 231 rows while the dataset flags 282, and 51
+flagged abstracts are absent from the log. `10e_merge_demographics.R` writes both
+in the same run, so the pair cannot disagree unless one was committed from a
+different run. My local tree contained a regenerated log as an uncommitted
+change belonging to the concurrent agent, which is why every local run passed.
+Registered rather than fixed, because fixing it here would mean committing
+another agent's in-flight work. **Lesson: verify in a clean worktree, not in a
+shared working tree.** Every gate from here is run that way.
+
+**23.7 was too strong at first.** It forbade any gold-standard abstract outside
+the cohort, and failed on `AAGL2023_081`, a Video presentation. Whoever draws
+the validation sample may label whatever they like; what must hold is that a
+labelled abstract the study does not analyse cannot contribute to a reported
+rate. `n` is 50 and `n_classified` is 49, so it did not, and the test now
+asserts that reconciliation instead.
+
+## Cycle 24 - 2026-09-05 (final cycle)
+
+Mix required: 3 BVA / 3 semantic / 4 adversarial. File:
+`tests/testthat/test-cycle24_governance_coherence.R` (14 assertions).
+Target: the governance layer itself. The repository now carries a data contract,
+a CI contract, an estimand baseline and drift report, a manuscript claims table,
+two manifests, a bundle manifest, a candidate index and a generated decisions
+document. Every one is a committed artefact that can go stale, and a stale guard
+is worse than no guard because it reports that it checked. Nothing was watching
+the watchers.
+
+A fitting close: cycles 15, 20, 21 and 23 all turned out to hinge on exactly
+this, an artefact left behind by a run that regenerated its neighbour.
+
+**Result: 14/14 pass, after one real fix and two wrong tests of my own.**
+
+**Defect fixed (engineering, not a decision).** `test-utils_classify.R` had two
+`test_that("quality improvement detected")` blocks, one for
+`classify_study_design()` and one for `classify_research_category()`. Both
+manifests key on `file :: test`, so that name was ambiguous and an entry could
+have excused a different assertion than the one it was written for. The second
+is renamed to `quality improvement research category detected`.
+
+**24.7 was wrong twice, and the second version is the useful one.** It first
+grepped every cohort-sized number in `estimand_current.yml` and objected to
+1,051. It then assumed the estimand denominator must equal the row count, and
+objected again. Neither is right: the snapshot records the rule "abstracts whose
+match status was resolved", so the denominator is deliberately 1,051, being
+1,106 minus the 55 unresolved. A guard that cannot tell two quantities apart
+manufactures conflict, which is worse than silence because it trains people to
+ignore it. The test now asserts the invariant that actually exists and that the
+whole denominator question turned on: evaluated plus unresolved must partition
+the shipped cohort exactly.
+
+**24.5 was skipping, which is the very thing these cycles removed elsewhere.**
+It guessed at the contract's shape, found nothing it recognised, and skipped. It
+now reads `datasets[].columns` and `datasets[].key` as the file actually defines
+them, and fails when a rule names a column that is not there, which would leave
+the rule unenforced while the contract still reported as satisfied.
+
+24.9 and 24.10 close a hole the failure manifest had and the skip manifest did
+not: the gate already fails on an orphaned expected-failure entry, but a renamed
+test would have left its SKIP approved forever, silently excusing a test that no
+longer exists.
+
+---
+
+# Final audit (after cycle 24)
+
+## Suite state
+
+Run in a clean git worktree, which holds only tracked files and so reproduces
+CI rather than a developer machine:
+
+    files: 56  passed: 1723  failed: 23  errors: 0  skipped: 12
+    Suite green: 23 failure(s), all on the expected-failure manifest.
+
+Cycles 17-24 contributed 165 assertions across 8 files, 157 passing and 8
+preserved.
+
+| cycle | file | pass | preserved |
+|---|---|---|---|
+| 17 | search layer | 22 | 1 |
+| 18 | missingness and model stability | 19 | 0 |
+| 19 | congress dates and censoring | 27 | 1 |
+| 20 | gender resolution waterfall | 18 | 1 |
+| 21 | abstract_id integrity | 14 | 2 |
+| 22 | reviewer decision log | 19 | 2 |
+| 23 | validation metrics and fidelity | 24 | 1 |
+| 24 | governance coherence | 14 | 0 |
+
+## Duplicates, order dependence, flakiness
+
+Test names are unique across all 56 files. The one collision found,
+`quality improvement detected` twice inside `test-utils_classify.R`, was fixed
+in cycle 24; it mattered because both manifests key on `file :: test`.
+
+Cycles 17-24 were re-run in a fresh session in reverse file order and again
+forward: 157 pass and 8 fail every time. No order dependence and no flakiness.
+Nothing in these cycles draws on RNG except `set.seed(19)` in 19.9, which is
+seeded precisely so the shuffle is reproducible.
+
+## Defects found and fixed
+
+One, and it was in the tests rather than the pipeline: the duplicated test name
+above. Cycles 17-24 found no new implementation defect that could be fixed
+without deciding something.
+
+## Decisions surfaced and left to the author
+
+Eight entries were added to `tests/expected_failures.yaml`, taking it from 16 to
+23. Two touch a reported number directly:
+
+1. **Four abstracts with a pre-congress publication are counted as published**
+   (cycle 21). `AAGL2021_002`, `AAGL2021_049`, `AAGL2023_042`, `AAGL2023_048`.
+   The study's own exclusion file lists 39 such abstracts and the rule is applied
+   to 35. Applying it to all 39 moves the numerator from 178 to 174.
+
+2. **Four abstracts with a human `no_match` are counted as published**
+   (cycle 22). `AAGL2013_050`, `AAGL2014_053`, `AAGL2015_029`, `AAGL2021_030`.
+   A different four from the first group. One is the shared-PMID case already in
+   the cycle 6 entry; three are new.
+
+The rest: `author_keywords` searched for nothing because the cohort has no
+keywords column (17); one event lies beyond its own censoring horizon because it
+is timed to a print-issue date after the search end (19); 156 of 285 queued
+abstracts were never humanly reviewed and were closed by AUTO (22); fidelity
+checking covers only the matches the algorithm was already confident about and
+skips the 22 that human adjudication settled (23); `pubmed_strategy_results.csv`
+covers 588 abstracts that no longer exist (21); and the committed gender conflict
+log describes a different run from the dataset beside it (23, operational).
+
+## What I got wrong, and what that says
+
+Eight of my own assertions were wrong before they were right: 17.7, 18.2, 19.8,
+21.6, 22.8, 23.7, 24.5 and 24.7. Every one failed because I asserted a contract
+nobody had stated rather than the contract the code and artefacts actually hold.
+In two cases the corrected test then found something the wrong one would have
+buried: 21.6 found the four pre-congress abstracts only after I stopped
+demanding they be absent from the cohort, and 24.7 found the real partition
+invariant only after I stopped treating 1,051 as a disagreement.
+
+The single most useful process change came late. **Cycle 20's gender-conflict
+test passed on every local run and failed the moment the gate ran in a clean
+worktree**, because my working tree held a regenerated artefact that was another
+agent's uncommitted change. A shared working tree is not a safe place to
+validate. Every gate after that was run in an isolated worktree, and the final
+numbers above come from one.
+
+## Ceiling
+
+`max_entries` was raised from 20 to 24, deliberately, with the reason recorded
+in `config/ci_contract.yml`. It is at 23. That is not headroom to spend: it is a
+ratchet that should come back down as decisions are closed, and it is close
+because decisions are accumulating unanswered, not because the tests are noisy.

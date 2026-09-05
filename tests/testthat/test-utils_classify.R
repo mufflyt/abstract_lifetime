@@ -104,7 +104,7 @@ test_that("education not triggered for RCTs about training", {
   expect_true(result != "education")
 })
 
-test_that("quality improvement detected", {
+test_that("quality improvement research category detected", {
   expect_equal(classify_research_category("quality improvement in surgical safety checklist"), "quality_improvement")
   expect_equal(classify_research_category("ERAS protocol implementation reduced length of stay"), "quality_improvement")
 })
