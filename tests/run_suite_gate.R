@@ -40,7 +40,21 @@ cat("files:", length(unique(df$file)),
     " errors:", sum(df$error),
     " skipped:", sum(df$skipped), "\n")
 
-manifest_path <- "tests/expected_failures.yaml"
+# The rules below are declared in config/ci_contract.yml so that this script,
+# tests.yaml and R-CMD-check.yaml cannot disagree about what green means. The
+# fallbacks keep the gate working if the contract is ever absent, but
+# tests/testthat/test-ci_contract.R fails in that case.
+`%||%` <- function(a, b) if (is.null(a)) b else a
+contract_path <- "config/ci_contract.yml"
+contract <- if (file.exists(contract_path)) yaml::read_yaml(contract_path) else list()
+mrules <- contract$manifest %||% list()
+
+manifest_path <- mrules$path %||% "tests/expected_failures.yaml"
+rule_unexpected <- isTRUE(mrules$fail_on_unexpected_failure %||% TRUE)
+rule_stale      <- isTRUE(mrules$fail_on_stale_entry %||% TRUE)
+rule_orphaned   <- isTRUE(mrules$fail_on_orphaned_entry %||% TRUE)
+max_entries     <- mrules$max_entries %||% Inf
+
 manifest <- if (file.exists(manifest_path)) {
   yaml::read_yaml(manifest_path)$expected_failures
 } else {
@@ -77,13 +91,13 @@ if (nrow(failed) > 0) {
 problems <- character()
 
 unexpected <- cls$unexpected
-if (length(unexpected) > 0) {
+if (rule_unexpected && length(unexpected) > 0) {
   problems <- c(problems, sprintf(
     "%d unexpected failure(s). Fix them, or add each to %s with a reason and the decision it is waiting on.",
     length(unexpected), manifest_path))
 }
 
-if (length(stale) > 0) {
+if (rule_stale && length(stale) > 0) {
   cat("\n--- stale manifest entries (these now PASS) ---\n")
   cat(paste0("  ", stale, collapse = "\n"), "\n")
   problems <- c(problems, sprintf(
@@ -91,12 +105,20 @@ if (length(stale) > 0) {
     length(stale), if (length(stale) == 1) "y" else "ies", manifest_path))
 }
 
-if (length(orphaned) > 0) {
+if (rule_orphaned && length(orphaned) > 0) {
   cat("\n--- orphaned manifest entries (no such test ran) ---\n")
   cat(paste0("  ", orphaned, collapse = "\n"), "\n")
   problems <- c(problems, sprintf(
     "%d manifest entr%s name a test that never ran. Re-point it at the renamed test, or remove it from %s.",
     length(orphaned), if (length(orphaned) == 1) "y does" else "ies", manifest_path))
+}
+
+if (length(manifest) > max_entries) {
+  problems <- c(problems, sprintf(
+    paste("the expected-failure manifest holds %d entries, above the %s allowed by",
+          "%s. It is meant to shrink: close a decision, or raise max_entries",
+          "deliberately and say why."),
+    length(manifest), format(max_entries), contract_path))
 }
 
 if (length(problems) > 0) {
