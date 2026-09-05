@@ -1440,3 +1440,48 @@ the validation sample may label whatever they like; what must hold is that a
 labelled abstract the study does not analyse cannot contribute to a reported
 rate. `n` is 50 and `n_classified` is 49, so it did not, and the test now
 asserts that reconciliation instead.
+
+## Cycle 24 - 2026-09-05 (final cycle)
+
+Mix required: 3 BVA / 3 semantic / 4 adversarial. File:
+`tests/testthat/test-cycle24_governance_coherence.R` (14 assertions).
+Target: the governance layer itself. The repository now carries a data contract,
+a CI contract, an estimand baseline and drift report, a manuscript claims table,
+two manifests, a bundle manifest, a candidate index and a generated decisions
+document. Every one is a committed artefact that can go stale, and a stale guard
+is worse than no guard because it reports that it checked. Nothing was watching
+the watchers.
+
+A fitting close: cycles 15, 20, 21 and 23 all turned out to hinge on exactly
+this, an artefact left behind by a run that regenerated its neighbour.
+
+**Result: 14/14 pass, after one real fix and two wrong tests of my own.**
+
+**Defect fixed (engineering, not a decision).** `test-utils_classify.R` had two
+`test_that("quality improvement detected")` blocks, one for
+`classify_study_design()` and one for `classify_research_category()`. Both
+manifests key on `file :: test`, so that name was ambiguous and an entry could
+have excused a different assertion than the one it was written for. The second
+is renamed to `quality improvement research category detected`.
+
+**24.7 was wrong twice, and the second version is the useful one.** It first
+grepped every cohort-sized number in `estimand_current.yml` and objected to
+1,051. It then assumed the estimand denominator must equal the row count, and
+objected again. Neither is right: the snapshot records the rule "abstracts whose
+match status was resolved", so the denominator is deliberately 1,051, being
+1,106 minus the 55 unresolved. A guard that cannot tell two quantities apart
+manufactures conflict, which is worse than silence because it trains people to
+ignore it. The test now asserts the invariant that actually exists and that the
+whole denominator question turned on: evaluated plus unresolved must partition
+the shipped cohort exactly.
+
+**24.5 was skipping, which is the very thing these cycles removed elsewhere.**
+It guessed at the contract's shape, found nothing it recognised, and skipped. It
+now reads `datasets[].columns` and `datasets[].key` as the file actually defines
+them, and fails when a rule names a column that is not there, which would leave
+the rule unenforced while the contract still reported as satisfied.
+
+24.9 and 24.10 close a hole the failure manifest had and the skip manifest did
+not: the gate already fails on an orphaned expected-failure entry, but a renamed
+test would have left its SKIP approved forever, silently excusing a test that no
+longer exists.
