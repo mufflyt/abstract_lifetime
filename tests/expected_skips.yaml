@@ -113,16 +113,6 @@ expected_skips:
 
   # ── Other gitignored inputs ─────────────────────────────────────────────────
 
-  - file: test-mysterycall_integrations.R
-    test: Table 1 is stratified, tested, and reconciles with the cohort
-    reason: >
-      Reads output/tables/table1_column_ns.csv. output/tables/ is gitignored
-      (.gitignore:31) even though the rest of output/ is committed, so the
-      study's own result tables are absent from a clean checkout.
-    to_enable: >
-      Un-ignore output/tables/. All five files total 20 KB, and this looks like
-      an oversight rather than a decision.
-
   - file: test-shiny_app.R
     test: JSON abstract extraction regex finds section-titles in cached HTML
     reason: >
