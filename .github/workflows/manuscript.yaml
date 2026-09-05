@@ -42,9 +42,18 @@ jobs:
       # word_document needs pandoc; nothing here needs LaTeX.
       - uses: r-lib/actions/setup-pandoc@v2
 
+      # setup-r-dependencies scans the project, finds mysterycall referenced in
+      # R/, and cannot resolve it from CRAN because it is GitHub-only. Without
+      # the explicit source below every other package in this list reports
+      # "dependency conflict" and nothing installs. Same pin as the other two
+      # workflows; tests/testthat/test-dependency_lockfile.R checks they agree.
+      #
+      # Comments must NOT appear inside the block literal: pak reads every line
+      # of it as a package reference.
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: |
+            mufflyt/mysterycall@42d66d92ef52a0f85d1f7c61208c2ddd79d9c06e
             any::rmarkdown
             any::knitr
             any::here
