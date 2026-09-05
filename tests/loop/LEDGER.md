@@ -1013,3 +1013,75 @@ cycles and is worth avoiding by default.
 
 **Result:** 10/15 assertions passed. Five failures are the findings above.
 **Gate: green — 13 failures, all on the manifest.**
+
+## Cycle 14 - 2026-09-04
+
+Mix required: 3 BVA / 4 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle14_text_flags_and_tables.R` (11 assertions).
+Target: the binary flags extracted from abstract text, the two text
+classifiers, and the derived tables. The concurrent suite's F3 test checks no
+text-derived covariate is structurally zero for a whole congress; the angles
+here are internal logical consistency between flags, and whether a flag can fire
+on an abstract that has no text.
+
+| # | Category | Target | Assumption challenged |
+|---|---|---|---|
+| 14.1 | BVA | abstract_word_count | zero only where there is genuinely no abstract |
+| 14.2 | BVA | body-only flags | cannot fire without an abstract body |
+| 14.3 | BVA | text classifiers | closed vocabularies |
+| 14.4 | semantic | stat_sig_reported | implies has_numeric_results |
+| 14.5 | semantic | has_trial_registration | concentrated in trial-like designs |
+| 14.6 | semantic | is_database_study | carries a database-scale sample |
+| 14.7 | semantic | derived tables | reconcile with the cohort |
+| 14.8 | adversarial | flag prevalence | not an artefact of abstract length |
+| 14.9 | adversarial | text flags | none constant |
+| 14.10 | adversarial | primary_procedure | coverage not concentrated by congress |
+
+### FINDING - a quarter of the cohort has no abstract text
+280 of 1,106 abstracts (25.3%) carry no text at all: `abstract_text`,
+`abstract_objective` and `abstract_conclusion` are all empty. Only 4 are the
+withdrawn abstracts. The loss concentrates in two congresses:
+
+    2017   97 of 90 evaluated       2014   38
+    2018   95 of 95                 2015   16
+                                    2016   13
+                                    2012   11
+                                    2013   10
+
+Consequences: every text-derived flag on those rows is a false negative rather
+than a measurement, `abstract_pts` can never contribute to their match score,
+and this is the mechanism behind the `sample_size` missingness recorded at cycle
+12 (86.7% in 2017, 92.6% in 2018). Two findings, one root cause.
+
+**Checked and NOT supported.** I expected this to explain the year-over-year
+publication rate pattern that has been open since April. It does not. The
+correlation between percent-no-text and publication rate is **-0.17**, and the
+two fully text-free congresses sit at opposite extremes: 2017 at 5.6%, the
+lowest in the study, and 2018 at 27.4%, the highest of the older years. Recorded
+because a plausible mechanism that the data does not support is worth knowing
+about explicitly, so nobody reaches for it later.
+
+### FINDING - two text extractors disagree
+11 abstracts are flagged as reporting statistical significance while also being
+flagged as carrying no numeric results. An abstract cannot claim significance
+without presenting a number, so at least one extractor is wrong on those rows.
+
+### Three test defects of my own
+- **14.2** treated every flag as requiring an abstract body. `is_database_study`
+  and `has_industry` can legitimately be read from a title ("... Using the
+  National Inpatient Sample"). Narrowed to the four that genuinely need the
+  body: significance, numeric results, IRB statement, trial registration.
+- **14.3** carried an incomplete vocabulary. `cerclage` and `ectopic_pregnancy`
+  are real `primary_procedure` classes; I had guessed the list rather than
+  reading it.
+- **14.7** bounded every table by the cohort. `table4_search_strategies.csv`
+  counts search QUERIES, not abstracts, and the video abstracts were searched
+  before exclusion, so 1,742 legitimately exceeds 1,106.
+
+Following the new rule, this cycle used a single `expect_true` with an
+informative label throughout rather than `expect_*` plus `fail()`; no failure
+double-reported.
+
+**Result:** 9/11 assertions passed after correcting my own premises. Both
+remaining failures are registered.
+**Gate: green — 15 failures, all on the manifest.**

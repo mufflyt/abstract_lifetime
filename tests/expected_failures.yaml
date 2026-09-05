@@ -177,3 +177,39 @@ expected_failures:
     decision_needed: >
       Fix the two enrichment paths or remove the columns.
     documented_in: tests/loop/LEDGER.md cycle 13
+
+  # ── Added by the test-generation loop, cycle 14 ──────────────────────────────
+
+  - file: test-cycle14_text_flags_and_tables.R
+    test: abstract_word_count is zero only for abstracts with no text
+    reason: >
+      280 of 1,106 abstracts (25.3%) carry no abstract text at all: abstract_text,
+      abstract_objective and abstract_conclusion are all empty. Only 4 are the
+      withdrawn abstracts. The loss concentrates almost entirely in two
+      congresses, 2017 (97 of 90 evaluated) and 2018 (95 of 95), with the
+      remainder spread thinly over 2012-2016. Every text-derived flag on those
+      rows is a false negative rather than a measurement, abstract_pts can never
+      contribute to their match score, and this is the mechanism behind the
+      sample_size missingness recorded at cycle 12 (86.7% in 2017, 92.6% in 2018).
+      Checked and NOT supported: this does not explain the year-over-year
+      publication rate pattern. The correlation between percent-no-text and
+      publication rate is -0.17, and the two fully text-free congresses sit at
+      opposite extremes (2017 at 5.6%, 2018 at 27.4%).
+    decision_needed: >
+      Recover the 2017 and 2018 abstract bodies at ingestion, or exclude
+      text-derived covariates for congresses where the text was never captured.
+      Reporting them as measured FALSE is the one option that is not defensible.
+    documented_in: tests/loop/LEDGER.md cycle 14
+
+  - file: test-cycle14_text_flags_and_tables.R
+    test: stat_sig_reported implies has_numeric_results
+    reason: >
+      11 abstracts are flagged as reporting statistical significance while also
+      being flagged as carrying no numeric results. An abstract cannot state
+      that a result reached significance without presenting a number, so the two
+      extractors disagree about the same text and at least one is wrong on those
+      rows.
+    decision_needed: >
+      Determine which extractor is at fault and reconcile them, or document that
+      the two flags are independently derived and may disagree.
+    documented_in: tests/loop/LEDGER.md cycle 14
