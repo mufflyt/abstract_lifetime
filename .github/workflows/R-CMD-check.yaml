@@ -25,6 +25,7 @@ jobs:
         with:
           extra-packages: |
             any::testthat
+            any::withr
             any::here
             any::config
             any::stringdist
