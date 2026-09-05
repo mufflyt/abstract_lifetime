@@ -35,7 +35,7 @@ truth, updated separately, and wrong. There is one copy now, it is generated,
 and `tests/testthat/test-decision_registry.R` fails if these counts stop
 matching the manifests or if a duplicate table reappears.
 
-<!--skip-count-->13<!--/skip-count--> tests are registered as skipping on
+<!--skip-count-->14<!--/skip-count--> tests are registered as skipping on
 purpose, in `tests/expected_skips.yaml`. That is the number of *registrations*,
 not the number that skip in any given run: an approved skip that manages to run
 is not an error, so the observed count is usually lower. A skipped test asserts

@@ -148,3 +148,23 @@ expected_skips:
       Cannot in CI, and it does not need to be: the comparison is meaningful
       only where both artefacts exist. The index's shape, uniqueness and size
       ceiling are asserted unconditionally in the same file.
+
+  # ── mtime ordering, which git does not preserve ─────────────────────────────
+  # A clone writes every file at checkout time, so on CI the figure and the
+  # dataset always share an mtime and the comparison is vacuous rather than
+  # wrong. The check is real only where the pipeline actually ran.
+
+  - file: test-figure1_flow_contract.R
+    test: the committed Figure 1 is not older than the data it depicts
+    reason: >
+      Compares the mtime of output/figures/figure1_strobe_flowchart.png against
+      output/final_analytical_dataset.csv. git does not record mtimes, so in a
+      clean checkout both files are written at the same instant and the
+      comparison proves nothing. It catches the real case on a developer
+      machine: re-running the pipeline and committing the dataset without
+      re-rendering the figure.
+    to_enable: >
+      cannot in CI without committing a render timestamp alongside the figure
+      and trusting it. The other six assertions in this file are content-based
+      and do run in CI, which is where a wrong NUMBER would be caught; this one
+      only covers a wrong VINTAGE of an otherwise valid figure.

@@ -9,6 +9,43 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-05] - Figure 1 is now checked by CI
+
+### Added
+
+- `R/utils_flow_counts.R` with `derive_flow_counts()`, and
+  `tests/testthat/test-figure1_flow_contract.R` (21 assertions). Nothing in CI
+  could previously catch a wrong number in Figure 1. `R/strobe_flowchart.R`
+  asserted its own arithmetic, but it runs only from `00_run_all.R`, which CI
+  does not run because the full pipeline needs gitignored caches. The existing
+  coverage in `test-cycle05_flow_fidelity_tables.R` tested a re-implementation
+  of those assertions against synthetic tuples, which proves the copy is
+  self-consistent and nothing about the figure. And the figure itself is a
+  tracked PNG whose numbers live in pixels, so it could depict a cohort the
+  data no longer describes with the whole suite green.
+- The derivation is now shared: `strobe_flowchart.R` calls the same function
+  the tests do, so CI exercises the real thing rather than a copy, and a test
+  guards against reinstating a private copy inside the script.
+- The four inputs are all tracked, so the contract genuinely runs in CI instead
+  of skipping. Mutation-tested: flipping one abstract to published is caught by
+  name (`published = 171`, `not_published = 880`), and a figure ten minutes
+  older than its data is caught with the command needed to fix it.
+- The README's Figure 1 alt text carries seven typed numbers. `test-docs_drift.R`
+  covered the headline rate and denominator; the flow breakdown -- 881 not
+  published, 839 with no qualifying publication, 42 pre-congress -- was covered
+  by nothing, and a typed number is exactly what goes stale after a cohort
+  decision. It is now checked against the derivation.
+
+### Notes
+
+- Prior art was surveyed before building this. The `flowchart` package used
+  here, plus `dtrackr` and `vtree`, all generate diagrams from data, which
+  removes typed numbers from the figure but asserts nothing about them.
+  IntoValue, the closest prior study design and already cited in Methods,
+  reports its cohort counts in prose with no automated verification. No
+  established pattern for testing participant-flow counts was found, so this
+  contract is written against the study's own arithmetic.
+
 ## [2026-09-05] - One YAML reader across the repository
 
 ### Changed
