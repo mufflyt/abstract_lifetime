@@ -95,3 +95,68 @@ test_that("the gate reads the contract rather than hard-coding it", {
   expect_true(grepl("config/ci_contract.yml", txt, fixed = TRUE),
               label = "run_suite_gate.R does not read config/ci_contract.yml, so the contract is decorative")
 })
+
+test_that("no workflow runs without being declared in the contract", {
+  ct <- yaml::read_yaml(contract_path)
+  declared <- vapply(ct$workflows, `[[`, character(1), "path")
+
+  wf_dir <- file.path(repo_root, ".github", "workflows")
+  skip_if_not(dir.exists(wf_dir), "no workflows directory")
+  on_disk <- file.path(".github", "workflows",
+                       list.files(wf_dir, pattern = "\\.ya?ml$"))
+
+  # The contract previously checked only that a DECLARED workflow exists. That
+  # catches a deleted workflow and misses the more likely drift: a new workflow
+  # added without being described. manuscript.yaml sat undeclared from the day
+  # it was added, so nothing recorded whether it was meant to gate or only to
+  # render.
+  undeclared <- setdiff(on_disk, declared)
+  expect_true(length(undeclared) == 0,
+              label = paste("workflow(s) run in CI but are not declared in",
+                            "config/ci_contract.yml:",
+                            paste(undeclared, collapse = ", "),
+                            "- add each with a role and whether it must invoke the gate"))
+})
+
+test_that("every must-pass gate is actually run by a declared workflow", {
+  ct <- yaml::read_yaml(contract_path)
+  declared <- vapply(ct$workflows, `[[`, character(1), "path")
+  txt <- paste(unlist(lapply(file.path(repo_root, declared), function(p)
+    if (file.exists(p)) readLines(p, warn = FALSE) else character(0))),
+    collapse = "\n")
+
+  # A gate declared here but invoked by no workflow is a promise nothing keeps.
+  # The suite gate is exempt: it is named by `runner` and checked above.
+  unrun <- character(0)
+  for (g in ct$gates) {
+    if (is.null(g$file)) next
+    if (!identical(g$policy, "all_must_pass")) next
+    if (!grepl(g$file, txt, fixed = TRUE)) unrun <- c(unrun, g$id)
+  }
+  expect_true(length(unrun) == 0,
+              label = paste("gate(s) declared in the contract that no declared",
+                            "workflow runs:", paste(unrun, collapse = ", ")))
+})
+
+test_that("the approved-skip manifest obeys the contract it is held to", {
+  ct <- yaml::read_yaml(contract_path)
+  skip_if(is.null(ct$skips$path), "no skip manifest declared")
+  spath <- file.path(repo_root, ct$skips$path)
+  expect_true(file.exists(spath),
+              label = sprintf("the contract declares %s, which does not exist",
+                              ct$skips$path))
+  skip_if_not(file.exists(spath))
+  entries <- yaml::read_yaml(spath)$expected_skips %||% list()
+
+  # Same rule as the failure manifest: an entry without a reason and a route to
+  # enabling it is an exemption, not a backlog item.
+  req <- ct$skips$require_fields %||% character(0)
+  for (e in entries) {
+    for (f in req) {
+      expect_true(
+        !is.null(e[[f]]) && nzchar(trimws(as.character(e[[f]]))),
+        label = sprintf("skip manifest entry '%s' is missing required field '%s'",
+                        e$test %||% "<unnamed>", f))
+    }
+  }
+})

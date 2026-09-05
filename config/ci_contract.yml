@@ -37,6 +37,26 @@ gates:
       A surviving mutant means the suite has stopped detecting a defect it was
       written to catch, which a passing test run alone cannot show.
 
+  - id: deidentification
+    name: Study-staff identities stay out of committed data
+    file: tests/testthat/test-deidentification_guard.R
+    policy: all_must_pass
+    rationale: >
+      output/manual_review_decisions.csv is committed and was carrying the real
+      initials of the three people who did the adjudication. They are now
+      pseudonymised to R01/R02/R03. This gate runs before the full suite because
+      a regression here republishes identities, which no later green run undoes.
+
+  - id: operator_identity
+    name: Operator identity and machine paths stay out of the repository
+    file: tests/testthat/test-operator_identity.R
+    policy: all_must_pass
+    rationale: >
+      Absolute paths under a named home directory, and the operator's own name
+      in committed config, identify a person and break reproduction on any other
+      machine. Guarded together with the reviewer pseudonyms because both are
+      identity leaking through generated artefacts.
+
   - id: suite
     name: Full test suite
     runner: tests/run_suite_gate.R
@@ -86,8 +106,28 @@ skips:
 
 # Workflows that must exist and must invoke the suite gate. Adding a workflow
 # that runs tests its own way is how the two files drifted the first time.
+# Every workflow in .github/workflows/ must appear here. A workflow that runs
+# without being declared is exactly how tests.yaml and R-CMD-check.yaml drifted
+# apart about what green meant, and test-ci_contract.R now fails on an
+# undeclared one rather than only on a declared-but-missing one.
 workflows:
   - path: .github/workflows/tests.yaml
     must_invoke_gate: true
+    role: Runs the ordered gates above and decides whether the suite is green.
+
   - path: .github/workflows/R-CMD-check.yaml
     must_invoke_gate: true
+    role: >
+      Runs the same gate under R CMD check conditions, so the two cannot
+      disagree about green the way they did once before.
+
+  # Renders rather than gates: it knits docs/*.Rmd against the committed
+  # outputs and fails if any document errors. It deliberately does not call the
+  # suite gate, so must_invoke_gate is false and that is a declared property
+  # rather than an omission.
+  - path: .github/workflows/manuscript.yaml
+    must_invoke_gate: false
+    role: >
+      Renders every document under docs/ from a clean checkout. Their chunks
+      read output/ and data/processed/ at knit time, so a renamed column breaks
+      the manuscript while the whole suite stays green.
