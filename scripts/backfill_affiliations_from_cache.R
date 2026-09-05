@@ -38,11 +38,30 @@ parse_affiliations <- function(html_txt) {
   ids    <- regmatches(chunk, gregexpr('"id":"(aff[0-9]+)"', chunk, perl = TRUE))[[1]]
 
   aff_id  <- str_match(ids,    '"id":"(aff[0-9]+)"')[, 2]
-  aff_txt <- str_match(textfn, '"textfn","_":"([^"]+)"')[, 2]
+
+  # The gregexpr above already tolerates both shapes; this second pattern used
+  # to require '"textfn","_"' adjacency, which is the pre-2017 shape only.
+  # ScienceDirect began emitting an attribute block inside textfn around 2017:
+  #
+  #   2015  {"#name":"textfn","_":"Cleveland Clinic, Cleveland, Ohio"}
+  #   2021  {"#name":"textfn","$":{"id":"cetextfn0001"},"_":"McGill University"}
+  #
+  # so every affiliation from 2017 onward was located and then dropped as NA.
+  # 661 of 1,154 cached files were affected.
+  aff_txt <- str_match(textfn, '"textfn"(?:[^_]{0,120})?"_":"([^"]+)"')[, 2]
 
   if (length(aff_id) == 0 || length(aff_txt) == 0) return(list())
   n <- min(length(aff_id), length(aff_txt))
-  setNames(as.list(aff_txt[seq_len(n)]), aff_id[seq_len(n)])
+  aff_id  <- aff_id[seq_len(n)]
+  aff_txt <- aff_txt[seq_len(n)]
+
+  # Never carry an unresolved affiliation into the map. Doing so let NA reach
+  # the paste() below and be written to disk as the STRING "NA | NA", which is
+  # how this failure hid for months: the column looked populated, so a coverage
+  # check counting is.na() saw nothing wrong.
+  keep <- !is.na(aff_id) & !is.na(aff_txt) & nzchar(aff_txt)
+  if (!any(keep)) return(list())
+  setNames(as.list(aff_txt[keep]), aff_id[keep])
 }
 
 # ── Extract authors with name + affiliation ref ────────────────────────────────
@@ -75,7 +94,10 @@ parse_authors_json <- function(html_txt, aff_map) {
     aff_ids <- str_match_all(blk, '"refid":"(aff[0-9]+)"')[[1]][, 2]
     aff_txt <- if (length(aff_ids) > 0 && length(aff_map) > 0) {
       valid <- aff_ids[aff_ids %in% names(aff_map)]
-      if (length(valid) > 0) paste(unlist(aff_map[valid]), collapse = " | ") else NA_character_
+      txt <- unlist(aff_map[valid])
+      txt <- txt[!is.na(txt) & nzchar(txt)]
+      # An author with no resolvable affiliation is NA, not the string "NA".
+      if (length(txt) > 0) paste(txt, collapse = " | ") else NA_character_
     } else NA_character_
 
     rows[[i]] <- tibble(position = i, given_name = given %||% NA_character_,
