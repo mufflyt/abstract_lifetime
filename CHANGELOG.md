@@ -9,6 +9,42 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-05] - Cohort truncation measured, not just recorded
+
+### Added
+
+- `scripts/cohort_truncation_bias.R` and `output/cohort_truncation_bias.csv`.
+  The existing audit measured the SIZE of the truncation, 1,154 of 7,711 items.
+  Size is not consequence: whether a 15% sample biases the rate depends on
+  whether the captured items differ from the rest, and the captured set is not
+  a random sample. It is the first N pages of each supplement in printed order.
+- Appendix A23 records what the truncation does to the estimate and which
+  sources were tried for closing it.
+
+### Note
+
+- **The bias has a direction.** Within the captured window, publication rate
+  falls across position quintiles (19.0, 16.2, 19.5, 11.0, 15.2), odds ratio
+  0.607 at p = 0.080 adjusted for congress year. Not significant, not nothing:
+  read as a direction, later pages publish less, so 16.2% is more likely an
+  over-estimate than an under-estimate for a complete congress. RCTs are more
+  frequent in the last captured quintile, which cuts the other way.
+- **It cannot currently be closed.** ScienceDirect returns HTTP 403; no
+  supplement PDFs are held; and the Crossref deposit, which is complete, public
+  and already cached, carries DOI, page, title and authors but **no session
+  type**. The study population is oral presentations, so a random sample of
+  uncaptured items would mix orals, videos and posters with no reachable source
+  to separate them. Indirect inference does not rescue it: the oral block ends
+  at S36 in 2022 and S26 in 2023, but the items past the 2015 and 2019
+  boundaries are titled as randomised trials, so the boundary is not
+  consistently placed.
+- A23.4 sets out a probe-study design: obtain session structure for one or two
+  congresses, sample 150-200 uncaptured orals, run the existing pipeline, and
+  compare against 16.2%. The cost is dominated by the human adjudication. Full
+  re-ingestion of 7,711 items is not proposed; the videos and posters in that
+  total are out of scope regardless.
+- README limitation 1 now states the consequence rather than only the size.
+
 ## [2026-09-05] - is_multicenter retained as a text claim
 
 ### Changed

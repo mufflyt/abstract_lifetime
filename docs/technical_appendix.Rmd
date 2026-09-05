@@ -2482,3 +2482,106 @@ rests on it; if one ever did, this limitation would need addressing first.
 this decision nothing needs it. It is retained at that stage as the evidence
 behind the table above, and propagating it would be a schema change to serve a
 definition that was not adopted.
+
+## A23. Cohort Truncation: What Can and Cannot Be Established
+
+A14 recorded that the pipeline holds 1,154 of 7,711 supplement items and that
+re-ingestion would require redoing the search and the adjudication. This
+appendix goes further: it establishes what the truncation does to the estimate,
+and which sources were tried and rejected for closing it.
+
+Nothing here changes a reported number. The cohort remains 1,106 abstracts.
+
+### A23.1 The captured set is not a random sample
+
+`R/01b_parse_web.R` fetches one issue-listing page per congress. Offset
+pagination is attempted only when a page returns exactly 100 items, and
+ScienceDirect returns the same page for every offset, so the loop breaks on the
+first iteration. Each congress is capped at roughly 100 presentations.
+
+The consequence is structural rather than statistical. The cohort is the
+**first N pages of each supplement in printed order**, not a sample drawn from
+it. Captured page ranges end at S26 to S60 against supplements running to S136
+to S286.
+
+### A23.2 The bias has a measurable direction
+
+`scripts/cohort_truncation_bias.R` tests whether publication varies with
+position inside the window that was captured.
+
+| position quintile | n | published | rate | % RCT |
+|---:|---:|---:|---:|---:|
+| 1 (earliest pages) | 211 | 40 | 19.0% | 9.5 |
+| 2 | 210 | 34 | 16.2% | 6.2 |
+| 3 | 210 | 41 | 19.5% | 9.0 |
+| 4 | 210 | 23 | 11.0% | 7.6 |
+| 5 (latest captured) | 210 | 32 | 15.2% | 13.3 |
+
+Adjusted for congress year, the odds of publication fall across the window:
+odds ratio **0.607**, p = 0.080. That is not significant, and it is not nothing.
+Read as a direction, later pages publish less, which would make **16.2% an
+over-estimate** of the rate across a complete supplement.
+
+Two cautions on reading it further. The test spans only the first ~15% of each
+supplement and says nothing about pages beyond it, where the trend could
+flatten, continue or reverse. And RCTs, the strongest predictor of publication
+in the model, are *more* frequent in the last captured quintile (13.3% against
+9.5% in the first), which cuts the other way. The honest summary is a weak
+signal toward over-estimation with an unmeasurable magnitude.
+
+### A23.3 Why the truncation cannot currently be closed
+
+Three routes were tried.
+
+| source | status |
+|---|---|
+| ScienceDirect issue listing | **HTTP 403** to this machine. The origin of the cohort is no longer reachable. |
+| Supplement PDFs | Not held. `R/01_parse_pdf.R` expects one file for 2023 only, and `data/raw/` is empty. Obtaining twelve supplements needs institutional access. |
+| Crossref deposit | **Complete and public**, and already cached for all twelve congresses. It carries DOI, page, title and authors, which is enough to drive the matching pipeline. It carries **no session type**. |
+
+The Crossref record was checked field by field. It exposes `type`
+(`journal-article` for every item), an empty `subject`, `special_numbering`,
+`container-title` and the author list. Nothing distinguishes an oral
+presentation from a video or a poster.
+
+That is the blocking fact. The study population is oral presentations; videos
+are excluded by design and posters were never in scope. A random sample of
+uncaptured Crossref items would mix all three, and there is no reachable source
+that labels them.
+
+Indirect inference does not rescue it. In the two congresses where the capture
+window crossed the boundary, orals end at S36 (2022) and S26 (2023), suggesting
+a short oral block. But the items immediately past the 2015 and 2019 boundaries
+are titled as randomised trials and comparative studies, which are oral-type
+research abstracts, so the boundary is not consistently placed. Item density
+per page does not separate the blocks either.
+
+### A23.4 What would close it, and what it would cost
+
+A probe study is the tractable design, and it is tractable only if the session
+type problem is solved first.
+
+1. Obtain session structure for one or two congresses, from the supplement PDF
+   or an authenticated ScienceDirect session. Without this, nothing else is
+   worth starting.
+2. Draw a random sample of uncaptured **oral** items, on the order of 150 to
+   200, and pull title and authors from the existing Crossref cache.
+3. Run the existing search and scoring pipeline over the sample, and adjudicate
+   it to the same standard as the main cohort.
+4. Compare the sample's publication rate against 16.2%. That estimates the bias
+   directly, without re-ingesting several thousand abstracts.
+
+The cost is dominated by step 3: roughly 150 to 200 human adjudications, the
+same work that produced the current cohort's decisions, plus the search
+runtime. Full re-ingestion of all 7,711 items is not proposed, because the
+adjudication burden scales with the cohort and the videos and posters in that
+total are out of scope regardless.
+
+### A23.5 How this should be reported
+
+Until a probe study is run, the limitation should be stated as it is measured:
+the cohort is the first portion of each supplement rather than a sample of it;
+publication rate declines weakly across the captured window (OR 0.607,
+p = 0.080); and the reported 16.2% is therefore best read as an estimate for
+early-programme oral presentations, with a possible downward correction of
+unknown size if applied to a complete congress.

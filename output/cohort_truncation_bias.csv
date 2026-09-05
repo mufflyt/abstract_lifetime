@@ -1,0 +1,14 @@
+metric,value
+rate_quintile_1,19
+rate_quintile_2,16.2
+rate_quintile_3,19.5
+rate_quintile_4,11
+rate_quintile_5,15.2
+pct_rct_quintile_1,9.5
+pct_rct_quintile_2,6.2
+pct_rct_quintile_3,9
+pct_rct_quintile_4,7.6
+pct_rct_quintile_5,13.3
+position_odds_ratio,0.607
+position_p_value,0.0802
+n_analysed,1051
