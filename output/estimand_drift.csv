@@ -1,0 +1,19 @@
+component,baseline,current,status
+population.congress_years,"2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023","2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023",unchanged
+population.n_congress_years,12,12,unchanged
+population.cohort_size,1106,1106,unchanged
+population.unit_of_analysis,one conference abstract,one conference abstract,unchanged
+denominator.rule,abstracts whose match status was resolved,abstracts whose match status was resolved,unchanged
+denominator.excludes_unresolved,TRUE,TRUE,unchanged
+denominator.n_unresolved,55,55,unchanged
+denominator.n_evaluated,1051,1051,unchanged
+outcome.definition,matched to a full publication,matched to a full publication,unchanged
+outcome.counted_as_published,"classification == 'definite', or a reviewer decision of match","classification == 'definite', or a reviewer decision of match",unchanged
+outcome.n_events,178,178,unchanged
+time.origin,congress date,congress date,unchanged
+time.censoring,administrative at the end of the search window,administrative at the end of the search window,unchanged
+time.search_window_start,2012/11/01,2012/11/01,unchanged
+time.search_window_end,2026/04/01,2026/04/01,unchanged
+time.interval_units,months,months,unchanged
+estimation.survival_model,Kaplan-Meier and Cox proportional hazards,Kaplan-Meier and Cox proportional hazards,unchanged
+estimation.pre_congress_handling,publications dated before their congress are excluded from the interval,publications dated before their congress are excluded from the interval,unchanged
