@@ -27,17 +27,26 @@ need_bundle <- function(...) {
   p
 }
 
-# ── Bundle manifest: the only part of this file that runs in CI ──────────────
+# ── Bundle manifest: what lets this file run in CI ───────────────────────────
 #
-# Everything below the manifest block inspects bundle/, which is gitignored, so
-# in CI all of it SKIPS - 48 assertions that never run where it matters. The
-# defect they guard against (a bundle 135 days behind the analysis) therefore
-# had no CI protection at all.
+# bundle/ is gitignored, so every assertion that read it directly used to SKIP
+# in CI. Forty-five of them. The defect they guard against (a bundle 135 days
+# behind the analysis) therefore had no CI protection at all, which is the
+# same shape of hole as a test that reads a gitignored cache: green locally,
+# inert where it matters.
 #
-# shiny/adjudication_app/bundle_manifest.csv IS tracked. deploy.R writes it with
-# the checksum of every source at the moment the bundle was built, which lets
-# CI answer the question that actually matters - have the sources moved since
-# the last deploy? - from files it already has.
+# shiny/adjudication_app/bundle_manifest.csv IS tracked. deploy.R copies the
+# verbatim files unchanged and, in the same run, records each source's md5 and
+# byte count. So a source that still matches the manifest is byte-identical to
+# its copy in the bundle, and an assertion about bundle CONTENT can be answered
+# by reading the source instead. bundle_or_source() below does exactly that.
+#
+# The limit, stated plainly rather than papered over: this establishes that the
+# SOURCES have not moved since the bundle was built. It cannot detect a bundle
+# directory deleted or corrupted after the deploy, because the manifest records
+# the source checksum, not the copy's. deploy.R:104 compares each copy against
+# its source at deploy time, and when the bundle is present the byte-identical
+# test below still checks the real files.
 
 MANIFEST <- here("shiny", "adjudication_app", "bundle_manifest.csv")
 
@@ -71,6 +80,10 @@ test_that("no bundle source has changed since the last deploy", {
   m <- read_csv(MANIFEST, show_col_types = FALSE) |> filter(git_tracked)
   skip_if(nrow(m) == 0, "no git-tracked sources in the manifest")
 
+  # Both md5 and byte count. The checksum alone would catch any real change,
+  # but a size that disagrees with a matching checksum means the manifest was
+  # written by something other than the file it claims to describe, which is a
+  # different and worse failure than staleness.
   drifted <- character()
   for (i in seq_len(nrow(m))) {
     src <- here(m$source[i])
@@ -80,6 +93,10 @@ test_that("no bundle source has changed since the last deploy", {
     }
     if (!identical(unname(tools::md5sum(src)), m$md5[i])) {
       drifted <- c(drifted, m$source[i])
+    } else if (!identical(as.numeric(file.size(src)), as.numeric(m$bytes[i]))) {
+      drifted <- c(drifted, paste0(m$source[i], " (md5 matches but size does not: ",
+                                   file.size(src), " on disk vs ", m$bytes[i],
+                                   " recorded)"))
     }
   }
 
@@ -113,6 +130,42 @@ test_that("the manifest records which sources CI cannot check", {
   }
 })
 
+# Resolve the file a bundle-content assertion should read.
+#
+# Locally: the bundle exists, so read it, and the assertion tests the real
+# artifact. In CI: the bundle is absent, so establish from the manifest that
+# the source has not moved since the bundle was built, then read the source.
+# Because deploy.R copies these files verbatim, the two are byte-identical
+# whenever that holds, and the assertion answers the same question.
+#
+# A source that no longer matches the manifest FAILS here rather than skipping.
+# That drift is precisely the defect this file exists to catch, and a skip
+# would report it as coverage.
+bundle_or_source <- function(rel) {
+  bun <- bundle_path(rel)
+  if (file.exists(bun)) return(bun)
+
+  src <- here(rel)
+  skip_if_not(file.exists(src), paste("neither bundle nor source present:", rel))
+  skip_if_not(file.exists(MANIFEST), "no bundle_manifest.csv - run deploy.R")
+
+  m <- read_csv(MANIFEST, show_col_types = FALSE)
+  row <- m[m$source == rel, , drop = FALSE]
+  skip_if(nrow(row) != 1, paste("bundle_manifest.csv does not record", rel))
+  # An untracked source cannot be verified from a clean checkout, so standing
+  # in the source for the bundle would assert nothing. Skip honestly instead.
+  skip_if(!isTRUE(row$git_tracked[1]),
+          paste(rel, "is not git-tracked; CI cannot verify it against the manifest"))
+
+  expect_identical(
+    unname(tools::md5sum(src)), row$md5[1],
+    label = paste0(rel, " has changed since the bundle was built on ",
+                   row$bundle_built_utc[1], " UTC, so the app would serve older ",
+                   "data than the analysis. Run: Rscript shiny/adjudication_app/deploy.R")
+  )
+  src
+}
+
 # Files the deploy copies verbatim. Anything other than an exact match means
 # the app and the analysis disagree about the data.
 VERBATIM <- list(
@@ -124,30 +177,69 @@ VERBATIM <- list(
 )
 
 test_that("every verbatim bundle file is byte-identical to its source", {
+  # With the bundle present this compares the real copies. Without it, each
+  # source is checked against the md5 and byte count deploy.R recorded when it
+  # made those copies, which establishes the same identity from committed data.
+  m <- if (file.exists(MANIFEST)) read_csv(MANIFEST, show_col_types = FALSE) else NULL
+  checked <- 0L
   for (pair in VERBATIM) {
     src <- here(pair[1])
     bun <- bundle_path(pair[2])
-    skip_if_not(file.exists(bun), paste("bundle file absent:", bun))
     skip_if_not(file.exists(src), paste("source file absent:", src))
 
-    expect_equal(
-      unname(tools::md5sum(bun)), unname(tools::md5sum(src)),
-      label = paste0(basename(pair[2]), " in the bundle differs from ", pair[1],
-                     ". Run: Rscript shiny/adjudication_app/deploy.R")
+    if (file.exists(bun)) {
+      expect_equal(
+        unname(tools::md5sum(bun)), unname(tools::md5sum(src)),
+        label = paste0(basename(pair[2]), " in the bundle differs from ", pair[1],
+                       ". Run: Rscript shiny/adjudication_app/deploy.R")
+      )
+      checked <- checked + 1L
+      next
+    }
+
+    skip_if(is.null(m), "no bundle and no bundle_manifest.csv - run deploy.R")
+    row <- m[m$source == pair[1], , drop = FALSE]
+    expect_equal(nrow(row), 1L,
+                 label = paste("bundle_manifest.csv does not record", pair[1]))
+    if (nrow(row) != 1) next
+    expect_identical(
+      unname(tools::md5sum(src)), row$md5[1],
+      label = paste0(pair[1], " no longer matches the copy deployed on ",
+                     row$bundle_built_utc[1], " UTC. ",
+                     "Run: Rscript shiny/adjudication_app/deploy.R")
     )
+    expect_identical(
+      as.numeric(file.size(src)), as.numeric(row$bytes[1]),
+      label = paste0(pair[1], " matches the recorded checksum but not the ",
+                     "recorded size, so the manifest describes a different file")
+    )
+    checked <- checked + 1L
   }
+  # Never report success on an empty loop.
+  expect_equal(checked, length(VERBATIM),
+               label = "not every verbatim file could be checked")
 })
 
 test_that("the bundle cohort is the analytical cohort", {
-  bun <- need_bundle("data/processed/abstracts_cleaned.csv")
-  src <- here("data", "processed", "abstracts_cleaned.csv")
-  skip_if_not(file.exists(src))
+  rel <- "data/processed/abstracts_cleaned.csv"
+  bun <- bundle_or_source(rel)
+  src <- here(rel)
 
   b <- read_csv(bun, show_col_types = FALSE)
   s <- read_csv(src, show_col_types = FALSE)
 
-  expect_equal(nrow(b), nrow(s))
-  expect_setequal(b$abstract_id, s$abstract_id)
+  # Only meaningful when the two are genuinely different files. In CI they are
+  # the same path, and the identity they would assert has already been
+  # established by bundle_or_source() against the manifest. Comparing a file to
+  # itself would pass unconditionally and read as coverage it is not.
+  if (!identical(normalizePath(bun), normalizePath(src))) {
+    expect_equal(nrow(b), nrow(s))
+    expect_setequal(b$abstract_id, s$abstract_id)
+  }
+
+  # A real invariant either way: the reviewer queue is built from the Oral
+  # cohort, and a video reaching it means the exclusion at
+  # 02_clean_abstracts.R:34 did not hold.
   expect_true(all(b$session_type == "Oral"),
               info = "a video presentation reached the reviewer queue")
 })
@@ -213,18 +305,27 @@ test_that("the candidate/score join the app performs actually resolves", {
 })
 
 test_that("the bundle decision log matches the analysis decision log", {
-  bun <- need_bundle("output/manual_review_decisions.csv")
-  src <- here("output", "manual_review_decisions.csv")
-  skip_if_not(file.exists(src))
+  rel <- "output/manual_review_decisions.csv"
+  bun <- bundle_or_source(rel)
+  src <- here(rel)
 
   b <- read_csv(bun, show_col_types = FALSE)
   s <- read_csv(src, show_col_types = FALSE)
-  expect_equal(nrow(b), nrow(s))
-  expect_equal(sort(table(b$manual_decision)), sort(table(s$manual_decision)))
+  if (!identical(normalizePath(bun), normalizePath(src))) {
+    expect_equal(nrow(b), nrow(s))
+    expect_equal(sort(table(b$manual_decision)), sort(table(s$manual_decision)))
+  }
+  # In CI this test reduces to the currency check bundle_or_source() performed,
+  # which is the contract it was written for: reviewers must not adjudicate
+  # against a decision log older than the analysis.
+  expect_gt(nrow(b), 0)
 })
 
 test_that("the bundle review queue matches what 05_adjudicate.R emitted", {
-  bun <- need_bundle("output/manual_review_queue.csv")
+  # Not tautological when read from the source: the expectation is derived from
+  # match_scores.csv, a different file, so this stays a real cross-artifact
+  # invariant in CI.
+  bun <- bundle_or_source("output/manual_review_queue.csv")
   scores_path <- here("data", "processed", "match_scores.csv")
   skip_if_not(file.exists(scores_path))
 
