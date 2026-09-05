@@ -4,6 +4,34 @@ What a fresh clone gets by running `Rscript 00_run_all.R`, and what it does not.
 
 ---
 
+## 0. Prior art this repository borrows from
+
+The layout is a **research compendium** in the sense of Marwick, Boettiger and
+Mullen: code, data and prose in one version-controlled project, with the
+computational environment pinned. The conventions come from
+[rrtools](https://github.com/benmarwick/rrtools) and
+[rrrpkg](https://github.com/ropensci/rrrpkg) (rOpenSci) - a top-level runner,
+analysis code under `R/`, committed inputs under `data/`, committed results
+under `output/`, prose under `docs/`, and a lockfile pinning package versions.
+This project reached that shape independently and adopts the names so reviewers
+who know the convention can navigate it without reading a map.
+
+Two departures are deliberate. There is no Docker image, so the environment is
+pinned by `renv.lock` alone and the R version is recorded rather than enforced.
+And the compendium is not an R package: there is no `DESCRIPTION` and the code
+is sourced, not installed, which costs the automatic dependency declaration a
+package would give and is why `tests/testthat/test-dependency_lockfile.R`
+checks the lockfile against a source scan instead.
+
+Data validation uses [pointblank](https://github.com/posit-dev/pointblank)
+(Iannone & Vanderkam) rather than a hand-rolled validator; see
+`config/data_contract.yml` and `R/utils_data_contract.R`.
+
+The matching methodology's closest published relative is the IntoValue
+programme ([intovalue-data](https://github.com/maia-sh/intovalue-data),
+[IntoValue2](https://github.com/quest-bih/IntoValue2), MIT), discussed in the
+manuscript Methods.
+
 ## 1. Environment
 
 | Requirement | Value |

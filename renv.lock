@@ -169,6 +169,12 @@
       "Source": "Repository",
       "Repository": "CRAN"
     },
+    "pointblank": {
+      "Package": "pointblank",
+      "Version": "0.12.4",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
     "purrr": {
       "Package": "purrr",
       "Version": "1.2.2",
@@ -190,6 +196,12 @@
     "renv": {
       "Package": "renv",
       "Version": "1.2.3",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
+    "rlang": {
+      "Package": "rlang",
+      "Version": "1.3.0",
       "Source": "Repository",
       "Repository": "CRAN"
     },

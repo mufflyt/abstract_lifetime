@@ -51,6 +51,7 @@ jobs:
         with:
           extra-packages: |
             any::testthat
+            any::pointblank
             any::jsonlite
             any::renv
             any::withr
