@@ -45,7 +45,10 @@ output/figures/*
 !output/figures/figure6_time_to_pub.png
 !output/figures/figure7_predictor_stability.png
 !output/figures/figure1_strobe_flowchart.png
+!output/figures/figure8_timevarying_n_authors.png
 !output/figures/figureS1_pub_rate_by_year.png
+!output/figures/figureS2_strategy_perf.png
+!output/figures/figureS3_score_dist.png
 
 # Google Sheets service account credentials
 google_credentials.json

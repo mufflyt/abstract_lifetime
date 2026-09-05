@@ -123,7 +123,20 @@ a cross-source disagreement recorded in `gender_conflict`.
 
 ![Histogram of months from conference to publication.](output/figures/figure6_time_to_pub.png)
 
-Four supplementary figures are generated into `output/figures/` but not tracked.
+Search-strategy yield, which is the evidence behind one of the open decisions in
+[DECISIONS_PENDING.md](docs/DECISIONS_PENDING.md): the `title` strategy is a
+pre-correction measurement, and a sixth strategy, `author_keywords`, never ran at
+all because the cohort carries no keywords column.
+
+![Yield per PubMed search strategy.](output/figures/figureS2_strategy_perf.png)
+
+The composite match-score distribution, which is what the adjudication
+thresholds cut across. The mid-score band is the one escalated to human review.
+
+![Distribution of composite match scores.](output/figures/figureS3_score_dist.png)
+
+Two further supplementary figures are generated into `output/figures/` but not
+tracked.
 
 ---
 
@@ -229,6 +242,8 @@ Rscript scripts/rebuild_candidate_pool.R
 | [REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md) | What a clean clone gets, and what it does not |
 | [FAILURE_MODES.md](docs/FAILURE_MODES.md) | Seventeen ways this pipeline can be plausibly wrong, and which nine are now fixed |
 | [VALIDATION.md](docs/VALIDATION.md) | The test suite and the invariants that have no test |
+| [TEST_GOVERNANCE.md](docs/TEST_GOVERNANCE.md) | What "green" means: the gate, both manifests, and why a skipped test is not a passing one |
+| [DECISIONS_PENDING.md](docs/DECISIONS_PENDING.md) | Every open decision, generated from the expected-failure manifest |
 | [METHODOLOGICAL_HISTORY.md](docs/METHODOLOGICAL_HISTORY.md) | Corrections, with their effect on the numbers |
 | [technical_appendix.Rmd](docs/technical_appendix.Rmd) | Extended appendices A1–A15. **A14** verifies the cohort truncation against Crossref; **A15** is the September 2026 remediation record |
 
@@ -252,31 +267,37 @@ Rscript scripts/rebuild_candidate_pool.R
 
 ## Test status
 
-30 test files. As of 2026-09-04: **959 passing, 3 failing, 0 skipped**
-(from 519 passing / 1 failing at the start of the day). Every remaining failure
-is deliberately left red, each marking a decision that belongs to the author
-rather than to code:
+56 test files. As of 2026-09-05, measured in a clean `git worktree` so the
+numbers are what CI sees rather than what a developer machine sees:
+**1,723 passing, 23 failing, 12 skipped.**
 
-| Failing test | What it reports | Why it stays red |
-|---|---|---|
-| `test-cycle04_validation_sensitivity.R:179` | `search_strategy_efficacy.csv` still carries the pre-correction `title`-strategy yield of 0.2% | Regenerating it means re-running the whole search layer, which would change candidate sets and invalidate the human adjudication |
-| `test-cycle06_scoring_composite.R:83` | `keyword_pts` fires on 0 of 1,106 abstracts, so the "10-component" score has nine live components | Fixing the component changes every score and therefore every classification |
-| `test-cycle06_scoring_composite.R:116` | 3 PMIDs are credited to 6 published abstracts | Deciding which abstract owns each PMID is adjudication; surfaced in `final_pmid_shared` |
+Every failure is deliberately left red, each marking a decision that belongs to
+the author rather than to code. The full list, with the reason and the decision
+each is waiting on, is generated into
+[docs/DECISIONS_PENDING.md](docs/DECISIONS_PENDING.md). Two of them move a number
+that appears in the manuscript:
 
-CI runs three gates: decision-logic boundary contracts, then mutation tests
-(every planted defect must still be killed), then the full suite measured
-against [`tests/expected_failures.yaml`](tests/expected_failures.yaml). CI is
-green only when the failures are *exactly* the three listed there. It fails on
-any other failure, if one of the three starts passing, and — since 2026-09-04 —
-if an entry names a test that no longer runs at all, so a renamed or deleted
-test cannot leave its excuse behind in the manifest.
+| Failing test | What it reports |
+|---|---|
+| `test-cycle21_id_integrity.R` | Four abstracts are counted as published on the strength of a paper that appeared *before* their congress. The study's own exclusion file lists 39 such abstracts and the rule is applied to 35. Consistently applied, the numerator moves from 178 to 174 |
+| `test-cycle22_decision_log.R` | Four *different* abstracts are counted as published against an explicit human `no_match` |
 
-The proportional-hazards entry was the fourth. It was **resolved on 2026-09-04**
-and removed: the violation was traced to a single term and modelled, and the
-assertion that replaced it is stronger than the one it retired — it now requires
-that any violation be diagnosed per term, remedied, and that the remedy actually
-restore the assumption. See [docs/STATISTICAL_ANALYSIS.md](docs/STATISTICAL_ANALYSIS.md#proportional-hazards).
-Full inventory and the list of invariants that have **no** test:
+CI runs five gates in order: decision-logic boundary contracts, mutation tests,
+the two identity guards, then the full suite measured against **both** manifests
+— [`tests/expected_failures.yaml`](tests/expected_failures.yaml) and
+[`tests/expected_skips.yaml`](tests/expected_skips.yaml).
+
+The second manifest is new, and it closes a hole that had already cost two days
+of red `main`. The gate used to treat a skipped test as a passing one, so a test
+that quietly stopped asserting anything was counted as coverage. **75 assertions
+ran only on a developer machine; 52 of them are now enforced in CI**, including
+`F2: every winning PMID resolves in the candidate pool`, a central pipeline
+invariant that had never once run there. The 23 that remain are genuinely
+environment-bound and each records what it would take to enable it.
+
+See [docs/TEST_GOVERNANCE.md](docs/TEST_GOVERNANCE.md) for the gate, both
+manifests, and why an authoritative gate result has to come from a clean
+worktree. Full inventory and the list of invariants that have **no** test:
 [docs/VALIDATION.md](docs/VALIDATION.md).
 
 ## Known limitations

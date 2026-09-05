@@ -1,5 +1,102 @@
 # NEWS
 
+## 2026-09-05 — the tests that were not running
+
+The suite had been reporting a number that was partly fiction.
+
+A test run has three outcomes and only two of them were being watched. A test
+can pass, it can fail, or it can not run at all, and the gate's rule for
+"passing" was `failed == 0 & error == 0` — which is true of a skipped test. So a
+test that quietly stopped asserting anything was counted on the good side of
+every summary line it appeared in.
+
+That is not a hypothetical. It had already cost two days. `main` went red on
+2026-09-03 with an error insisting that a registered failure had started
+passing. It had not. The test read the PubMed XML cache, which is gitignored, so
+in CI it skipped, the gate read the skip as a pass, and then complained that the
+manifest entry describing the real finding was stale. There was no correct fix
+available while the gate believed a skip was evidence of anything.
+
+Pulling that thread found 24 test blocks that skipped in CI, holding **75
+assertions that only ever ran on a developer machine**. Among them were 45
+guarding the Shiny deploy bundle against being stale — written after a bundle
+was found 135 days behind the analysis, with reviewers adjudicating a
+pre-denominator-fix cohort — and `F2: every winning PMID resolves in the
+candidate pool`, one of the pipeline's central invariants, which had never once
+run in CI.
+
+Most of them are now running, and not by relaxing anything:
+
+- The bundle checks read `bundle_manifest.csv`, which is committed and records
+  each source's md5 and byte count at the moment the bundle was built. A source
+  that still matches it is byte-identical to its copy, so the assertion can read
+  the source. Simulating a stale bundle now turns three tests red where CI
+  previously reported nothing at all.
+- The candidate checks read a committed 1.4 MB `abstract_id`/`pmid` index rather
+  than the gitignored 130 MB pool. Two columns, 65,697 pairs, which is all those
+  assertions ever looked at.
+- Table 1's reconciliation needed one 4 KB file that had never been added.
+
+**75 inert assertions, down to 23.** The 23 that remain are genuinely
+environment-bound and each says so, with what it would take to enable it.
+
+The durable part is the guard. `tests/expected_skips.yaml` now records every
+approved skip with a reason and a route to enabling it, and the gate fails on
+any skip that is not there. It is deliberately one-directional: an unapproved
+skip fails, an approved skip that runs anyway does not, because the bundle and
+the cache legitimately exist on one machine and not the other, and a guard that
+cannot tell those apart would be turned off within a week.
+
+`test-shiny_e2e.R` deserves its own sentence. Three hundred and thirty-two lines
+of browser tests, credited with 17 tests in the validation inventory, asserting
+nothing anywhere, because `shinytest2` is installed on no machine involved. It
+is now explicitly opt-in, and carries a floor assertion that runs everywhere and
+fails if that exclusion stops being recorded.
+
+## 2026-09-05 (later) — cycles 17 to 24, and what they found
+
+The 24-cycle test-generation protocol had stopped at 16. The remaining eight
+cycles added 165 assertions and surfaced eight decisions. Two of them move a
+number that appears in the manuscript.
+
+**Four abstracts are counted as published on the strength of a paper that
+appeared before the congress at which the abstract was presented.** The study
+maintains `output/excluded_pre_congress_publications.csv`, listing 39 such
+abstracts, and applies the exclusion to 35 of them. For `AAGL2021_002`,
+`AAGL2021_049`, `AAGL2023_042` and `AAGL2023_048` the matched PMID is exactly
+the one listed as excluded. Applying the rule consistently moves the numerator
+from 178 to 174.
+
+**Four more are counted as published against an explicit human `no_match`.** A
+different four. A reviewer looked at the abstract, said the candidate was not its
+publication, and the outcome column says published anyway. One was already known
+from the shared-PMID finding; three are new.
+
+Neither is fixed here. Both are definitions of the outcome, and choosing one
+silently is exactly what the expected-failure manifest exists to prevent.
+
+The rest: a search strategy that searched for nothing because the cohort has no
+keywords column; one survival event lying four months beyond its own censoring
+horizon, because it is timed to a print-issue date after the search ended; 156
+of the 285 abstracts queued for human review that were never humanly reviewed
+and were closed by the algorithm they had been escalated away from; and
+title-fidelity verification that covers the matches the algorithm was already
+confident about while skipping the 22 that human adjudication had to settle.
+
+One process note worth keeping, because it invalidated a day of my own local
+verification. A test passed on every local run and failed the instant the gate
+ran in a clean checkout: the working tree held a regenerated artefact belonging
+to a concurrent agent, so every local run had been reading a fix that was not
+committed. **A shared working tree is not a safe place to validate.** Gate
+results quoted as authoritative here now come from a throwaway `git worktree`,
+which holds only tracked files and is therefore what CI actually sees.
+
+Eight of my own assertions in these cycles were wrong before they were right,
+every one because I asserted a contract nobody had stated rather than the one
+the code holds. Twice the corrected version then found something the wrong one
+would have buried.
+
+
 ## 2026-09-04 (later) — the proportional-hazards question, answered
 
 Yesterday's audit left four open decisions parked in an expected-failure
