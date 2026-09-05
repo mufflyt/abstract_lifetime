@@ -983,8 +983,8 @@ stages:
              data/processed/km_fit.rds, data/processed/cox_model.rds,
              output/aim2b_cox_regression.csv, output/aim4_strategy_performance.csv]
     outputs:
-      - output/figures/figure1_flow_diagram.png
-      - output/figures/figure1_flow_data.csv
+      - output/figures/classification_tiers.png
+      - output/figures/classification_tiers.csv
       - "output/figures/figure2_km_curve.{png,pdf}"
       - "output/figures/figure3_km_by_year.{png,pdf}"
       - "output/figures/figure4_subgroup_rates.{png,pdf}"
@@ -1028,7 +1028,7 @@ stages:
     tests: []
     notes: >
       Derives every count from the data and asserts the arithmetic with
-      stopifnot() before drawing. Supersedes R/strobe_flow_diagram.R.
+      stopifnot() before drawing. Superseded and replaced R/strobe_flow_diagram.R, deleted 2026-09-05.
 
   - id: deploy
     name: Shiny bundle and deploy

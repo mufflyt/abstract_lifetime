@@ -34,7 +34,7 @@ test_that("pseudonymise_reviewer maps known staff to stable pseudonyms", {
 })
 
 test_that("the algorithmic marker and missing values are preserved", {
-  # R/06_analyze_results.R, R/10_interrater.R, R/strobe_flow_diagram.R and the
+  # R/06_analyze_results.R, R/10_interrater.R and the
   # Shiny app all branch on the literal "AUTO". Renaming it would silently
   # change adjudication precedence.
   expect_equal(pseudonymise_reviewer("AUTO"), "AUTO")

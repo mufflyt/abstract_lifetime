@@ -11,7 +11,7 @@ library(dplyr)
 source(here::here("R", "utils_decisions.R"))
 
 P_FINAL <- here::here("output", "final_analytical_dataset.csv")
-P_FLOW  <- here::here("output", "figures", "figure1_flow_data.csv")
+P_FLOW  <- here::here("output", "figures", "classification_tiers.csv")
 P_FID   <- here::here("data", "processed", "fidelity_checks.csv")
 P_T3    <- here::here("output", "tables", "table3_logistic_regression.csv")
 P_AIM3  <- here::here("output", "aim3_logistic_regression.csv")

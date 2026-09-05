@@ -64,7 +64,7 @@ output/excluded_pre_congress_publications.csv,final,CSV,ad hoc audit (no script 
 output/interrater_agreement.csv,final,CSV,R/10_interrater.R,manuscript,One agreement metric,metric,3,2,yes,partly,irr package (not installed),yes,72,2026-09-05 12:56,cohens_kappa is NA because irr is absent.
 output/validation_metrics.csv,final,CSV,R/validation_gold_standard.R,manuscript; tests,One performance metric,metric,11,2,yes,partly,gold standard labels,yes,168,2026-09-05 12:56,
 output/search_strategy_efficacy.csv,intermediate,CSV,R/03_search_pubmed.R,manuscript,One PubMed strategy,strategy,5,6,yes,partly,none,no,253,2026-09-05 12:56,"STALE (Apr 19): n_abstracts_searched = 1738 and title yield 0.2%, both from before the title-phrase correction."
-output/figures/figure1_flow_data.csv,final,CSV,R/08_make_figures.R,README figure 1,One flow-diagram step,step,11,2,yes,yes,none,yes,203,2026-09-05 12:56,Current.
+output/figures/classification_tiers.csv,final,CSV,R/08_make_figures.R,README classification-tier chart,One flow-diagram step,step,11,2,yes,yes,none,yes,203,2026-09-05 12:56,Current.
 output/tables/table1_characteristics.csv,final,CSV,R/07_make_tables.R,manuscript,One publication-status stratum,final_published,35,6,yes,yes,none,yes,2304,2026-09-05 12:56,gitignored.
 output/tables/table2_pub_rate_subgroups.csv,final,CSV,R/07_make_tables.R,manuscript,One subgroup,subgroup,8,4,yes,yes,none,yes,172,2026-09-05 12:56,gitignored.
 output/tables/table3_logistic_regression.csv,final,CSV,R/07_make_tables.R,manuscript,One model term,term,8,4,yes,yes,none,yes,342,2026-09-05 12:56,gitignored.
