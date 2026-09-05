@@ -336,13 +336,25 @@ worktree. Full inventory and the list of invariants that have **no** test:
 
 ## Known limitations
 
-1. **The cohort is truncated.** The ScienceDirect listing scraper captures only
-   the first ~100 items per congress supplement, against 392–852 items deposited
-   in Crossref. For congress years 2012–2021 the captured window ends while
-   still inside the oral-presentation block, so an unknown number of oral
-   presentations were never ingested. The cohort is best described as *the first
-   ~95–100 presentations listed in each supplement*, not *all oral
-   presentations*. [FAILURE_MODES.md F1](docs/FAILURE_MODES.md)
+1. **The cohort is truncated, and it is not a random sample.** The
+   ScienceDirect listing scraper captures only the first ~100 items per congress
+   supplement, against 392–852 items deposited in Crossref: 1,154 of 7,711
+   overall. The captured set is the **first N pages of each supplement in
+   printed order**, ending at S26–S60 against supplements running to S136–S286.
+
+   Publication rate declines weakly across the captured window (position odds
+   ratio 0.607, p = 0.080, adjusted for congress year), so the reported rate is
+   best read as an estimate for **early-programme oral presentations**, with a
+   possible downward correction of unknown size if applied to a complete
+   congress. RCTs are more frequent in the last captured quintile, which cuts
+   the other way.
+
+   The truncation cannot currently be closed: ScienceDirect returns HTTP 403,
+   no supplement PDFs are held, and the Crossref deposit — which is complete,
+   public and cached — carries **no session type**, so uncaptured oral
+   presentations cannot be told from videos or posters. See
+   [appendix A23](docs/technical_appendix.Rmd) for the evidence and a costed
+   probe-study design.
 2. **2017 and 2018 have no recoverable abstract text at all** (1 of 97 and 0 of
    95). Every text-derived covariate is near zero for those two congresses, and
    congress year is in neither model, so they act as a measurement-driven
