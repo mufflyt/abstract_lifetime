@@ -4,7 +4,7 @@
 
 # Decisions pending
 
-This repository keeps 15 tests failing on purpose. Each one below is a question that code cannot answer: resolving it changes the estimand, the cohort, or an adjudication that a human already recorded. None is a defect awaiting a fix.
+This repository keeps 16 tests failing on purpose. Each one below is a question that code cannot answer: resolving it changes the estimand, the cohort, or an adjudication that a human already recorded. None is a defect awaiting a fix.
 
 CI is green while exactly these fail. If one of them starts passing, CI goes red until its entry is removed, so this list cannot quietly outlive its reasons.
 
@@ -145,4 +145,14 @@ Work an item by deciding the question in **Decision needed**, then either make t
 **Decision needed.** Re-run 02b to completion and record how many of the 280 PubMed can actually supply, or document that the text is unrecoverable and treat the text-derived flags for 2012-2018 as missing rather than FALSE.
 
 **Documented in.** tests/loop/LEDGER.md cycle 15
+
+## test-cycle17_search_layer.R
+
+### 16. every search strategy the builder defines can actually be built
+
+**What fails.** build_search_strategies() at R/utils_pubmed.R:429 defines six strategies. Only five ever ran. author_keywords is built only when abstract_row$keywords is non-empty, and abstracts_cleaned.csv has no keywords column at all, so the branch is unreachable for every abstract in the cohort and that strategy searched for nothing. This is the same dead keyword pathway cycle 6 found in the scoring composite, appearing here one stage earlier in the search.
+
+**Decision needed.** Extracting keywords and enabling the strategy would widen every candidate set, which changes the scored pairs and therefore invalidates the human adjudication recorded against the current candidates. Whether the candidate pool is re-derived is the author's call, not the code's.
+
+**Documented in.** tests/loop/LEDGER.md cycle 17
 

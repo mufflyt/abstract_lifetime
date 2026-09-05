@@ -221,3 +221,21 @@ expected_failures:
       actually supply, or document that the text is unrecoverable and treat the
       text-derived flags for 2012-2018 as missing rather than FALSE.
     documented_in: tests/loop/LEDGER.md cycle 15
+
+  - file: test-cycle17_search_layer.R
+    test: every search strategy the builder defines can actually be built
+    reason: >
+      build_search_strategies() at R/utils_pubmed.R:429 defines six strategies.
+      Only five ever ran. author_keywords is built only when
+      abstract_row$keywords is non-empty, and abstracts_cleaned.csv has no
+      keywords column at all, so the branch is unreachable for every abstract in
+      the cohort and that strategy searched for nothing. This is the same dead
+      keyword pathway cycle 6 found in the scoring composite, appearing here one
+      stage earlier in the search.
+    decision_needed: >
+      Extracting keywords and enabling the strategy would widen every candidate
+      set, which changes the scored pairs and therefore invalidates the human
+      adjudication recorded against the current candidates. Whether the
+      candidate pool is re-derived is the author's call, not the code's.
+    documented_in: tests/loop/LEDGER.md cycle 17
+

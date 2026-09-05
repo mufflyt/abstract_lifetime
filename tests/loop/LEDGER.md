@@ -1178,3 +1178,39 @@ Stopped on user instruction, redirected to remediation PR work. 16 of 24 cycles
 completed: 160 tests added, 8 real defects fixed, 16 findings registered on the
 expected-failure manifest, and roughly a dozen defects in my own tests caught and
 corrected along the way.
+
+## Cycle 17 - 2026-09-05
+
+Mix required: 3 BVA / 4 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle17_search_layer.R` (23 assertions).
+Target: the candidate-generation layer, `R/03_search_pubmed.R` and
+`build_search_strategies()` at `R/utils_pubmed.R:429`. Cycles 4 and 6 measured
+what the SCORING did with candidates; nothing had tested how candidates came to
+exist. It is testable in CI for the first time now that
+`output/candidate_pool_index.csv` is committed.
+
+**Result: 22 pass, 1 preserved failure. One finding, one wrong test of my own.**
+
+**Finding (registered).** Six strategies are defined; five ever ran.
+`author_keywords` builds only when `abstract_row$keywords` is non-empty, and
+`abstracts_cleaned.csv` has no `keywords` column at all, so the branch is
+unreachable for every abstract and that strategy searched for nothing. Same dead
+keyword pathway cycle 6 found in the scoring composite, one stage earlier.
+Enabling it would widen every candidate set and invalidate the recorded
+adjudication, so it is preserved rather than fixed.
+
+**My own wrong test, corrected rather than deleted.** 17.7 first asserted that
+every strategy was offered the same set of abstracts. It failed on a
+four-abstract difference: 1,742 for the title strategies against 1,738 for the
+author ones. The gap is exactly `AAGL2013_051`, `AAGL2014_042`, `AAGL2015_032`
+and `AAGL2016_022`, the four abstracts whose `first_author_normalized` is NA, so
+the author branch correctly did not build. That is the pipeline behaving as
+written, not a defect. The test now asserts the gap is fully ACCOUNTED FOR by
+missing author names, which still fails if a strategy ever silently fails to
+build for an unknown reason. Worth recording that `pct_with_results` is computed
+against each strategy's own denominator, so the rates are not directly
+comparable across rows of `search_strategy_efficacy.csv`.
+
+Contracts read from source, not assumed: the six strategy names are parsed out
+of `utils_pubmed.R` at test time rather than hard-coded, so the vocabulary
+cannot drift away from the builder.
