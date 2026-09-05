@@ -133,9 +133,19 @@ all because the cohort carries no keywords column.
 The composite match-score distribution, which is what the adjudication
 thresholds cut across. The mid-score band is the one escalated to human review.
 
-![Distribution of composite match scores.](output/figures/figureS3_score_dist.png)
+![Histogram of composite match score per abstract, coloured by classification. A large no-match mass sits below score 3, a mixed probable and possible band runs from 3 to 7, and a definite tail extends past 7. Dashed vertical lines mark the probable and definite thresholds.](output/figures/figureS3_score_dist.png)
 
-Two further supplementary figures are generated into `output/figures/` but not
+The same classification, split by congress year. The search ran once across all
+twelve years, so a year-specific artefact would appear here as a step change.
+None does — the mix is stable, which is what licenses pooling the years.
+
+![Stacked proportion bar chart of match classification by congress year, 2012 to 2023. No-match dominates every year at roughly 60 to 77 percent, with definite, probable, possible and excluded making up the remainder in broadly similar proportions across years.](output/figures/figureS4_class_by_year.png)
+
+The `excluded` band is abstracts whose only candidate publication predates the
+congress. They leave the numerator, not the denominator — see
+[docs/OUTCOME_DEFINITION.md](docs/OUTCOME_DEFINITION.md).
+
+One further supplementary figure is generated into `output/figures/` but not
 tracked.
 
 ---
@@ -269,7 +279,20 @@ Rscript scripts/rebuild_candidate_pool.R
 
 56 test files. As of 2026-09-05, measured in a clean `git worktree` so the
 numbers are what CI sees rather than what a developer machine sees:
-**1,723 passing, 23 failing, 12 skipped.**
+**1,723 passing, <!--manifest-count-->23<!--/manifest-count--> failing,
+12 skipped.**
+
+The failing count is written as a marker and checked against
+[`tests/expected_failures.yaml`](tests/expected_failures.yaml) by
+`tests/testthat/test-decision_registry.R`, so it cannot drift the way the
+hand-maintained tables it replaced did.
+
+The other two are observations, not registrations, and are deliberately not
+checked. The pass total moves on almost every commit. The skip total is
+environment-dependent by design: `tests/expected_skips.yaml` registers 13
+approved skips, and 12 of them actually skipped in this run — an approved skip
+that manages to run is not an error, which is why the gate fails on *unapproved*
+skips only.
 
 Every failure is deliberately left red, each marking a decision that belongs to
 the author rather than to code. The full list, with the reason and the decision

@@ -1,0 +1,11 @@
+metric,value
+cox_n,1020
+cox_events,171
+ph_global_p,0.041
+ph_global_p_without_violator,0.5295
+aic_proportional,2303.6
+aic_time_varying,2295.4
+schoenfeld_rho_violator,0.257
+violator_ceiling,5
+violator_n_at_ceiling,499
+violator_pct_at_ceiling,48.9

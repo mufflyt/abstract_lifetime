@@ -1,5 +1,47 @@
 # NEWS
 
+## 2026-09-05 (later) - the registry's last two copies
+
+The test-governance work earlier today removed the hand-written table of
+registered failures from the README. There was a second copy in
+`docs/VALIDATION.md`, and it had drifted the same way: three rows against a
+manifest of twenty-three. Anyone reading it would have concluded the project had
+three open questions.
+
+That is the failure the suite gate exists to prevent, reappearing one level up.
+A description of the truth, kept beside the truth, updated separately, and
+wrong. Both copies are gone and both documents link to the generated registry.
+What remains in prose is a count, written as a marker a test checks against the
+manifest, plus a guard that fails if a table of manifest rows ever comes back.
+
+Writing that guard was instructive twice over. Its first form flagged nineteen
+rows in VALIDATION.md, which turned out to be the legitimate test *inventory*, a
+catalogue of every test file with its assertion count and gate. The difference
+is that a manifest row cites a line number and an inventory row does not, so the
+guard now requires one. A check that forbids the wrong thing is worse than no
+check, because it teaches people to work around it.
+
+Then it failed on its first real run, and it was right to. The README said 12
+skips; the skip manifest holds 13 entries. Both numbers are correct. An entry in
+that manifest is a registration, not a prediction: whether a test actually skips
+depends on whether the gitignored caches are present, and the whole point of the
+gate is that an approved skip which manages to run is fine. So the marker
+belongs on the registered count and the observed count is labelled as an
+observation. Marking both would have forced them to agree, which would have
+meant either falsifying the README or deleting a legitimate manifest entry to
+make a number match.
+
+The last thing was the same principle applied to numbers. Several figures
+justifying the proportional-hazards remediation had been worked out at a prompt
+and typed into prose: the model frame size, what the global test becomes with
+the violating term dropped, the AIC of each fit, the Schoenfeld correlation, the
+share of the frame at the author ceiling. A number with no producer cannot be
+re-derived, so nothing notices when it stops being true, and every one of them
+had already shifted at the last refit. They now come from a script, and seven
+are registered as claims the suite recomputes.
+
+Nothing scientific was decided. Twenty-three decisions remain open.
+
 ## 2026-09-05: the tests that were not running
 
 The suite had been reporting a number that was partly fiction.

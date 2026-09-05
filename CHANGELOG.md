@@ -9,6 +9,47 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-05] - Single-sourced registry, and a producer for the PH figures
+
+### Fixed
+
+- **`docs/VALIDATION.md` still carried a hand-maintained table of the registered
+  failures, stopped at three rows while the manifest holds twenty-three.** The
+  README's copy went in the same-day test-governance work; this removes the
+  other one. Both now link to the generated
+  [`docs/DECISIONS_PENDING.md`](docs/DECISIONS_PENDING.md).
+- Counts stated in prose are now written as markers
+  (`<!--manifest-count-->23<!--/manifest-count-->`) and checked against the
+  manifest, so they cannot silently go stale the way the tables did.
+
+### Added
+
+- `scripts/ph_diagnostics_report.R` and `output/cox_ph_support.csv`. The numbers
+  justifying the proportional-hazards remediation (Cox frame size, the global
+  Schoenfeld test with the violating term removed, the AIC of both fits, the
+  Schoenfeld residual correlation, the share of the frame at the author-count
+  ceiling) were computed ad hoc and typed into prose. A number with no producer
+  cannot be re-derived, so nothing noticed when one stopped being true, and all
+  of them had shifted at the previous refit. Seven are now registered in
+  `docs/manuscript_claims.csv`.
+- `tests/testthat/test-decision_registry.R`: marked counts must match their
+  manifest, the generated registry must hold one entry per manifest entry and
+  keep its do-not-edit banner, and a table of manifest rows reappearing in
+  either document fails the suite. The guard requires a line number in the row,
+  so the legitimate test inventory in VALIDATION.md is not caught by it.
+- Figure S4, match classification by congress year, added to the README beside
+  S2 and S3. It shows the classification mix does not drift across the twelve
+  years the single search pass covered.
+- Appendix A17, including the distinction the count guard exposed on its first
+  run: the skip manifest holds 13 registrations while 12 skips were observed,
+  and those are different quantities.
+
+### Changed
+
+- `docs/_meta/data_inventory_meta.csv` gained entries for `cox_ph_support.csv`
+  and `output/candidate_pool_index.csv`, the latter committed earlier without
+  metadata. The builder's own guard caught both.
+
 ## [2026-09-05]: CI stops counting skipped tests as coverage; cycles 17-24
 
 ### Fixed

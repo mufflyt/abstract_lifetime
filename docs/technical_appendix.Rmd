@@ -1962,3 +1962,110 @@ retention fell from 67.4% to 62.0%. It was already described as "not
 congress-driven but not sampling-robust"; it is now marginally less
 congress-independent as well. The qualification it carries should be read as
 having got slightly stronger, not weaker.
+
+## A17. Single-Sourcing the Decision Registry
+
+This appendix records a documentation defect, not a scientific one, and the
+guard added so it cannot recur.
+
+### A17.1 The same rot, one level up
+
+`tests/expected_failures.yaml` registers every test left failing on purpose.
+The suite gate fails when an unregistered test fails, when a registered one
+starts passing, when an entry names a test that no longer runs, and — since the
+skip work — when a test skips without approval. All of that exists because a
+list of known-failing tests rots: a decision gets taken, the entry stays, and CI
+keeps green-lighting a question that has already been answered.
+
+The manifest was protected. Its *descriptions* were not. Both `README.md` and
+`docs/VALIDATION.md` carried a hand-maintained table of the registered failures,
+and both had stopped at three rows while the manifest grew to **23**. A reader
+of either document would have concluded the project had three open questions.
+
+`docs/DECISIONS_PENDING.md` had been generated from the manifest the whole time
+and listed all 23 correctly. The problem was not a missing artefact; it was two
+unofficial copies of one that already existed.
+
+### A17.2 What replaced them
+
+Both tables are deleted. Each document now links to the generated registry and
+states only a count, written as a marker:
+
+```
+<!--manifest-count-->23<!--/manifest-count-->
+```
+
+`tests/testthat/test-decision_registry.R` asserts that every marked count equals
+the length of its manifest, that `DECISIONS_PENDING.md` carries one heading per
+manifest entry and keeps its do-not-edit banner, and that neither document
+reintroduces a table of manifest rows.
+
+That last check needed narrowing. Its first form matched any table row citing a
+test file and flagged nineteen rows in `docs/VALIDATION.md` — the legitimate
+test **inventory**, which tabulates every test file with its assertion count and
+gate. A manifest row cites a specific *line* (`test-cycle04_….R:179`); an
+inventory row does not. The guard now requires the line number, so it catches
+the duplicate table without forbidding the catalogue.
+
+README also stopped quoting pass and fail totals. They changed on almost every
+commit, so the figure was stale before it could be read.
+
+### A17.2b A registration is not an observation
+
+The count guard caught something on its first run that is worth keeping. The
+README stated *12 skipped*, taken from a clean-worktree run;
+`tests/expected_skips.yaml` holds **13** entries. Both are correct, and they
+measure different things.
+
+An entry in the skip manifest is a *registration*: this test is allowed to skip,
+and here is why. Whether it actually skips depends on the environment — the
+Shiny bundle, the PubMed XML cache and the 2017 JMIG cache are all gitignored,
+so a machine that has run the pipeline reaches assertions that CI cannot. The
+gate is built on exactly that asymmetry: it fails on an *unapproved* skip, and
+says nothing when an approved one runs anyway.
+
+So the marker checking a manifest length belongs on the registered count, and
+the observed count is left unchecked and labelled as an observation. Marking
+both would have forced the two to agree, which would either have falsified the
+README or created pressure to delete a legitimate manifest entry to make a
+number match.
+
+### A17.3 Numbers with no producer
+
+A second, smaller instance of the same principle. Several figures justifying the
+proportional-hazards remediation in A16 were computed at a prompt and typed into
+prose:
+
+| metric | value |
+|---|---:|
+| Cox model frame | 1,020 abstracts, 171 events |
+| Global Schoenfeld p, violator removed | 0.5295 |
+| AIC, proportional fit | 2303.6 |
+| AIC, time-varying fit | 2295.4 |
+| Schoenfeld ρ with time, violator | 0.257 |
+| Share of frame at the author ceiling | 48.9% |
+
+A number with no producer cannot be re-derived, so nothing notices when it stops
+being true — and every one of these shifted at the 2026-09-05 refit.
+`scripts/ph_diagnostics_report.R` now computes them into
+`output/cox_ph_support.csv`, reading the model specification back from
+`output/model_variable_screen.csv` rather than restating it, so it cannot drift
+from the model actually fitted. Seven are registered in
+`docs/manuscript_claims.csv` and recomputed by the claims test.
+
+### A17.4 Two files committed without metadata
+
+`scripts/build_docs_metadata.R` refused to run until
+`output/candidate_pool_index.csv` and `output/cox_ph_support.csv` were described
+in `docs/_meta/data_inventory_meta.csv`. The first had been committed by other
+work without an entry. The builder's own guard caught both, which is the
+behaviour that guard was added for.
+
+Regenerating the documentation on a branch also revealed that the builder
+requires every documented file to be present on disk, including the large
+gitignored artefacts (`pubmed_candidates.csv`, the search checkpoints, the 2017
+JMIG cache). It therefore cannot run in a clean checkout — only on a machine
+that has done a full pipeline run. That is a limitation of the builder rather
+than a defect in the metadata, and it is recorded here rather than worked
+around: the caches were linked in temporarily to regenerate, and the links
+removed before committing.
