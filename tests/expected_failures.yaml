@@ -56,3 +56,124 @@ expected_failures:
       Regenerating it means re-running the whole search layer, which would
       change candidate sets and invalidate the human adjudication.
     documented_in: docs/PUBLICATION_SEARCH.md section 8
+
+  # ── Added by the test-generation loop, cycles 11-13 ──────────────────────────
+
+  - file: test-cycle11_authors_and_queue.R
+    test: no author variable piles up at a hard ceiling
+    reason: >
+      n_authors caps at 5 with 532 of 1,106 rows (48.1%) sitting exactly at the
+      cap; author_count caps at 5 with 197 (17.8%). Half the mass on the maximum
+      is the signature of a display cap, not a distribution. authors_truncated
+      confirms the mechanism: the ScienceDirect listing elides long author lists
+      and the parser counts only what is visible.
+    decision_needed: >
+      Recover full author lists at ingestion, model team size as censored, or
+      stop reporting a per-author effect. All three change what the manuscript
+      may claim.
+    documented_in: tests/loop/LEDGER.md cycle 11
+
+  - file: test-cycle11_authors_and_queue.R
+    test: the team-size predictor spans a usable range
+    reason: >
+      Same censoring as above, stated against the reported coefficient.
+      aim3_logistic_regression.csv reports n_authors at OR 1.325 per author,
+      p < 0.001, and the draft abstract calls that a significant team-size
+      effect. The coefficient is estimated over a variable that cannot exceed 5.
+      Unlike the funding term, this one is significant and headline-reported.
+    decision_needed: Same decision as the entry above; both clear together.
+    documented_in: tests/loop/LEDGER.md cycle 11
+
+  - file: test-cycle12_covariate_integrity.R
+    test: every aim3 term maps to a column in the exported dataset
+    reason: >
+      log_sample_size is a reported model term with no column in
+      final_analytical_dataset.csv. It is derived inside 06_analyze_results.R
+      and never written out, so nobody holding the published dataset can
+      reproduce, check or correct the model.
+    decision_needed: >
+      Export the derived term, or drop it from the reported model. Not fixed by
+      the loop because 06_analyze_results.R was mid-edit by another author.
+    documented_in: tests/loop/LEDGER.md cycle 12
+
+  - file: test-cycle12_covariate_integrity.R
+    test: is_us_based agrees with first_author_country
+    reason: >
+      STALENESS TRACKER, not an open question. The root cause was fixed:
+      parse_affiliation() took the last comma token of an affiliation as the
+      country, yielding US states. It now calls parse_country(), and 09c
+      re-derives the column. author_characteristics.csv and
+      abstracts_with_matches.csv are clean; final_analytical_dataset.csv still
+      carries 18 states because 06_analyze_results.R has not re-run.
+    decision_needed: >
+      None. Remove this entry once 06_analyze_results.R runs and the assertion
+      starts passing.
+    documented_in: tests/loop/LEDGER.md cycle 12
+
+  - file: test-cycle12_covariate_integrity.R
+    test: model covariate missingness does not vary sharply by congress year
+    reason: >
+      sample_size missingness ranges from 13.3% (2013) to 92.6% (2018) across
+      congresses. The logistic model deletes rows with any missing covariate and
+      log_sample_size is a term, so 2017 and 2018 are almost entirely absent
+      from the model that estimates the predictors. 2018 also carries the
+      highest reported publication rate.
+    decision_needed: >
+      Improve sample-size extraction for the affected congresses, drop the term,
+      or report the model cohort's year composition as a limitation.
+    documented_in: tests/loop/LEDGER.md cycle 12
+
+  - file: test-cycle13_enrichment_quality.R
+    test: practice_type and career_stage emit only documented values
+    reason: >
+      career_stage emits "faculty_senior" while orcid_career_stage emits
+      "senior_faculty". Two vocabularies for one concept, so any code joining or
+      comparing them treats them as different levels.
+    decision_needed: Pick one spelling and migrate the other.
+    documented_in: tests/loop/LEDGER.md cycle 13
+
+  - file: test-cycle13_enrichment_quality.R
+    test: practice_type reaches the community class its rules describe
+    reason: >
+      STALENESS TRACKER, not an open question. The community branch at
+      utils_affiliation.R:173 is gated on is_us, which was computed from the
+      broken country field, so it never fired. Fixing parse_country() repaired
+      it: author_characteristics.csv now shows community=20 and practice_type
+      coverage rose from 193 to 949 classified rows. final_analytical_dataset.csv
+      is stale until 06_analyze_results.R re-runs.
+    decision_needed: >
+      None. Remove this entry once 06_analyze_results.R runs.
+    documented_in: tests/loop/LEDGER.md cycle 13
+
+  - file: test-cycle13_enrichment_quality.R
+    test: orcid_false_positive is a live flag rather than a constant
+    reason: >
+      orcid_false_positive is FALSE on all 1,102 rows it covers. A flag that
+      never fires gives the same answer as no flag, so the ORCID
+      false-positive check cannot currently distinguish anything.
+    decision_needed: >
+      Establish whether the detector is unreachable or simply never written,
+      then either fix it or remove the column so it does not imply a check that
+      is not happening.
+    documented_in: tests/loop/LEDGER.md cycle 13
+
+  - file: test-cycle13_enrichment_quality.R
+    test: career_stage resolves for a usable share of the cohort
+    reason: >
+      career_stage resolves 15 of 1,106 rows (1.4%) even after the country fix
+      improved every other classifier. subspecialty reaches 53% and ACOG
+      district 88% on the same affiliations, so the input is not the limit.
+    decision_needed: >
+      Improve the classifier or drop the column. At 1.4% its presence implies a
+      coverage it does not have.
+    documented_in: tests/loop/LEDGER.md cycle 13
+
+  - file: test-cycle13_enrichment_quality.R
+    test: no enrichment column is wholly missing or single-valued
+    reason: >
+      orcid_subspecialty is the constant "obstetrics" on every row it covers,
+      and orcid_false_positive is the constant FALSE. Neither carries
+      information, but both appear in the published dataset as if they do.
+    decision_needed: >
+      Fix the two enrichment paths or remove the columns.
+    documented_in: tests/loop/LEDGER.md cycle 13

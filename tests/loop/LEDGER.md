@@ -943,3 +943,73 @@ green on the next full run.
 
 Bundle refreshed again, since `abstracts_with_matches.csv` changed. Their 55
 bundle-currency assertions pass.
+
+## Cycle 13 - 2026-09-04
+
+Mix required: 4 BVA / 3 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle13_enrichment_quality.R` (15 assertions).
+Target: the enrichment layer producing the demographic covariates. Cycle 12
+showed one of them was populated by a wrong rule; this cycle asks whether the
+others are doing anything at all, or are present-but-inert.
+
+| # | Category | Target | Assumption challenged |
+|---|---|---|---|
+| 13.1 | BVA | npi_match_score | non-negative, ordered by its own confidence tier |
+| 13.2 | BVA | cited_by_count | non-negative integral count |
+| 13.3 | BVA | journal_impact_proxy | non-negative and finite |
+| 13.4 | BVA | classifier vocabularies | only documented values, in both artifacts |
+| 13.5 | semantic | npi_number | assigned only at high confidence |
+| 13.6 | semantic | practice_type | reaches every class its rules document |
+| 13.7 | semantic | orcid_false_positive | a live flag, not a constant |
+| 13.8 | adversarial | career_stage | resolves for a usable share |
+| 13.9 | adversarial | enrichment coverage | does not concentrate by congress year |
+| 13.10 | adversarial | enrichment columns | none wholly missing or single-valued |
+
+### The country fix cascaded further than expected
+The `community` branch at `utils_affiliation.R:173` is gated on
+
+```r
+is_us <- is.na(country) || str_detect(tolower(country), "^usa$|united states|...")
+```
+
+With the country field holding `"Arizona."`, `is_us` was FALSE for every US
+affiliation, so the branch never fired and US community hospitals were being
+labelled academic. Fixing `parse_country()` in the previous step repaired it,
+and the effect on the shipped classifiers is large:
+
+    practice_type   193 -> 949 rows classified   community 0 -> 20
+                    NA 82.5% -> 14.2%
+    acog_district   missing 82.2% -> 11.9%
+    subspecialty    missing 83.8% -> 46.7%
+
+`is_academic` is a model covariate. The draft abstract reports practice type as
+a non-significant predictor; that was estimated on 17% coverage and there is now
+86%. The claim needs re-estimating rather than restating.
+
+### Findings registered on the manifest
+`tests/expected_failures.yaml` was clean this cycle, so the backlog from cycles
+11-13 was registered properly: ten entries, each with a reason and the decision
+it waits on. Two are explicitly labelled STALENESS TRACKERS rather than open
+questions (12.5 and 13.6), because the fix is already in and only
+`06_analyze_results.R` has yet to re-run. They go red when they start passing,
+which is exactly what the manifest's own rule intends.
+
+New findings this cycle:
+
+- **13.4** `career_stage` emits `faculty_senior` while `orcid_career_stage`
+  emits `senior_faculty`. Two vocabularies for one concept.
+- **13.7 / 13.10** `orcid_false_positive` is FALSE on all 1,102 rows it covers,
+  and `orcid_subspecialty` is the constant `"obstetrics"`. Neither carries
+  information, but both ship as though they do.
+- **13.8** `career_stage` resolves 15 of 1,106 rows (1.4%) even after the
+  country fix lifted every other classifier. The input is not the limit.
+
+### Test defects of my own
+13.4 originally read only the analytical dataset, which is stale, so the
+vocabulary drift was invisible. Extended to check `author_characteristics.csv`
+as well, after which it caught it. Also collapsed two more `expect_*` plus
+`fail()` pairs that double-reported; that pattern has now appeared in four
+cycles and is worth avoiding by default.
+
+**Result:** 10/15 assertions passed. Five failures are the findings above.
+**Gate: green — 13 failures, all on the manifest.**
