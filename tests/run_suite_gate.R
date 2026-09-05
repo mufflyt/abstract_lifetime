@@ -133,17 +133,9 @@ if (rule_orphaned && length(orphaned) > 0) {
 # Every skip is printed with the reason recorded for it, so an intentional
 # skip is visible as a gap rather than blending into the pass count.
 if (length(scls$skipped_keys) > 0) {
-  reasons <- setNames(
-    vapply(skip_manifest, function(e) e$reason %||% "", character(1)),
-    key(vapply(skip_manifest, `[[`, character(1), "file"),
-        vapply(skip_manifest, `[[`, character(1), "test")))
   cat("\n--- skipped: these assert nothing in this environment ---\n")
-  for (k in sort(scls$skipped_keys)) {
-    r <- reasons[[k]]
-    cat(sprintf("  %s%s\n", k,
-                if (is.null(r) || !nzchar(r)) "  [NOT APPROVED]" else
-                  paste0("\n      reason: ", trimws(gsub("\\s+", " ", r)))))
-  }
+  cat(gate_skip_report(scls$skipped_keys, skip_manifest), sep = "\n")
+  cat("\n")
 }
 
 if (rule_unapproved_skip && length(scls$unapproved) > 0) {
