@@ -9,6 +9,6 @@ n_candidates,numeric,94.6,56.627,wilcoxon,0.2218,definitional - unresolved are t
 gender_unified,categorical,NA,NA,chi-square,0.3284,substantive
 is_multicenter,numeric,0.036,0.06,wilcoxon,0.4691,substantive
 has_funding,numeric,0,0.007,wilcoxon,0.545,substantive
-is_academic,numeric,0.327,0.336,wilcoxon,0.8955,substantive
+is_academic,numeric,0.667,0.635,wilcoxon,0.6362,substantive
 abstract_word_count,numeric,179.073,178.657,wilcoxon,0.92490000000000006,substantive
-is_us_based,numeric,0.818,0.82,wilcoxon,0.9704,substantive
+is_us_based,numeric,0.574,0.576,wilcoxon,0.9767,substantive

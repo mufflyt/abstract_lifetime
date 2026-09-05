@@ -1,7 +1,9 @@
 subgroup,n,published,rate
 Non-RCT,955,139,14.6
 RCT,96,31,32.3
-Non-Academic,698,118,16.9
-Academic,353,52,14.7
-International,189,22,11.6
-US-based,862,148,17.2
+Non-Academic,379,53,14
+Academic,659,117,17.8
+NA,13,0,0
+International,440,86,19.5
+US-based,598,84,14
+NA,13,0,0

@@ -81,6 +81,39 @@ for (col in c("affiliation_raw", "abstract_full_text", "abstract_design",
 # MIN_USABLE_CHARS, or matching a leading-footnote pattern, is page furniture.
 MIN_USABLE_CHARS <- 100L
 
+# Institutional affiliation patterns, applied to the AFFILIATION string, not to
+# abstract body text. The previous definitions read the abstract body, where
+# words like "residency", "fellowship" and "tertiary center" describe the study
+# rather than the author's institution. Validated against real affiliations the
+# body-text proxy agreed 54% of the time for academic status and 53% for US
+# location, understating academic affiliation by half and overstating US
+# location by 24 percentage points. PI decision, 2026-09-05; see appendix A21.
+ACADEMIC_AFFILIATION_RE <- paste0(
+  "universit|medical school|school of medicine|college of medicine|",
+  "teaching hospital|academic medical|\\bmayo clinic\\b|cleveland clinic|",
+  "institute of technology|hospital universit|centre hospitalier universitaire|",
+  "\\bnhs\\b|karolinska|charit\u00e9"
+)
+
+# A US affiliation names a US state or the country. Non-US countries are tested
+# first because "Ontario, California" and "Ontario, Canada" both contain a US
+# state name, and international affiliations routinely name a city that
+# collides with one.
+NON_US_COUNTRY_RE <- paste0(
+  "\\b(canada|united kingdom|england|scotland|wales|ireland|china|japan|india|",
+  "australia|new zealand|brazil|mexico|argentina|chile|colombia|france|germany|",
+  "italy|spain|portugal|netherlands|belgium|switzerland|austria|sweden|norway|",
+  "denmark|finland|poland|czech|greece|turkey|israel|egypt|nigeria|south africa|",
+  "saudi|emirates|qatar|kuwait|lebanon|jordan|iran|pakistan|bangladesh|",
+  "singapore|malaysia|thailand|vietnam|indonesia|philippines|korea|taiwan|",
+  "hong kong|russia|ukraine|romania|hungary|peru|ecuador|uruguay)\\b"
+)
+US_AFFILIATION_RE <- paste0(
+  "\\b(", paste(c(tolower(state.name), tolower(state.abb),
+                 "united states", "usa", "u\\.s\\.a", "u\\.s\\."),
+               collapse = "|"), ")\\b"
+)
+
 degenerate <- !is.na(abstracts$abstract_text) &
   (nchar(abstracts$abstract_text) < MIN_USABLE_CHARS |
      str_detect(abstracts$abstract_text, "^\\s*\\*\\s*:"))
@@ -100,6 +133,20 @@ before <- abstracts |>
                    ~ sum(.x, na.rm = TRUE)))
 
 # --- Identical rules to R/02_clean_abstracts.R, over the current text ---------
+
+# Abstract-level affiliations, produced by scripts/backfill_affiliations_from_cache.R.
+# One row per abstract, the union of institution strings in the source record.
+AFF_PATH <- here("data", "processed", "abstract_affiliations.csv")
+if (file.exists(AFF_PATH)) {
+  aff_tbl <- read_csv(AFF_PATH, show_col_types = FALSE) |>
+    select(abstract_id, .aff_text = affiliations, .n_aff = n_affiliations) |>
+    distinct(abstract_id, .keep_all = TRUE)
+} else {
+  cli_alert_warning("No abstract_affiliations.csv; affiliation covariates will be NA")
+  aff_tbl <- tibble(abstract_id = character(0), .aff_text = character(0),
+                    .n_aff = integer(0))
+}
+abstracts <- abstracts |> left_join(aff_tbl, by = "abstract_id")
 
 abstracts <- abstracts |>
   mutate(
@@ -130,25 +177,26 @@ abstracts <- abstracts |>
       NA_real_
     }),
 
-    is_academic = str_detect(
-      tolower(coalesce(affiliation_raw, "")),
-      "university|medical school|academic|teaching hospital|school of medicine"
-    ) | str_detect(
-      tolower(coalesce(.search_text, "")),
-      "\\buniversity\\b|\\bacademic\\b|teaching hospital|school of medicine|tertiary.*center|residency|fellowship"
+    # Derived from the author affiliation, never from abstract body text.
+    # NA where no affiliation is on file: absence of evidence is not evidence
+    # of a non-academic, non-US institution, and coding it FALSE filled the
+    # comparison group with unknowns.
+    is_academic = if_else(
+      !is.na(.aff_text) & nzchar(.aff_text),
+      str_detect(tolower(.aff_text), ACADEMIC_AFFILIATION_RE),
+      NA
     ),
 
-    is_us_based = str_detect(
-      tolower(paste(coalesce(affiliation_raw, ""), coalesce(.search_text, ""))),
-      paste0("\\b(", paste(c(
-        tolower(state.name), tolower(state.abb), "united states", "usa",
-        "new york", "los angeles", "chicago", "houston", "boston",
-        "philadelphia", "san francisco", "seattle", "pittsburgh",
-        "cleveland clinic", "mayo clinic", "johns hopkins",
-        "columbia university", "stanford", "harvard", "yale",
-        "duke", "emory", "vanderbilt", "cedars-sinai"
-      ), collapse = "|"), ")\\b")
-    )
+    is_us_based = if_else(
+      !is.na(.aff_text) & nzchar(.aff_text),
+      str_detect(tolower(.aff_text), US_AFFILIATION_RE) &
+        !str_detect(tolower(.aff_text), NON_US_COUNTRY_RE),
+      NA
+    ),
+
+    # Distinct institutions named in the record. The previous multicenter flag
+    # was derived from abstract text; this counts what the source lists.
+    n_affiliations = .n_aff
   )
 
 abstracts <- abstracts |>
@@ -240,7 +288,8 @@ abstracts <- abstracts |>
     ),
     result_positivity = vapply(.positivity_text, classify_result_positivity, character(1))
   ) |>
-  select(-.search_text, -.lc, -.positivity_text)
+  select(-.search_text, -.lc, -.positivity_text,
+         -any_of(c(".aff_text", ".n_aff")))
 
 # --- Report the movement, by congress year -----------------------------------
 

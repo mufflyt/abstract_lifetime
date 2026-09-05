@@ -2322,3 +2322,102 @@ more appear, something is writing superseded decisions again.
 Whether the three stale AUTO prefills should be regenerated or deleted is not
 decided here. They do not change any number today, because the classification
 they contradict is what the analysis uses.
+
+## A21. Deriving Affiliation Covariates From Affiliations
+
+**PI decision, 2026-09-05.** `is_academic` and `is_us_based` are now derived
+from the author affiliation rather than from abstract body text. The
+publication rate does not change. One reported finding disappears.
+
+### A21.1 What they were measuring
+
+Neither variable had ever read an affiliation. `affiliation_raw` was empty for
+all 1,106 abstracts because of the parser defect in A20, so the affiliation
+branch of each rule never fired and both fell through to abstract body text.
+The academic pattern included `residency`, `fellowship` and `tertiary.*center`,
+which describe a study rather than an author's institution. The US pattern
+matched any state name anywhere in the abstract.
+
+Validated against real affiliations:
+
+| | body text | affiliation | agreement |
+|---|---:|---:|---:|
+| academic | 33.5% | 63.6% | 54.1% |
+| US-based | 82.1% | 57.6% | 52.7% |
+
+Both proxies agree with the construct they claim to measure at close to chance.
+The academic proxy understated academic affiliation by half; the US proxy
+overstated US location by 24 percentage points.
+
+### A21.2 Abstract-level extraction
+
+The per-author affiliation table reaches 55% of the cohort, because linking an
+author to an institution needs a `refid` that the 2017-2018 ScienceDirect
+format does not emit. Abstract-level covariates do not need that link: "is any
+author at an academic institution" and "how many institutions appear" are
+properties of the record. `scripts/backfill_affiliations_from_cache.R` now also
+writes `data/processed/abstract_affiliations.csv`, the union of institution
+strings per abstract, reaching **1,092 of 1,106 (98.7%)**, including 2017 and
+2018 at 100%.
+
+Where no affiliation is on file the covariates are `NA`, not `FALSE`. Coding
+absence as a negative was what filled the comparison group with unknowns and
+produced the era gradient that made an earlier attempt at this change
+unusable.
+
+### A21.3 The result
+
+Both are now stable across congress years, which the text proxies were not:
+academic ranges 55.8% to 75.6% and US-based 50.0% to 64.4%, with no cliff at
+the 2017-2018 boundary where the text ran out.
+
+| Cox term | before | after | p before | p after |
+|---|---:|---:|---:|---:|
+| `is_rct` | 2.172 | 2.002 | <0.001 | 0.001 |
+| **`is_academic`** | **0.649** | **1.097** | **0.013** | **0.587** |
+| `is_us_based` | 1.354 | 0.787 | 0.205 | 0.136 |
+| `n_authors` | 1.252 | 1.218 | 0.002 | 0.006 |
+| `gender_unified` | 0.780 | 0.746 | 0.114 | 0.066 |
+| `is_multicenter` | 1.402 | 1.361 | 0.219 | 0.265 |
+
+**The academic finding does not survive measurement.** It reverses direction
+and becomes null, and its bootstrap retention falls from 47.4% to 5.6%, the
+lowest of any term. Reported for three refits as "academic affiliation is
+associated with slower publication", it was an artefact of a proxy that agreed
+with the construct 54% of the time. It should be reported as no evidence of an
+association.
+
+`is_rct` and `n_authors` survive, at 93.2% and 88.6% bootstrap retention. They
+were never affiliation-derived and they do not move.
+
+### A21.4 A second proportional-hazards violator
+
+The global Schoenfeld test moves from p = 0.043 to **p = 0.010**, and the
+violation is no longer confined to one term: `is_us_based` now violates at
+p = 0.005 alongside `n_authors` at p = 0.003.
+
+The remediation handled this without modification, which is what the generic
+implementation was written for. It reads the violating set from `cox.zph` and
+chooses by type: `n_authors` is numeric and takes a log-time interaction,
+`is_us_based` is logical and moves into `strata()`. Stratifying on both
+restores the global test to p = 0.607.
+
+The diagnostics script did need fixing. It assumed a single numeric violator
+and took `violators[1]`, which with two violators selected the categorical one
+and silently produced no AIC or ceiling metrics at all. It now selects the
+first numeric violator for those metrics, reports how many terms violate, and
+computes the "without violator" refit by dropping every violating term rather
+than one.
+
+### A21.5 What was audited and deliberately not changed
+
+`n_affiliations` is now recorded from the source: mean 2.37 institutions per
+abstract, 679 abstracts naming more than one.
+
+`is_multicenter` is unchanged at 65 abstracts, and the gap is deliberate. More
+than one affiliation on a paper is not the same as a multicentre study: a
+single-centre study routinely lists authors from several institutions, and a
+collaborator's home department is not a study site. Redefining
+`is_multicenter` as `n_affiliations > 1` would take it from 65 to 679 and
+change what the variable means, which is a decision about the estimand rather
+than a measurement repair. It is left as text-derived and flagged.

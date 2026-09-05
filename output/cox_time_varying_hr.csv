@@ -1,7 +1,7 @@
 term,months,hazard_ratio,conf_low,conf_high
-n_authors,3,1.004,0.835,1.209
-n_authors,6,1.15,0.994,1.33
-n_authors,12,1.316,1.134,1.528
-n_authors,24,1.507,1.24,1.83
-n_authors,36,1.631,1.294,2.056
-n_authors,48,1.725,1.33,2.238
+n_authors,3,0.982,0.816,1.183
+n_authors,6,1.121,0.968,1.298
+n_authors,12,1.279,1.1,1.487
+n_authors,24,1.46,1.201,1.775
+n_authors,36,1.577,1.25,1.989
+n_authors,48,1.666,1.284,2.161
