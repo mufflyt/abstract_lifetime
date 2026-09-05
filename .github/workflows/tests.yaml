@@ -51,6 +51,8 @@ jobs:
         with:
           extra-packages: |
             any::testthat
+            any::jsonlite
+            any::renv
             any::here
             any::config
             any::dplyr
