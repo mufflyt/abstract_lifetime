@@ -2421,3 +2421,64 @@ collaborator's home department is not a study site. Redefining
 `is_multicenter` as `n_affiliations > 1` would take it from 65 to 679 and
 change what the variable means, which is a decision about the estimand rather
 than a measurement repair. It is left as text-derived and flagged.
+
+## A22. `is_multicenter` Stays a Text Claim
+
+**PI decision, 2026-09-05: leave `is_multicenter` as it is.** No code changed;
+this records why, so the question is not reopened by the next person who
+notices the gap.
+
+### A22.1 The gap that prompted the question
+
+A21 recovered author affiliations for 98.7% of the cohort, which made a
+competing definition available for the first time. The two disagree in size:
+
+| measure | n |
+|---|---:|
+| `is_multicenter` (abstract says so) | 65 |
+| more than one affiliation named | 679 |
+| both | 58 |
+| says multicentre, one affiliation | 7 |
+
+Fifty-eight of the 65 also name several institutions, so the measures agree
+wherever the text is explicit. The 621 that name several institutions without
+using the word are where they part.
+
+### A22.2 Why the larger number is not the better one
+
+They measure different things. `is_multicenter` is a claim about **study
+design**: the work was conducted at more than one site. Affiliation count is a
+fact about **authorship**: the people on the paper work at more than one
+institution. A single-centre study with a statistician from another university
+satisfies the second and not the first, and that arrangement is routine.
+
+Redefining the variable would take it from 65 to 679 and convert it from a
+design measure into a collaboration-breadth measure while keeping the name.
+That is a change to what is being estimated, not a repair of how it is
+measured, and it is the opposite of what A21 did: A21 kept the construct and
+fixed the instrument.
+
+### A22.3 What the decision costs, stated plainly
+
+The retained definition reads the abstract body, which is the same class of
+instrument that produced the `is_academic` artefact. Two consequences follow
+and both are limitations of the study rather than defects to be fixed:
+
+* It **under-counts**. A two-site study that never writes "multicentre" is
+  recorded FALSE. There is no way to know how many, because the design is not
+  stated in a structured field anywhere in the source.
+* It is **unavailable where the text is**. 2017 and 2018 have no recoverable
+  abstract text, so their abstracts cannot express the claim and are FALSE by
+  absence, exactly the pattern A21 removed from `is_academic`.
+
+The second is the more serious and is not remedied here. The variable is not
+significant in either model (HR 1.361, p = 0.265), so no reported conclusion
+rests on it; if one ever did, this limitation would need addressing first.
+
+### A22.4 What was not adopted
+
+`n_affiliations` is computed in `data/processed/abstracts_cleaned.csv` and is
+**not** carried into the analytical dataset, which remains 93 columns. Under
+this decision nothing needs it. It is retained at that stage as the evidence
+behind the table above, and propagating it would be a schema change to serve a
+definition that was not adopted.

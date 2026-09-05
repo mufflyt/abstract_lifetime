@@ -26,6 +26,12 @@ checks the lockfile against a source scan instead.
 Data validation uses [pointblank](https://github.com/posit-dev/pointblank)
 (Iannone & Vanderkam) rather than a hand-rolled validator; see
 `config/data_contract.yml` and `R/utils_data_contract.R`.
+`Rscript scripts/check_data_contract.R` writes an interrogation report to
+`output/data_contract_reports/`, naming the rows that failed rather than only
+how many. That directory is deliberately **not** listed in
+`docs/_meta/data_inventory_meta.csv`: the metadata builder's path scan does not
+reach it, so documenting it made the builder fail on any machine that had not
+run the check.
 
 The matching methodology's closest published relative is the IntoValue
 programme ([intovalue-data](https://github.com/maia-sh/intovalue-data),
