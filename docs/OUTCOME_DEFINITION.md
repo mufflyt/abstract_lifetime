@@ -40,15 +40,32 @@ abstract submission deadline, which is not recorded anywhere in the repository.
 The technical appendix (A13.6) argues that a paper appearing within about six
 months of the meeting was plausibly still in press at submission and belongs in
 the numerator; that argument has not been adopted, and the six-month boundary is
-an assumption, not a validated cutpoint.
+an assumption, not a validated cutpoint. It also plays no part in the current
+behaviour: the four abstracts that survive the exclusion are separated from the
+other 35 purely by reviewer verdict, and their intervals overlap the excluded
+ones, so no cutpoint reproduces the split. Whether a reviewer `match` should
+override a pre-congress exclusion remains an open decision.
 
 **Does online-ahead-of-print count?**
-Yes, but it is dated to the print issue. The pipeline reads
-`JournalIssue/PubDate` and ignores `ArticleDate`, so an OAP paper's
-`months_to_pub` is measured to its later print month. This lengthens time to
-publication and, for a paper whose OAP date precedes the congress but whose
-print date follows it, changes nothing; for the reverse case it misdates two
-known post-congress papers into the pre-congress window (appendix A13.6).
+Yes, but it is dated to the print issue. **PI decision, 2026-09-05: the print
+issue date is the publication date.** The pipeline reads
+`JournalIssue/PubDate` and ignores `ArticleDate`, which is now the intended
+behaviour rather than an undocumented one, and issue dates given only to the
+month resolve to the first of that month. An OAP paper's `months_to_pub` is
+therefore measured to its later print month, which lengthens time to
+publication.
+
+The same date decides whether a publication preceded its congress. That was
+previously ambiguous in a way that mattered: `output/excluded_pre_congress_publications.csv`
+was built from `ArticleDate` while the analysis measured from
+`JournalIssue/PubDate`, so the two disagreed by 1.5 to 4.9 months on the four
+contested abstracts. Under the decided rule the analysis is already correct and
+**that file is on the wrong basis and needs regenerating**; it is evidence, not
+an input to any number, so nothing downstream is wrong today. See appendix A18.
+
+`tests/testthat/test-publication_date_basis.R` pins the decision: it fails if
+the parser starts preferring `ArticleDate`, and it fails if any interval in the
+analytical dataset can only be reproduced from an electronic date.
 
 **Must the abstract and the paper share authors?**
 Not as a requirement. Author agreement is scored (components 3–6, up to 6 of a

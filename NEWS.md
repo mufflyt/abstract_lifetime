@@ -1,5 +1,32 @@
 # NEWS
 
+## 2026-09-05 - which date counts
+
+PubMed gives an article two dates: the electronic release and the print issue.
+For a journal that publishes online ahead of print they can be months apart. The
+study had been using both at once. Every interval in the analysis was measured
+to the print issue, while the file identifying papers that predated their
+congress had been built from the electronic date. Neither was wrong on its own
+terms; nothing had recorded which question the study was asking.
+
+It mattered most where it was hardest to see. For one contested abstract the
+electronic date puts the paper five months before the congress and the print
+issue puts it six days before, which is the difference between a pre-existing
+paper and one that appeared essentially at the meeting.
+
+The PI has decided: the print issue date is the publication date. Because the
+analysis already worked that way, no reported number moves. What changes is that
+the Methods now say so, and a test enforces it. The sharpest part of that test
+uses the disagreement itself: the two bases give answers 1.5 to 4.9 months apart
+for the four contested abstracts, so a recorded interval identifies which basis
+produced it.
+
+Two things are deliberately still open. The exclusion file is on the electronic
+basis and needs regenerating, and until it is, whether the remaining question
+concerns four abstracts or seven is unknown. And whether a reviewer's `match`
+should override a pre-congress exclusion, which is what moves the numerator
+between 178 and 174, is a separate decision that has not been taken.
+
 ## 2026-09-05 (later) - the registry's last two copies
 
 The test-governance work earlier today removed the hand-written table of

@@ -2069,3 +2069,72 @@ that has done a full pipeline run. That is a limitation of the builder rather
 than a defect in the metadata, and it is recorded here rather than worked
 around: the caches were linked in temporarily to regenerate, and the links
 removed before committing.
+
+## A18. The Publication Date Is the Print Issue Date
+
+**PI decision, 2026-09-05.** Recorded here because the study had been using two
+different definitions at once without anyone having chosen between them.
+
+### A18.1 The ambiguity
+
+PubMed carries at least two dates for an article. `ArticleDate` is the
+electronic release; `JournalIssue/PubDate` is the print issue. For journals that
+publish online ahead of print they differ by months.
+
+`R/utils_pubmed.R` reads `JournalIssue/PubDate` and defaults an absent day to
+the first of the month, so every interval in the analysis is measured to the
+print issue. `output/excluded_pre_congress_publications.csv`, the file that
+identifies publications predating their congress, was built from `ArticleDate`.
+Both were internally consistent and neither was wrong; they simply answered
+different questions, and nothing recorded which question the study was asking.
+
+On the four abstracts whose pre-congress status is contested, the two bases
+disagree by 1.5 to 4.9 months:
+
+| abstract | electronic date | months before | print issue | months before |
+|---|---|---:|---|---:|
+| AAGL2021_002 | 2021-05-13 | 6.1 | 2021-07-01 | 4.5 |
+| AAGL2021_049 | 2021-06-12 | 5.1 | 2021-10-01 | 1.4 |
+| AAGL2023_042 | 2023-04-23 | 6.5 | 2023-08-01 | 3.2 |
+| AAGL2023_048 | 2023-06-04 | 5.1 | 2023-11-01 | 0.2 |
+
+Both dates were read from the cached PubMed records themselves
+(`data/cache/pubmed_xml/<pmid>.xml`), not from a derived file, so the
+discrepancy is verified at source. For `AAGL2023_048` the choice is between
+"five months before the congress" and "six days before".
+
+### A18.2 What the decision settles, and what it does not
+
+It settles the date basis: the print issue date is the publication date,
+throughout, for the time-to-publication interval and for whether a paper
+preceded its congress. Articles released online ahead of print are dated to
+their print issue. Month-only issue dates resolve to the first of the month.
+
+Because the analysis already used that basis, **no number changes.** The
+publication rate, the median time to publication and every model are unaffected.
+
+It does **not** settle whether a reviewer's `match` should override a
+pre-congress exclusion. That is the separate question of branch order in
+`assign_final_published()`, it is what moves the numerator between 178 and 174,
+and it remains open.
+
+### A18.3 What still needs doing
+
+`output/excluded_pre_congress_publications.csv` is on the electronic basis and
+is therefore inconsistent with the decision. It is evidence rather than an input
+to any reported figure, so nothing downstream is wrong today, but it should be
+regenerated before the branch-order question is settled, because the two bases
+identify different sets. Measured on issue dates, three abstracts carry negative
+intervals and are absent from that file, while some of its 39 entries would no
+longer qualify. Whether the open question concerns four abstracts or seven
+depends on that regeneration.
+
+### A18.4 The guard
+
+`tests/testthat/test-publication_date_basis.R` prevents the ambiguity returning.
+It fails if the parser stops reading `JournalIssue/PubDate` or starts assigning
+the date from `ArticleDate`, if the month-only default changes, if the Methods
+stop defining which date is meant, and if any of the four contested intervals
+stops matching the issue-date arithmetic. That last check is the sharpest: the
+two bases give answers 1.5 to 4.9 months apart for those abstracts, so the
+recorded interval identifies its own provenance.
