@@ -6,8 +6,8 @@ output: word_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 library(readr); library(here)
-fail_n <- tryCatch(length(yaml::read_yaml(here("tests","expected_failures.yaml"))$expected_failures), error = function(e) NA)
-skip_n <- tryCatch(length(yaml::read_yaml(here("tests","expected_skips.yaml"))$expected_skips), error = function(e) NA)
+fail_n <- tryCatch(length(yaml::yaml.load_file(here("tests","expected_failures.yaml"))$expected_failures), error = function(e) NA)
+skip_n <- tryCatch(length(yaml::yaml.load_file(here("tests","expected_skips.yaml"))$expected_skips), error = function(e) NA)
 ```
 
 ## Abstract

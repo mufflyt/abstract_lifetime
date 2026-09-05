@@ -35,7 +35,7 @@ marked_count <- function(txt, name) {
 DOCS <- c("README.md", "docs/VALIDATION.md")
 
 test_that("every stated manifest count matches tests/expected_failures.yaml", {
-  n <- length(yaml::read_yaml(file.path(repo_root, "tests", "expected_failures.yaml"))$expected_failures)
+  n <- length(yaml::yaml.load_file(file.path(repo_root, "tests", "expected_failures.yaml"))$expected_failures)
   found_any <- FALSE
   for (d in DOCS) {
     txt <- read_text(d)
@@ -55,7 +55,7 @@ test_that("every stated manifest count matches tests/expected_failures.yaml", {
 test_that("every stated skip count matches tests/expected_skips.yaml", {
   p <- file.path(repo_root, "tests", "expected_skips.yaml")
   skip_if_not(file.exists(p), "no skip manifest")
-  n <- length(yaml::read_yaml(p)$expected_skips)
+  n <- length(yaml::yaml.load_file(p)$expected_skips)
   for (d in DOCS) {
     txt <- read_text(d)
     if (is.na(txt)) next
@@ -93,7 +93,7 @@ test_that("no document reintroduces a hand-maintained table of manifest entries"
 test_that("the generated registry is current with the manifest", {
   doc <- read_text("docs/DECISIONS_PENDING.md")
   skip_if(is.na(doc), "docs/DECISIONS_PENDING.md absent")
-  n <- length(yaml::read_yaml(file.path(repo_root, "tests", "expected_failures.yaml"))$expected_failures)
+  n <- length(yaml::yaml.load_file(file.path(repo_root, "tests", "expected_failures.yaml"))$expected_failures)
 
   # One "### " heading per registered decision.
   headings <- grep("^### ", strsplit(doc, "\n")[[1]], value = TRUE)

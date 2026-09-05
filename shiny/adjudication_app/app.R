@@ -34,7 +34,7 @@ get_sheet_id <- function() {
   if (nchar(id) == 0) {
     cfg_path <- app_path("config.yml")
     if (file.exists(cfg_path)) {
-      cfg <- yaml::read_yaml(cfg_path)
+      cfg <- yaml::yaml.load_file(cfg_path)
       id <- cfg$default$google_sheet_id %||% ""
     }
   }

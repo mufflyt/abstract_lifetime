@@ -27,7 +27,7 @@ unwrap <- function(x) {
 }
 
 build_decisions_markdown <- function(manifest_path = here::here("tests", "expected_failures.yaml")) {
-  m <- yaml::read_yaml(manifest_path)
+  m <- yaml::yaml.load_file(manifest_path)
   entries <- m$expected_failures
 
   # Group by the file the test lives in. The cycles were thematic, so the file

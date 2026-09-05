@@ -22,7 +22,7 @@ report_script <- file.path(repo_root, "scripts", "estimand_drift_report.R")
 
 test_that("the estimand baseline exists and describes a complete estimand", {
   expect_true(file.exists(baseline_path))
-  b <- read_yaml(baseline_path)
+  b <- yaml::yaml.load_file(baseline_path)
 
   # PICO-ish: population, denominator rule, outcome, time. Dropping any one of
   # these makes the recorded estimand ambiguous.
@@ -73,7 +73,7 @@ test_that("the drift report actually detects a changed estimand", {
   # estimand, so the baseline is perturbed in a temp copy and the report must
   # notice. Without this the test above would pass on a broken checker forever.
   skip_if_not(file.exists(baseline_path))
-  b <- read_yaml(baseline_path)
+  b <- yaml::yaml.load_file(baseline_path)
   expect_true(!is.null(b$denominator$excludes_unresolved))
 
   perturbed <- b

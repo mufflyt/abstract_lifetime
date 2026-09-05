@@ -60,8 +60,8 @@ test_that("no governance artefact is missing or empty", {
 # ============================================================
 test_that("the manifests obey the ceilings the contract sets for them", {
   need(P_CI, P_FAIL)
-  ct <- yaml::read_yaml(P_CI)
-  fails <- yaml::read_yaml(P_FAIL)$expected_failures
+  ct <- yaml::yaml.load_file(P_CI)
+  fails <- yaml::yaml.load_file(P_FAIL)$expected_failures
   cap <- ct$manifest$max_entries
   skip_if(is.null(cap), "no ceiling declared")
   expect_lte(length(fails), cap,
@@ -100,8 +100,8 @@ test_that("the estimand drift report holds usable values", {
 # ============================================================
 test_that("no test is both expected to fail and approved to skip", {
   need(P_FAIL, P_SKIP)
-  f <- yaml::read_yaml(P_FAIL)$expected_failures
-  s <- yaml::read_yaml(P_SKIP)$expected_skips
+  f <- yaml::yaml.load_file(P_FAIL)$expected_failures
+  s <- yaml::yaml.load_file(P_SKIP)$expected_skips
   key <- function(e) paste(e$file, e$test, sep = " :: ")
   fk <- vapply(f, key, character(1))
   sk <- vapply(s, key, character(1))
@@ -119,7 +119,7 @@ test_that("no test is both expected to fail and approved to skip", {
 # ============================================================
 test_that("every column the data contract governs exists in the dataset it names", {
   need(P_DC)
-  dc <- yaml::read_yaml(P_DC)
+  dc <- yaml::yaml.load_file(P_DC)
   skip_if(is.null(dc$datasets), "the contract declares no datasets")
 
   problems <- character(0)
@@ -174,7 +174,7 @@ test_that("every manuscript claim names a source file that is present", {
 test_that("the estimand snapshot's cohort size is the cohort actually shipped", {
   need(P_FINAL, P_EC)
   f <- readr::read_csv(P_FINAL, show_col_types = FALSE)
-  ec <- yaml::read_yaml(P_EC)
+  ec <- yaml::yaml.load_file(P_EC)
 
   # My first version grepped every cohort-sized number in the snapshot and
   # complained about 1051. That is not a disagreement: 1,051 is the
@@ -221,7 +221,7 @@ test_that("the estimand snapshot's cohort size is the cohort actually shipped", 
 # ============================================================
 test_that("the estimand baseline and the current snapshot are comparable", {
   need(P_EB, P_EC)
-  b <- yaml::read_yaml(P_EB); c_ <- yaml::read_yaml(P_EC)
+  b <- yaml::yaml.load_file(P_EB); c_ <- yaml::yaml.load_file(P_EC)
   # A drift report is meaningless if the two documents no longer describe the
   # same fields: sections present in one and not the other are silently not
   # compared, which is drift that hides drift.
@@ -280,7 +280,7 @@ test_that("both manifests reference tests that exist in the suite", {
   problems <- character(0)
   for (nm in c("expected_failures", "expected_skips")) {
     p <- if (nm == "expected_failures") P_FAIL else P_SKIP
-    es <- yaml::read_yaml(p)[[nm]]
+    es <- yaml::yaml.load_file(p)[[nm]]
     if (is.null(es)) next
     k <- vapply(es, function(e) paste(e$file, e$test, sep = " :: "), character(1))
     # The gate already fails on an orphaned expected-failure entry, but the skip

@@ -67,7 +67,7 @@ test_that("the skip manifest exists and every entry is fully documented", {
   p <- here::here("tests", "expected_skips.yaml")
   expect_true(file.exists(p))
   skip_if_not(file.exists(p), "manifest absent")
-  m <- yaml::read_yaml(p)$expected_skips
+  m <- yaml::yaml.load_file(p)$expected_skips
   expect_true(length(m) > 0)
   # A bare test name would turn the manifest into a list of excuses. Every
   # entry has to say why it cannot run and what would make it run.
@@ -88,7 +88,7 @@ test_that("the skip manifest exists and every entry is fully documented", {
 test_that("every skip manifest entry names a test file that exists", {
   p <- here::here("tests", "expected_skips.yaml")
   skip_if_not(file.exists(p), "manifest absent")
-  m <- yaml::read_yaml(p)$expected_skips
+  m <- yaml::yaml.load_file(p)$expected_skips
   missing <- unique(vapply(m, `[[`, character(1), "file"))
   missing <- missing[!file.exists(file.path(here::here("tests", "testthat"), missing))]
   expect_true(length(missing) == 0,
