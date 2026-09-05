@@ -127,15 +127,16 @@ test_that("sensitivity scenarios state which population they divide by", {
 # --- F2: the candidate pool must cover what was scored -----------------------
 
 test_that("F2: every winning PMID resolves in the candidate pool", {
-  sc_path   <- here::here("data", "processed", "match_scores.csv")
-  cand_path <- here::here("data", "processed", "pubmed_candidates.csv")
+  sc_path <- here::here("data", "processed", "match_scores.csv")
   skip_if_no_file(sc_path)
-  skip_if_no_file(cand_path)
+  # Reads the 130 MB pool when it is present, and output/candidate_pool_index.csv
+  # otherwise. This invariant is one of the pipeline's central ones and had never
+  # run in CI, because the only artefact it could read was gitignored.
+  cand <- candidate_pool()
+  skip_if(is.null(cand), "neither the candidate pool nor its committed index is available")
 
   sc <- read_csv(sc_path, show_col_types = FALSE) |>
     mutate(best_pmid = as.character(best_pmid))
-  cand <- read_csv(cand_path, show_col_types = FALSE,
-                   col_types = cols(.default = col_character()))
 
   unresolvable <- sc |>
     filter(!is.na(best_pmid)) |>

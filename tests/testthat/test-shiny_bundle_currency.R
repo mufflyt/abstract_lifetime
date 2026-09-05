@@ -21,12 +21,6 @@ suppressPackageStartupMessages({
 BUNDLE <- here("shiny", "adjudication_app", "bundle")
 
 bundle_path <- function(...) file.path(BUNDLE, ...)
-need_bundle <- function(...) {
-  p <- bundle_path(...)
-  skip_if_not(file.exists(p), paste("bundle file absent (gitignored):", p))
-  p
-}
-
 # ── Bundle manifest: what lets this file run in CI ───────────────────────────
 #
 # bundle/ is gitignored, so every assertion that read it directly used to SKIP
@@ -245,12 +239,14 @@ test_that("the bundle cohort is the analytical cohort", {
 })
 
 test_that("the bundle carries every candidate the app must display", {
-  bun <- need_bundle("data/processed/pubmed_candidates.csv")
+  # Asserts COVERAGE against match_scores.csv, not currency, so the manifest
+  # cannot stand in: it needs the rows themselves. candidate_pool() reads the
+  # bundle's 130 MB pool when present and output/candidate_pool_index.csv
+  # otherwise, which carries exactly the two columns this compares on.
   scores_path <- here("data", "processed", "match_scores.csv")
   skip_if_not(file.exists(scores_path))
-
-  cands <- read_csv(bun, show_col_types = FALSE,
-                    col_types = cols(.default = col_character()))
+  cands <- candidate_pool()
+  skip_if(is.null(cands), "no candidate pool or index available")
   scores <- read_csv(scores_path, show_col_types = FALSE) |>
     mutate(best_pmid = as.character(best_pmid))
 
@@ -279,13 +275,17 @@ test_that("the bundle carries every candidate the app must display", {
 })
 
 test_that("the candidate/score join the app performs actually resolves", {
-  cand_p <- need_bundle("data/processed/pubmed_candidates.csv")
-  sd_p   <- need_bundle("data/processed/match_scores_detailed.rds")
-
   # app.R:1310-1317 joins candidates to score_details by `pmid`. A type
   # mismatch between the two would join nothing and silently render an
-  # unsorted, score-free candidate table.
-  cands <- read_csv(cand_p, show_col_types = FALSE)
+  # unsorted, score-free candidate table. The join key is pmid, which the
+  # committed index carries, so this runs without the 130 MB pool.
+  sd_p <- bundle_or_source("data/processed/match_scores_detailed.rds")
+  # "infer", not the default character coercion. app.R:203 reads the pool with
+  # readr's inference and joins it to score_details, which carries a numeric
+  # pmid. Coercing here would make both sides agree by construction and the
+  # test would assert nothing, which is how it briefly passed 0 assertions.
+  cands <- candidate_pool(typed = "infer")
+  skip_if(is.null(cands), "no candidate pool or index available")
   detail <- readRDS(sd_p)
 
   has_scores <- which(!vapply(detail$score_details, is.null, logical(1)))

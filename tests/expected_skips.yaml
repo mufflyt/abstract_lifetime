@@ -28,62 +28,17 @@ expected_skips:
   # 136,339,347 bytes. Only two of its columns are ever read by these tests.
 
   - file: test-shiny_app.R
-    test: pubmed_candidates.csv exists when the pipeline has been run
-    reason: data/processed/pubmed_candidates.csv is gitignored at 130 MB.
-    to_enable: >
-      Commit an abstract_id/pmid index of the candidate pool. Both columns
-      together are 1.4 MB over 65,697 rows, which is what every candidate
-      assertion in the suite actually reads.
-
-  - file: test-shiny_app.R
-    test: pubmed_candidates.csv has pmid and abstract_id columns
-    reason: data/processed/pubmed_candidates.csv is gitignored at 130 MB.
-    to_enable: Commit an abstract_id/pmid index of the candidate pool.
-
-  - file: test-shiny_app.R
-    test: abstract_ids are consistent across data files
-    reason: data/processed/pubmed_candidates.csv is gitignored at 130 MB.
-    to_enable: Commit an abstract_id/pmid index of the candidate pool.
-
-  - file: test-shiny_app.R
     test: candidate_rows returns candidates sorted by score
     reason: >
-      Depends on the bundle candidate pool, which is absent, so the reactive
-      returns no rows to sort.
-    to_enable: Commit an abstract_id/pmid index of the candidate pool.
-
-  - file: test-remediation_invariants.R
-    test: 'F2: every winning PMID resolves in the candidate pool'
-    reason: >
-      data/processed/pubmed_candidates.csv is gitignored at 130 MB. This is one
-      of the pipeline's core invariants and it has never run in CI.
-    to_enable: Commit an abstract_id/pmid index of the candidate pool.
-
-  - file: test-docs_drift.R
-    test: 'F2 (FIXED 2026-09-03): the candidate pool covers every scored pair'
-    reason: data/processed/pubmed_candidates.csv is gitignored at 130 MB.
-    to_enable: Commit an abstract_id/pmid index of the candidate pool.
-
-  - file: test-shiny_bundle_currency.R
-    test: the bundle carries every candidate the app must display
-    reason: >
-      Reads the bundle copy of the 130 MB candidate pool. The manifest cannot
-      stand in here: this asserts candidate COVERAGE against match_scores.csv,
-      not currency, so it needs the rows themselves.
-    to_enable: Commit an abstract_id/pmid index of the candidate pool.
-
-  - file: test-shiny_bundle_currency.R
-    test: the candidate/score join the app performs actually resolves
-    reason: >
-      Reads the bundle candidate pool and match_scores_detailed.rds to check
-      that the join app.R:1310 performs resolves rather than silently matching
-      nothing on a type mismatch.
-    to_enable: Commit an abstract_id/pmid index of the candidate pool.
-
-  # ── The 47 MB deploy bundle ─────────────────────────────────────────────────
-  # shiny/adjudication_app/bundle/ is gitignored (.gitignore:54). Most currency
-  # assertions were converted to read bundle_manifest.csv instead; these two
-  # boot a Shiny server against the bundle and cannot be answered from metadata.
+      Drives the app reactive against the bundle candidate pool. Unlike the
+      other candidate assertions this one needs the SCORE columns to have
+      something to sort by, and output/candidate_pool_index.csv is deliberately
+      only abstract_id and pmid.
+    to_enable: >
+      Would need score columns in the committed index, which would grow it well
+      past the point where committing it is reasonable. The join that feeds this
+      reactive is covered instead by "the candidate/score join the app performs
+      actually resolves" in test-shiny_bundle_currency.R, which does run in CI.
 
   - file: test-shiny_bundle_currency.R
     test: the running server loads the current cohort and full candidate sets
@@ -192,3 +147,14 @@ expected_skips:
       an app with no candidate pool to display, which produces failures rather
       than coverage. Revisit if the candidate index lands and a Chrome step is
       added.
+  - file: test-candidate_pool_index.R
+    test: the index is a faithful projection of the pool it was built from
+    reason: >
+      Compares output/candidate_pool_index.csv against the 130 MB pool it was
+      derived from. The pool is gitignored, so this can only run on a machine
+      that has done a full pipeline run, which is exactly where a stale index
+      would be introduced.
+    to_enable: >
+      Cannot in CI, and it does not need to be: the comparison is meaningful
+      only where both artefacts exist. The index's shape, uniqueness and size
+      ceiling are asserted unconditionally in the same file.
