@@ -28,15 +28,32 @@ n_evaluated <- n_cohort - n_pending
 n_published <- sum(analytic_tbl$final_published, na.rm = TRUE)
 n_not_pub   <- n_evaluated - n_published
 
+# Abstracts whose credited publication predates their congress. PI decision,
+# 2026-05-09: such a paper cannot be a conference-to-publication conversion, so
+# they are counted UNPUBLISHED. They stay in the denominator, which is why they
+# are drawn as a breakdown of "Not published" rather than as an exclusion arrow
+# off the spine: an exclusion arrow would say they left the study, and they did
+# not. See docs/OUTCOME_DEFINITION.md.
+n_pre_congress <- sum(!is.na(analytic_tbl$months_to_pub) &
+                        analytic_tbl$months_to_pub < 0, na.rm = TRUE)
+n_no_pub_found <- n_not_pub - n_pre_congress
+
 stopifnot(
   nrow(analytic_tbl) == n_cohort,
   n_published + n_not_pub == n_evaluated,
-  n_evaluated + n_pending == n_cohort
+  n_evaluated + n_pending == n_cohort,
+  # No abstract may be counted published on a paper that predates its congress.
+  sum(analytic_tbl$final_published %in% TRUE &
+        analytic_tbl$months_to_pub < 0, na.rm = TRUE) == 0,
+  n_no_pub_found + n_pre_congress == n_not_pub
 )
 
 message("parsed ", n_parsed, " -> cohort ", n_cohort, " -> evaluated ", n_evaluated)
 message("publication rate: ", round(n_published / n_evaluated * 100, 1), "% (",
         n_published, "/", n_evaluated, ")")
+message("not published ", n_not_pub, " = ", n_no_pub_found,
+        " with no qualifying publication + ", n_pre_congress,
+        " whose publication predates the congress")
 
 INK <- "#1B3A4B"
 
@@ -93,14 +110,41 @@ strobe_fc <- as_fc(
     border_color = INK
   )
 
+# Break the unpublished arm down. This is a split, not an exclusion arrow,
+# because these abstracts remain in the denominator: they are counted
+# unpublished, not removed from the study. An arrow off the spine would say the
+# opposite.
+#
+# fc_split() addresses branches by positional name ("group 1", "group 2")
+# because as_fc(N = ) has no real grouping variable to name them after. Looking
+# the group up by its label rather than hard-coding a position means a future
+# reordering of the split fails loudly instead of silently annotating the
+# published arm.
+not_pub_group <- strobe_fc$fc$group[
+  strobe_fc$fc$type == "split" & strobe_fc$fc$label == "Not published"]
+stopifnot(length(not_pub_group) == 1)
+
+strobe_fc <- strobe_fc |>
+  fc_split(
+    N            = c(n_no_pub_found, n_pre_congress),
+    sel_group    = not_pub_group,
+    label        = c("No qualifying\npublication identified",
+                     "Publication predates\nthe congress"),
+    text_pattern = "{label}\nn = {n}",
+    text_fs      = 8,
+    width        = 0.19,
+    bg_fill      = "#F4F1EC",
+    border_color = "#8A9BA5"
+  )
+
 # fc_export() requires the drawn object, not the spec
 strobe_fc <- fc_draw(strobe_fc)
 
 fc_export(strobe_fc, filename = "figure1_strobe_flowchart.png",
           path = here("output", "figures"),
-          width = 2400, height = 1500, res = 260, units = "px")
+          width = 2400, height = 1750, res = 260, units = "px")
 fc_export(strobe_fc, filename = "figure1_strobe_flowchart.pdf",
           path = here("output", "figures"),
-          width = 9, height = 5.8, units = "in")
+          width = 9, height = 6.7, units = "in")
 
 message("wrote output/figures/figure1_strobe_flowchart.{png,pdf}")
