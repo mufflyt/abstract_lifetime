@@ -1,12 +1,12 @@
 # NEWS
 
-## 2026-09-05 — the tests that were not running
+## 2026-09-05: the tests that were not running
 
 The suite had been reporting a number that was partly fiction.
 
 A test run has three outcomes and only two of them were being watched. A test
 can pass, it can fail, or it can not run at all, and the gate's rule for
-"passing" was `failed == 0 & error == 0` — which is true of a skipped test. So a
+"passing" was `failed == 0 & error == 0`, which is true of a skipped test. So a
 test that quietly stopped asserting anything was counted on the good side of
 every summary line it appeared in.
 
@@ -19,9 +19,9 @@ available while the gate believed a skip was evidence of anything.
 
 Pulling that thread found 24 test blocks that skipped in CI, holding **75
 assertions that only ever ran on a developer machine**. Among them were 45
-guarding the Shiny deploy bundle against being stale — written after a bundle
+guarding the Shiny deploy bundle against being stale, written after a bundle
 was found 135 days behind the analysis, with reviewers adjudicating a
-pre-denominator-fix cohort — and `F2: every winning PMID resolves in the
+pre-denominator-fix cohort, and `F2: every winning PMID resolves in the
 candidate pool`, one of the pipeline's central invariants, which had never once
 run in CI.
 
@@ -53,7 +53,7 @@ nothing anywhere, because `shinytest2` is installed on no machine involved. It
 is now explicitly opt-in, and carries a floor assertion that runs everywhere and
 fails if that exclusion stops being recorded.
 
-## 2026-09-05 (later) — cycles 17 to 24, and what they found
+## 2026-09-05 (later): cycles 17 to 24, and what they found
 
 The 24-cycle test-generation protocol had stopped at 16. The remaining eight
 cycles added 165 assertions and surfaced eight decisions. Two of them move a

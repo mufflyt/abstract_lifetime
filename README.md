@@ -283,8 +283,8 @@ that appears in the manuscript:
 | `test-cycle22_decision_log.R` | Four *different* abstracts are counted as published against an explicit human `no_match` |
 
 CI runs five gates in order: decision-logic boundary contracts, mutation tests,
-the two identity guards, then the full suite measured against **both** manifests
-— [`tests/expected_failures.yaml`](tests/expected_failures.yaml) and
+the two identity guards, then the full suite measured against **both** manifests,
+[`tests/expected_failures.yaml`](tests/expected_failures.yaml) and
 [`tests/expected_skips.yaml`](tests/expected_skips.yaml).
 
 The second manifest is new, and it closes a hole that had already cost two days

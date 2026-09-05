@@ -48,7 +48,7 @@ declaration and the reality drift apart.
 | 5 | Full suite, measured against both manifests | Everything else |
 
 The contract is checked in both directions. A declared workflow that does not
-exist fails, and — since a workflow was once added without being declared — a
+exist fails, and, since a workflow was once added without being declared, a
 workflow on disk that is *not* declared fails too. A gate declared in the
 contract that no workflow actually invokes also fails, so the contract cannot
 promise something nothing keeps.
