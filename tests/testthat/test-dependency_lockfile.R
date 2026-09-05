@@ -48,6 +48,12 @@ test_that("every package the code uses is locked", {
   locked <- names(lock$Packages)
 
   unlocked <- setdiff(used, c(locked, OPTIONAL))
+
+  # Printed unconditionally: testthat's summary reporter truncates expectation
+  # labels in CI logs, which made an earlier failure here undiagnosable.
+  cat("\n[lockfile] used:", length(used), " locked:", length(locked),
+      " unlocked:", paste(unlocked, collapse = ", "),
+      " stale:", paste(setdiff(locked, used), collapse = ", "), "\n")
   expect_equal(
     length(unlocked), 0,
     label = paste0(
