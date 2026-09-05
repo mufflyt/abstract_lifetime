@@ -1401,3 +1401,42 @@ author. The loop is surfacing decisions faster than they are being answered.
 Refusing to register a real finding in order to stay under a ceiling would be
 the ceiling defeating its own purpose. It should come back down as decisions are
 closed.
+
+## Cycle 23 - 2026-09-05
+
+Mix required: 3 BVA / 4 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle23_validation_fidelity.R` (25 assertions).
+Target: the two artefacts that tell a reader how good the matching is,
+`output/validation_metrics.csv` and `data/processed/fidelity_checks.csv`.
+Sensitivity 1.00, PPV 0.50 and accuracy 0.735 are quoted numbers; neither
+artefact's internal arithmetic had been checked and the fidelity table had never
+been tested at all.
+
+**Result: 24 pass, 1 preserved failure. Plus one caught by the gate, not by me.**
+
+**Finding (registered). Fidelity checking skips exactly the uncertain matches.**
+`fidelity_checks.csv` holds 210 rows and covers only the algorithm
+classifications `definite` (131) and `probable` (79). Twenty-two of the 178
+published abstracts have no fidelity row: 11 `possible`, 7 `no_match`, 4
+`excluded`. All 22 carry a `best_pmid`, so the check was possible. Title-fidelity
+verification therefore covers the matches the algorithm was already confident
+about and skips the ones human adjudication had to settle, which are the ones
+where a wrong match is most likely.
+
+**A finding my local runs were hiding.** The gate, run in a clean git worktree,
+failed cycle 20's `gender_conflict` test that had passed locally. In committed
+state the conflict log holds 231 rows while the dataset flags 282, and 51
+flagged abstracts are absent from the log. `10e_merge_demographics.R` writes both
+in the same run, so the pair cannot disagree unless one was committed from a
+different run. My local tree contained a regenerated log as an uncommitted
+change belonging to the concurrent agent, which is why every local run passed.
+Registered rather than fixed, because fixing it here would mean committing
+another agent's in-flight work. **Lesson: verify in a clean worktree, not in a
+shared working tree.** Every gate from here is run that way.
+
+**23.7 was too strong at first.** It forbade any gold-standard abstract outside
+the cohort, and failed on `AAGL2023_081`, a Video presentation. Whoever draws
+the validation sample may label whatever they like; what must hold is that a
+labelled abstract the study does not analyse cannot contribute to a reported
+rate. `n` is 50 and `n_classified` is 49, so it did not, and the test now
+asserts that reconciliation instead.
