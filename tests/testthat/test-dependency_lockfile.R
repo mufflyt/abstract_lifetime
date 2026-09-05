@@ -19,6 +19,10 @@ lock_path  <- file.path(repo_root, "renv.lock")
 # Keep in step with OPTIONAL in scripts/build_lockfile.R.
 OPTIONAL <- c("shinytest2")
 
+# Required at runtime but never named in the source, so no dependency scan
+# reports it. Keep in step with RUNTIME_ONLY in scripts/build_lockfile.R.
+RUNTIME_ONLY <- c("dbplyr")
+
 test_that("renv.lock exists and is well-formed", {
   expect_true(file.exists(lock_path))
   lock <- jsonlite::fromJSON(lock_path, simplifyVector = FALSE)
@@ -53,7 +57,7 @@ test_that("every package the code uses is locked", {
   # labels in CI logs, which made an earlier failure here undiagnosable.
   cat("\n[lockfile] used:", length(used), " locked:", length(locked),
       " unlocked:", paste(unlocked, collapse = ", "),
-      " stale:", paste(setdiff(locked, used), collapse = ", "), "\n")
+      " stale:", paste(setdiff(locked, c(used, RUNTIME_ONLY)), collapse = ", "), "\n")
   expect_equal(
     length(unlocked), 0,
     label = paste0(
@@ -72,7 +76,7 @@ test_that("the lockfile does not carry packages the project no longer uses", {
   # Transitive dependencies are legitimately absent from source scans, so this
   # only flags packages that were locked directly and then dropped from the
   # code. It is a staleness signal, not a correctness one.
-  stale <- setdiff(names(lock$Packages), c(used, base_pkgs))
+  stale <- setdiff(names(lock$Packages), c(used, base_pkgs, RUNTIME_ONLY))
   expect_equal(
     length(stale), 0,
     label = paste0(

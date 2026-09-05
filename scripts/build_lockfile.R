@@ -25,8 +25,17 @@ BASE <- rownames(installed.packages(priority = "base"))
 # tests/testthat/test-dependency_lockfile.R.
 MYSTERYCALL_SHA <- "42d66d92ef52a0f85d1f7c61208c2ddd79d9c06e"
 
+# Runtime-only dependencies: never named in the source, but required for the
+# code to work. dbplyr is the case here -- R/09j runs dplyr verbs against a
+# DuckDB connection, and dplyr dispatches to dbplyr to build the SQL. Nothing
+# ever writes `library(dbplyr)`, so a plain source scan misses it; newer renv
+# infers it and older renv does not, which is exactly the kind of environment
+# difference a lockfile exists to remove. Locked explicitly so both agree, and
+# excluded from the "no longer used" check because no scan will ever see it.
+RUNTIME_ONLY <- c("dbplyr")
+
 deps <- renv::dependencies(path = ".", quiet = TRUE)
-pkgs <- sort(setdiff(unique(deps$Package), BASE))
+pkgs <- sort(setdiff(union(unique(deps$Package), RUNTIME_ONLY), BASE))
 
 # Packages that are referenced but optional: every use site guards them, so a
 # machine without them still runs the suite. They are not locked, and

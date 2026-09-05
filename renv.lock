@@ -39,6 +39,12 @@
       "Source": "Repository",
       "Repository": "CRAN"
     },
+    "dbplyr": {
+      "Package": "dbplyr",
+      "Version": "2.5.1",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
     "DiagrammeR": {
       "Package": "DiagrammeR",
       "Version": "1.0.11",
