@@ -1284,3 +1284,33 @@ the only reason that fallback is harmless today.
 42 abstracts have a negative `months_to_pub`. That is not an error: they are the
 pre-congress publications the study exists to count, and 19.8 asserts the group
 is non-empty because its disappearance would itself be a defect.
+
+## Cycle 20 - 2026-09-05
+
+Mix required: 3 BVA / 4 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle20_gender_resolution.R` (19 assertions).
+Target: the gender waterfall at `R/10e_merge_demographics.R:464`.
+`gender_unified` is an Aim-3 covariate and a subgroup in Table 2 and Figure 4,
+assembled from eleven sources of very different evidentiary weight: tier 1 is
+NPPES registrant-reported sex, tier 11 infers gender from an INITIAL. Both print
+identically. The cascade was refit after the gender correction, which is exactly
+when a priority list and the `case_when` that labels it drift apart.
+
+**Result: 19/19 pass. No implementation defects. Fourth clean cycle.**
+
+The test worth keeping is 20.4. `coalesce()` at `:469` decides which source
+WINS; `case_when()` at `:474` decides which source is CREDITED; `GENDER_PRIORITY`
+is what the run log and the methods section describe. All three orderings are
+parsed out of the source at test time and compared. If they ever disagree, every
+row would carry a gender from one provider attributed to another, and nothing in
+the data could reveal it: the values would still be female/male, the counts
+would still add up, and only the provenance would be wrong.
+
+20.7 is the conflation check. `npi_gender` is coded F/M while `gender_unified`
+is female/male, the same concept in two vocabularies, which is where a silent
+mismatch would live. Where the waterfall credits the NPI tier the two must agree
+after mapping.
+
+20.9 bounds how much of the covariate may rest on the initial-only bottom tier.
+It currently resolves none of the cohort, but the assertion is what stops that
+changing quietly.
