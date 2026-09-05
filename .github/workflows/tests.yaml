@@ -102,7 +102,32 @@ jobs:
           }
         shell: Rscript {0}
 
-      # Gate 3. Everything else, measured against tests/expected_failures.yaml.
+      # Gates 3 and 4. Identity. output/manual_review_decisions.csv is committed,
+      # and it was carrying the real initials of the three people who did the
+      # adjudication; config carried the operator's own name and absolute paths
+      # under their home directory. These run before the full suite because a
+      # regression here republishes an identity, and no later green run undoes
+      # that.
+      - name: Identity guards (reviewer pseudonyms, operator paths)
+        run: |
+          library(testthat)
+          files <- c("tests/testthat/test-deidentification_guard.R",
+                     "tests/testthat/test-operator_identity.R")
+          n_fail <- 0
+          for (f in files) {
+            df <- as.data.frame(test_file(f, reporter = "summary",
+                                          stop_on_failure = FALSE))
+            cat(basename(f), "passed:", sum(df$passed),
+                " failed:", sum(df$failed) + sum(df$error), "\n")
+            n_fail <- n_fail + sum(df$failed) + sum(df$error)
+          }
+          if (n_fail > 0) {
+            stop("Identity guard failures: ", n_fail,
+                 ". A real name or machine path has re-entered committed data.")
+          }
+        shell: Rscript {0}
+
+      # Gate 5. Everything else, measured against tests/expected_failures.yaml.
       # The gate lives in tests/run_suite_gate.R so this workflow and
       # R-CMD-check.yaml cannot drift apart on what "green" means.
       - name: Full test suite
