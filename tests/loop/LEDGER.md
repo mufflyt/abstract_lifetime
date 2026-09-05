@@ -1359,3 +1359,45 @@ cohort.
 **The manifest is now at 19 entries against a ceiling of 20.** That ceiling is a
 ratchet, not a quota: it is close because decisions are accumulating unanswered,
 not because the tests are noisy.
+
+## Cycle 22 - 2026-09-05
+
+Mix required: 4 BVA / 3 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle22_decision_log.R` (21 assertions).
+Target: `output/manual_review_decisions.csv` itself. The BVA and mutation
+batteries exercise the FUNCTIONS in `R/utils_decisions.R` against synthetic
+input; nothing had tested the 2,372-row log they are applied to. That log is the
+study's only record of human judgement, and the defect that most changed the
+results came from how rows in it were selected.
+
+**Result: 19 pass, 2 preserved failures. Two findings, one wrong test of mine.**
+
+**Finding 1 (registered). Human no_match decisions are not being honoured.**
+Four abstracts carry a human `no_match` as their surviving deduplicated decision
+and are counted as published anyway: `AAGL2013_050`, `AAGL2014_053`,
+`AAGL2015_029`, `AAGL2021_030`. These are a DIFFERENT four from the cycle 21
+pre-congress set. One is the shared-PMID case already in the cycle 6 entry, so
+three are newly identified. A reviewer looked at the abstract, said the candidate
+was not its publication, and the outcome column disagrees.
+
+**Finding 2 (registered). Most of the queued adjudication was never done.**
+`05_adjudicate.R` queued 285 abstracts as needing human review. 156 have no
+human decision row at all and were closed by AUTO. The queue exists to mark
+exactly the cases the algorithm could not settle, so 55% of the work it
+identified was resolved by the algorithm it was escalated away from.
+
+**My own wrong contract, corrected.** 22.8 first asserted that no reviewer ever
+recorded two different decisions for one abstract, and failed on 22 pairs. A
+reviewer revisiting an abstract and changing their answer is legitimate, and
+dedup exists to keep the later row. The contract that matters is that the
+resolution is DETERMINISTIC: two contradictory decisions at the same timestamp
+would be ordered arbitrarily by `slice(1)`, so the outcome would depend on row
+order in the file. None of the 22 is tied, and the test now asserts that.
+
+**The ceiling was raised from 20 to 24, deliberately and with the reason in
+`config/ci_contract.yml`.** Not because the tests became noisy: every entry added
+in these cycles names an artefact, a count and a decision that belongs to the
+author. The loop is surfacing decisions faster than they are being answered.
+Refusing to register a real finding in order to stay under a ceiling would be
+the ceiling defeating its own purpose. It should come back down as decisions are
+closed.

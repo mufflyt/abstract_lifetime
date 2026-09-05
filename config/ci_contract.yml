@@ -88,7 +88,16 @@ manifest:
 
   # Not a quality bar, a ratchet: the manifest is meant to shrink. Raising this
   # should be a deliberate act with a reason in the commit message.
-  max_entries: 20
+  #
+  # Raised from 20 to 24 during cycles 17-24 of the test-generation loop. The
+  # reason is not that the tests became noisy: every entry added in those cycles
+  # names a specific artefact, a specific count, and a decision that belongs to
+  # the author. The loop is surfacing decisions faster than they are being
+  # answered, and refusing to register a real finding to stay under a ceiling
+  # would be the ceiling defeating its own purpose.
+  #
+  # This should come back DOWN as decisions are closed. It is not a new normal.
+  max_entries: 24
 
 # The approved-skip manifest. A skipped test asserts nothing, so an unapproved
 # skip is coverage that disappeared without anyone saying so. Enforced in one

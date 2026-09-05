@@ -4,7 +4,7 @@
 
 # Decisions pending
 
-This repository keeps 19 tests failing on purpose. Each one below is a question that code cannot answer: resolving it changes the estimand, the cohort, or an adjudication that a human already recorded. None is a defect awaiting a fix.
+This repository keeps 21 tests failing on purpose. Each one below is a question that code cannot answer: resolving it changes the estimand, the cohort, or an adjudication that a human already recorded. None is a defect awaiting a fix.
 
 CI is green while exactly these fail. If one of them starts passing, CI goes red until its entry is removed, so this list cannot quietly outlive its reasons.
 
@@ -183,4 +183,22 @@ Work an item by deciding the question in **Decision needed**, then either make t
 **Decision needed.** Regenerating means re-running the whole search layer, which changes candidate sets and invalidates the human adjudication recorded against the current candidates. Same decision as the cycle 4 entry, and it should be taken with it rather than separately.
 
 **Documented in.** tests/loop/LEDGER.md cycle 21
+
+## test-cycle22_decision_log.R
+
+### 20. final_published follows from the deduplicated decisions
+
+**What fails.** Four abstracts carry a human no_match decision as their surviving deduplicated decision and are nonetheless counted as published: AAGL2013_050, AAGL2014_053, AAGL2015_029, AAGL2021_030. These are NOT the four in the cycle 21 pre-congress finding; they are a separate set. One of them is the shared-PMID case already recorded in the cycle 6 entry, so three are newly identified. A reviewer looked at the abstract, said the candidate was not its publication, and the outcome column says published anyway.
+
+**Decision needed.** Whether a human no_match can be overridden by the algorithm, and if not, whether these four leave the numerator. That moves a reported result, and it is the same question as the shared-PMID adjudication in the cycle 6 entry, so the two should be decided together.
+
+**Documented in.** tests/loop/LEDGER.md cycle 22
+
+### 21. every queued abstract received a human decision
+
+**What fails.** 05_adjudicate.R queued 285 abstracts as needing human review. 156 of them have no human decision row at all and were resolved by AUTO. The queue exists to mark the cases the algorithm could not settle, so 55% of the work it identified was never done and was closed algorithmically instead.
+
+**Decision needed.** Whether the remaining 156 are reviewed, or whether the study reports that the mid-score band was resolved by algorithm for the majority of the cases flagged for human eyes. This is a completeness statement about the adjudication and belongs in the methods either way.
+
+**Documented in.** tests/loop/LEDGER.md cycle 22
 
