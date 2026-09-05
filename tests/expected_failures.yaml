@@ -213,3 +213,24 @@ expected_failures:
       Determine which extractor is at fault and reconcile them, or document that
       the two flags are independently derived and may disagree.
     documented_in: tests/loop/LEDGER.md cycle 14
+
+  # ── Added by the test-generation loop, cycle 15 ──────────────────────────────
+
+  - file: test-cycle15_backfill_contract.R
+    test: every eligible abstract was at least attempted by the backfill
+    reason: >
+      R/02b_backfill_abstract_text.R exists to repair exactly the gap cycle 14
+      measured, and all 280 text-free abstracts are eligible for it: every one
+      has a usable DOI. Only 15 were ever fetched. The other 265 have no cached
+      XML under the DOI-derived key the fetcher uses, so they were never
+      attempted. The stage stopped at 5.4% of its own workload.
+      Worth knowing before anyone finishes it: none of the 15 that WERE fetched
+      returned an <AbstractText> element, so PubMed may simply not hold abstract
+      bodies for these supplement entries. Completing the backfill may recover
+      little. That is an argument for running it and finding out, not for
+      leaving 265 rows in an unknown state.
+    decision_needed: >
+      Re-run 02b to completion and record how many of the 280 PubMed can
+      actually supply, or document that the text is unrecoverable and treat the
+      text-derived flags for 2012-2018 as missing rather than FALSE.
+    documented_in: tests/loop/LEDGER.md cycle 15

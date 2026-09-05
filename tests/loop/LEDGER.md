@@ -1085,3 +1085,58 @@ double-reported.
 **Result:** 9/11 assertions passed after correcting my own premises. Both
 remaining failures are registered.
 **Gate: green — 15 failures, all on the manifest.**
+
+## Cycle 15 - 2026-09-04
+
+Mix required: 3 BVA / 3 semantic / 4 adversarial. File:
+`tests/testthat/test-cycle15_backfill_contract.R` (14 assertions).
+Target: `R/02b_backfill_abstract_text.R`, the stage that exists specifically to
+repair the gap cycle 14 measured. Its header states the problem: ScienceDirect
+paywalls the individual article pages for older supplement issues, so the
+scraper could not retrieve abstract text for 2012-2018.
+
+| # | Category | Target | Assumption challenged |
+|---|---|---|---|
+| 15.1 | BVA | cache key | derivation matches the fetcher exactly |
+| 15.2 | BVA | cached files | clear the >100 byte floor the fetcher requires |
+| 15.3 | BVA | eligibility | every text-free abstract has the DOI it needs |
+| 15.4 | semantic | backfill | fills a row or leaves evidence it tried |
+| 15.5 | semantic | re-run safety | rows with text are excluded from the filter |
+| 15.6 | semantic | word count | agrees with text presence upstream |
+| 15.7 | adversarial | cache | every file belongs to a known key space |
+| 15.8 | adversarial | cache | cached XML parses |
+| 15.9 | adversarial | abstract_text | no PubMed XML markup leaked through |
+| 15.10 | adversarial | text loss | confined to the documented 2012-2018 window |
+
+### FINDING - the backfill stopped at 5.4% of its own workload
+All 280 text-free abstracts are eligible: every one has a usable DOI, so none is
+permanently unreachable (15.3 passes). Only **15 were ever fetched**. The other
+**265** have no cached XML under the DOI-derived key the fetcher uses.
+
+Worth knowing before anyone finishes it: **none of the 15 that were fetched
+returned an `<AbstractText>` element**. PubMed may simply not hold abstract
+bodies for these supplement entries, in which case completing the backfill
+recovers little. That is an argument for running it and finding out, not for
+leaving 265 rows in an unknown state.
+
+### I nearly published a false finding, and the rule caught it
+My first pass rebuilt the cache key without stripping the `https://doi.org/`
+prefix that `fetch_pubmed_by_doi()` strips at `:45`. Every reconstructed
+filename was wrong, so the check reported **0 of 280 fetched** and I was one step
+from recording that the backfill had never run at all. The giveaway was that the
+same derivation also reported 0 of 826 for rows that demonstrably HAVE text.
+
+15.1 now asserts the key derivation directly, against the three input shapes the
+script handles, so the same mistake fails loudly instead of producing a
+confident wrong number.
+
+A second premise was wrong the same way: 15.7 originally demanded every cache
+file match a cohort DOI and flagged 1,472 of 1,566 as orphans. They are
+**PMID-keyed entries** from another stage sharing the same directory. Corrected
+to accept either key space and fail only on files belonging to neither.
+
+Both errors were the same shape as the ones the loop prompt now warns about:
+reconstructing a contract instead of reading it.
+
+**Result:** 13/14 assertions pass. The single failure is the finding above.
+**Gate: green — 16 failures, all on the manifest.**
