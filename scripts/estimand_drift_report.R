@@ -116,7 +116,7 @@ if (update_baseline || !file.exists(baseline_path)) {
   quit(save = "no", status = 0)
 }
 
-baseline_flat <- flatten_fp(read_yaml(baseline_path))
+baseline_flat <- flatten_fp(yaml::yaml.load_file(baseline_path))
 
 keys <- union(names(baseline_flat), names(current_flat))
 rows <- lapply(keys, function(k) {

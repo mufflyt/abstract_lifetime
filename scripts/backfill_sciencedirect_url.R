@@ -7,7 +7,7 @@ suppressPackageStartupMessages({
   library(yaml); library(cli)
 })
 
-cfg <- yaml::read_yaml(here("config.yml"))
+cfg <- yaml::yaml.load_file(here("config.yml"))
 sid <- cfg$default$google_sheet_id
 gs4_auth(path = here("shiny", "adjudication_app", "google_credentials.json"))
 

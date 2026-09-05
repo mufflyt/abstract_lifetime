@@ -35,7 +35,7 @@ test_that("the committed document matches what the manifest generates now", {
 test_that("every open decision reaches the document", {
   skip_if_not(file.exists(DOC), "document absent")
   skip_if_not(requireNamespace("yaml", quietly = TRUE), "yaml absent")
-  m <- yaml::read_yaml(here::here("tests", "expected_failures.yaml"))
+  m <- yaml::yaml.load_file(here::here("tests", "expected_failures.yaml"))
   txt <- paste(readLines(DOC, warn = FALSE), collapse = "\n")
   missing <- character(0)
   for (e in m$expected_failures) {

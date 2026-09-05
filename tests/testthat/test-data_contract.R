@@ -18,7 +18,7 @@ contract_path <- file.path(repo_root, "config", "data_contract.yml")
 
 test_that("the contract file is well-formed and points at real data", {
   expect_true(file.exists(contract_path))
-  ct <- yaml::read_yaml(contract_path)
+  ct <- yaml::yaml.load_file(contract_path)
   expect_gt(length(ct$datasets), 0)
   for (ds in ct$datasets) {
     expect_true(nzchar(ds$path %||% ""))
@@ -51,7 +51,7 @@ test_that("the committed analytical dataset satisfies the contract row by row", 
 # would pass the test above forever.
 
 with_corrupted <- function(mutate_fn) {
-  ct <- yaml::read_yaml(contract_path)
+  ct <- yaml::yaml.load_file(contract_path)
   ds <- ct$datasets[[1]]
   df <- read_csv(file.path(repo_root, ds$path), show_col_types = FALSE)
   df <- mutate_fn(df)

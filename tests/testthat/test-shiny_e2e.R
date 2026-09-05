@@ -48,7 +48,7 @@ test_that("the e2e suite's exclusion is explicit and registered", {
     succeed("shiny e2e suite is running")
   } else {
     p <- here::here("tests", "expected_skips.yaml")
-    entries <- if (file.exists(p)) yaml::read_yaml(p)$expected_skips else list()
+    entries <- if (file.exists(p)) yaml::yaml.load_file(p)$expected_skips else list()
     files <- vapply(entries, function(e) e$file %||% "", character(1))
     expect_true(
       "test-shiny_e2e.R" %in% files,

@@ -46,7 +46,7 @@ cat("files:", length(unique(df$file)),
 # tests/testthat/test-ci_contract.R fails in that case.
 `%||%` <- function(a, b) if (is.null(a)) b else a
 contract_path <- "config/ci_contract.yml"
-contract <- if (file.exists(contract_path)) yaml::read_yaml(contract_path) else list()
+contract <- if (file.exists(contract_path)) yaml::yaml.load_file(contract_path) else list()
 mrules <- contract$manifest %||% list()
 
 manifest_path <- mrules$path %||% "tests/expected_failures.yaml"
@@ -56,7 +56,7 @@ rule_orphaned   <- isTRUE(mrules$fail_on_orphaned_entry %||% TRUE)
 max_entries     <- mrules$max_entries %||% Inf
 
 manifest <- if (file.exists(manifest_path)) {
-  yaml::read_yaml(manifest_path)$expected_failures
+  yaml::yaml.load_file(manifest_path)$expected_failures
 } else {
   list()
 }
@@ -67,7 +67,7 @@ srules <- contract$skips %||% list()
 skip_manifest_path <- srules$path %||% "tests/expected_skips.yaml"
 rule_unapproved_skip <- isTRUE(srules$fail_on_unapproved_skip %||% TRUE)
 skip_manifest <- if (file.exists(skip_manifest_path)) {
-  yaml::read_yaml(skip_manifest_path)$expected_skips
+  yaml::yaml.load_file(skip_manifest_path)$expected_skips
 } else {
   list()
 }

@@ -17,7 +17,7 @@ s <- read_csv(here("output", "sensitivity_analyses.csv"), show_col_types = FALSE
 cox <- read_csv(here("output", "aim2b_cox_regression.csv"), show_col_types = FALSE)
 ph <- read_csv(here("output", "cox_ph_assumption.csv"), show_col_types = FALSE)
 
-cfg <- yaml::read_yaml(here("config.yml"))
+cfg <- yaml::yaml.load_file(here("config.yml"))
 
 n_total <- nrow(d)
 n_congresses <- length(unique(d$congress_year))

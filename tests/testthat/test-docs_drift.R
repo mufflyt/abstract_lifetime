@@ -34,7 +34,7 @@ test_that("every script path in the pipeline manifest exists", {
   skip_if_no_file(manifest_path)
   skip_if_not_installed("yaml")
 
-  manifest <- yaml::read_yaml(manifest_path)
+  manifest <- yaml::yaml.load_file(manifest_path)
   scripts <- vapply(manifest$stages, function(s) s$script %||% NA_character_,
                     character(1))
   scripts <- scripts[!is.na(scripts)]

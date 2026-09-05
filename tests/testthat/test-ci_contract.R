@@ -13,7 +13,7 @@ contract_path <- file.path(repo_root, "config", "ci_contract.yml")
 
 test_that("the CI contract exists and is well-formed", {
   expect_true(file.exists(contract_path))
-  ct <- yaml::read_yaml(contract_path)
+  ct <- yaml::yaml.load_file(contract_path)
 
   expect_true(is.numeric(ct$version) || is.character(ct$version))
   expect_gt(length(ct$gates), 0)
@@ -28,7 +28,7 @@ test_that("the CI contract exists and is well-formed", {
 })
 
 test_that("every gate names a file that exists", {
-  ct <- yaml::read_yaml(contract_path)
+  ct <- yaml::yaml.load_file(contract_path)
   for (g in ct$gates) {
     target <- g$file %||% g$runner
     expect_true(nzchar(target %||% ""),
@@ -39,7 +39,7 @@ test_that("every gate names a file that exists", {
 })
 
 test_that("every declared workflow exists and invokes the shared gate", {
-  ct <- yaml::read_yaml(contract_path)
+  ct <- yaml::yaml.load_file(contract_path)
   runner <- NULL
   for (g in ct$gates) if (!is.null(g$runner)) runner <- g$runner
   skip_if(is.null(runner), "no runner declared")
@@ -61,10 +61,10 @@ test_that("every declared workflow exists and invokes the shared gate", {
 })
 
 test_that("the manifest obeys the contract it is held to", {
-  ct <- yaml::read_yaml(contract_path)
+  ct <- yaml::yaml.load_file(contract_path)
   mpath <- file.path(repo_root, ct$manifest$path)
   skip_if_not(file.exists(mpath))
-  entries <- yaml::read_yaml(mpath)$expected_failures %||% list()
+  entries <- yaml::yaml.load_file(mpath)$expected_failures %||% list()
 
   # The ratchet. The manifest is meant to shrink.
   if (!is.null(ct$manifest$max_entries)) {
@@ -97,7 +97,7 @@ test_that("the gate reads the contract rather than hard-coding it", {
 })
 
 test_that("no workflow runs without being declared in the contract", {
-  ct <- yaml::read_yaml(contract_path)
+  ct <- yaml::yaml.load_file(contract_path)
   declared <- vapply(ct$workflows, `[[`, character(1), "path")
 
   wf_dir <- file.path(repo_root, ".github", "workflows")
@@ -119,7 +119,7 @@ test_that("no workflow runs without being declared in the contract", {
 })
 
 test_that("every must-pass gate is actually run by a declared workflow", {
-  ct <- yaml::read_yaml(contract_path)
+  ct <- yaml::yaml.load_file(contract_path)
   declared <- vapply(ct$workflows, `[[`, character(1), "path")
   txt <- paste(unlist(lapply(file.path(repo_root, declared), function(p)
     if (file.exists(p)) readLines(p, warn = FALSE) else character(0))),
@@ -139,14 +139,14 @@ test_that("every must-pass gate is actually run by a declared workflow", {
 })
 
 test_that("the approved-skip manifest obeys the contract it is held to", {
-  ct <- yaml::read_yaml(contract_path)
+  ct <- yaml::yaml.load_file(contract_path)
   skip_if(is.null(ct$skips$path), "no skip manifest declared")
   spath <- file.path(repo_root, ct$skips$path)
   expect_true(file.exists(spath),
               label = sprintf("the contract declares %s, which does not exist",
                               ct$skips$path))
   skip_if_not(file.exists(spath))
-  entries <- yaml::read_yaml(spath)$expected_skips %||% list()
+  entries <- yaml::yaml.load_file(spath)$expected_skips %||% list()
 
   # Same rule as the failure manifest: an entry without a reason and a route to
   # enabling it is an exemption, not a backlog item.

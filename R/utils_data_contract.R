@@ -119,7 +119,7 @@ build_contract_agent <- function(df, ds, label = ds$path) {
 #'   means the contract holds. Row-level detail is in the written report.
 validate_data_contract <- function(contract_path, root = here::here(),
                                    report_dir = NULL) {
-  ct <- yaml::read_yaml(contract_path)
+  ct <- yaml::yaml.load_file(contract_path)
   out <- list()
 
   for (ds in ct$datasets) {

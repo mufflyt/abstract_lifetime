@@ -9,6 +9,36 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-05] - One YAML reader across the repository
+
+### Changed
+
+- All 45 YAML read sites now call `yaml::yaml.load_file()`. This is a
+  consistency change with no behaviour change, and it is worth being explicit
+  about why, because it arrived attached to a claim that is not true: an audit
+  reported that `yaml::read_yaml()` fails or warns on non-ASCII UTF-8 under a
+  standard R locale. It does not reproduce. The two readers return
+  `identical()` output for every config and manifest the repository ships --
+  `config.yml`, `config/ci_contract.yml`, `config/data_contract.yml`,
+  `tests/expected_failures.yaml`, `tests/expected_skips.yaml` and
+  `docs/estimand_baseline.yml` -- and five of those six contain non-ASCII
+  bytes. No parsing defect was fixed here, because none was found.
+- The change is still worth keeping for a smaller reason: one reader means a
+  reader-specific quirk, if one is ever genuinely found, has one place to be
+  fixed rather than 45. Three call sites the audit missed are included --
+  `scripts/estimand_drift_report.R` and `tests/testthat/test-estimand_drift.R`
+  called the unqualified `read_yaml()` -- since a partial conversion would have
+  left the repository mixed and accomplished nothing.
+
+### Added
+
+- `tests/testthat/test-yaml_reader_consistency.R`. A standardisation that
+  nothing enforces drifts back, so this fails if any source file reintroduces
+  `read_yaml`, and separately asserts the two readers still agree on every
+  shipped config -- if that assertion ever fails, the choice of reader stops
+  being cosmetic and needs investigating. It also pins that `write_yaml`, which
+  has no `yaml.load_file` equivalent, survived the search-and-replace.
+
 ## [2026-09-05] - Unapproved-skip reporting fixed; F17 narrowed
 
 ### Fixed
