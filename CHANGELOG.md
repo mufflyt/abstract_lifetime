@@ -9,7 +9,7 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
-## [2026-09-05] — CI stops counting skipped tests as coverage; cycles 17-24
+## [2026-09-05]: CI stops counting skipped tests as coverage; cycles 17-24
 
 ### Fixed
 
