@@ -1,0 +1,73 @@
+# ci_contract.yml — what continuous integration must verify, declared once.
+#
+# The workflows in .github/workflows implement this contract. tests/testthat/
+# test-ci_contract.R asserts that they still do, so a gate cannot be quietly
+# dropped from a workflow while this file continues to promise it.
+#
+# Each gate names: what it protects, which workflow step implements it, and what
+# a failure means. A gate with no implementing step is a promise the repository
+# is not keeping.
+
+contract_version: 1
+
+gates:
+
+  - id: decision_contracts
+    protects: >
+      Adjudication precedence and the publication-rate denominator. These
+      encode defects that reached the analysis outputs.
+    implemented_by:
+      workflow: tests.yaml
+      step: "Decision precedence and denominator contracts (BVA)"
+    failure_means: >
+      A boundary that previously produced a wrong published number is no longer
+      held. Do not merge.
+
+  - id: mutation_kill
+    protects: >
+      The detection power of the decision-logic suite itself.
+    implemented_by:
+      workflow: tests.yaml
+      step: "Mutation tests (every planted defect must be killed)"
+    failure_means: >
+      A planted defect survived, so the suite has stopped detecting a regression
+      it was written to catch. Strengthen the invariant battery; never weaken
+      the mutant.
+
+  - id: suite_gate
+    protects: >
+      Every other test, with the expected-failure manifest supplying the signal.
+    implemented_by:
+      workflow: tests.yaml
+      step: "Full test suite"
+    failure_means: >
+      Either an unregistered test failed, or a registered expected failure
+      started passing and its manifest entry must now be removed.
+
+  - id: manuscript_renders
+    protects: >
+      The manuscript and technical appendix. Both compute their numbers from
+      output/ at knit time, so a broken document is a broken result, and an
+      undefined inline variable is invisible until someone renders.
+    implemented_by:
+      workflow: tests.yaml
+      step: "Render manuscript documents"
+    failure_means: >
+      A document that reports study results no longer builds. The numbers in it
+      cannot be trusted until it does.
+
+# NOTE: a `deidentification` gate belongs here, naming
+# tests/testthat/test-deidentification_guard.R. That guard is on the
+# chore/deidentify-reviewers branch, not this one. Declaring a gate whose
+# implementation is not present would make the contract promise something the
+# repository cannot keep, which is the exact failure this file exists to
+# prevent. Add the gate in a follow-up once both branches are on main.
+
+# Documents that must render for the manuscript_renders gate to pass.
+rendered_documents:
+  - docs/abstract_results_section.Rmd
+  - docs/technical_appendix.Rmd
+
+# Failures allowed to be red without failing CI, provided each is listed in
+# tests/expected_failures.yaml with a reason and the decision it waits on.
+expected_failures_manifest: tests/expected_failures.yaml

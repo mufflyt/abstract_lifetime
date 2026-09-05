@@ -47,6 +47,9 @@ jobs:
       #
       # Comments must NOT appear inside the block literal below: pak reads every
       # line of it as a package reference and fails with "Cannot parse package".
+      # rmarkdown::render needs pandoc, which the R setup action does not install.
+      - uses: r-lib/actions/setup-pandoc@v2
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: |
@@ -65,6 +68,7 @@ jobs:
             any::cli
             any::yaml
             any::irr
+            any::rmarkdown
             mufflyt/mysterycall@42d66d92ef52a0f85d1f7c61208c2ddd79d9c06e
 
       # Gate 1. The decision-logic contracts. These encode defects that reached
@@ -104,6 +108,27 @@ jobs:
       # R-CMD-check.yaml cannot drift apart on what "green" means.
       - name: Full test suite
         run: Rscript tests/run_suite_gate.R
+
+      # Gate 4. The manuscript and technical appendix compute their numbers from
+      # output/ at knit time, so a document that will not build is a result that
+      # cannot be trusted. An undefined inline variable is invisible until
+      # someone renders; this catches it in CI instead. Declared as the
+      # manuscript_renders gate in config/ci_contract.yml.
+      - name: Render manuscript documents
+        run: |
+          docs <- yaml::read_yaml("config/ci_contract.yml")$rendered_documents
+          failed <- character(0)
+          for (d in docs) {
+            if (!file.exists(d)) { failed <- c(failed, paste(d, "(missing)")); next }
+            out <- tempfile(fileext = ".docx")
+            res <- tryCatch({ rmarkdown::render(d, output_file = out, quiet = TRUE); "ok" },
+                            error = function(e) conditionMessage(e))
+            if (!identical(res, "ok")) failed <- c(failed, paste0(d, ": ", res))
+            else cat("rendered", d, "\n")
+          }
+          if (length(failed)) stop("document(s) failed to render:\n  ",
+                                   paste(failed, collapse = "\n  "))
+        shell: Rscript {0}
 
       - name: Lint
         run: |
