@@ -43,9 +43,18 @@ test_that("all required tracked data files exist", {
   }
 })
 
-test_that("pubmed_candidates.csv exists when the pipeline has been run", {
-  p <- skip_if_no_file("data", "processed", "pubmed_candidates.csv")
-  expect_gt(file.info(p)$size, 1000L, label = "pubmed_candidates size")
+test_that("the candidate pool is available, in full or as its committed index", {
+  # Was: assert the 130 MB pool exists. That is a property of a machine that has
+  # run the pipeline, not of the repository, so in CI it only ever skipped.
+  # output/candidate_pool_index.csv makes the same question answerable from a
+  # clean checkout.
+  src <- candidate_pool_source()
+  expect_false(is.na(src),
+               label = paste("neither data/processed/pubmed_candidates.csv nor",
+                             "output/candidate_pool_index.csv is present; run",
+                             "Rscript scripts/build_candidate_index.R"))
+  skip_if(is.na(src))
+  expect_gt(file.info(here(src))$size, 1000L, label = paste(src, "size"))
 })
 
 test_that("bundle copies of data files exist and are non-empty", {
@@ -117,17 +126,17 @@ test_that("abstracts_with_matches.csv has required columns", {
   expect_gte(nrow(rq), 50L)
 })
 
-test_that("pubmed_candidates.csv has pmid and abstract_id columns", {
-  cands <- read_csv(skip_if_no_file("data", "processed", "pubmed_candidates.csv"),
-                    show_col_types = FALSE)
+test_that("the candidate pool has pmid and abstract_id columns", {
+  cands <- candidate_pool()
+  skip_if(is.null(cands), "no candidate pool or index available")
   expect_true("pmid" %in% names(cands))
   expect_true("abstract_id" %in% names(cands))
   expect_gte(nrow(cands), 100L)
 })
 
 test_that("abstract_ids are consistent across data files", {
-  cands <- read_csv(skip_if_no_file("data", "processed", "pubmed_candidates.csv"),
-                    show_col_types = FALSE)
+  cands <- candidate_pool()
+  skip_if(is.null(cands), "no candidate pool or index available")
   abs  <- read_csv(here("data", "processed", "abstracts_cleaned.csv"),
                    show_col_types = FALSE)
   rq   <- read_csv(here("output", "abstracts_with_matches.csv"),

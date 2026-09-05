@@ -246,15 +246,13 @@ test_that("the inline decision logic in 07 and 08 still agrees with utils_decisi
 # --- Pinned known defects (see docs/FAILURE_MODES.md) -------------------------
 
 test_that("F2 (FIXED 2026-09-03): the candidate pool covers every scored pair", {
-  sc_path   <- here::here("data", "processed", "match_scores.csv")
-  cand_path <- here::here("data", "processed", "pubmed_candidates.csv")
+  sc_path <- here::here("data", "processed", "match_scores.csv")
   skip_if_no_file(sc_path)
-  skip_if_no_file(cand_path)
+  cand <- candidate_pool()
+  skip_if(is.null(cand), "neither the candidate pool nor its committed index is available")
 
   sc <- read_csv(sc_path, show_col_types = FALSE) |>
     dplyr::mutate(best_pmid = as.character(best_pmid))
-  cand <- read_csv(cand_path, show_col_types = FALSE,
-                   col_types = readr::cols(.default = readr::col_character()))
 
   unresolvable <- sc |>
     dplyr::filter(!is.na(best_pmid)) |>
