@@ -1314,3 +1314,48 @@ after mapping.
 20.9 bounds how much of the covariate may rest on the initial-only bottom tier.
 It currently resolves none of the cohort, but the assertion is what stops that
 changing quietly.
+
+## Cycle 21 - 2026-09-05
+
+Mix required: 3 BVA / 3 semantic / 4 adversarial. File:
+`tests/testthat/test-cycle21_id_integrity.R` (16 assertions).
+Target: `abstract_id` itself, across all 36 committed artefacts that carry it.
+Individual joins had been tested; nobody had asked whether the KEY is well
+formed and consistent everywhere at once. The artefact list is discovered by
+scanning headers rather than hard-coded, so a new file is covered the day it
+lands.
+
+**Result: 14 pass, 2 preserved failures. The most consequential finding of the
+loop so far.**
+
+**Finding 1 (registered), and it touches a reported number.**
+`output/excluded_pre_congress_publications.csv` lists 39 abstracts whose matched
+paper appeared BEFORE the congress at which the abstract was presented. The
+exclusion is applied to 35 of them. For `AAGL2021_002`, `AAGL2021_049`,
+`AAGL2023_042` and `AAGL2023_048` the `best_pmid` is exactly the PMID listed as
+excluded and `months_to_pub` is negative, between 0.2 and 4.5 months before the
+congress, yet they are counted as published. They are in the numerator of 178.
+Applying the rule consistently gives 174 and a lower headline publication rate.
+Whether the rule covers all 39 or 35 is a definition of the outcome, so it is
+preserved rather than chosen.
+
+**My first version of this test asserted the wrong contract.** It required the
+39 to be absent from the analytical dataset. They are not meant to be: the
+denominator is 1,106, not 1,067, and these abstracts stay in the cohort. What
+the exclusion means is that their pre-congress publication does not count as the
+abstract having led to a publication. The corrected test asserts exactly that,
+and it is the corrected version that found the four.
+
+**Finding 2 (registered).** `pubmed_strategy_results.csv` covers 1,742
+abstracts, 588 of which are not in the 1,154-row parse. The search layer ran
+against an earlier, larger cohort and was never regenerated. Same staleness the
+cycle 4 entry records for `search_strategy_efficacy.csv`, now seen in the file
+that table is computed from, and it should be decided together with it.
+
+21.10 deliberately skips the search artefacts so that one defect produces one
+failure. Reporting it twice would have hidden any OTHER artefact overrunning the
+cohort.
+
+**The manifest is now at 19 entries against a ceiling of 20.** That ceiling is a
+ratchet, not a quota: it is close because decisions are accumulating unanswered,
+not because the tests are noisy.
