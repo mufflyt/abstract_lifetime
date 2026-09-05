@@ -27,6 +27,11 @@ results <- read_csv(here("output", "abstracts_with_matches.csv"), show_col_types
 if (file.exists(here("output", "manual_review_decisions.csv"))) {
   decisions <- read_csv(here("output", "manual_review_decisions.csv"), show_col_types = FALSE)
   results <- assign_final_published(results, dedup_decisions_for_analysis(decisions))
+  # 06 refreshes months_to_pub against the credited PMID before applying the
+  # pre-congress exclusion; this script does not, so recomputing the cascade
+  # alone is not enough to match it. Adopt the settled outcome instead. 06 runs
+  # first in 00_run_all.R. See R/utils_decisions.R.
+  results <- adopt_analysis_outcome(results)
 } else {
   results <- results |>
     mutate(final_published = classification == "definite")

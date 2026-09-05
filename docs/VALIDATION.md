@@ -29,7 +29,7 @@ The registered failures are **not listed here.** They live in
 
 This document and the README both used to carry their own hand-maintained copy
 of that table. Both drifted to three rows while the manifest grew to
-<!--manifest-count-->23<!--/manifest-count-->, which is the same failure the
+<!--manifest-count-->22<!--/manifest-count-->, which is the same failure the
 manifest gate exists to prevent — a description of the truth kept next to the
 truth, updated separately, and wrong. There is one copy now, it is generated,
 and `tests/testthat/test-decision_registry.R` fails if these counts stop

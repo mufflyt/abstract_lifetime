@@ -1,5 +1,47 @@
 # NEWS
 
+## 2026-09-05 - the denominator question, answered
+
+The rule is now: a publication that appeared before the congress cannot count as
+having come out of it, and no reviewer judgment overrides that. The numerator
+moves from 178 to 171 and the rate from 16.9% to 16.3%.
+
+The denominator does not move. An excluded abstract stays in the cohort and is
+counted unpublished; it does not leave the study. Neither does the median time
+to publication, which stays at 13.7 months, because every abstract this affects
+had a negative interval and was already outside the time-to-event analysis. The
+Cox model actually gains seven observations, since an abstract counted
+unpublished contributes censored follow-up while one counted published with a
+negative interval is discarded outright.
+
+Implementing it was less obvious than it sounds. The scorer already flags
+pre-conference candidates with an `excluded` classification, and trusting that
+flag would have missed three abstracts. Two of them carry a reviewer-supplied
+PMID different from the algorithm's best candidate, and the pre-conference
+penalty had been computed against the wrong paper; for those two the interval
+reaching the cascade was missing altogether, and only becomes 10.3 months before
+the congress after 06 re-joins the publication fields on the credited PMID. A
+third was scored `definite` despite its paper predating the congress by two
+weeks, and the `definite` branch used to win outright. So the rule is applied to
+the credited publication's date, twice: once in the cascade, and once more after
+the refresh.
+
+That in turn exposed a drift. The table and figure scripts recompute the outcome
+through the same cascade, with comments explaining that this is how they avoid
+diverging from the analysis. They do not do 06's date refresh, so under the new
+rule they would have called two abstracts published that the analysis calls
+unpublished. Both now adopt the settled outcome rather than recomputing it.
+
+The best evidence that the rule is right is a number that went to zero.
+`n_pre_congress`, the count of published abstracts whose paper predates their
+congress, was 7 and is now 0. The estimand is internally coherent: published
+means published after the congress, by construction rather than by convention.
+
+One finding weakened and should be said plainly. Academic affiliation now
+survives only 50.4% of bootstrap resamples, down from 62.0%. It was already
+described as not sampling-robust; it is now about a coin flip, and should be
+read as suggestive at most.
+
 ## 2026-09-05 - which date counts
 
 PubMed gives an article two dates: the electronic release and the print issue.

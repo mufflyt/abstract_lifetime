@@ -257,25 +257,6 @@ expected_failures:
     documented_in: tests/loop/LEDGER.md cycle 19
 
   - file: test-cycle21_id_integrity.R
-    test: a pre-congress publication is not counted as a publication
-    reason: >
-      output/excluded_pre_congress_publications.csv lists 39 abstracts whose
-      matched paper appeared before the congress at which the abstract was
-      presented. The exclusion is applied to 35 of them, which carry
-      final_published FALSE. For AAGL2021_002, AAGL2021_049, AAGL2023_042 and
-      AAGL2023_048 the best_pmid is exactly the PMID listed as excluded and
-      months_to_pub is negative (0.2 to 4.5 months before the congress), yet
-      they are counted as published. They sit in the numerator of 178.
-    decision_needed: >
-      Whether the pre-congress exclusion applies to all 39 or to 35. Applying it
-      consistently moves the numerator from 178 to 174 and lowers the headline
-      publication rate, so it changes a reported result. The alternative reading
-      is that these four are correctly counted and the other 35 are wrongly
-      excluded, which moves the numerator the other way. Either answer is a
-      definition of the outcome, not a coding fix.
-    documented_in: tests/loop/LEDGER.md cycle 21
-
-  - file: test-cycle21_id_integrity.R
     test: no artefact references an abstract the parse never produced
     reason: >
       data/processed/pubmed_strategy_results.csv covers 1,742 abstracts, of

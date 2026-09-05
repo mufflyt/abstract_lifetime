@@ -155,8 +155,8 @@ test_that("the documented numerator and denominator agree with the dataset", {
   expect_equal(n_cohort, 1106L)
   expect_equal(n_pending, 55L)
   expect_equal(n_evaluated, 1051L)
-  expect_equal(n_published, 178L)
-  expect_equal(round(n_published / n_evaluated * 100, 1), 16.9)
+  expect_equal(n_published, 171L)
+  expect_equal(round(n_published / n_evaluated * 100, 1), 16.3)
 })
 
 test_that("aim1_publication_rate.csv agrees with the dataset it summarises", {
@@ -230,6 +230,10 @@ test_that("the inline decision logic in 07 and 08 still agrees with utils_decisi
     dplyr::left_join(dplyr::select(inline_dedup, abstract_id, manual_decision),
                      by = "abstract_id") |>
     dplyr::mutate(final_published = dplyr::case_when(
+      # The pre-congress exclusion is the first branch since the PI decision of
+      # 2026-09-05. A reference implementation without it would assert the
+      # absence of the rule.
+      !is.na(months_to_pub) & months_to_pub < 0 ~ FALSE,
       classification == "definite" ~ TRUE,
       manual_decision == "match" ~ TRUE,
       manual_decision == "no_match" ~ FALSE,
@@ -241,6 +245,24 @@ test_that("the inline decision logic in 07 and 08 still agrees with utils_decisi
                    info = paste("R/07_make_tables.R and R/08_make_figures.R have",
                                 "diverged from R/utils_decisions.R; see",
                                 "docs/FAILURE_MODES.md F9"))
+})
+
+test_that("07 and 08 adopt the outcome the analysis settled", {
+  # Recomputing the cascade is no longer sufficient for them to agree with 06.
+  # 06 refreshes months_to_pub against the credited PMID before applying the
+  # pre-congress exclusion; 07 and 08 do not, so two abstracts would be
+  # unpublished in the analysis and published in the tables. Both must adopt
+  # the settled outcome. See appendix A19.3.
+  for (f in c("R/07_make_tables.R", "R/08_make_figures.R")) {
+    p <- here::here(f)
+    skip_if_not(file.exists(p))
+    txt <- paste(readLines(p, warn = FALSE), collapse = "\n")
+    expect_true(
+      grepl("adopt_analysis_outcome(", txt, fixed = TRUE),
+      label = paste(f, "does not call adopt_analysis_outcome(), so it can",
+                    "disagree with R/06_analyze_results.R about which abstracts",
+                    "are published"))
+  }
 })
 
 # --- Pinned known defects (see docs/FAILURE_MODES.md) -------------------------

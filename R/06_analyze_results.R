@@ -113,6 +113,26 @@ if (file.exists(candidates_path)) {
 }
 
 # ------------------------------------------------------------------
+# Re-apply the pre-congress exclusion now that months_to_pub describes the
+# paper actually credited.
+#
+# assign_final_published() applies the same rule above, but at that point the
+# interval came from 05, which joins on best_pmid. Where a reviewer supplied a
+# different PMID the interval described the wrong paper or was missing, so the
+# rule could not fire. AAGL2018_002 and AAGL2018_019 are the live cases: both
+# resolve to 10.3 months before their congress only after the refresh.
+# PI decision, 2026-09-05. See docs/OUTCOME_DEFINITION.md.
+# ------------------------------------------------------------------
+n_before_pre <- sum(results$final_published, na.rm = TRUE)
+results <- apply_pre_congress_exclusion(results)
+n_excluded_pre <- n_before_pre - sum(results$final_published, na.rm = TRUE)
+if (n_excluded_pre > 0) {
+  cli_alert_info(
+    "Pre-congress exclusion removed {n_excluded_pre} abstract{?s} from the numerator \
+     after the publication dates were refreshed")
+}
+
+# ------------------------------------------------------------------
 # One publication credited to more than one abstract.
 #
 # The publication rate is a per-abstract quantity, and two abstracts from the

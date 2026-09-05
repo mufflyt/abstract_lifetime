@@ -7,9 +7,10 @@ denominator.rule,abstracts whose match status was resolved,abstracts whose match
 denominator.excludes_unresolved,TRUE,TRUE,unchanged
 denominator.n_unresolved,55,55,unchanged
 denominator.n_evaluated,1051,1051,unchanged
-outcome.definition,matched to a full publication,matched to a full publication,unchanged
-outcome.counted_as_published,"classification == 'definite', or a reviewer decision of match","classification == 'definite', or a reviewer decision of match",unchanged
-outcome.n_events,178,178,unchanged
+outcome.definition,matched to a full publication that appeared after the congress,matched to a full publication that appeared after the congress,unchanged
+outcome.counted_as_published,"classification == 'definite', or a reviewer decision of match; in either case only if the credited publication's print issue date is on or after the congress date (PI decision, 2026-09-05)","classification == 'definite', or a reviewer decision of match; in either case only if the credited publication's print issue date is on or after the congress date (PI decision, 2026-09-05)",unchanged
+outcome.pre_congress_excluded,always; no classification or reviewer verdict overrides it,always; no classification or reviewer verdict overrides it,unchanged
+outcome.n_events,171,171,unchanged
 time.origin,congress date,congress date,unchanged
 time.censoring,administrative at the end of the search window,administrative at the end of the search window,unchanged
 time.search_window_start,2012/11/01,2012/11/01,unchanged

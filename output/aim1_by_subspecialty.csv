@@ -1,9 +1,9 @@
 subspecialty,n,n_published,rate,availability_among_published,availability_among_unpublished,outcome_conditional_stratifier
-FPMRS,8,8,100,77.5,1.9,TRUE
-REI,1,1,100,77.5,1.9,TRUE
-obstetrics,10,10,100,77.5,1.9,TRUE
-surgery_other,1,1,100,77.5,1.9,TRUE
-general_OBGYN,104,94,90.4,77.5,1.9,TRUE
-MIGS,26,23,88.5,77.5,1.9,TRUE
-GYN_ONC,4,1,25,77.5,1.9,TRUE
-urology,1,0,0,77.5,1.9,TRUE
+FPMRS,8,8,100,80.1,2,TRUE
+REI,1,1,100,80.1,2,TRUE
+obstetrics,10,10,100,80.1,2,TRUE
+surgery_other,1,1,100,80.1,2,TRUE
+general_OBGYN,104,93,89.4,80.1,2,TRUE
+MIGS,26,23,88.5,80.1,2,TRUE
+GYN_ONC,4,1,25,80.1,2,TRUE
+urology,1,0,0,80.1,2,TRUE

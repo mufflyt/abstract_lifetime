@@ -1,8 +1,8 @@
 scenario,denominator,n,n_published,rate
 Definite only,cohort,1106,131,11.8
 Definite + probable,cohort,1106,212,19.2
-Definite + reviewer-confirmed,evaluated,1051,178,16.9
-Published within 12 months,evaluated with sufficient follow-up,1051,78,7.4
-Published within 24 months,evaluated with sufficient follow-up,1051,139,13.2
-Published within 36 months,evaluated with sufficient follow-up,991,142,14.3
-Published within 48 months,evaluated with sufficient follow-up,901,124,13.8
+Definite + reviewer-confirmed,evaluated,1051,171,16.3
+Published within 12 months,evaluated with sufficient follow-up,1051,71,6.8
+Published within 24 months,evaluated with sufficient follow-up,1051,132,12.6
+Published within 36 months,evaluated with sufficient follow-up,991,137,13.8
+Published within 48 months,evaluated with sufficient follow-up,901,119,13.2

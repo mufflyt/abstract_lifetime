@@ -18,9 +18,12 @@ dec <- function(id, reviewer, decision, when) {
                  manual_decision = decision, manual_pmid = NA_character_,
                  review_timestamp = ts(when))
 }
-res <- function(id, classification) {
+# months_to_pub joined the contract when the pre-congress exclusion became the
+# first branch (PI decision, 2026-09-05). Default is a post-congress interval so
+# the other branches are exercised as before.
+res <- function(id, classification, months_to_pub = 12) {
   tibble::tibble(abstract_id = id, classification = classification,
-                 best_pmid = NA_character_)
+                 best_pmid = NA_character_, months_to_pub = months_to_pub)
 }
 
 # ------------------------------------------------------------
@@ -33,10 +36,11 @@ fixture <- list(
     res("A3", "probable"),   # human skip -> NA
     res("A4", "possible"),   # AUTO only -> keeps AUTO's no_match
     res("A5", "no_match"),   # no reviewer
-    res("A6", "excluded"),   # human match (pre-congress override)
+    res("A6", "excluded", months_to_pub = -3),  # human match must NOT override
     res("A7", "probable"),   # AUTO newer than human: human must still win
     res("A8", "probable"),   # two human rows; the LATER one must win
-    res("A9", "excluded")    # no reviewer at all; must resolve FALSE, not NA
+    res("A9", "excluded", months_to_pub = -2),  # no reviewer; FALSE, not NA
+    res("A10", "definite", months_to_pub = -0.5) # definite must NOT override either
   ),
   decisions = bind_rows(
     dec("A1", "R01",   "no_match", "2026-04-20 10:00:00"),
@@ -47,7 +51,8 @@ fixture <- list(
     dec("A7", "R01",   "match",    "2026-04-14 09:00:00"),
     dec("A7", "AUTO", "no_match", "2099-01-01 00:00:00"),
     dec("A8", "R01",   "no_match", "2026-04-18 10:00:00"),
-    dec("A8", "R02",   "match",    "2026-04-22 10:00:00")
+    dec("A8", "R02",   "match",    "2026-04-22 10:00:00"),
+    dec("A10", "R01",  "match",    "2026-04-22 10:00:00")
   )
 )
 
@@ -75,11 +80,12 @@ check_invariants <- function(dedup_fn, assign_fn, summary_fn) {
   note(is.na(get("A3")), "skip_on_probable_is_na")
   note(isFALSE(get("A4")), "auto_only_resolves_false")
   note(isFALSE(get("A5")), "no_match_resolves_false")
-  note(isTRUE(get("A6")), "human_match_overrides_excluded")
+  note(isFALSE(get("A6")), "human_match_does_not_override_precongress")
   note(isTRUE(get("A7")), "human_decision_survives")
   note(identical(dd$reviewer[dd$abstract_id == "A8"], "R02"), "latest_human_wins")
   note(isTRUE(get("A8")), "latest_human_decision_applied")
   note(isFALSE(get("A9")), "excluded_without_reviewer_is_false")
+  note(isFALSE(get("A10")), "definite_does_not_override_precongress")
   note(nrow(fp) == nrow(fixture$results), "no_row_duplication_after_join")
   note(identical(s$n_evaluated, s$n_cohort - s$n_pending), "denominator_definition")
   note(identical(s$n_published + s$n_not_published, s$n_evaluated), "parts_close")
