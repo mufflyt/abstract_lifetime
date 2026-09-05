@@ -1485,3 +1485,94 @@ the rule unenforced while the contract still reported as satisfied.
 not: the gate already fails on an orphaned expected-failure entry, but a renamed
 test would have left its SKIP approved forever, silently excusing a test that no
 longer exists.
+
+---
+
+# Final audit (after cycle 24)
+
+## Suite state
+
+Run in a clean git worktree, which holds only tracked files and so reproduces
+CI rather than a developer machine:
+
+    files: 56  passed: 1723  failed: 23  errors: 0  skipped: 12
+    Suite green: 23 failure(s), all on the expected-failure manifest.
+
+Cycles 17-24 contributed 165 assertions across 8 files, 157 passing and 8
+preserved.
+
+| cycle | file | pass | preserved |
+|---|---|---|---|
+| 17 | search layer | 22 | 1 |
+| 18 | missingness and model stability | 19 | 0 |
+| 19 | congress dates and censoring | 27 | 1 |
+| 20 | gender resolution waterfall | 18 | 1 |
+| 21 | abstract_id integrity | 14 | 2 |
+| 22 | reviewer decision log | 19 | 2 |
+| 23 | validation metrics and fidelity | 24 | 1 |
+| 24 | governance coherence | 14 | 0 |
+
+## Duplicates, order dependence, flakiness
+
+Test names are unique across all 56 files. The one collision found,
+`quality improvement detected` twice inside `test-utils_classify.R`, was fixed
+in cycle 24; it mattered because both manifests key on `file :: test`.
+
+Cycles 17-24 were re-run in a fresh session in reverse file order and again
+forward: 157 pass and 8 fail every time. No order dependence and no flakiness.
+Nothing in these cycles draws on RNG except `set.seed(19)` in 19.9, which is
+seeded precisely so the shuffle is reproducible.
+
+## Defects found and fixed
+
+One, and it was in the tests rather than the pipeline: the duplicated test name
+above. Cycles 17-24 found no new implementation defect that could be fixed
+without deciding something.
+
+## Decisions surfaced and left to the author
+
+Eight entries were added to `tests/expected_failures.yaml`, taking it from 16 to
+23. Two touch a reported number directly:
+
+1. **Four abstracts with a pre-congress publication are counted as published**
+   (cycle 21). `AAGL2021_002`, `AAGL2021_049`, `AAGL2023_042`, `AAGL2023_048`.
+   The study's own exclusion file lists 39 such abstracts and the rule is applied
+   to 35. Applying it to all 39 moves the numerator from 178 to 174.
+
+2. **Four abstracts with a human `no_match` are counted as published**
+   (cycle 22). `AAGL2013_050`, `AAGL2014_053`, `AAGL2015_029`, `AAGL2021_030`.
+   A different four from the first group. One is the shared-PMID case already in
+   the cycle 6 entry; three are new.
+
+The rest: `author_keywords` searched for nothing because the cohort has no
+keywords column (17); one event lies beyond its own censoring horizon because it
+is timed to a print-issue date after the search end (19); 156 of 285 queued
+abstracts were never humanly reviewed and were closed by AUTO (22); fidelity
+checking covers only the matches the algorithm was already confident about and
+skips the 22 that human adjudication settled (23); `pubmed_strategy_results.csv`
+covers 588 abstracts that no longer exist (21); and the committed gender conflict
+log describes a different run from the dataset beside it (23, operational).
+
+## What I got wrong, and what that says
+
+Eight of my own assertions were wrong before they were right: 17.7, 18.2, 19.8,
+21.6, 22.8, 23.7, 24.5 and 24.7. Every one failed because I asserted a contract
+nobody had stated rather than the contract the code and artefacts actually hold.
+In two cases the corrected test then found something the wrong one would have
+buried: 21.6 found the four pre-congress abstracts only after I stopped
+demanding they be absent from the cohort, and 24.7 found the real partition
+invariant only after I stopped treating 1,051 as a disagreement.
+
+The single most useful process change came late. **Cycle 20's gender-conflict
+test passed on every local run and failed the moment the gate ran in a clean
+worktree**, because my working tree held a regenerated artefact that was another
+agent's uncommitted change. A shared working tree is not a safe place to
+validate. Every gate after that was run in an isolated worktree, and the final
+numbers above come from one.
+
+## Ceiling
+
+`max_entries` was raised from 20 to 24, deliberately, with the reason recorded
+in `config/ci_contract.yml`. It is at 23. That is not headroom to spend: it is a
+ratchet that should come back down as decisions are closed, and it is close
+because decisions are accumulating unanswered, not because the tests are noisy.
