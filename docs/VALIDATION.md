@@ -23,11 +23,23 @@ whatever its interval width. It should be reported as not estimable, or
 dropped — `mysterycall_remove_near_zero()` identifies it automatically at a
 frequency ratio of 1044:7, above the conventional 19:1 cutoff.
 
-| Failing test | Reports | Why it is not fixed |
-|---|---|---|
-| `test-cycle04_validation_sensitivity.R:179` | `search_strategy_efficacy.csv` still carries the pre-correction 0.2% `title` yield | Regenerating it means re-running the whole search layer, which would change candidate sets and invalidate the human adjudication |
-| `test-cycle06_scoring_composite.R:83` | `keyword_pts` fires on 0 of 1,106 abstracts | Fixing the component changes every composite score and therefore every classification, invalidating the adjudication |
-| `test-cycle06_scoring_composite.R:116` | 3 PMIDs credited to 6 published abstracts | Deciding which abstract owns each PMID is adjudication. Surfaced as `final_pmid_shared` and `output/shared_publication_matches.csv`; see FAILURE_MODES.md F17 |
+The registered failures are **not listed here.** They live in
+[DECISIONS_PENDING.md](DECISIONS_PENDING.md), generated from
+`tests/expected_failures.yaml` by `Rscript R/generate_decisions_pending.R`.
+
+This document and the README both used to carry their own hand-maintained copy
+of that table. Both drifted to three rows while the manifest grew to
+<!--manifest-count-->23<!--/manifest-count-->, which is the same failure the
+manifest gate exists to prevent — a description of the truth kept next to the
+truth, updated separately, and wrong. There is one copy now, it is generated,
+and `tests/testthat/test-decision_registry.R` fails if these counts stop
+matching the manifests or if a duplicate table reappears.
+
+<!--skip-count-->13<!--/skip-count--> tests are registered as skipping on
+purpose, in `tests/expected_skips.yaml`. That is the number of *registrations*,
+not the number that skip in any given run: an approved skip that manages to run
+is not an error, so the observed count is usually lower. A skipped test asserts
+nothing, so the gate fails on unapproved skips.
 
 **Resolved and removed from the manifest, 2026-09-04.** The Cox
 proportional-hazards entry (`test-pipeline_semantics.R::PH assumption holds`,

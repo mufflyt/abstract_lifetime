@@ -19,3 +19,10 @@ ph_global_p,Global Schoenfeld test for proportional hazards,0.041,p_value,output
 ph_remediated_p,Global Schoenfeld test after stratifying on the violating term,0.71,p_value,output/cox_ph_assumption.csv,d$remediated_global_p[1],0.0005,docs/STATISTICAL_ANALYSIS.md
 sens_definite_only_rate,Publication rate counting definite matches only,11.8,percent,output/sensitivity_analyses.csv,"d$rate[d$scenario == ""Definite only""]",0.05,docs/STATISTICAL_ANALYSIS.md
 sens_definite_probable_rate,Publication rate counting definite and probable matches,19.2,percent,output/sensitivity_analyses.csv,"d$rate[d$scenario == ""Definite + probable""]",0.05,docs/STATISTICAL_ANALYSIS.md
+cox_model_n,Abstracts in the Cox model frame,1020,count,output/cox_ph_support.csv,"d$value[d$metric == ""cox_n""]",0,docs/STATISTICAL_ANALYSIS.md
+cox_model_events,Events in the Cox model,171,count,output/cox_ph_support.csv,"d$value[d$metric == ""cox_events""]",0,docs/STATISTICAL_ANALYSIS.md
+ph_global_p_without_violator,Global Schoenfeld test with the violating term removed,0.5295,p_value,output/cox_ph_support.csv,"d$value[d$metric == ""ph_global_p_without_violator""]",0.0005,"docs/STATISTICAL_ANALYSIS.md; appendix A16"
+aic_proportional,AIC of the proportional-hazards Cox fit,2303.6,aic,output/cox_ph_support.csv,"d$value[d$metric == ""aic_proportional""]",0.05,"docs/STATISTICAL_ANALYSIS.md; appendix A16"
+aic_time_varying,AIC of the time-varying Cox fit,2295.4,aic,output/cox_ph_support.csv,"d$value[d$metric == ""aic_time_varying""]",0.05,"docs/STATISTICAL_ANALYSIS.md; appendix A16"
+schoenfeld_rho_violator,Spearman correlation of the violator Schoenfeld residuals with time,0.257,correlation,output/cox_ph_support.csv,"d$value[d$metric == ""schoenfeld_rho_violator""]",0.0005,"docs/STATISTICAL_ANALYSIS.md; appendix A16"
+author_ceiling_pct,Share of the Cox model frame at the author-count ceiling,48.9,percent,output/cox_ph_support.csv,"d$value[d$metric == ""violator_pct_at_ceiling""]",0.05,"README.md; docs/STATISTICAL_ANALYSIS.md; appendix A16"
