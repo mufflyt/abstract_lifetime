@@ -9,6 +9,44 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-05] - is_multicenter retained as a text claim
+
+### Changed
+
+- **PI decision: `is_multicenter` is left as it is.** No code changed. The
+  affiliation recovery made a competing definition available for the first
+  time, and it was not adopted: `is_multicenter` is TRUE for 65 abstracts while
+  679 name more than one affiliation, and 58 of the 65 do both, so the measures
+  agree where the text is explicit and diverge where it is silent.
+- The two measure different things. `is_multicenter` is a claim about study
+  design; affiliation count is a fact about authorship. A single-centre study
+  with a statistician from another university satisfies the second and not the
+  first. Redefining would take the variable from 65 to 679 and convert a design
+  measure into a collaboration-breadth measure under the same name, which is an
+  estimand change rather than a measurement repair.
+- The data dictionary now says what the variable actually is: a claim made in
+  the abstract text, not a verified design fact, and one that under-counts.
+  `docs/STATISTICAL_ANALYSIS.md` carries the same note against the results row.
+
+### Added
+
+- `tests/testthat/test-multicenter_semantics.R` pins the decision: it fails if
+  the variable is redefined from affiliation count, if the two measures stop
+  being distinguishable, or if `n_affiliations` reaches the analytical dataset
+  without the documentation catching up.
+
+### Note
+
+- Two limitations are recorded rather than fixed. The definition under-counts,
+  because a two-site study that never writes "multicentre" is FALSE; and it is
+  unavailable for 2017-2018, where no abstract text survives, so those
+  abstracts are FALSE by absence. That is the pattern A21 removed from
+  `is_academic`. The variable is not significant in either model (HR 1.361,
+  p = 0.265), so no conclusion rests on it; if one ever did, the second
+  limitation would need addressing first.
+- `n_affiliations` remains in `abstracts_cleaned.csv` only. The analytical
+  dataset stays at 93 columns.
+
 ## [2026-09-05] - Affiliation covariates derived from affiliations
 
 ### Changed

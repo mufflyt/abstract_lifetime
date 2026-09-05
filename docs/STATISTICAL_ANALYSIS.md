@@ -220,7 +220,15 @@ confidence intervals from `broom::tidy(exponentiate = TRUE, conf.int = TRUE)`:
 | `is_us_basedTRUE` | 0.787 | 0.575 – 1.078 | 0.136 |
 | `n_authors` | 1.218 | 1.058 – 1.402 | 0.006 |
 | `gender_unifiedmale` | 0.746 | 0.549 – 1.014 | 0.066 |
-| `is_multicenterTRUE` | 1.361 | 0.793 – 2.336 | 0.265 |
+| `is_multicenterTRUE`&nbsp;† | 1.361 | 0.793 – 2.336 | 0.265 |
+
+† `is_multicenter` records whether the abstract *describes* the study as
+multicentre, not a verified design fact. It is TRUE for 65 of 1,106, while
+679 abstracts name more than one affiliation; the two agree where the text is
+explicit and diverge where it is silent. Retained as the design claim by PI
+decision on 2026-09-05 rather than redefined as affiliation count, which
+would measure collaboration breadth. It under-counts, and it is unavailable
+for 2017-2018 where no abstract text survives. See appendix A22.
 
 The `n_authors` row is a hazard ratio **averaged over follow-up** and should not
 be quoted on its own; that term violates proportional hazards and the effect it
