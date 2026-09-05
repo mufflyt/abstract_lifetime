@@ -25,6 +25,26 @@ missing <- abstracts |>
 
 cli_alert_info("{nrow(missing)} abstracts need backfill")
 
+# Record, as a committed artifact, which eligible abstracts were actually
+# attempted. The evidence otherwise lives only in data/cache/pubmed_xml, which
+# is gitignored, so a test asserting backfill coverage silently SKIPS in CI and
+# the gate reads the skip as a pass. That is how the cycle-15 finding became
+# invisible on main. Written before fetching so an interrupted run still leaves
+# an honest record of what it faced.
+write_backfill_coverage <- function(missing_df, cache_dir) {
+  key <- function(d) {
+    b <- stringr::str_replace(d, "^https?://doi\\.org/", "")
+    stringr::str_replace_all(b, "[/:]", "_")
+  }
+  cov <- tibble::tibble(
+    abstract_id = missing_df$abstract_id,
+    congress_year = missing_df$congress_year,
+    attempted = file.exists(file.path(cache_dir, paste0(key(missing_df$doi), ".xml")))
+  )
+  readr::write_csv(cov, here::here("output", "backfill_coverage.csv"))
+  cov
+}
+
 if (nrow(missing) == 0) {
   cli_alert_success("Nothing to backfill")
   invisible(NULL)
@@ -32,6 +52,9 @@ if (nrow(missing) == 0) {
 
 cache_dir <- here("data", "cache", "pubmed_xml")
 dir.create(cache_dir, showWarnings = FALSE, recursive = TRUE)
+
+coverage <- write_backfill_coverage(missing, cache_dir)
+cli_alert_info("Backfill coverage recorded: {sum(coverage$attempted)} of {nrow(coverage)} eligible abstracts previously attempted")
 
 has_key <- nchar(Sys.getenv("ENTREZ_KEY", "")) > 0
 delay   <- if (has_key) 1 / cfg$pubmed$rate_limit_with_key else 1 / cfg$pubmed$rate_limit_per_sec
