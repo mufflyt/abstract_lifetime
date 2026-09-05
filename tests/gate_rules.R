@@ -38,3 +38,36 @@ gate_classify <- function(df, expected) {
     skipped_entries = expected[expected %in% all_keys[skipped_flag]]
   )
 }
+
+#' Classify which tests SKIPPED against the approved-skip manifest.
+#'
+#' A skipped test asserts nothing. Counted as a pass it is worse than absent,
+#' because it occupies the place where coverage is supposed to be: that is how
+#' 45 bundle assertions and a backfill-coverage check sat inert in CI for weeks
+#' while reporting green.
+#'
+#' Direction matters here. An UNAPPROVED skip is a failure: a test that stopped
+#' asserting without anyone saying so. An approved skip that ran anyway is NOT
+#' a failure, because the skip set is genuinely environment-dependent -- the
+#' Shiny bundle and the PubMed cache exist on a developer machine and not in a
+#' clean checkout, so the same suite legitimately skips different tests in the
+#' two places. Those are reported, not enforced.
+#'
+#' @param df       as.data.frame(testthat::test_dir(...))
+#' @param approved character vector of "file :: test" keys from the skip manifest
+#' @return list(skipped_keys, unapproved, did_not_skip)
+skip_classify <- function(df, approved) {
+  if (!nrow(df)) {
+    return(list(skipped_keys = character(0), unapproved = character(0),
+                did_not_skip = approved))
+  }
+  skipped_flag <- if ("skipped" %in% names(df)) df$skipped > 0 else rep(FALSE, nrow(df))
+  all_keys <- gate_key(df$file, df$test)
+  skipped_keys <- all_keys[skipped_flag]
+
+  list(
+    skipped_keys = skipped_keys,
+    unapproved   = setdiff(skipped_keys, approved),
+    did_not_skip = setdiff(approved, skipped_keys)
+  )
+}

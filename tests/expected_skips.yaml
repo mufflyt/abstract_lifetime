@@ -1,0 +1,187 @@
+# expected_skips.yaml — tests that assert nothing in some environment, and why.
+#
+# A skipped test is not a passing test. Counted as coverage it is worse than an
+# absent test, because it occupies the place where a check is supposed to be.
+# Two real defects in this repository hid exactly there: 45 bundle-currency
+# assertions that skipped in CI while the bundle was 135 days stale, and a
+# backfill-coverage check that skipped on a gitignored cache so the suite gate
+# read it as a pass and reported its manifest entry as fixed.
+#
+# tests/run_suite_gate.R fails when a test skips WITHOUT an entry here. It does
+# NOT fail when an entry runs anyway: the skip set is legitimately
+# environment-dependent, because the Shiny bundle, the PubMed XML cache and the
+# 130 MB candidate pool exist on a developer machine and not in a clean
+# checkout. Those are reported so the list can be pruned deliberately.
+#
+# Every entry must carry:
+#   file, test  - the identity the gate matches on
+#   reason      - why it cannot run here
+#   to_enable   - what would actually make it run, or "cannot" with the cost
+#
+# This list is meant to shrink. An entry whose to_enable is cheap is a backlog
+# item, not a permanent exemption.
+
+expected_skips:
+
+  # ── The 130 MB candidate pool ───────────────────────────────────────────────
+  # data/processed/pubmed_candidates.csv is gitignored (.gitignore:62) at
+  # 136,339,347 bytes. Only two of its columns are ever read by these tests.
+
+  - file: test-shiny_app.R
+    test: pubmed_candidates.csv exists when the pipeline has been run
+    reason: data/processed/pubmed_candidates.csv is gitignored at 130 MB.
+    to_enable: >
+      Commit an abstract_id/pmid index of the candidate pool. Both columns
+      together are 1.4 MB over 65,697 rows, which is what every candidate
+      assertion in the suite actually reads.
+
+  - file: test-shiny_app.R
+    test: pubmed_candidates.csv has pmid and abstract_id columns
+    reason: data/processed/pubmed_candidates.csv is gitignored at 130 MB.
+    to_enable: Commit an abstract_id/pmid index of the candidate pool.
+
+  - file: test-shiny_app.R
+    test: abstract_ids are consistent across data files
+    reason: data/processed/pubmed_candidates.csv is gitignored at 130 MB.
+    to_enable: Commit an abstract_id/pmid index of the candidate pool.
+
+  - file: test-shiny_app.R
+    test: candidate_rows returns candidates sorted by score
+    reason: >
+      Depends on the bundle candidate pool, which is absent, so the reactive
+      returns no rows to sort.
+    to_enable: Commit an abstract_id/pmid index of the candidate pool.
+
+  - file: test-remediation_invariants.R
+    test: 'F2: every winning PMID resolves in the candidate pool'
+    reason: >
+      data/processed/pubmed_candidates.csv is gitignored at 130 MB. This is one
+      of the pipeline's core invariants and it has never run in CI.
+    to_enable: Commit an abstract_id/pmid index of the candidate pool.
+
+  - file: test-docs_drift.R
+    test: 'F2 (FIXED 2026-09-03): the candidate pool covers every scored pair'
+    reason: data/processed/pubmed_candidates.csv is gitignored at 130 MB.
+    to_enable: Commit an abstract_id/pmid index of the candidate pool.
+
+  - file: test-shiny_bundle_currency.R
+    test: the bundle carries every candidate the app must display
+    reason: >
+      Reads the bundle copy of the 130 MB candidate pool. The manifest cannot
+      stand in here: this asserts candidate COVERAGE against match_scores.csv,
+      not currency, so it needs the rows themselves.
+    to_enable: Commit an abstract_id/pmid index of the candidate pool.
+
+  - file: test-shiny_bundle_currency.R
+    test: the candidate/score join the app performs actually resolves
+    reason: >
+      Reads the bundle candidate pool and match_scores_detailed.rds to check
+      that the join app.R:1310 performs resolves rather than silently matching
+      nothing on a type mismatch.
+    to_enable: Commit an abstract_id/pmid index of the candidate pool.
+
+  # ── The 47 MB deploy bundle ─────────────────────────────────────────────────
+  # shiny/adjudication_app/bundle/ is gitignored (.gitignore:54). Most currency
+  # assertions were converted to read bundle_manifest.csv instead; these two
+  # boot a Shiny server against the bundle and cannot be answered from metadata.
+
+  - file: test-shiny_bundle_currency.R
+    test: the running server loads the current cohort and full candidate sets
+    reason: >
+      Boots the app's server function against the bundle directory. Requires
+      the bundle and the candidate pool, not a checksum of either.
+    to_enable: >
+      Cannot, without shipping 47 MB into the checkout. The currency contract
+      this protects is covered by the manifest assertions in the same file.
+
+  - file: test-shiny_bundle_currency.R
+    test: the server serves the current decision log
+    reason: Boots the app's server function against the gitignored bundle.
+    to_enable: >
+      Cannot, without shipping 47 MB. Currency is covered by the manifest
+      assertions in the same file.
+
+  - file: test-shiny_app.R
+    test: bundle copies of data files exist and are non-empty
+    reason: shiny/adjudication_app/bundle/ is gitignored at 47 MB.
+    to_enable: >
+      Cannot. Existence of the bundle is a property of a developer machine
+      after a deploy, not of the repository.
+
+  - file: test-shiny_app.R
+    test: bundle abstracts_cleaned.csv is not stale vs main copy
+    reason: >
+      Compares bundle mtime against the source. Superseded by the content-based
+      manifest checks in test-shiny_bundle_currency.R, which do run in CI.
+    to_enable: >
+      Cannot, and should not: an mtime comparison is satisfied by touch and says
+      nothing about content. Retire this test in favour of the manifest checks.
+
+  - file: test-shiny_app.R
+    test: bundle abstracts_cleaned.csv has AAGL2012_001
+    reason: shiny/adjudication_app/bundle/ is gitignored at 47 MB.
+    to_enable: >
+      Cannot. The equivalent assertion against the source cohort runs in CI via
+      test-shiny_bundle_currency.R.
+
+  - file: test-cycle08_reproducibility_contracts.R
+    test: the Shiny bundle shares the main cohort's schema and ids
+    reason: shiny/adjudication_app/bundle/ is gitignored at 47 MB.
+    to_enable: >
+      Cannot directly. The manifest checks in test-shiny_bundle_currency.R
+      establish that the bundle sources are current, which is the contract.
+
+  # ── The PubMed XML cache ────────────────────────────────────────────────────
+  # data/cache/ is gitignored (.gitignore:23) at 26 MB. These three assert
+  # properties OF the cache, so unlike the coverage check they cannot be
+  # rewritten against a committed artifact.
+
+  - file: test-cycle15_backfill_contract.R
+    test: cached PubMed XML files clear the size floor the fetcher requires
+    reason: >
+      Asserts that no cached file is under the 100-byte floor at
+      R/02b_backfill_abstract_text.R:49. There is no cache in a clean checkout.
+    to_enable: >
+      Cannot. This is a property of the cache itself, not of the analysis, and
+      the coverage question it used to be conflated with is now answered by
+      output/backfill_coverage.csv.
+
+  - file: test-cycle15_backfill_contract.R
+    test: the cache holds no files for DOIs outside the cohort
+    reason: Asserts a property of the gitignored 26 MB PubMed XML cache.
+    to_enable: Cannot; the cache is not a repository artifact.
+
+  - file: test-cycle15_backfill_contract.R
+    test: cached XML parses
+    reason: Asserts a property of the gitignored 26 MB PubMed XML cache.
+    to_enable: Cannot; the cache is not a repository artifact.
+
+  # ── Other gitignored inputs ─────────────────────────────────────────────────
+
+  - file: test-mysterycall_integrations.R
+    test: Table 1 is stratified, tested, and reconciles with the cohort
+    reason: >
+      Reads output/tables/table1_column_ns.csv. output/tables/ is gitignored
+      (.gitignore:31) even though the rest of output/ is committed, so the
+      study's own result tables are absent from a clean checkout.
+    to_enable: >
+      Un-ignore output/tables/. All five files total 20 KB, and this looks like
+      an oversight rather than a decision.
+
+  - file: test-shiny_app.R
+    test: JSON abstract extraction regex finds section-titles in cached HTML
+    reason: >
+      Reads the ScienceDirect HTML scrape cache under data/cache/, which is
+      gitignored.
+    to_enable: Cannot; the scrape cache is not a repository artifact.
+
+  # ── Missing test dependency ─────────────────────────────────────────────────
+
+  - file: test-shiny_e2e.R
+    test: (code run outside of `test_that()`)
+    reason: >
+      shinytest2 is not installed, in CI or locally, so this file asserts
+      nothing anywhere while still appearing in the suite as a test file.
+    to_enable: >
+      Add any::shinytest2 to the workflow package lists, or retire the file.
+      Leaving a zero-assertion file in place misrepresents end-to-end coverage.
