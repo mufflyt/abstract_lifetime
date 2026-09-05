@@ -207,6 +207,33 @@ Abstract-level variables were extracted using a combination of structured field 
 
 ### Publication Search Strategy
 
+**Relation to prior designs.** The closest published approach is the IntoValue
+programme, which followed registered clinical trials to their results
+publications and identified publications for 68.4% of trials (Wieschowski and
+colleagues; data and analysis code at github.com/maia-sh/intovalue-data and
+github.com/quest-bih/IntoValue2). That design can anchor its matching on a
+persistent identifier: a registered trial carries a trial registration number,
+and IntoValue was able to report how often that number appears in the
+publication itself (38% in abstracts, 60% in full text), turning the link
+between record and paper into a checkable fact.
+
+No such identifier exists here. A congress abstract published in a journal
+supplement carries a DOI for the supplement item, but that identifier does not
+propagate into the subsequent full publication, and the AAGL programme assigns
+no persistent study identifier that both documents share. Abstract and article
+are therefore linked only by their content: title, authors, institution,
+journal and date. That is why this study uses a weighted multi-component
+similarity score with a Cochrane-aligned classification and human adjudication
+of the ambiguous band, rather than an identifier join. It is a heavier
+procedure than IntoValue's, and it is heavier because the identifier that would
+make it lighter does not exist for conference abstracts.
+
+The consequence is that matching is a measurement with error rather than a
+lookup, and it is reported as such: classification tiers, adjudication
+decisions and the sensitivity of the headline rate to the matching threshold
+are all reported below and in the supplementary materials.
+
+
 A tiered, multi-database search was conducted to identify full peer-reviewed publications corresponding to each conference abstract. The search window extended from the date of each respective congress through April 2026, providing `r round(followup_max, 1)` years of follow-up for the earliest cohort (`r yr_min`) and `r round(followup_min, 1)` years for the most recent (`r yr_max`).
 
 **Primary search (PubMed/MEDLINE).** Six complementary search strategies were applied to each abstract via the NCBI E-Utilities API: (1) title keyword phrase search, (2) first-author search, (3) last-author search, (4) author plus keyword combination, (5) distinctive title fragment search, and (6) broad author search. Each strategy was filtered by publication date and results from the JMIG supplement issues were excluded to prevent self-matching.

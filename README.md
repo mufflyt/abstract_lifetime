@@ -387,6 +387,19 @@ worktree. Full inventory and the list of invariants that have **no** test:
 
 ---
 
+## Prior art
+
+The repository layout follows the **research compendium** convention from
+[rrtools](https://github.com/benmarwick/rrtools) and
+[rrrpkg](https://github.com/ropensci/rrrpkg) (rOpenSci). Data validation uses
+[pointblank](https://github.com/posit-dev/pointblank). The closest published
+relative of the matching methodology is the IntoValue programme
+([intovalue-data](https://github.com/maia-sh/intovalue-data),
+[IntoValue2](https://github.com/quest-bih/IntoValue2)), which followed
+registered trials to their publications; the manuscript Methods explains why an
+identifier-anchored design of that kind is not available for conference
+abstracts. See [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md).
+
 ## Citation
 
 See [CITATION.cff](CITATION.cff). Change history:

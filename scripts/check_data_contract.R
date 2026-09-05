@@ -9,7 +9,8 @@
 suppressPackageStartupMessages({library(here); library(readr); library(cli); library(yaml)})
 source(here("R", "utils_data_contract.R"))
 
-v <- validate_data_contract(here("config", "data_contract.yml"))
+v <- validate_data_contract(here("config", "data_contract.yml"),
+                            report_dir = here("output", "data_contract_reports"))
 out <- here("output", "data_contract_violations.csv")
 write_csv(v, out)
 

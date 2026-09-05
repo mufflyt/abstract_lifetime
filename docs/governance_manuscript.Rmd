@@ -1,0 +1,151 @@
+---
+title: "Registering the decisions a pipeline cannot make: a governance layer for reproducible observational research"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(readr); library(here)
+fail_n <- tryCatch(length(yaml::read_yaml(here("tests","expected_failures.yaml"))$expected_failures), error = function(e) NA)
+skip_n <- tryCatch(length(yaml::read_yaml(here("tests","expected_skips.yaml"))$expected_skips), error = function(e) NA)
+```
+
+## Abstract
+
+Reproducible-research practice has converged on a good answer to *can this
+analysis be re-run*: version control, a pinned environment, a declarative
+pipeline, continuous integration. It has no comparable answer to a different
+question: *which parts of this analysis are not settled, and who is supposed to
+settle them.* In a retrospective cohort study of conference abstracts we found
+that the second question dominated. Most of what threatened the results was not
+code that failed but code that succeeded while resting on a decision nobody had
+made, or on a measurement nobody had validated. We describe a governance layer
+built to make those two failure modes visible: an expected-failure manifest that
+registers open scientific decisions as deliberately failing tests, an estimand
+fingerprint that fails when the target quantity changes silently, a row-level
+data contract, and a claims registry binding every number in the manuscript to
+the file that produces it. We report what it caught.
+
+## The problem
+
+A continuous-integration suite answers a binary question: did the code do what
+the tests say. That is necessary and it is not the hard part of an observational
+study. The hard parts look like this:
+
+* A covariate is derived by a rule nobody has validated, and the rule is wrong
+  about half the time.
+* A parser silently drops two thirds of its input and writes the failure to disk
+  as data, so every downstream completeness check reports success.
+* An outcome is decided by the order of four branches in a `case_when()`, and
+  that order encodes a scientific position no author has taken.
+* A denominator changes and every reported number moves with it, correctly, so
+  nothing fails.
+
+None of these is a bug in the sense CI understands. Each is a question that code
+cannot answer, sitting in a place where code will answer it anyway, by default,
+invisibly.
+
+## The governance layer
+
+**Expected-failure manifest.** Tests that encode open questions are written to
+fail and registered in `tests/expected_failures.yaml` with a reason and the
+decision they wait on. The suite gate treats the manifest as the definition of
+green: it fails on any unregistered failure, and equally when a registered test
+starts passing, when an entry names a test that no longer runs, or when a test
+skips without approval. The rules are declared as data in `config/ci_contract.yml`
+so the gate and the workflows cannot disagree.
+
+The second rule is the one that matters. A list of known-failing tests rots: a
+decision is taken, the entry stays, and CI keeps green-lighting a settled
+question. Failing when an entry starts passing forces the registry to shrink as
+decisions are made.
+
+**Estimand fingerprint.** The parameters that define the target quantity -
+population, denominator rule, outcome definition, time origin, censoring - are
+recorded in a baseline. A drift report rebuilds the fingerprint and fails when it
+differs. Changing the estimand then requires an explicit act with a commit
+message, rather than being a side effect of editing configuration. This is
+distinct from checking that values are right: an analysis can produce a perfectly
+reconcilable number for a question nobody intended to ask.
+
+**Row-level data contract.** Aggregate checks hide row-level corruption. A
+dataset can carry the right row count, the right rate and the right median while
+individual rows contradict themselves. The contract declares per-column and
+cross-field invariants and reports the offending identifier. It is implemented
+with pointblank.
+
+**Claims registry.** Every quantitative claim in the manuscript is a row carrying
+its value, the file it comes from, an expression that recovers it, a tolerance
+and where it appears. A test recomputes each one. Prose that quotes a number no
+file produces any more fails the suite.
+
+**Mutation testing of the guards.** Half of the data-contract tests corrupt a
+copy of the data and require the checker to catch it. Zero violations is only
+meaningful if the validator can find one; a broken validator is indistinguishable
+from a healthy dataset.
+
+## What it caught
+
+`r fail_n` decisions are currently registered as open. The following were found
+by the layer itself rather than by review.
+
+**A parser that disguised its own failure.** An affiliation extractor located
+author affiliations correctly and discarded them, because one of two regular
+expressions had been updated for a change in the source format and the other had
+not. Unresolved values reached a `paste()` and were written to disk as the string
+`"NA | NA"`. The column therefore looked populated: 1,874 rows held NA-token
+strings that no missingness check could see, and a model input sat at zero of
+1,106 populated for months without anything noticing. 661 of 1,154 source files
+were affected. It surfaced only when a covariate audit asked why one variable had
+no evidence for two of twelve congress years.
+
+**A covariate measuring the wrong construct.** The same audit showed that
+`is_academic`, described as institutional affiliation, was derived from abstract
+body text using patterns including "residency" and "fellowship" - words that
+describe a study, not an author's institution. Against real affiliations it
+agreed 54% of the time and understated academic affiliation by half. A companion
+variable, US-based status, overstated its prevalence by 24 percentage points.
+Bootstrap retention had been falling for three refits; the audit explained why.
+
+**An outcome decided by branch order.** Whether an abstract counted as published
+depended on the order of branches in a single `case_when()`. Two positions
+nobody had argued for were encoded there: that a publication predating the
+congress could still count as a conversion if a reviewer confirmed the paper, and
+that a `definite` score outranked a human reviewer's rejection. Registering both
+as failing tests forced them to be decided. Both were reversed.
+
+**A guard that caught a schema change.** Implementing one of those decisions
+required joining a reviewer column into the cascade. Left in place it widened the
+analytical dataset by one column and tripped the documentation-drift test - a
+rule change should not silently reshape the dataset.
+
+## What it costs
+
+The layer is roughly 2,000 lines of tests and configuration against a 6,000-line
+analysis. It is not free, and two costs are worth naming.
+
+It slows changes that ought to be fast, because a covariate redefinition now
+requires updating the claims registry, the estimand baseline and the prose
+together. That is the intended trade, but it is a trade.
+
+And it can encourage registering a decision rather than taking it. The
+manifest ceiling exists for this reason: the registry is meant to shrink, and
+growing it past a stated limit must be deliberate.
+
+## What it does not do
+
+It does not detect a wrong-but-plausible number. Every check here is either an
+identity, a contract, or a comparison against a recorded baseline. An analysis
+that is internally consistent, reconciles with its own outputs and targets its
+declared estimand can still be wrong about the world. The affiliation parser was
+caught by a human asking why a variable behaved oddly, not by a test.
+
+The layer's claim is narrower: it makes the unsettled parts of an analysis
+visible and keeps them visible until someone settles them.
+
+## Availability
+
+Code, data and the full decision registry are at
+https://github.com/mufflyt/abstract_lifetime. The registry generated from the
+manifest is `docs/DECISIONS_PENDING.md`; the governance mechanics are
+`docs/TEST_GOVERNANCE.md`.
