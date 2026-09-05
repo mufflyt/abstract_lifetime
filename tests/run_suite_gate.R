@@ -61,10 +61,26 @@ manifest <- if (file.exists(manifest_path)) {
   list()
 }
 
+# The approved-skip manifest. A skipped test asserts nothing, so an unapproved
+# skip is a test that stopped covering something without anyone saying so.
+srules <- contract$skips %||% list()
+skip_manifest_path <- srules$path %||% "tests/expected_skips.yaml"
+rule_unapproved_skip <- isTRUE(srules$fail_on_unapproved_skip %||% TRUE)
+skip_manifest <- if (file.exists(skip_manifest_path)) {
+  yaml::read_yaml(skip_manifest_path)$expected_skips
+} else {
+  list()
+}
+
 key <- function(file, test) paste(file, test, sep = " :: ")
 expected_keys <- if (length(manifest) > 0) {
   key(vapply(manifest, `[[`, character(1), "file"),
       vapply(manifest, `[[`, character(1), "test"))
+} else character(0)
+
+approved_skip_keys <- if (length(skip_manifest) > 0) {
+  key(vapply(skip_manifest, `[[`, character(1), "file"),
+      vapply(skip_manifest, `[[`, character(1), "test"))
 } else character(0)
 
 # Both workflows invoke this from the repository root; the fallback keeps it
@@ -75,6 +91,7 @@ source(gate_rules)
 
 failed <- df[df$failed > 0 | df$error > 0, , drop = FALSE]
 cls <- gate_classify(df, expected_keys)
+scls <- skip_classify(df, approved_skip_keys)
 failed_keys     <- cls$failed_keys
 stale           <- cls$stale
 orphaned        <- cls$orphaned
@@ -111,6 +128,39 @@ if (rule_orphaned && length(orphaned) > 0) {
   problems <- c(problems, sprintf(
     "%d manifest entr%s name a test that never ran. Re-point it at the renamed test, or remove it from %s.",
     length(orphaned), if (length(orphaned) == 1) "y does" else "ies", manifest_path))
+}
+
+# Every skip is printed with the reason recorded for it, so an intentional
+# skip is visible as a gap rather than blending into the pass count.
+if (length(scls$skipped_keys) > 0) {
+  reasons <- setNames(
+    vapply(skip_manifest, function(e) e$reason %||% "", character(1)),
+    key(vapply(skip_manifest, `[[`, character(1), "file"),
+        vapply(skip_manifest, `[[`, character(1), "test")))
+  cat("\n--- skipped: these assert nothing in this environment ---\n")
+  for (k in sort(scls$skipped_keys)) {
+    r <- reasons[[k]]
+    cat(sprintf("  %s%s\n", k,
+                if (is.null(r) || !nzchar(r)) "  [NOT APPROVED]" else
+                  paste0("\n      reason: ", trimws(gsub("\\s+", " ", r)))))
+  }
+}
+
+if (rule_unapproved_skip && length(scls$unapproved) > 0) {
+  problems <- c(problems, sprintf(
+    paste("%d test(s) skipped without an entry in %s. A skipped test asserts",
+          "nothing; add each with a reason and how it would be made to run, or",
+          "make it run."),
+    length(scls$unapproved), skip_manifest_path))
+}
+
+# Not enforced. The skip set is environment-dependent by design: the Shiny
+# bundle and the PubMed cache exist on a developer machine and not in a clean
+# checkout, so an entry that legitimately skips in CI runs locally. Reported so
+# the list can still be pruned deliberately.
+if (length(scls$did_not_skip) > 0) {
+  cat("\n--- approved skips that RAN here (informational) ---\n")
+  cat(paste0("  ", sort(scls$did_not_skip), collapse = "\n"), "\n")
 }
 
 if (length(manifest) > max_entries) {

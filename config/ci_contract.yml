@@ -70,6 +70,20 @@ manifest:
   # should be a deliberate act with a reason in the commit message.
   max_entries: 20
 
+# The approved-skip manifest. A skipped test asserts nothing, so an unapproved
+# skip is coverage that disappeared without anyone saying so. Enforced in one
+# direction only: see the header of tests/expected_skips.yaml for why an
+# approved skip that runs anyway is reported rather than failed.
+skips:
+  path: tests/expected_skips.yaml
+
+  # A test that skips with no entry is a regression in coverage.
+  fail_on_unapproved_skip: true
+
+  # Every entry must say why it cannot run and what would make it run, so the
+  # list stays a backlog rather than becoming a set of permanent exemptions.
+  require_fields: [file, test, reason, to_enable]
+
 # Workflows that must exist and must invoke the suite gate. Adding a workflow
 # that runs tests its own way is how the two files drifted the first time.
 workflows:
