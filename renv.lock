@@ -283,6 +283,12 @@
       "Source": "Repository",
       "Repository": "CRAN"
     },
+    "withr": {
+      "Package": "withr",
+      "Version": "3.0.3",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
     "xml2": {
       "Package": "xml2",
       "Version": "1.6.0",
