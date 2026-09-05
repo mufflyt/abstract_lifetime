@@ -9,6 +9,81 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-05] — CI stops counting skipped tests as coverage; cycles 17-24
+
+### Fixed
+
+- **A skipped test is no longer read as a passing one.** The suite gate
+  classified results as `failed == 0 & error == 0`, which is true of a skipped
+  test. `test-cycle15_backfill_contract.R` read the gitignored PubMed XML cache,
+  so in CI it skipped, the gate counted the skip as a pass, and then reported the
+  test's expected-failure entry as stale. `main` was red for two days with no
+  correct fix available. `tests/gate_rules.R` now classifies skips separately,
+  and `R/02b_backfill_abstract_text.R` writes `output/backfill_coverage.csv` so
+  the assertion reads a committed artefact and fails identically everywhere.
+- **`test-utils_classify.R` had two `test_that` blocks with the same name.** Both
+  manifests key on `file :: test`, so that key was ambiguous and an entry could
+  have excused a different assertion than the one it was written for.
+
+### Added
+
+- **`tests/expected_skips.yaml` and a skip guard.** The gate now fails when a
+  test skips without an approved entry, and prints every skip with its reason.
+  Enforced in one direction only: an unapproved skip fails, an approved skip
+  that runs anyway does not, because the skip set is legitimately
+  environment-dependent. Each entry records why it cannot run and what would
+  make it run.
+- **`output/candidate_pool_index.csv`**, a 1.4 MB `abstract_id`/`pmid`
+  projection of the gitignored 130 MB candidate pool, covering 65,697 pairs.
+  This activates seven previously inert checks, including
+  `F2: every winning PMID resolves in the candidate pool`, a central pipeline
+  invariant that had never run in CI.
+- **`docs/TEST_GOVERNANCE.md`**, documenting the gate, both manifests, and the
+  rule that authoritative gate results come from a clean git worktree.
+- **`docs/DECISIONS_PENDING.md`**, generated from the expected-failure manifest
+  by `R/generate_decisions_pending.R`, with a currency test.
+- **Cycles 17-24 of the test-generation loop**, 165 assertions across eight
+  files, completing the 24-cycle protocol. Targets: the candidate-generation
+  layer, the missingness and model-stability diagnostics, congress date
+  resolution, the gender resolution waterfall, `abstract_id` integrity across 36
+  artefacts, the reviewer decision log, validation and match fidelity, and the
+  coherence of the governance layer itself.
+
+### Changed
+
+- **The Shiny bundle is verified from its committed manifest.** 45 assertions
+  read the gitignored 47 MB bundle and skipped in CI. `bundle_manifest.csv`
+  records each source's md5 and byte count at deploy time, so a source that
+  still matches it is byte-identical to its copy. Drift now produces three CI
+  failures where CI previously reported nothing.
+- **`test-shiny_e2e.R` is opt-in.** It contributed zero assertions everywhere
+  because `shinytest2` is installed nowhere, while still appearing as a test
+  file. It now requires `RUN_SHINY_E2E=true`, and a floor assertion runs in every
+  environment and fails if the exclusion is unrecorded.
+- **`config/ci_contract.yml` declares all three workflows and five gates.**
+  `manuscript.yaml` had been undeclared since it was added. The contract test now
+  also fails on a workflow that exists but is not declared, and on a declared
+  gate that no workflow invokes.
+- **`manifest.max_entries` raised from 20 to 24**, deliberately and with the
+  reason recorded. A ratchet to bring back down as decisions close, not headroom.
+
+### Measured
+
+- Assertions that ran only on a developer machine: **75 to 23**. Fifty-two are
+  now enforced in CI.
+- Approved skips: **20 to 13**.
+- Suite in a clean worktree: 56 files, 1,723 passing, 23 registered failures,
+  12 approved skips.
+
+### Open
+
+Eight decisions were surfaced and left to the author, taking the
+expected-failure manifest from 16 to 23 entries. Two touch a reported number:
+four abstracts with a pre-congress publication and four with a human `no_match`
+are both counted as published, in the numerator of 178. See
+`docs/DECISIONS_PENDING.md`.
+
+
 ## [2026-09-04] — Proportional hazards resolved
 
 ### Fixed
