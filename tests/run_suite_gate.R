@@ -53,15 +53,18 @@ expected_keys <- if (length(manifest) > 0) {
       vapply(manifest, `[[`, character(1), "test"))
 } else character(0)
 
+# Both workflows invoke this from the repository root; the fallback keeps it
+# working if that ever stops being true.
+gate_rules <- if (file.exists("tests/gate_rules.R")) "tests/gate_rules.R" else
+  file.path(here::here(), "tests", "gate_rules.R")
+source(gate_rules)
+
 failed <- df[df$failed > 0 | df$error > 0, , drop = FALSE]
-failed_keys <- key(failed$file, failed$test)
-
-passing <- df[df$failed == 0 & df$error == 0, , drop = FALSE]
-stale <- expected_keys[expected_keys %in% key(passing$file, passing$test)]
-
-# An entry naming a test that did not run at all: renamed, deleted, or a typo.
-# Skipped tests still appear in `df`, so this does not fire on a skip.
-orphaned <- expected_keys[!expected_keys %in% key(df$file, df$test)]
+cls <- gate_classify(df, expected_keys)
+failed_keys     <- cls$failed_keys
+stale           <- cls$stale
+orphaned        <- cls$orphaned
+skipped_entries <- cls$skipped_entries
 
 if (nrow(failed) > 0) {
   cat("\n--- failures ---\n")
@@ -73,7 +76,7 @@ if (nrow(failed) > 0) {
 
 problems <- character()
 
-unexpected <- failed_keys[!failed_keys %in% expected_keys]
+unexpected <- cls$unexpected
 if (length(unexpected) > 0) {
   problems <- c(problems, sprintf(
     "%d unexpected failure(s). Fix them, or add each to %s with a reason and the decision it is waiting on.",
@@ -99,6 +102,11 @@ if (length(orphaned) > 0) {
 if (length(problems) > 0) {
   cat("\n")
   stop(paste(problems, collapse = "\n"), call. = FALSE)
+}
+
+if (length(skipped_entries) > 0) {
+  cat("\n--- manifest entries whose test skipped (not judged either way) ---\n")
+  cat(paste0("  ", skipped_entries, collapse = "\n"), "\n")
 }
 
 cat(sprintf("\nSuite green: %d failure(s), all on the expected-failure manifest.\n",
