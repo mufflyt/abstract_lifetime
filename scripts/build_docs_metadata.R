@@ -183,7 +183,8 @@ cli_alert_success("docs/data_dictionary.csv — {nrow(dictionary)} variables")
 # fall in exactly one, so a new column cannot be quietly left out of the prose.
 GROUPS <- list(
   "Identity and congress" = c("abstract_id", "congress_year", "title", "session_type"),
-  "AAGL author fields" = c("first_author_normalized", "last_author_normalized", "author_count"),
+  "AAGL author fields" = c("first_author_normalized", "last_author_normalized", "author_count",
+                           "authors_truncated"),
   "Study characteristics derived from abstract text" = c(
     "is_rct", "sample_size", "is_academic", "is_us_based", "study_design",
     "is_multicenter", "has_funding", "stat_sig_reported", "has_numeric_results",

@@ -6,9 +6,9 @@ sample_size,numeric,331.97,3081.853,wilcoxon,0.1266,substantive
 is_rct,numeric,0.036,0.091,wilcoxon,0.1622,substantive
 congress_year,numeric,2017.873,2017.287,wilcoxon,0.1933,substantive
 n_candidates,numeric,94.6,56.627,wilcoxon,0.2218,definitional - unresolved are the mid-score band by construction
+gender_unified,categorical,NA,NA,chi-square,0.3284,substantive
 is_multicenter,numeric,0.036,0.06,wilcoxon,0.4691,substantive
 has_funding,numeric,0,0.007,wilcoxon,0.545,substantive
-gender_unified,categorical,NA,NA,chi-square,0.8281,substantive
 is_academic,numeric,0.327,0.336,wilcoxon,0.8955,substantive
 abstract_word_count,numeric,179.073,178.657,wilcoxon,0.92490000000000006,substantive
 is_us_based,numeric,0.818,0.82,wilcoxon,0.9704,substantive

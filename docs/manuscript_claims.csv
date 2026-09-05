@@ -12,10 +12,10 @@ ttp_n_pre_congress,Published abstracts dated before their congress and excluded 
 ttp_median,Median months from congress to publication,13.7,months,output/aim2_time_to_pub.csv,"d$value[d$metric == ""median_months""]",0.05,"README.md; abstract_results_section.Rmd"
 ttp_q1,First quartile of months to publication,5.7,months,output/aim2_time_to_pub.csv,"d$value[d$metric == ""q1_months""]",0.05,README.md
 ttp_q3,Third quartile of months to publication,22.6,months,output/aim2_time_to_pub.csv,"d$value[d$metric == ""q3_months""]",0.05,README.md
-cox_rct_hr,Hazard ratio for randomized design,2.227,hazard_ratio,output/aim2b_cox_regression.csv,"d$estimate[d$term == ""is_rctTRUE""]",0.005,"README.md; docs/STATISTICAL_ANALYSIS.md"
-cox_academic_hr,Hazard ratio for academic affiliation,0.62,hazard_ratio,output/aim2b_cox_regression.csv,"d$estimate[d$term == ""is_academicTRUE""]",0.005,"README.md; docs/STATISTICAL_ANALYSIS.md"
-cox_nauthors_hr,Hazard ratio per additional author averaged over follow-up,1.257,hazard_ratio,output/aim2b_cox_regression.csv,"d$estimate[d$term == ""n_authors""]",0.005,docs/STATISTICAL_ANALYSIS.md
-ph_global_p,Global Schoenfeld test for proportional hazards,0.043,p_value,output/cox_ph_assumption.csv,d$p_value[1],0.0005,docs/STATISTICAL_ANALYSIS.md
-ph_remediated_p,Global Schoenfeld test after stratifying on the violating term,0.688,p_value,output/cox_ph_assumption.csv,d$remediated_global_p[1],0.0005,docs/STATISTICAL_ANALYSIS.md
+cox_rct_hr,Hazard ratio for randomized design,2.146,hazard_ratio,output/aim2b_cox_regression.csv,"d$estimate[d$term == ""is_rctTRUE""]",0.005,"README.md; docs/STATISTICAL_ANALYSIS.md"
+cox_academic_hr,Hazard ratio for academic affiliation,0.637,hazard_ratio,output/aim2b_cox_regression.csv,"d$estimate[d$term == ""is_academicTRUE""]",0.005,"README.md; docs/STATISTICAL_ANALYSIS.md"
+cox_nauthors_hr,Hazard ratio per additional author averaged over follow-up,1.266,hazard_ratio,output/aim2b_cox_regression.csv,"d$estimate[d$term == ""n_authors""]",0.005,docs/STATISTICAL_ANALYSIS.md
+ph_global_p,Global Schoenfeld test for proportional hazards,0.041,p_value,output/cox_ph_assumption.csv,d$p_value[1],0.0005,docs/STATISTICAL_ANALYSIS.md
+ph_remediated_p,Global Schoenfeld test after stratifying on the violating term,0.71,p_value,output/cox_ph_assumption.csv,d$remediated_global_p[1],0.0005,docs/STATISTICAL_ANALYSIS.md
 sens_definite_only_rate,Publication rate counting definite matches only,11.8,percent,output/sensitivity_analyses.csv,"d$rate[d$scenario == ""Definite only""]",0.05,docs/STATISTICAL_ANALYSIS.md
 sens_definite_probable_rate,Publication rate counting definite and probable matches,19.2,percent,output/sensitivity_analyses.csv,"d$rate[d$scenario == ""Definite + probable""]",0.05,docs/STATISTICAL_ANALYSIS.md

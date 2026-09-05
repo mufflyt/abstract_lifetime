@@ -59,6 +59,15 @@ datasets:
         regex: "^[0-9]+$"
         allow_na: true
 
+      authors_truncated:
+        # Computed at R/02_clean_abstracts.R:54 and carried through
+        # R/05_adjudicate.R on purpose. It marks rows whose raw author string
+        # ended in an ellipsis, i.e. where the listing is known to be
+        # incomplete rather than merely short.
+        required: true
+        type: logical
+        allow_na: false
+
     rules:
       - id: congress_year_matches_id
         expr: "as.integer(substr(abstract_id, 5, 8)) == congress_year"
@@ -78,6 +87,30 @@ datasets:
         description: >
           Every abstract counted as published must name the publication it was
           matched to, so the numerator is auditable row by row.
+
+      - id: truncation_flag_stays_informative
+        expr: "TRUE"
+        holds_when: "length(unique(authors_truncated)) > 1"
+        description: >
+          authors_truncated must retain both values. It was computed and then
+          dropped from the R/05_adjudicate.R select once already, and with it
+          gone nothing downstream could tell a censored author list from a
+          genuinely short one -- author_count and n_authors read as real
+          distributions rather than values capped by the source listing. A
+          column that silently collapses to a single value is the same defect
+          wearing a different hat, so a constant flag fails here.
+
+      - id: truncation_and_cap_are_distinct_signals
+        expr: "TRUE"
+        holds_when: "sum(authors_truncated & author_count < 5) > 0"
+        description: >
+          The two censoring signals do not coincide and must not be conflated.
+          A row flagged authors_truncated parses to author_count 4, because the
+          ellipsis consumes a slot rather than a name; a row at the display cap
+          shows author_count 5 and is not flagged. Counting only author_count
+          >= 5 therefore understates how many author lists are incomplete. This
+          rule fails if the parser ever changes so that the two coincide, which
+          would silently alter what every author-count result is measured over.
 
       - id: pmid_is_a_candidate_not_a_publication
         # Deliberately inverted: this asserts that unpublished rows DO carry
