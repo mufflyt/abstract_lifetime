@@ -1140,3 +1140,41 @@ reconstructing a contract instead of reading it.
 
 **Result:** 13/14 assertions pass. The single failure is the finding above.
 **Gate: green — 16 failures, all on the manifest.**
+
+## Cycle 16 - 2026-09-04
+
+Mix required: 4 BVA / 3 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle16_session_type.R` (17 assertions).
+Target: `R/01d_tag_session_type.R`. Session type is the first filter in the
+denominator chain (1,154 parsed minus 48 video gives the 1,106 cohort), and
+nothing had tested it.
+
+**Result: 17/17 pass. No implementation defects and no defects in my own tests.**
+Second clean cycle of the sixteen.
+
+Contracts asserted rather than assumed: the case_when mapping at `:72` including
+the 2022 "Video Sessions" wording and case-insensitivity; that `current_section`
+starts NA so an item before the first `h3.section-title` would be tagged NA and
+escape the video filter; that the Oral subset equals the cleaned cohort exactly;
+that the dropped rows are exactly the Video rows.
+
+16.7 records why no `Poster` row exists even though the mapping can produce one:
+technical appendix A14 shows ingestion captures a contiguous prefix stopping
+between S26 and S60 while supplements run to S141-S286, so the poster sections
+were never reached. If posters ever appear, the exclusion filter at
+`02_clean_abstracts.R:34` drops Video only and posters would enter the
+denominator.
+
+16.10 checks the tagger reads TOC section headings rather than titles: abstracts
+whose title mentions "video" are not predominantly tagged Video.
+
+**Gate: green — 16 failures, all on the manifest.**
+
+---
+
+# LOOP STOPPED AFTER CYCLE 16
+
+Stopped on user instruction, redirected to remediation PR work. 16 of 24 cycles
+completed: 160 tests added, 8 real defects fixed, 16 findings registered on the
+expected-failure manifest, and roughly a dozen defects in my own tests caught and
+corrected along the way.
