@@ -147,3 +147,14 @@ expected_skips:
       an app with no candidate pool to display, which produces failures rather
       than coverage. Revisit if the candidate index lands and a Chrome step is
       added.
+  - file: test-candidate_pool_index.R
+    test: the index is a faithful projection of the pool it was built from
+    reason: >
+      Compares output/candidate_pool_index.csv against the 130 MB pool it was
+      derived from. The pool is gitignored, so this can only run on a machine
+      that has done a full pipeline run, which is exactly where a stale index
+      would be introduced.
+    to_enable: >
+      Cannot in CI, and it does not need to be: the comparison is meaningful
+      only where both artefacts exist. The index's shape, uniqueness and size
+      ceiling are asserted unconditionally in the same file.
