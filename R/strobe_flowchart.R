@@ -20,33 +20,18 @@ cleaned_tbl  <- read_csv(here("data", "processed", "abstracts_cleaned.csv"),
 analytic_tbl <- read_csv(here("output", "final_analytical_dataset.csv"),
                          show_col_types = FALSE)
 
-n_parsed    <- nrow(parsed_tbl)
-n_cohort    <- nrow(cleaned_tbl)
-n_video     <- n_parsed - n_cohort
-n_pending   <- sum(is.na(analytic_tbl$final_published))
-n_evaluated <- n_cohort - n_pending
-n_published <- sum(analytic_tbl$final_published, na.rm = TRUE)
-n_not_pub   <- n_evaluated - n_published
+source(here("R", "utils_flow_counts.R"))
 
-# Abstracts whose credited publication predates their congress. PI decision,
-# 2026-05-09: such a paper cannot be a conference-to-publication conversion, so
-# they are counted UNPUBLISHED. They stay in the denominator, which is why they
-# are drawn as a breakdown of "Not published" rather than as an exclusion arrow
-# off the spine: an exclusion arrow would say they left the study, and they did
-# not. See docs/OUTCOME_DEFINITION.md.
-n_pre_congress <- sum(!is.na(analytic_tbl$months_to_pub) &
-                        analytic_tbl$months_to_pub < 0, na.rm = TRUE)
-n_no_pub_found <- n_not_pub - n_pre_congress
-
-stopifnot(
-  nrow(analytic_tbl) == n_cohort,
-  n_published + n_not_pub == n_evaluated,
-  n_evaluated + n_pending == n_cohort,
-  # No abstract may be counted published on a paper that predates its congress.
-  sum(analytic_tbl$final_published %in% TRUE &
-        analytic_tbl$months_to_pub < 0, na.rm = TRUE) == 0,
-  n_no_pub_found + n_pre_congress == n_not_pub
-)
+n_parsed <- nrow(parsed_tbl)
+n_cohort <- nrow(cleaned_tbl)
+.fc <- derive_flow_counts(analytic_tbl, n_parsed, n_cohort)
+n_video        <- .fc$video
+n_pending      <- .fc$pending
+n_evaluated    <- .fc$evaluated
+n_published    <- .fc$published
+n_not_pub      <- .fc$not_published
+n_pre_congress <- .fc$pre_congress
+n_no_pub_found <- .fc$no_pub_found
 
 message("parsed ", n_parsed, " -> cohort ", n_cohort, " -> evaluated ", n_evaluated)
 message("publication rate: ", round(n_published / n_evaluated * 100, 1), "% (",
