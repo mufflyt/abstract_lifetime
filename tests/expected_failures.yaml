@@ -239,3 +239,20 @@ expected_failures:
       candidate pool is re-derived is the author's call, not the code's.
     documented_in: tests/loop/LEDGER.md cycle 17
 
+  - file: test-cycle19_congress_dates.R
+    test: no publication event falls outside its own censoring horizon
+    reason: >
+      AAGL2022_077 is recorded as an event at 44.8 months while its censoring
+      horizon is 40.8 months. The search ended 2026-04-01 and the article
+      carries a 2026-08 print-issue date, so it was matched on an earlier
+      e-publication date but timed to the later print date. One row of 269, and
+      it is credited with an event at a time when an identical unpublished
+      abstract would already have left the risk set.
+    decision_needed: >
+      Which date defines time-to-publication, the e-publication date or the
+      print-issue date. Timing to e-pub would move many rows; censoring this one
+      at the horizon changes a single observation but sets a precedent for
+      ahead-of-print matches. Either way it is a survival-analysis definition,
+      not a coding error.
+    documented_in: tests/loop/LEDGER.md cycle 19
+

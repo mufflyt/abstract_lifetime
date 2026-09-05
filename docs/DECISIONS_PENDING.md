@@ -4,7 +4,7 @@
 
 # Decisions pending
 
-This repository keeps 16 tests failing on purpose. Each one below is a question that code cannot answer: resolving it changes the estimand, the cohort, or an adjudication that a human already recorded. None is a defect awaiting a fix.
+This repository keeps 17 tests failing on purpose. Each one below is a question that code cannot answer: resolving it changes the estimand, the cohort, or an adjudication that a human already recorded. None is a defect awaiting a fix.
 
 CI is green while exactly these fail. If one of them starts passing, CI goes red until its entry is removed, so this list cannot quietly outlive its reasons.
 
@@ -155,4 +155,14 @@ Work an item by deciding the question in **Decision needed**, then either make t
 **Decision needed.** Extracting keywords and enabling the strategy would widen every candidate set, which changes the scored pairs and therefore invalidates the human adjudication recorded against the current candidates. Whether the candidate pool is re-derived is the author's call, not the code's.
 
 **Documented in.** tests/loop/LEDGER.md cycle 17
+
+## test-cycle19_congress_dates.R
+
+### 17. no publication event falls outside its own censoring horizon
+
+**What fails.** AAGL2022_077 is recorded as an event at 44.8 months while its censoring horizon is 40.8 months. The search ended 2026-04-01 and the article carries a 2026-08 print-issue date, so it was matched on an earlier e-publication date but timed to the later print date. One row of 269, and it is credited with an event at a time when an identical unpublished abstract would already have left the risk set.
+
+**Decision needed.** Which date defines time-to-publication, the e-publication date or the print-issue date. Timing to e-pub would move many rows; censoring this one at the horizon changes a single observation but sets a precedent for ahead-of-print matches. Either way it is a survival-analysis definition, not a coding error.
+
+**Documented in.** tests/loop/LEDGER.md cycle 19
 

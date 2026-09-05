@@ -1246,3 +1246,41 @@ announces itself rather than propagating silently.
 congress appears in the leave-one-out table that is not in the dataset (a stale
 diagnostic) and if a congress in the dataset was never left out (a robustness
 claim covering less than it says).
+
+## Cycle 19 - 2026-09-05
+
+Mix required: 4 BVA / 3 semantic / 3 adversarial. File:
+`tests/testthat/test-cycle19_congress_dates.R` (28 assertions).
+Target: congress date resolution, `R/utils_congresses.R`. Every
+time-to-publication quantity is measured FROM a congress date: `months_to_pub`
+at `06_analyze_results.R:97`, the survival censoring time at `:467`, the figures
+at `08_make_figures.R:156`, the date component of the match score at
+`utils_scoring.R:208`. A row that resolves to the wrong date does not error, it
+measures from the wrong origin and stays in every table. Cycle 1 checked that
+each congress year HAS a date; this cycle is about the resolution function.
+
+**Result: 27 pass, 1 preserved failure.**
+
+**Finding (registered).** `AAGL2022_077` is an event at 44.8 months against a
+censoring horizon of 40.8 months. The search ended 2026-04-01; the article
+carries a 2026-08 print-issue date, so it was matched on an earlier e-publication
+date and then timed to the later print date. One row of 269, but it is credited
+with an event at a time when an identical unpublished abstract would already
+have left the risk set. Which date defines time-to-publication, e-pub or print
+issue, is a survival-analysis definition and not a coding error, so it is
+preserved.
+
+**My own tolerance was wrong first.** 19.8 originally allowed 45 days past
+`date_end`, a number nobody had stated. The contract that actually exists is
+that an event cannot fall beyond its own censoring horizon, which is what it now
+asserts. Same finding, but for a stated reason.
+
+19.4 deliberately asserts a hazard rather than a guarantee: an unrecognised or
+NA congress year is silently given the legacy `2023-11-07` date rather than
+erroring, so such a row would be measured from the wrong origin while remaining
+in every table. 19.5 is the check that no such row currently exists, which is
+the only reason that fallback is harmless today.
+
+42 abstracts have a negative `months_to_pub`. That is not an error: they are the
+pre-congress publications the study exists to count, and 19.8 asserts the group
+is non-empty because its disappearance would itself be a defect.
