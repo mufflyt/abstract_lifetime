@@ -4,7 +4,7 @@
 
 # Decisions pending
 
-This repository keeps 23 tests failing on purpose. Each one below is a question that code cannot answer: resolving it changes the estimand, the cohort, or an adjudication that a human already recorded. None is a defect awaiting a fix.
+This repository keeps 22 tests failing on purpose. Each one below is a question that code cannot answer: resolving it changes the estimand, the cohort, or an adjudication that a human already recorded. None is a defect awaiting a fix.
 
 CI is green while exactly these fail. If one of them starts passing, CI goes red until its entry is removed, so this list cannot quietly outlive its reasons.
 
@@ -178,15 +178,7 @@ Work an item by deciding the question in **Decision needed**, then either make t
 
 ## test-cycle21_id_integrity.R
 
-### 19. a pre-congress publication is not counted as a publication
-
-**What fails.** output/excluded_pre_congress_publications.csv lists 39 abstracts whose matched paper appeared before the congress at which the abstract was presented. The exclusion is applied to 35 of them, which carry final_published FALSE. For AAGL2021_002, AAGL2021_049, AAGL2023_042 and AAGL2023_048 the best_pmid is exactly the PMID listed as excluded and months_to_pub is negative (0.2 to 4.5 months before the congress), yet they are counted as published. They sit in the numerator of 178.
-
-**Decision needed.** Whether the pre-congress exclusion applies to all 39 or to 35. Applying it consistently moves the numerator from 178 to 174 and lowers the headline publication rate, so it changes a reported result. The alternative reading is that these four are correctly counted and the other 35 are wrongly excluded, which moves the numerator the other way. Either answer is a definition of the outcome, not a coding fix.
-
-**Documented in.** tests/loop/LEDGER.md cycle 21
-
-### 20. no artefact references an abstract the parse never produced
+### 19. no artefact references an abstract the parse never produced
 
 **What fails.** data/processed/pubmed_strategy_results.csv covers 1,742 abstracts, of which 588 are not in the 1,154-row parse. The search layer ran against an earlier, larger cohort and its artefacts were never regenerated after the parse was corrected. This is the same staleness the cycle 4 entry records for output/search_strategy_efficacy.csv, seen in the file that efficacy table is computed from.
 
@@ -196,7 +188,7 @@ Work an item by deciding the question in **Decision needed**, then either make t
 
 ## test-cycle22_decision_log.R
 
-### 21. final_published follows from the deduplicated decisions
+### 20. final_published follows from the deduplicated decisions
 
 **What fails.** Four abstracts carry a human no_match decision as their surviving deduplicated decision and are nonetheless counted as published: AAGL2013_050, AAGL2014_053, AAGL2015_029, AAGL2021_030. These are NOT the four in the cycle 21 pre-congress finding; they are a separate set. One of them is the shared-PMID case already recorded in the cycle 6 entry, so three are newly identified. A reviewer looked at the abstract, said the candidate was not its publication, and the outcome column says published anyway.
 
@@ -204,7 +196,7 @@ Work an item by deciding the question in **Decision needed**, then either make t
 
 **Documented in.** tests/loop/LEDGER.md cycle 22
 
-### 22. every queued abstract received a human decision
+### 21. every queued abstract received a human decision
 
 **What fails.** 05_adjudicate.R queued 285 abstracts as needing human review. 156 of them have no human decision row at all and were resolved by AUTO. The queue exists to mark the cases the algorithm could not settle, so 55% of the work it identified was never done and was closed algorithmically instead.
 
@@ -214,7 +206,7 @@ Work an item by deciding the question in **Decision needed**, then either make t
 
 ## test-cycle23_validation_fidelity.R
 
-### 23. fidelity checks cover the published abstracts, and only those
+### 22. fidelity checks cover the published abstracts, and only those
 
 **What fails.** data/processed/fidelity_checks.csv holds 210 rows, covering only the algorithm classifications definite (131) and probable (79). Twenty-two of the 178 published abstracts have no fidelity row: 11 classified possible, 7 no_match and 4 excluded. All 22 carry a best_pmid, so the check was possible. The effect is that title-fidelity verification covers the matches the algorithm was already confident about and skips exactly the uncertain ones that human adjudication had to settle.
 

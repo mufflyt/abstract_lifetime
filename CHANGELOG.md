@@ -9,6 +9,56 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-05] - The pre-congress exclusion is absolute
+
+### Changed
+
+- **PI decision: a reviewer's `match` does not override the pre-congress
+  exclusion.** A publication that appeared before the congress cannot be a
+  conference-to-publication conversion. The test now runs as the first branch
+  of the outcome cascade, ahead of both `classification == "definite"` and the
+  reviewer verdict, and is applied to the print issue date of the publication
+  actually credited to the abstract.
+- **The numerator moves from 178 to 171** and the rate from 16.9% to 16.3%
+  (95% CI 14.2-18.6). The denominator is unchanged at 1,051: an excluded
+  abstract stays in the cohort counted unpublished. The median time to
+  publication is unchanged at 13.7 months, because these abstracts had negative
+  intervals and were already outside the time-to-event analysis. The Cox model
+  gains seven observations as they become censored.
+- `output/aim2_time_to_pub.csv` now reports `n_pre_congress = 0`, down from 7.
+  That is the rule verifying itself.
+- `R/07_make_tables.R` and `R/08_make_figures.R` adopt the settled outcome from
+  the analytical dataset instead of recomputing it. They recomputed through the
+  same cascade but without 06's date refresh, so after this change they would
+  have disagreed with the analysis on two abstracts.
+
+### Added
+
+- `scripts/pre_congress_exclusions.R`. The evidence file had no producer and
+  had been built by hand from electronic publication dates while the analysis
+  measured from print issue dates. It now regenerates on the decided basis: 42
+  abstracts, against 39 in the hand-built file, and fails if any is still
+  counted as published.
+- `apply_pre_congress_exclusion()` and `adopt_analysis_outcome()` in
+  `R/utils_decisions.R`, and eight boundary cases in the BVA gate covering the
+  congress date itself, a publication one day before it, and the two overrides
+  the decision removes.
+- Appendix A19.
+
+### Fixed
+
+- Testing `classification == "excluded"` would have missed three abstracts. Two
+  carry a reviewer PMID other than the scored best candidate, so the
+  pre-conference penalty had been computed against a paper that was not the one
+  counted; one was scored `definite` despite its credited paper predating the
+  congress by two weeks.
+
+### Note
+
+- `is_academic` bootstrap retention fell from 62.0% to 50.4%. Already described
+  as not sampling-robust, it now survives about half of resamples and should be
+  read as suggestive at most.
+
 ## [2026-09-05] - The publication date is the print issue date
 
 ### Changed

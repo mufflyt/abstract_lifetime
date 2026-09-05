@@ -17,9 +17,15 @@ dec <- function(id, reviewer, decision, when, pmid = NA_character_) {
                  review_timestamp = ts(when))
 }
 
-res <- function(id, classification, best_pmid = NA_character_) {
+# months_to_pub is part of the contract since the pre-congress exclusion became
+# the first branch (PI decision, 2026-09-05). The default is a plainly
+# post-congress interval so the existing precedence cases below still exercise
+# what they were written to exercise; the pre-congress boundary gets its own
+# block at BVA 5.
+res <- function(id, classification, best_pmid = NA_character_,
+                months_to_pub = 12) {
   tibble::tibble(abstract_id = id, classification = classification,
-                 best_pmid = best_pmid)
+                 best_pmid = best_pmid, months_to_pub = months_to_pub)
 }
 
 # ============================================================
@@ -233,4 +239,86 @@ test_that("exported rate is reconstructible from exported counts", {
   expect_equal(val("n_evaluated"), s$n_evaluated)
   expect_equal(round(val("published") / val("n_evaluated") * 100, 1),
                val("publication_rate"))
+})
+
+# ============================================================
+# BVA 5: the pre-congress boundary
+#
+# PI decision, 2026-09-05: a publication that appeared before the congress
+# cannot be a conference-to-publication conversion, and no other evidence
+# overrides that. The boundary is months_to_pub == 0, the congress date itself.
+#
+# The interval is measured to the PRINT ISSUE date, so a paper whose issue is
+# dated the month of the congress lands at or near zero. AAGL2023_048 is the
+# real case: six days before, which under the electronic date would have read
+# as five months before.
+# ============================================================
+
+test_that("a publication on the congress date itself counts as published", {
+  d <- dec("A1", "AUTO", "match", "2026-01-01 00:00:00")
+  out <- assign_final_published(res("A1", "definite", months_to_pub = 0),
+                                dedup_decisions_for_analysis(d))
+  expect_true(out$final_published)
+})
+
+test_that("a publication just before the congress does not count", {
+  d <- dec("A1", "AUTO", "match", "2026-01-01 00:00:00")
+  out <- assign_final_published(res("A1", "definite", months_to_pub = -0.01),
+                                dedup_decisions_for_analysis(d))
+  expect_false(out$final_published)
+})
+
+test_that("a definite classification does not override the exclusion", {
+  # This is the branch order the decision changed. `definite` used to win
+  # outright, which is how AAGL2015_010 was counted despite its credited paper
+  # predating the congress by two weeks.
+  d <- dec("A1", "AUTO", "match", "2026-01-01 00:00:00")
+  out <- assign_final_published(res("A1", "definite", months_to_pub = -0.5),
+                                dedup_decisions_for_analysis(d))
+  expect_false(out$final_published)
+})
+
+test_that("a human match does not override the exclusion", {
+  d <- dec("A1", "R01", "match", "2026-01-01 00:00:00")
+  out <- assign_final_published(res("A1", "excluded", months_to_pub = -5.1),
+                                dedup_decisions_for_analysis(d))
+  expect_false(out$final_published)
+})
+
+test_that("two independent human matches do not override the exclusion", {
+  # AAGL2023_048 had exactly this: two reviewers, three days apart, both match.
+  d <- rbind(dec("A1", "R03", "match", "2026-01-01 00:00:00"),
+             dec("A1", "R01", "match", "2026-01-04 00:00:00"))
+  out <- assign_final_published(res("A1", "excluded", months_to_pub = -0.2),
+                                dedup_decisions_for_analysis(d))
+  expect_false(out$final_published)
+})
+
+test_that("a missing interval is undated, not early", {
+  # An abstract with no resolvable publication date must not be swept into the
+  # exclusion. It is decided on the evidence that exists.
+  d <- dec("A1", "R01", "match", "2026-01-01 00:00:00")
+  out <- assign_final_published(res("A1", "possible", months_to_pub = NA_real_),
+                                dedup_decisions_for_analysis(d))
+  expect_true(out$final_published)
+})
+
+test_that("the exclusion does not resurrect an abstract a reviewer rejected", {
+  # Pre-congress and a human no_match both point the same way; the result must
+  # be FALSE, not NA.
+  d <- dec("A1", "R01", "no_match", "2026-01-01 00:00:00")
+  out <- assign_final_published(res("A1", "excluded", months_to_pub = -3),
+                                dedup_decisions_for_analysis(d))
+  expect_false(out$final_published)
+})
+
+test_that("assign_final_published refuses input without the interval", {
+  # The rule cannot be applied silently-not-at-all. A caller passing a table
+  # without months_to_pub gets an error, not a quietly weaker cascade.
+  d <- dec("A1", "AUTO", "match", "2026-01-01 00:00:00")
+  bare <- tibble::tibble(abstract_id = "A1", classification = "definite",
+                         best_pmid = NA_character_)
+  expect_error(
+    assign_final_published(bare, dedup_decisions_for_analysis(d)),
+    "months_to_pub")
 })

@@ -29,11 +29,33 @@ Code: `assign_final_published()`, `R/utils_decisions.R:70-93`.
 ## Clause-by-clause
 
 **Does publication before the conference count?**
-No, with one exception. A best candidate dated before the congress date forces
-`classification == "excluded"`, and the abstract is retained in the cohort and
-counted **unpublished** (39 abstracts). The exception is branch order: a
-reviewer who records `match` on such an abstract overrides it to published
-(4 of the 39). No rule constrains the reviewer's PMID to be post-congress.
+No, without exception. **PI decision, 2026-09-05: a reviewer's `match` does not
+override the pre-congress exclusion.**
+
+The test is applied to the interval between the congress date and the print
+issue date of the publication actually credited to the abstract, and it is the
+first branch of the outcome cascade, ahead of both `classification == "definite"`
+and the reviewer verdict. 42 abstracts have a credited publication predating
+their congress; none is counted as published, and
+`output/aim2_time_to_pub.csv` now reports `n_pre_congress = 0`, which is the
+rule verifying itself.
+
+Testing `classification == "excluded"` instead would have been wrong three
+times over. Two abstracts (AAGL2018_002, AAGL2018_019) carry a reviewer PMID
+other than the scored best candidate, so the pre-conference penalty had been
+computed against a paper that was not the one being counted; one
+(AAGL2015_010) was scored `definite` despite its credited paper predating the
+congress by two weeks. The rule is therefore applied to the credited
+publication, after `R/06_analyze_results.R` re-joins the publication fields on
+`final_pmid`.
+
+The change moved the numerator from 178 to 171 and the rate from 16.9% to
+16.3% (95% CI 14.2-18.6). The denominator is unchanged at 1,051: an excluded
+abstract stays in the cohort and is counted unpublished, it does not leave the
+study. The median time to publication is unchanged at 13.7 months, because
+these abstracts had negative intervals and were already outside the
+time-to-event analysis; the Cox model gains seven observations as they become
+censored.
 
 The comparison date is the congress start date from `config.yml`, not the
 abstract submission deadline, which is not recorded anywhere in the repository.

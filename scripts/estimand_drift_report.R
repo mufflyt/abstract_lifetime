@@ -61,8 +61,12 @@ fingerprint <- list(
 
   # Outcome: what counts as the event.
   outcome = list(
-    definition          = "matched to a full publication",
-    counted_as_published = "classification == 'definite', or a reviewer decision of match",
+    definition          = "matched to a full publication that appeared after the congress",
+    counted_as_published = paste(
+      "classification == 'definite', or a reviewer decision of match;",
+      "in either case only if the credited publication's print issue date is",
+      "on or after the congress date (PI decision, 2026-09-05)"),
+    pre_congress_excluded = "always; no classification or reviewer verdict overrides it",
     n_events            = sum(d$final_published %in% TRUE)
   ),
 

@@ -21,9 +21,12 @@ denominator:
   n_unresolved: 55
   n_evaluated: 1051
 outcome:
-  definition: matched to a full publication
-  counted_as_published: classification == 'definite', or a reviewer decision of match
-  n_events: 178
+  definition: matched to a full publication that appeared after the congress
+  counted_as_published: classification == 'definite', or a reviewer decision of match;
+    in either case only if the credited publication's print issue date is on or after
+    the congress date (PI decision, 2026-09-05)
+  pre_congress_excluded: always; no classification or reviewer verdict overrides it
+  n_events: 171
 time:
   origin: congress date
   censoring: administrative at the end of the search window

@@ -2138,3 +2138,101 @@ stop defining which date is meant, and if any of the four contested intervals
 stops matching the issue-date arithmetic. That last check is the sharpest: the
 two bases give answers 1.5 to 4.9 months apart for those abstracts, so the
 recorded interval identifies its own provenance.
+
+## A19. The Pre-Congress Exclusion, Settled
+
+**PI decision, 2026-09-05: a reviewer's `match` does not override the
+pre-congress exclusion.** This is the rule the study now uses, and it changed
+the numerator.
+
+### A19.1 The rule
+
+A publication that appeared before the congress cannot be a
+conference-to-publication conversion. The comparison uses the print issue date
+(A18) of the publication actually credited to the abstract, and the test is the
+**first** branch of the outcome cascade in `assign_final_published()`, ahead of
+both `classification == "definite"` and the reviewer verdict.
+
+An abstract failing the test stays in the cohort and is counted unpublished. It
+does not leave the study, so the denominator is untouched.
+
+A missing interval is not treated as pre-congress. An abstract whose credited
+publication has no resolvable date is undated, not early, and is decided on the
+evidence that exists.
+
+### A19.2 Why the classification could not be used as the test
+
+The obvious implementation is to trust `classification == "excluded"`, which the
+scorer already sets when the best candidate predates the congress. That would
+have been wrong three times:
+
+| abstract | classification | why the classification misses it |
+|---|---|---|
+| AAGL2018_002 | `no_match` | reviewer supplied PMID 29454147; the penalty was computed against best candidate 39220672 |
+| AAGL2018_019 | `no_match` | same, PMID 29408695 against best candidate 34136570 |
+| AAGL2015_010 | `definite` | credited paper predates the congress by two weeks, but scored `definite` and branch 1 won outright |
+
+The first two are the sharper problem. `R/05_adjudicate.R` joins publication
+metadata on `best_pmid` and runs before the reviewer decisions are read, so
+where a reviewer supplied a different PMID the interval described the wrong
+paper, and for these two it was missing entirely. `R/06_analyze_results.R`
+re-joins on `final_pmid`, and only after that is the interval the one the rule
+is about, at 10.3 months before the congress for both.
+
+The rule is therefore applied twice: once inside `assign_final_published()`, so
+every caller gets it, and once more in 06 via
+`apply_pre_congress_exclusion()` after the refresh. The second application is
+what catches those two, and 06 reports how many it removed.
+
+### A19.3 A drift this exposed
+
+`R/07_make_tables.R` and `R/08_make_figures.R` recompute the outcome from
+`abstracts_with_matches.csv` through the same cascade, with comments saying this
+exists so they cannot drift from the analysis. They can: 06 refreshes the
+interval before applying the exclusion and they do not, so after this change the
+same abstract would have been unpublished in the analysis and published in the
+tables. Both now adopt the settled outcome from
+`output/final_analytical_dataset.csv` through `adopt_analysis_outcome()`. They
+run after 06 in `00_run_all.R`, so it is available.
+
+### A19.4 What moved
+
+| quantity | before | after |
+|---|---:|---:|
+| Published | 178 | **171** |
+| Not published | 873 | 880 |
+| Denominator | 1,051 | **1,051** |
+| Publication rate | 16.9% | **16.3%** |
+| Wilson 95% CI | 14.8-19.3 | 14.2-18.6 |
+| Median time to publication | 13.7 mo | **13.7 mo** |
+| Published with usable interval | 171 | 171 |
+| Published dated before their congress | 7 | **0** |
+| Cox N / events | 1,020 / 171 | 1,027 / 171 |
+| Logistic N | 1,027 | 1,027 |
+| PH global p | 0.041 | 0.041 |
+
+The denominator does not move, and neither does the median time to publication:
+these abstracts had negative intervals and were already outside the
+time-to-event analysis. The Cox model gains seven observations, because an
+abstract counted unpublished contributes censored follow-up whereas one counted
+published with a negative interval is discarded by the `time > 0` filter.
+
+`n_pre_congress` falling from 7 to 0 is the rule verifying itself. The estimand
+is now internally coherent: "published" means "published after the congress", by
+construction rather than by convention.
+
+### A19.5 The evidence file
+
+`output/excluded_pre_congress_publications.csv` had no producer. It was built by
+hand from electronic publication dates while the analysis measured from print
+issue dates, so it described a different set from the one the rule acts on.
+`scripts/pre_congress_exclusions.R` now regenerates it from the analytical
+dataset on the decided basis: **42 abstracts**, against 39 in the hand-built
+file, and it fails loudly if any of them is still counted as published.
+
+### A19.6 One reading weakened
+
+`is_academic` bootstrap retention fell from 62.0% to **50.4%**. It was already
+described as not sampling-robust; it is now retained in only about half of
+resamples and should be read as suggestive at most. Its leave-one-congress-out
+behaviour and its direction are unchanged.

@@ -132,8 +132,10 @@ test_that("the analysis transform is idempotent and order-independent", {
   skip_if(!file.exists(dec_p), "decisions absent")
 
   d <- readr::read_csv(dec_p, show_col_types = FALSE)
+  # months_to_pub is part of the contract since the pre-congress exclusion
+  # became the first branch of the cascade (PI decision, 2026-09-05).
   f <- readr::read_csv(P_FINAL, show_col_types = FALSE) |>
-    dplyr::select(abstract_id, classification, best_pmid)
+    dplyr::select(abstract_id, classification, best_pmid, months_to_pub)
 
   # Shelling out to 06_analyze_results.R made this test skip whenever the stage
   # could not run in the harness, which is a hole rather than a safeguard. The

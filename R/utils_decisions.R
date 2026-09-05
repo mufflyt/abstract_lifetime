@@ -87,10 +87,36 @@ assign_final_published <- function(results, decisions_deduped) {
   join_cols <- intersect(c("abstract_id", "manual_decision", "manual_pmid"),
                          names(decisions_deduped))
 
+  # The pre-congress guard needs the interval. Every production caller passes a
+  # table that carries it (R/05_adjudicate.R computes it); a caller that does
+  # not would silently lose the rule, so fail rather than skip it.
+  if (!"months_to_pub" %in% names(results)) {
+    stop("assign_final_published: `results` has no months_to_pub column, so the ",
+         "pre-congress exclusion cannot be applied. See docs/OUTCOME_DEFINITION.md.")
+  }
+
   results |>
     left_join(select(decisions_deduped, all_of(join_cols)), by = "abstract_id") |>
     mutate(
+      # PI decision, 2026-09-05: a publication that appeared before the
+      # congress cannot be a conference-to-publication conversion, and a
+      # reviewer's `match` does not override that. The test is therefore the
+      # FIRST branch, ahead of both `definite` and the reviewer verdict.
+      #
+      # It is applied to `months_to_pub`, which is the interval to the paper
+      # actually credited to the abstract, measured to the print issue date
+      # (PI decision, same day; see docs/OUTCOME_DEFINITION.md). Testing
+      # `classification == "excluded"` instead would miss three abstracts:
+      # two where a reviewer supplied a PMID other than the scored best
+      # candidate, so the pre-conference penalty was computed against a paper
+      # that is not the one counted, and one scored `definite` despite its
+      # credited paper predating the congress by two weeks.
+      #
+      # A missing interval is NOT treated as pre-congress: an abstract with no
+      # resolvable date is undated, not early, and the branches below decide it
+      # on the evidence that does exist.
       final_published = case_when(
+        !is.na(.data$months_to_pub) & .data$months_to_pub < 0 ~ FALSE,
         classification == "definite" ~ TRUE,
         manual_decision == "match" ~ TRUE,
         manual_decision == "no_match" ~ FALSE,
@@ -131,4 +157,79 @@ publication_rate_summary <- function(results_with_fp) {
     n_not_published  = n_evaluated - n_published,
     publication_rate = if (n_evaluated == 0) NA_real_ else n_published / n_evaluated
   )
+}
+
+#' Apply the pre-congress exclusion to an already-assigned outcome
+#'
+#' PI decision, 2026-09-05: a publication that appeared before the congress
+#' cannot be a conference-to-publication conversion, and neither a `definite`
+#' classification nor a reviewer's `match` overrides that.
+#'
+#' `assign_final_published()` applies the same rule, but it can only see the
+#' interval its input carries. R/05_adjudicate.R joins publication metadata on
+#' `best_pmid` and runs before the reviewer decisions are read, so where a
+#' reviewer supplied a different PMID the interval at that point describes the
+#' algorithm's candidate rather than the paper being credited, and is sometimes
+#' missing altogether. R/06_analyze_results.R re-joins on `final_pmid`, and only
+#' after that is the interval the one the rule is about. This function is how
+#' the rule gets applied to it.
+#'
+#' Two abstracts depend on this. AAGL2018_002 and AAGL2018_019 carry a reviewer
+#' PMID whose `best_pmid` had no date, so the interval reaching
+#' `assign_final_published()` is NA and the rule cannot fire; after the refresh
+#' both resolve to 10.3 months before their congress.
+#'
+#' @param results Table carrying `final_published` and a refreshed `months_to_pub`.
+#' @return The same table with `final_published` set FALSE wherever the credited
+#'   publication predates the congress. A missing interval is left alone: an
+#'   abstract with no resolvable date is undated, not early.
+apply_pre_congress_exclusion <- function(results) {
+  stopifnot(is.data.frame(results))
+  if (!all(c("final_published", "months_to_pub") %in% names(results))) {
+    stop("apply_pre_congress_exclusion: needs final_published and months_to_pub")
+  }
+  pre <- !is.na(results$months_to_pub) & results$months_to_pub < 0
+  results$final_published[pre] <- FALSE
+  results
+}
+
+#' Adopt the outcome R/06_analyze_results.R settled on
+#'
+#' R/07_make_tables.R and R/08_make_figures.R recompute the outcome from
+#' `abstracts_with_matches.csv` through the same cascade, which was intended to
+#' stop them drifting from the analysis. It does not quite: 06 refreshes
+#' `months_to_pub` against the credited PMID before applying the pre-congress
+#' exclusion, and 07 and 08 do not, so an abstract can be unpublished in the
+#' analysis and published in the tables.
+#'
+#' They run after 06 in `00_run_all.R`, so the settled outcome is available on
+#' disk. Adopting it is what "cannot drift" actually requires.
+#'
+#' @return `results` with `final_published` and `final_pmid` taken from the
+#'   analytical dataset where it exists, unchanged otherwise.
+adopt_analysis_outcome <- function(results,
+                                   fad_path = here::here("output", "final_analytical_dataset.csv")) {
+  if (!file.exists(fad_path)) return(results)
+  auth <- readr::read_csv(fad_path, show_col_types = FALSE)
+  if (!all(c("abstract_id", "final_published") %in% names(auth))) return(results)
+
+  keep <- intersect(c("abstract_id", "final_published", "final_pmid", "months_to_pub"),
+                    names(auth))
+  auth <- dplyr::distinct(auth[, keep, drop = FALSE], .data$abstract_id, .keep_all = TRUE)
+  names(auth)[names(auth) != "abstract_id"] <-
+    paste0(".auth_", names(auth)[names(auth) != "abstract_id"])
+
+  n_before <- nrow(results)
+  out <- dplyr::left_join(results, auth, by = "abstract_id")
+  if (nrow(out) != n_before) {
+    stop("adopt_analysis_outcome: join changed the row count")
+  }
+  for (col in setdiff(names(auth), "abstract_id")) {
+    target <- sub("^\\.auth_", "", col)
+    if (target %in% names(out)) {
+      out[[target]] <- dplyr::coalesce(out[[col]], out[[target]])
+    }
+    out[[col]] <- NULL
+  }
+  out
 }
