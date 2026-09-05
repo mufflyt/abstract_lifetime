@@ -231,7 +231,7 @@ Algorithm performance was assessed against a manually curated gold standard of `
 
 ### Publication Outcome Variables
 
-For matched publications, the following outcome variables were extracted: journal name, publication year, DOI, PMID, publication type (classified as journal article, review, RCT/trial, case report, editorial/letter, or observational study from PubMed PublicationType tags), citation count, and journal impact proxy (2-year mean citedness from OpenAlex). Time to publication was calculated as the interval in months from the conference date to the publication date.
+For matched publications, the following outcome variables were extracted: journal name, publication year, DOI, PMID, publication type (classified as journal article, review, RCT/trial, case report, editorial/letter, or observational study from PubMed PublicationType tags), citation count, and journal impact proxy (2-year mean citedness from OpenAlex). Time to publication was calculated as the interval in months from the conference date to the publication date, defined throughout as the **print issue date** recorded in PubMed (`JournalIssue/PubDate`). Articles released online ahead of print were dated to their print issue rather than to their electronic release, and issue dates given only to the month were resolved to the first of that month. The same date determines whether a publication preceded its congress and is therefore ineligible to count as a conference-to-publication conversion.
 
 ### Statistical Analysis
 

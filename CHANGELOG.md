@@ -9,6 +9,43 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-05] - The publication date is the print issue date
+
+### Changed
+
+- **PI decision: the publication date is the print issue date**
+  (`JournalIssue/PubDate`), for the time-to-publication interval and for
+  whether a paper preceded its congress. Articles released online ahead of
+  print are dated to their print issue; month-only issue dates resolve to the
+  first of the month. The Methods in `docs/abstract_results_section.Rmd`
+  previously said only "the publication date", which was ambiguous between two
+  PubMed fields that differ by months.
+- **No number changes.** The analysis already measured from the print issue,
+  so the rate, the median time to publication and every model are unaffected.
+  What changes is that the definition is now stated and enforced.
+
+### Added
+
+- `tests/testthat/test-publication_date_basis.R`. It fails if the parser stops
+  reading `JournalIssue/PubDate` or assigns the date from `ArticleDate`, if the
+  month-only default changes, if the Methods stop defining the date, or if any
+  of the four contested pre-congress intervals stops matching issue-date
+  arithmetic. The two bases differ by 1.5 to 4.9 months on those abstracts, so
+  a recorded interval identifies its own provenance.
+- Appendix A18.
+
+### Known issue, not fixed here
+
+- `output/excluded_pre_congress_publications.csv` was built from `ArticleDate`
+  and is on the wrong basis. It is evidence rather than an input to any
+  reported figure, so nothing downstream is wrong, but it must be regenerated
+  before the branch-order question is settled: the two bases identify different
+  sets, and whether that open decision concerns four abstracts or seven depends
+  on it.
+- Whether a reviewer `match` should override a pre-congress exclusion remains
+  open. That is what moves the numerator between 178 and 174, and it is not
+  decided here.
+
 ## [2026-09-05] - Single-sourced registry, and a producer for the PH figures
 
 ### Fixed
