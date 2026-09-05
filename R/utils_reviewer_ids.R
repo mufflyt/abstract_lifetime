@@ -10,7 +10,7 @@
 # groups by reviewer (interrater agreement, per-reviewer counts, the human/AUTO
 # precedence rule) behaves identically before and after, because only the label
 # changes. "AUTO" is NOT pseudonymised: R/06_analyze_results.R,
-# R/10_interrater.R, R/strobe_flow_diagram.R and the Shiny app all branch on
+# R/10_interrater.R and the Shiny app all branch on
 # that literal string.
 
 #' Pseudonymise a study-staff reviewer identifier

@@ -115,3 +115,36 @@ test_that("strobe_flowchart.R derives its counts from the shared function", {
   expect_false(any(grepl("^n_published <- sum", src)),
                info = "counts must come from derive_flow_counts(), not be recomputed inline")
 })
+
+test_that("exactly one artifact claims to be Figure 1", {
+  # Two files were named figure1_*: the STROBE chart, and a classification-tier
+  # view from 08_make_figures.R. They are different cuts of the cohort, so the
+  # tier view was not deleted -- it was renamed to classification_tiers.*,
+  # because the ambiguity was in the NAME, not the content. A reader who cites
+  # "Figure 1" must land on one file.
+  figs <- list.files(file.path(root, "output", "figures"), pattern = "^figure1")
+  stems <- unique(sub("[.][^.]+$", "", figs))
+  expect_equal(stems, "figure1_strobe_flowchart",
+               info = paste("figure1_* artifacts found:", paste(figs, collapse = ", ")))
+})
+
+test_that("figure numbering has no gaps or repeats", {
+  # A second figure1_ was possible because nothing checked the numbering.
+  figs <- list.files(file.path(root, "output", "figures"), pattern = "^figure[0-9]+_")
+  n <- as.integer(sub("^figure([0-9]+)_.*$", "\\1", figs))
+  expect_equal(anyDuplicated(n), 0L,
+               info = paste("two artifacts share a figure number:",
+                            paste(figs[duplicated(n) | duplicated(n, fromLast = TRUE)],
+                                  collapse = ", ")))
+  expect_equal(sort(n), seq_len(length(n)),
+               info = paste("figure numbers are not 1..n:", paste(sort(n), collapse = ", ")))
+})
+
+test_that("the retired flow generator is gone and nothing calls it", {
+  expect_false(file.exists(file.path(root, "R", "strobe_flow_diagram.R")))
+  live <- c(list.files(file.path(root, "R"), pattern = "[.]R$", full.names = TRUE),
+            file.path(root, "00_run_all.R"))
+  live <- live[file.exists(live)]
+  callers <- Filter(function(f) any(grepl("strobe_flow_diagram", readLines(f, warn = FALSE))), live)
+  expect_length(callers, 0L)
+})

@@ -118,8 +118,8 @@ stale *sentences*:
 
 | Artefact | Generated | Consistent with the current analysis? |
 |---|---|---|
-| `output/figures/figure1_flow_data.csv` | 2026-09-01 22:16 | ✅ 1,154 / 48 / 1,106 / 131 / 81 / 142 / 39 / 713 |
-| `figure1_flow_diagram.png` | 2026-09-01 22:16 | ✅ |
+| `output/figures/classification_tiers.csv` | 2026-09-01 22:16 | ✅ 1,154 / 48 / 1,106 / 131 / 81 / 142 / 39 / 713 |
+| `classification_tiers.png` | 2026-09-01 22:16 | ✅ |
 | `figure1_strobe_flowchart.{png,pdf}` | 2026-09-03 14:56 | ✅ asserts its own arithmetic with `stopifnot()` |
 | `figure2`–`figure6`, `figureS1`–`figureS4` | 2026-09-01 22:16 | ⚠️ one analysis run behind. `06_analyze_results.R` was re-run 2026-09-03 15:27; the model outputs are **byte-identical** to the 2026-09-01 versions (verified against commit `e288259`), so the figures are numerically current, but a future re-run will silently desynchronise them. |
 | `output/tables/table1`–`table4` | 2026-09-01 22:16 | ⚠️ same |
@@ -128,7 +128,7 @@ stale *sentences*:
 | `output/aim5_publication_bias.csv` | 2026-09-03 | ✅ regenerated; `result_positivity` restored to `05`'s select |
 | `output/search_strategy_efficacy.csv` | 2026-04-19 | ❌ **still stale** — a pre-correction measurement. Regenerating it requires re-running the search layer. |
 | `output/aim4_strategy_performance.csv` / `table4` | 2026-09-03 | ⚠️ the pool is repaired, but rows recovered by the rebuild carry `strategies = "unrecovered"`, so attribution covers only the pairs whose provenance survived |
-| `output/figures/strobe_flow.{png,pdf,svg}` | 2026-09-01 21:30 | ❌ superseded by `figure1_strobe_flowchart` |
+| `output/figures/strobe_flow.{png,pdf,svg}` | removed 2026-09-05 | ❌ deleted with `R/strobe_flow_diagram.R`; superseded by `figure1_strobe_flowchart` |
 
 ---
 

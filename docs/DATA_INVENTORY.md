@@ -90,8 +90,8 @@ reason.
 | `data/processed/second_author_triangulation.csv` | 0 bytes, 0 rows. `10g_second_author_triangulation.R` contributes nothing to the gender waterfall (tier 9 never fires). |
 | `data/cache/jmig_2017_abstracts.json` | 97 entries, every `abstract_text` is `null`. The 2017 recovery failed on CORS. Retained as evidence, not as data. |
 | `output/excluded_pre_congress_publications.csv` | 39 rows. **No script in the repository writes it** — it was produced by an ad-hoc audit that was never committed. Its content is cited in appendix A13.6. |
-| `R/strobe_flow_diagram.R` | Superseded by `R/strobe_flowchart.R`, which asserts its arithmetic. Both still produce a "figure 1". |
-| `output/figures/strobe_flow.{png,pdf,svg}` | Output of the superseded script. |
+| `R/strobe_flow_diagram.R` | Deleted 2026-09-05. Superseded by `R/strobe_flowchart.R`, which asserts its arithmetic. It was not in `00_run_all.R` and its outputs were gitignored, so it produced a third flow diagram nothing consumed. |
+| `output/figures/strobe_flow.{png,pdf,svg}` | Removed 2026-09-05 with the script that wrote them. |
 | `deploy_shiny.R` (repo root) | Duplicates `shiny/adjudication_app/deploy.R`, which is the one `00_run_all.R` calls. |
 | `docs/abstract_results_section.html` | 658 KB rendered artefact from 2026-04-17, older than the `.Rmd` and older than the data. |
 

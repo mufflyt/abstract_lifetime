@@ -9,6 +9,43 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-05] - One Figure 1
+
+### Removed
+
+- `R/strobe_flow_diagram.R` and its `output/figures/strobe_flow.{png,pdf,svg}`.
+  It was a third flow-diagram generator, documented as superseded since
+  2026-09-01. It was absent from `00_run_all.R` and its outputs were gitignored,
+  so nothing produced it and nothing read it. Regenerating the lockfile dropped
+  `DiagrammeRsvg` and `rsvg`, which no other file used -- confirmation after the
+  fact that the script was genuinely dead rather than merely quiet.
+
+### Changed
+
+- `output/figures/figure1_flow_diagram.png` and `figure1_flow_data.csv` are now
+  `classification_tiers.png` and `classification_tiers.csv`. Two artifacts were
+  named `figure1_*`, so a reader citing "Figure 1" could land on either.
+- The tier view was renamed rather than deleted, because the two are not
+  duplicates: the STROBE chart shows the outcome chain (1,106 -> 1,051 -> 170
+  published), and this shows the algorithmic classification tiers (131 definite,
+  81 probable, 142 possible, 39 pre-conference top candidate, 713 no match),
+  which the chart does not. The ambiguity was in the name, not the content, so
+  the name is what changed. It now carries no figure number, because it is not a
+  numbered figure in the manuscript.
+- README, `SOURCE_OF_TRUTH.md`, `DATA_INVENTORY.md`, `PIPELINE.md`,
+  `RESULTS_PROVENANCE.md`, `pipeline_manifest.yml` and both data inventories
+  follow the rename. The README now states which figure is Figure 1 and why the
+  companion is not a second one.
+
+### Added
+
+- Three guards in `test-figure1_flow_contract.R`: exactly one `figure1_*`
+  artifact exists, figure numbers are `1..n` with no gaps or repeats, and the
+  retired generator is gone with nothing calling it. Mutation-tested -- a
+  returning `figure1_flow_diagram.png` and a duplicate `figure3_` are each
+  caught by name. Nothing previously checked the numbering, which is how a
+  second Figure 1 became possible.
+
 ## [2026-09-05] - Figure 1 is now checked by CI
 
 ### Added

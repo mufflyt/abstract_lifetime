@@ -51,12 +51,6 @@
       "Source": "Repository",
       "Repository": "CRAN"
     },
-    "DiagrammeRsvg": {
-      "Package": "DiagrammeRsvg",
-      "Version": "0.1",
-      "Source": "Repository",
-      "Repository": "CRAN"
-    },
     "digest": {
       "Package": "digest",
       "Version": "0.6.39",
@@ -214,12 +208,6 @@
     "rsconnect": {
       "Package": "rsconnect",
       "Version": "1.10.0",
-      "Source": "Repository",
-      "Repository": "CRAN"
-    },
-    "rsvg": {
-      "Package": "rsvg",
-      "Version": "2.7.0",
       "Source": "Repository",
       "Repository": "CRAN"
     },

@@ -12,7 +12,7 @@ each other by `tests/testthat/test-docs_drift.R`.
 `10b_resolve_names_openalex.R`, `10c_coauthor_triangulation.R`,
 `10d_orcid_demographics.R`, `10e_merge_demographics.R`,
 `10f_senior_author_triangulation.R`, `10g_second_author_triangulation.R`,
-`run_demographics.R`, `strobe_flowchart.R`, `strobe_flow_diagram.R` and every
+`run_demographics.R`, `strobe_flowchart.R` and every
 script in `scripts/` except the three backfills that are sourced explicitly.
 
 This matters: **`R/10e_merge_demographics.R` is what puts the demographics block into
@@ -251,9 +251,11 @@ precedence rule. The two currently agree with stage 6 on all 1,106 rows —
 verified — but the duplication is a live drift hazard
 ([FAILURE_MODES.md](FAILURE_MODES.md) F9).
 
-`R/strobe_flowchart.R` produces the cohort figure with `stopifnot()` assertions;
-`R/strobe_flow_diagram.R` is an older DiagrammeR version of the same idea and is
-an archive candidate.
+`R/strobe_flowchart.R` produces the cohort figure with `stopifnot()` assertions,
+and is now the only generator of one. `R/strobe_flow_diagram.R`, an older
+DiagrammeR version of the same idea, was deleted on 2026-09-05: it was absent
+from `00_run_all.R` and its outputs were gitignored, so it produced a third flow
+diagram that nothing read.
 
 ---
 

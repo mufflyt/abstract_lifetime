@@ -90,7 +90,7 @@ flow <- tibble::tibble(
         n_definite_fig, n_probable_fig, n_possible_fig,
         n_excluded_fig, n_no_match_fig)
 )
-write_csv(flow, here("output", "figures", "figure1_flow_data.csv"))
+write_csv(flow, here("output", "figures", "classification_tiers.csv"))
 
 tryCatch({
   if (requireNamespace("DiagrammeR", quietly = TRUE)) {
@@ -140,7 +140,7 @@ tryCatch({
     html_file <- tempfile(fileext = ".html")
     htmlwidgets::saveWidget(g, html_file, selfcontained = TRUE)
     if (requireNamespace("webshot2", quietly = TRUE)) {
-      webshot2::webshot(html_file, here("output", "figures", "figure1_flow_diagram.png"),
+      webshot2::webshot(html_file, here("output", "figures", "classification_tiers.png"),
                         vwidth = 1000, vheight = 900, zoom = 3)
       cli_alert_success("Figure 1 saved")
     }
