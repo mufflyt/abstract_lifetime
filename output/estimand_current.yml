@@ -1,0 +1,36 @@
+population:
+  congress_years:
+  - 2012
+  - 2013
+  - 2014
+  - 2015
+  - 2016
+  - 2017
+  - 2018
+  - 2019
+  - 2020
+  - 2021
+  - 2022
+  - 2023
+  n_congress_years: 12
+  cohort_size: 1106
+  unit_of_analysis: one conference abstract
+denominator:
+  rule: abstracts whose match status was resolved
+  excludes_unresolved: yes
+  n_unresolved: 55
+  n_evaluated: 1051
+outcome:
+  definition: matched to a full publication
+  counted_as_published: classification == 'definite', or a reviewer decision of match
+  n_events: 178
+time:
+  origin: congress date
+  censoring: administrative at the end of the search window
+  search_window_start: 2012/11/01
+  search_window_end: 2026/04/01
+  interval_units: months
+estimation:
+  survival_model: Kaplan-Meier and Cox proportional hazards
+  pre_congress_handling: publications dated before their congress are excluded from
+    the interval
