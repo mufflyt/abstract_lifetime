@@ -33,7 +33,10 @@ suppressPackageStartupMessages({
 cli_h1("Cohort completeness against the Crossref deposit")
 
 JMIG_ISSN <- "1553-4650"
-CONTACT <- Sys.getenv("PIPELINE_EMAIL", unset = "tyler.muffly@dhha.org")
+# Crossref asks for a contact address for its polite pool. That address belongs
+# to whoever runs the audit, so it comes from the environment; the fallback is
+# the RFC 2606 documentation domain, never a real mailbox.
+CONTACT <- Sys.getenv("PIPELINE_EMAIL", unset = "abstract.lifetime@example.com")
 cache_dir <- here("data", "cache", "crossref_supplements")
 dir.create(cache_dir, showWarnings = FALSE, recursive = TRUE)
 

@@ -187,9 +187,15 @@ default:
   # smaller or empty match set rather than failing, and tier 1 of the gender
   # waterfall loses coverage. Override with the ABOG_NPI_PATH and
   # NPPES_DUCKDB_PATH environment variables.
+  # Left empty on purpose. These files live outside the repository and their
+  # locations are specific to whoever is running the pipeline, so committing a
+  # real path both breaks portability and publishes the operator's home
+  # directory and external volume names. Set ABOG_NPI_PATH and
+  # NPPES_DUCKDB_PATH in .Renviron (gitignored) instead; both stages skip
+  # cleanly when unset. See R/utils_external_paths.R.
   external_data:
-    abog_npi_path: "~/isochrones/data/canonical_abog/canonical_abog_npi_LATEST.csv"
-    nppes_duckdb_path: "/Volumes/MufflySamsung/DuckDB/nber_my_duckdb.duckdb"
+    abog_npi_path: ""
+    nppes_duckdb_path: ""
 
   # --- Pipeline ---
   pipeline:

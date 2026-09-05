@@ -4,3 +4,20 @@ ENTREZ_KEY=your_api_key_here
 
 # CrossRef polite pool (use your email)
 CROSSREF_EMAIL=your_email@example.com
+
+# OpenAlex polite pool (optional). Unset simply means the ordinary request
+# pool: slower, identical data. Never commit a real address to config or code.
+OPENALEX_MAILTO=your_email@example.com
+
+# Contact address sent to Crossref / ScienceDirect polite pools.
+PIPELINE_EMAIL=your_email@example.com
+
+# --- External data outside the repository (optional; both skip when unset) ---
+# These live on the operator's machine, so their paths are personal and are
+# deliberately absent from config.yml. See R/utils_external_paths.R.
+#
+# ABOG NPI export used by R/10_npi_matching.R and R/10c_coauthor_triangulation.R
+ABOG_NPI_PATH=/path/to/canonical_abog_npi_LATEST.csv
+#
+# NPPES / CMS Open Payments DuckDB mirror used by R/09j and R/10_npi_matching.R
+NPPES_DUCKDB_PATH=/path/to/nber_my_duckdb.duckdb

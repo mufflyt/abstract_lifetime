@@ -18,7 +18,7 @@
 #   2015 — SKIPPED (corrupt payment dates in DuckDB table)
 #   2016–2023 — open_payments_all_years (Covered_Recipient_* columns)
 #
-# DuckDB: /Volumes/MufflySamsung/DuckDB/nber_my_duckdb.duckdb
+# DuckDB: resolved from NPPES_DUCKDB_PATH / config.yml external_data
 # Cache:  data/cache/open_payments/<last>_<init>_<year>.rds
 # Writes: data/processed/gender_from_open_payments.csv
 # Updates: output/abstracts_with_matches.csv
@@ -30,7 +30,11 @@ suppressPackageStartupMessages({
 
 `%||%` <- function(a, b) if (is.null(a) || length(a) == 0 || (length(a) == 1 && is.na(a))) b else a
 
-DUCKDB_PATH <- "/Volumes/MufflySamsung/DuckDB/nber_my_duckdb.duckdb"
+source(here("R", "utils_external_paths.R"))
+
+# Resolved, never hard-coded: the mirror lives outside the repo and its
+# location is specific to the operator's machine. See R/utils_external_paths.R.
+DUCKDB_PATH <- external_path("nppes_duckdb_path", "NPPES_DUCKDB_PATH")
 cache_dir   <- here("data", "cache", "open_payments")
 out_path    <- here("data", "processed", "gender_from_open_payments.csv")
 # NOTE: Pure sidecar producer — reads abstracts_cleaned.csv only.
@@ -39,11 +43,17 @@ dir.create(cache_dir, showWarnings = FALSE, recursive = TRUE)
 
 cli_h1("Gender enrichment from CMS Open Payments (Sunshine Act)")
 
-if (!file.exists(DUCKDB_PATH)) {
-  cli_alert_warning("DuckDB not found at {DUCKDB_PATH} — skipping")
+if (!external_available(DUCKDB_PATH)) {
+  cli_alert_warning("NPPES/Open Payments DuckDB not configured or not found - skipping. Set NPPES_DUCKDB_PATH to enable.")
   write_csv(tibble(), out_path)
-  invisible(NULL)
 }
+
+# 00_run_all.R *sources* this script, so `quit()` would end the entire pipeline
+# run, and a bare `invisible(NULL)` at top level does not stop a script at all
+# (which is why the previous guard fell through to dbConnect). The remainder is
+# therefore wrapped in an explicit conditional. Inner lines keep their original
+# indentation so the diff stays reviewable.
+if (external_available(DUCKDB_PATH)) {
 
 # ── AAGL conference dates ──────────────────────────────────────────────────────
 # 2015 omitted — corrupt payment dates in the open_payments_2015 DuckDB table
@@ -311,3 +321,5 @@ print(as.data.frame(
 # This script only writes its sidecar CSV (gender_from_open_payments.csv).
 
 } # end nrow(name_tbl) > 0
+
+} # end: external DuckDB available
