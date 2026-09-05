@@ -1,2 +1,2 @@
 test,p_value,violating_terms,remediation,remediated_global_p
-cox_zph_global,0.043,n_authors,time_varying:n_authors,0.67
+cox_zph_global,0.01,is_us_based|n_authors,time_varying:n_authors;strata:is_us_based,0.607

@@ -3,10 +3,10 @@ is_rct,FALSE,955 (90.9%),816 (92.6%),139 (81.8%),< 0.001
 is_rct,TRUE,96 (9.1%),65 (7.4%),31 (18.2%),NA
 is_multicenter,FALSE,988 (94.0%),833 (94.6%),155 (91.2%),0.090
 is_multicenter,TRUE,63 (6.0%),48 (5.4%),15 (8.8%),NA
-is_academic,FALSE,698 (66.4%),580 (65.8%),118 (69.4%),0.366
-is_academic,TRUE,353 (33.6%),301 (34.2%),52 (30.6%),NA
-is_us_based,FALSE,189 (18.0%),167 (19.0%),22 (12.9%),0.062
-is_us_based,TRUE,862 (82.0%),714 (81.0%),148 (87.1%),NA
+is_academic,FALSE,379 (36.5%),326 (37.6%),53 (31.2%),0.114
+is_academic,TRUE,659 (63.5%),542 (62.4%),117 (68.8%),NA
+is_us_based,FALSE,440 (42.4%),354 (40.8%),86 (50.6%),0.018
+is_us_based,TRUE,598 (57.6%),514 (59.2%),84 (49.4%),NA
 study_design,case_control,10 (1.0%),7 (0.8%),3 (1.8%),< 0.001
 study_design,case_series,42 (4.0%),36 (4.1%),6 (3.5%),NA
 study_design,cost_analysis,1 (0.1%),1 (0.1%),0 (0.0%),NA

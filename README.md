@@ -80,11 +80,14 @@ zero for them — see [Known limitations](#known-limitations).
 
 ![Cox proportional hazards forest plot showing hazard ratios with 95% confidence intervals for randomized design, academic affiliation, US location, author count, inferred male first author and multicenter conduct.](output/figures/figure5_cox_forest.png)
 
-Randomized design (HR 2.17, 95% CI 1.45–3.26) is associated with faster
-publication and academic affiliation with *slower* publication (HR 0.65,
-0.46–0.91). US location (HR 1.35, 0.85–2.17), male first authorship (HR 0.78,
-0.57–1.06) and multicenter conduct (HR 1.40, 0.82–2.40) are not statistically
-distinguishable from no effect. `has_funding` is not a term in this model — the
+Randomized design (HR 2.00, 95% CI 1.34–3.00) is associated with faster
+publication. **Academic affiliation is not** (HR 1.10, 0.78–1.55, p = 0.59):
+the apparent protective effect reported earlier was an artefact of deriving
+academic status from abstract body text rather than from the author's
+affiliation, and it disappears once the affiliation is read (appendix A21). US
+location (HR 0.79, 0.58–1.08), male first authorship (HR 0.75, 0.55–1.02) and
+multicenter conduct (HR 1.36, 0.79–2.34) are not statistically distinguishable
+from no effect. `has_funding` is not a term in this model — the
 near-zero-variance screen removes it (TRUE for 7 of 1,051).
 
 Author count is reported separately below, because its effect is not constant.
@@ -95,7 +98,7 @@ Author count is reported separately below, because its effect is not constant.
 
 The Cox model reports HR 1.25 per additional author (1.09–1.44, p = 0.002), and
 that single number is the **only** proportional-hazards violation in the model
-(`cox.zph` p = 0.002 for this term; every other term p ≥ 0.13). Refitting it
+(`cox.zph` p = 0.003 for this term; `is_us_based` also violates at p = 0.005). Refitting it
 with a log-time interaction shows what the constant was averaging: no detectable
 effect at three months (HR 1.01, 0.84–1.22), rising to 1.32 (1.13–1.53) at one
 year and 1.51 (1.24–1.83) at two. Team size does not buy speed to first
@@ -105,8 +108,8 @@ Read this with the ceiling in mind: `n_authors` is truncated at 5 by the source
 ingest, and 49.3% of the model frame sits at that cap.
 
 Two cautions. Only two terms are robust to resampling:
-across 500 bootstrap refits, `n_authors` and `is_rct` are each retained 95.2% of the time,
-while `is_academic` survives only 47.4% — it is significant in
+across 500 bootstrap refits, `is_rct` is retained 93.2% of the time and
+`n_authors` 88.6%, while `is_academic` survives only 5.6% — it is significant in
 eleven of twelve leave-one-congress-out refits, so it is close to
 congress-independent, but it is not sampling-robust either. And `has_funding` is now
 excluded from both models by a near-zero-variance rule (TRUE for 7 of 1,051).
@@ -115,7 +118,7 @@ See `output/model_predictor_stability.csv` and
 
 ### How much do those estimates depend on the sample?
 
-![Horizontal bar chart of bootstrap retention frequency for each logistic-regression term over 500 refits. Number of authors 95.2 percent and randomized trial 95.2 percent are shaded green as robust; academic affiliation 47.4 percent, US-based 32.6 percent, log sample size 27.4 percent, multicenter 23.6 percent and inferred first-author gender 22.2 percent are shaded red as unstable.](output/figures/figure7_predictor_stability.png)
+![Horizontal bar chart of bootstrap retention frequency for each logistic-regression term over 500 refits. Randomized trial 93.2 percent and number of authors 88.6 percent are shaded green as robust; gender 45.4 percent, US-based 41.6 percent, log sample size 27.4 percent, multicenter 23.6 percent and inferred first-author gender 22.2 percent are shaded red as unstable.](output/figures/figure7_predictor_stability.png)
 
 Only two terms survive resampling. `is_academic` reaches p = 0.020 in the fitted
 model but holds in under two-thirds of bootstrap refits — although it *is*
@@ -371,11 +374,11 @@ worktree. Full inventory and the list of invariants that have **no** test:
     `study_design` (p = 0.0004) and `n_authors` (p = 0.013), the latter a
     significant predictor in both models. Bounds: 16.1% if all unpublished,
     21.1% if all published. See `output/unresolved_vs_evaluated.csv`.
-11. The proportional-hazards assumption is **violated** (global p = 0.043), and
+11. The proportional-hazards assumption is **violated** (global p = 0.010), and
     the violation is confined to `n_authors` (p = 0.002). That term is fitted
     with a log-time interaction and reported as a time-varying hazard ratio;
     the other five are unchanged when `n_authors` is stratified out instead
-    (global p = 0.67, no HR moving more than 2%). `n_authors` is separately
+    (global p = 0.607). `n_authors` is separately
     limited by a ceiling at 5 authors covering 49.3% of the model frame.
 12. **Three publications are each credited to two abstracts**, so six of the 170
     numerator rows rest on three papers. The numerator is not deduplicated —

@@ -1,5 +1,43 @@
 # NEWS
 
+## 2026-09-05 - a finding that did not survive measurement
+
+Two covariates, academic affiliation and US location, had never read an
+affiliation. The parser defect meant that branch of each rule was always empty,
+so both fell through to the abstract body, where the academic pattern matched
+words like "residency" and "tertiary center" and the US pattern matched any
+state name anywhere in the text. Against real affiliations they agreed 54% and
+53% of the time, which is close to chance.
+
+Deriving them properly changes one conclusion. Academic affiliation was
+reported for three refits as associated with slower publication, hazard ratio
+0.65 at p = 0.013. Measured from the affiliation it is 1.10 at p = 0.59, and its
+bootstrap retention falls from 47% to 5.6%, the lowest of any term in the model.
+It was an artefact of the proxy. It should be reported as no evidence of an
+association, and the README and Methods now say so.
+
+The finding that does survive is randomized design, and number of authors with
+it. Neither was ever affiliation-derived; both keep their effect and their
+stability.
+
+Reaching 98.7% coverage needed a change of unit. Linking an author to an
+institution requires a reference the 2017-2018 source format does not emit, so
+the per-author table stops at 55% of the cohort. But "is any author at an
+academic institution" is a property of the record, not of a particular author,
+so taking the union of institutions in each source file answers it without the
+link. That reaches 1,092 of 1,106 abstracts, including the two congress years
+that had no usable data at all under the previous approach.
+
+Two smaller things came out of it. A second term now violates proportional
+hazards, and the remediation absorbed it without modification: it reads the
+violating set and picks a remedy by type, a time-varying coefficient for the
+numeric term and stratification for the logical one. And the diagnostics script
+that supports it had a latent bug, invisible while there was only ever one
+violator, that silently produced no metrics when the first violator was
+categorical.
+
+The publication rate did not move.
+
 ## 2026-09-05 - the reviewer outranks the score
 
 The second outcome decision of the day, and the smaller one: 171 becomes 170.

@@ -68,11 +68,24 @@ rows <- list(
 )
 
 if (length(violators) > 0) {
-  v <- violators[1]
+  # More than one term can violate. The AIC comparison and the ceiling metrics
+  # only mean anything for a NUMERIC violator, because that is the one given a
+  # time-varying coefficient; a categorical violator is stratified instead.
+  # Taking violators[1] produced no metrics at all the first time two terms
+  # violated and the categorical one sorted first.
+  numeric_violators <- violators[vapply(violators,
+    function(z) is.numeric(cox_data[[z]]), logical(1))]
+  rows <- c(rows, list(tibble(metric = "n_violating_terms",
+                              value = as.numeric(length(violators)))))
+  if (!length(numeric_violators)) {
+    cli_alert_info("No numeric violator; AIC and ceiling metrics not applicable")
+  }
+  v <- if (length(numeric_violators)) numeric_violators[1] else violators[1]
 
-  # What the global test becomes with the violator removed: the evidence that
-  # the violation is confined to that one term.
-  rest <- setdiff(terms, v)
+  # What the global test becomes with EVERY violating term removed. Dropping
+  # only one leaves the global test still failing when there are two, which
+  # makes the number uninterpretable.
+  rest <- setdiff(terms, violators)
   if (length(rest) >= 2) {
     m_wo <- coxph(as.formula(paste("Surv(time, event) ~", paste(rest, collapse = " + "))),
                   data = cox_data)

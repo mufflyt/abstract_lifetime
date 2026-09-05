@@ -1,8 +1,8 @@
 model,variable,kept,pct_missing,n_levels,reason
 cox,is_rct,TRUE,0,2,kept
 cox,log_sample_size,FALSE,NA,NA,absent from the model frame
-cox,is_academic,TRUE,0,2,kept
-cox,is_us_based,TRUE,0,2,kept
+cox,is_academic,TRUE,1.2,2,kept
+cox,is_us_based,TRUE,1.2,2,kept
 cox,session_type,FALSE,0,1,fewer than 2 distinct values
 cox,n_authors,TRUE,0.4,5,kept
 cox,gender_unified,TRUE,2.3,2,kept

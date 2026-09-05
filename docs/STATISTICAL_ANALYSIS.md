@@ -205,7 +205,7 @@ it before the formula is built. (This document listed it here until 2026-09-04,
 which contradicted the screen table two sections up. The formula shown is now
 the one read back from `data/processed/cox_model.rds`.)
 
-`cox_data <- km_data |> drop_na(all_of(cox_formula_parts))` → **n = 1,027,
+`cox_data <- km_data |> drop_na(all_of(cox_formula_parts))` → **n = 1,018,
 events = 170**. Reference categories are the `FALSE` level for each logical and
 `female` for `gender_unified` (alphabetical, R default). `n_authors` enters as a
 continuous count.
@@ -215,12 +215,12 @@ confidence intervals from `broom::tidy(exponentiate = TRUE, conf.int = TRUE)`:
 
 | term | HR | 95% CI | p |
 |---|---:|---|---:|
-| `is_rctTRUE` | 2.172 | 1.449 – 3.255 | <0.001 |
-| `is_academicTRUE` | **0.649** | 0.461 – 0.913 | **0.013** |
-| `is_us_basedTRUE` | 1.354 | 0.847 – 2.165 | 0.205 |
-| `n_authors` | 1.252 | 1.089 – 1.439 | 0.002 |
-| `gender_unifiedmale` | 0.780 | 0.574 – 1.061 | 0.114 |
-| `is_multicenterTRUE` | 1.402 | 0.818 – 2.403 | 0.219 |
+| `is_rctTRUE` | 2.002 | 1.336 – 3.001 | 0.001 |
+| `is_academicTRUE` | 1.097 | 0.782 – 1.539 | 0.587 |
+| `is_us_basedTRUE` | 0.787 | 0.575 – 1.078 | 0.136 |
+| `n_authors` | 1.218 | 1.058 – 1.402 | 0.006 |
+| `gender_unifiedmale` | 0.746 | 0.549 – 1.014 | 0.066 |
+| `is_multicenterTRUE` | 1.361 | 0.793 – 2.336 | 0.265 |
 
 The `n_authors` row is a hazard ratio **averaged over follow-up** and should not
 be quoted on its own; that term violates proportional hazards and the effect it
@@ -247,13 +247,13 @@ the per-term tests to `output/cox_ph_terms.csv`:
 
 | term | χ² | df | p |
 |---|---:|---:|---:|
-| `is_rct` | 2.244 | 1 | 0.134 |
-| `is_academic` | 0.290 | 1 | 0.591 |
-| `is_us_based` | 0.912 | 1 | 0.340 |
-| **`n_authors`** | **9.233** | 1 | **0.002** |
+| `is_rct` | 2.121 | 1 | 0.145 |
+| `is_academic` | 3.383 | 1 | 0.066 |
+| **`is_us_based`** | **8.028** | 1 | **0.005** |
+| **`n_authors`** | **8.756** | 1 | **0.003** |
 | `gender_unified` | 0.002 | 1 | 0.962 |
 | `is_multicenter` | 0.297 | 1 | 0.586 |
-| GLOBAL | 12.985 | 6 | 0.043 |
+| GLOBAL | 16.735 | 6 | 0.010 |
 
 The violation is **entirely attributable to `n_authors`**. Every other term sits
 between p = 0.13 and p = 0.96, and refitting without `n_authors` returns the
@@ -267,7 +267,7 @@ fitted before choosing.
 | option | global p after | consequence |
 |---|---:|---|
 | Report the HRs as averages over follow-up | 0.043 (unchanged) | Honest but uninformative — it names the problem without measuring it, and leaves `n_authors` = 1.266 to be read as a constant anyway |
-| Stratify on `n_authors` | 0.67 | Restores the assumption but **discards the estimate**. `n_authors` is one of only two predictors that survive bootstrap resampling (95.2% retention, `R/06d_model_stability.R`); stratifying it away deletes a real finding to fix a diagnostic |
+| Stratify on both violators | 0.607 | Restores the assumption but **discards the estimate**. `n_authors` is one of only two predictors that survive bootstrap resampling (88.6% retention, `R/06d_model_stability.R`); stratifying it away deletes a real finding to fix a diagnostic |
 | **Time-varying coefficient** (chosen) | — | Keeps the term and estimates its drift. AIC 2286.3 vs 2294.1 for the PH fit; the log-time interaction is significant at p = 0.001 |
 
 The model is `coxph(..., + tt(n_authors), tt = function(x, t, ...) x * log(t))`,
@@ -297,7 +297,7 @@ first publication, they are the ones still converting abstracts to papers years
 afterwards, while small-team abstracts go dead.
 
 **Sensitivity.** `output/aim2b_cox_regression_stratified.csv` stratifies on
-`n_authors` instead, which restores the assumption (global p = 0.67) and lets
+`n_authors` instead, which restores the assumption (global p = 0.607) and lets
 the other five hazard ratios be read as constants. They barely move — every one
 is within 2% of the primary fit:
 
@@ -450,9 +450,9 @@ how often each term is retained at p < 0.05
 
 | predictor | retained | reading |
 |---|---:|---|
-| `n_authors` | **95.2%** | robust |
-| `is_rct` | **95.2%** | robust |
-| `is_academic` | 47.4% | unstable |
+| `is_rct` | **93.2%** | robust |
+| `n_authors` | **88.6%** | robust |
+| `is_academic` | 5.6% | unstable |
 | `is_us_based` | 37.4% | unstable |
 | `log_sample_size` | 27.4% | unstable |
 | `is_multicenter` | 23.6% | unstable |
@@ -488,7 +488,7 @@ None does.
 They disagree about `is_academic`, and the disagreement is informative rather
 than contradictory. It is significant in **eleven of twelve** leave-one-congress-out
 refits — so it is close to congress-independent, though no longer entirely so —
-but survives only **47.4%** of bootstrap resamples — so it is sensitive to which *abstracts* are
+but survives only **5.6%** of bootstrap resamples — so it is sensitive to which *abstracts* are
 drawn. The two diagnostics test different things, and the honest summary is
 that `is_academic` is not congress-driven but is not sampling-robust either. It
 should be reported with that qualification, not as a headline.
@@ -562,9 +562,9 @@ for adaptation into Methods.
 
 | Check | Implemented | Result |
 |---|---|---|
-| Proportional hazards | `cox.zph(cox_model)`; global test and remediation in `output/cox_ph_assumption.csv`, per-term tests in `output/cox_ph_terms.csv` | global p = **0.043**, violated. **Diagnosed and remediated 2026-09-04**: the violation is confined to `n_authors` (p = 0.002; every other term p ≥ 0.13), which now carries a log-time interaction. Stratifying on it instead restores global p = **0.67** and moves no other HR by more than 2%. See *Proportional hazards* under Aim 2b. |
+| Proportional hazards | `cox.zph(cox_model)`; global test and remediation in `output/cox_ph_assumption.csv`, per-term tests in `output/cox_ph_terms.csv` | global p = **0.010**, violated by two terms. **Diagnosed and remediated 2026-09-04**: the violation is confined to `n_authors` (p = 0.002; every other term p ≥ 0.13), which now carries a log-time interaction. Stratifying on it instead restores global p = **0.607** and moves no other HR by more than 2%. See *Proportional hazards* under Aim 2b. |
 | Collinearity | **not implemented** | — |
-| Predictor stability | `R/06d_model_stability.R`, 500 bootstrap refits | Only `n_authors` and `is_rct` (95.2% each) are robust |
+| Predictor stability | `R/06d_model_stability.R`, 500 bootstrap refits | Only `is_rct` (93.2%) and `n_authors` (88.6%) are robust |
 | Leave-one-congress-out | `R/06d_model_stability.R`, 84 refits | No term changes direction; `is_academic` significant in 11 of 12, `is_us_based` in only 1 of 12 |
 | Goodness of fit (Hosmer–Lemeshow, calibration, AUC) | **not implemented** | — |
 | Sparse-category handling | **Explicit** since 2026-09-04: `screen_model_vars()` applies a near-zero-variance rule and records every decision to `output/model_variable_screen.csv`. | `has_funding` is TRUE for 7 of 1,106 abstracts (it was 3 before `02d` re-derived the predictors from the backfilled text); its Cox CI spans 0.43–7.17 and its logistic CI 0.29–11.3. `mysterycall_remove_near_zero()` flags it automatically at a frequency ratio of 1044:7 |

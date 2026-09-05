@@ -64,6 +64,37 @@ parse_affiliations <- function(html_txt) {
   setNames(as.list(aff_txt[keep]), aff_id[keep])
 }
 
+# ── Abstract-level affiliations ────────────────────────────────────────────────
+#
+# The per-author table needs each author linked to an affiliation id via
+# "refid". Three ScienceDirect formats appear across 2012-2023, and the
+# 2017-2018 one carries no refid at all: its affiliation ids are "tx0010"
+# rather than "aff0010" and author blocks do not reference them. Per-author
+# linkage therefore fails for 192 abstracts whose affiliations are present and
+# parse cleanly.
+#
+# Abstract-level covariates do not need that linkage. "Is any author at an
+# academic institution" and "how many distinct institutions appear" are
+# properties of the record, so the UNION of affiliation strings answers them
+# without knowing which author belongs to which. That reaches 98.7% of the
+# cohort against 55% for the linked table.
+#
+# Both tables are written. The per-author one remains the source for
+# author-level work; this one is the source for covariates.
+parse_affiliations_union <- function(html_txt) {
+  start <- regexpr('"affiliations":\\{', html_txt, fixed = FALSE)
+  if (start < 0) return(character(0))
+  chunk <- substr(html_txt, start, start + 8000)
+  tf <- regmatches(chunk, gregexpr('"textfn"(?:[^_]{0,150})?"_":"([^"]+)"',
+                                   chunk, perl = TRUE))[[1]]
+  if (!length(tf)) return(character(0))
+  v <- str_match(tf, '"textfn"(?:[^_]{0,150})?"_":"([^"]+)"')[, 2]
+  v <- v[!is.na(v) & nzchar(v)]
+  # Distinct institutions, order preserved. A multi-author paper repeats the
+  # same affiliation once per author, so duplicates are the norm.
+  unique(trimws(v))
+}
+
 # ── Extract authors with name + affiliation ref ────────────────────────────────
 parse_authors_json <- function(html_txt, aff_map) {
   # Strategy: find the ordered author list block. ScienceDirect places all authors
@@ -161,6 +192,25 @@ author_aff_mapped <- author_aff |>
 
 write_csv(author_aff_mapped, out_path)
 cli_alert_success("Wrote {out_path} ({nrow(author_aff_mapped)} rows)")
+
+# ── Abstract-level affiliation table ──────────────────────────────────────────
+union_out <- here("data", "processed", "abstract_affiliations.csv")
+
+union_rows <- lapply(seq_len(nrow(pii_map)), function(i) {
+  f <- file.path(cache_dir, paste0(pii_map$pii[i], ".html"))
+  if (!file.exists(f)) return(NULL)
+  txt <- paste(readLines(f, warn = FALSE), collapse = "")
+  v <- parse_affiliations_union(txt)
+  if (!length(v)) return(NULL)
+  tibble(abstract_id = pii_map$abstract_id[i],
+         n_affiliations = length(v),
+         affiliations = paste(v, collapse = " | "))
+})
+abstract_aff <- bind_rows(union_rows)
+write_csv(abstract_aff, union_out)
+cli_alert_success(
+  "Wrote {union_out} ({nrow(abstract_aff)} of {nrow(pii_map)} abstracts, \
+   {round(100 * nrow(abstract_aff) / nrow(pii_map), 1)}%)")
 
 # ── Backfill affiliation_raw in abstracts_cleaned.csv ─────────────────────────
 first_author_aff <- author_aff_mapped |>

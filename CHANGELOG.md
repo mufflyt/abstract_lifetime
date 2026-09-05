@@ -9,6 +9,60 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-05] - Affiliation covariates derived from affiliations
+
+### Changed
+
+- **`is_academic` and `is_us_based` are derived from the author affiliation
+  instead of abstract body text.** Neither had ever read an affiliation: the
+  affiliation branch of each rule never fired because of the parser defect, so
+  both fell through to the abstract body, where the academic pattern matched
+  "residency", "fellowship" and "tertiary center" and the US pattern matched
+  any state name anywhere in the text. Against real affiliations the two
+  proxies agreed 54.1% and 52.7% of the time.
+- **The academic finding does not survive.** HR 0.649 (p = 0.013) becomes 1.097
+  (p = 0.587); bootstrap retention falls from 47.4% to 5.6%. Reported for three
+  refits as "academic affiliation is associated with slower publication", it
+  was an artefact of a proxy that agreed with its construct about as often as a
+  coin. It should now be reported as no evidence of an association.
+- `is_us_based` reverses direction, 1.354 to 0.787, and remains non-significant
+  either way. `is_rct` and `n_authors` were never affiliation-derived and
+  survive at 93.2% and 88.6% retention.
+- The publication rate, denominator and time to publication do not change.
+
+### Added
+
+- `data/processed/abstract_affiliations.csv`, the union of institution strings
+  per abstract. Per-author linkage needs a refid the 2017-2018 ScienceDirect
+  format does not emit and reaches 55% of the cohort; abstract-level covariates
+  do not need that link and this reaches **1,092 of 1,106 (98.7%)**, including
+  2017 and 2018 at 100%.
+- `n_affiliations`, the count of distinct institutions per abstract: mean 2.37,
+  679 abstracts naming more than one.
+
+### Fixed
+
+- Absence of an affiliation is now `NA`, not `FALSE`. Coding it as a negative
+  filled the comparison group with unknowns and produced an era gradient that
+  made an earlier attempt at this change unusable.
+- `scripts/ph_diagnostics_report.R` assumed a single numeric violator. With two
+  violators it selected the categorical one and silently produced no AIC or
+  ceiling metrics. It now picks the first numeric violator for those, reports
+  how many terms violate, and drops every violator for the "without violator"
+  refit rather than one.
+
+### Note
+
+- **A second proportional-hazards violator.** Global p moves from 0.043 to
+  0.010; `is_us_based` now violates at p = 0.005 alongside `n_authors` at
+  p = 0.003. The remediation handled it unchanged, choosing by type: a log-time
+  interaction for the numeric term, `strata()` for the logical one. Stratifying
+  on both restores the global test to 0.607.
+- `is_multicenter` is deliberately unchanged at 65. More than one affiliation
+  is not a multicentre study, and redefining it as `n_affiliations > 1` would
+  take it from 65 to 679 and change what the variable means. That is an
+  estimand decision, not a measurement repair.
+
 ## [2026-09-05] - A human no_match supersedes the algorithm
 
 ### Changed
