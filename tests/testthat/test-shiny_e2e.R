@@ -1,13 +1,73 @@
 # tests/testthat/test-shiny_e2e.R
 # End-to-end browser tests using shinytest2.
-# These tests drive a real headless Chromium session against the full app UI.
+#
+# This file is OPT-IN and asserts nothing unless you ask for it. That is a
+# deliberate change from an accidental one: it previously guarded itself with
+# skip_if_not_installed("shinytest2"), and since shinytest2 is installed
+# nowhere - not in CI, not on the development machine - the file contributed
+# zero assertions everywhere while still appearing in the suite as a test file.
+# A test that cannot fail is not coverage, and one that looks like coverage is
+# worse than none, because it occupies the place where a check is supposed to
+# be.
+#
+# Three things are required, and CI has none of them:
+#
+#   1. shinytest2, which is in no workflow's package list.
+#   2. A working Chrome or Chromium install for the headless session.
+#   3. data/processed/pubmed_candidates.csv. app.R falls back from bundle/ to
+#      repo-relative paths, so the app starts in a clean checkout, but the
+#      candidate pool is gitignored at 130 MB and every screen these tests
+#      drive renders candidates.
+#
+# Installing shinytest2 in CI would therefore not produce coverage. It would
+# produce a browser launch against an app with no candidates to display.
+#
+# To run it locally:
+#
+#   install.packages("shinytest2")
+#   RUN_SHINY_E2E=true Rscript -e 'testthat::test_file("tests/testthat/test-shiny_e2e.R")'
+#
+# The exclusion is registered in tests/expected_skips.yaml, so tests/run_suite_gate.R
+# prints it as an unrun gap on every run rather than letting it pass silently.
 
 library(testthat)
 
-# These drive a real headless Chromium session. shinytest2 is not in the CI
-# dependency list (see .github/workflows/R-CMD-check.yaml) and browser-driven
-# e2e tests need a working Chrome install, so the whole file skips where the
-# package is unavailable. A top-level skip() skips every test below it.
+`%||%` <- function(a, b) if (is.null(a)) b else a
+
+test_that("the e2e suite's exclusion is explicit and registered", {
+  # This block runs in EVERY environment, on purpose. A top-level skip() emits
+  # no result row at all under some testthat reporters, so the file could
+  # contribute literally nothing and be invisible to the skip guard rather than
+  # merely inert. This assertion is the file's floor: whatever else happens, it
+  # reports whether the browser tests ran and, when they did not, insists the
+  # absence is recorded somewhere a human reads.
+  optin <- identical(tolower(Sys.getenv("RUN_SHINY_E2E", "")), "true")
+  have  <- requireNamespace("shinytest2", quietly = TRUE)
+
+  if (optin && have) {
+    succeed("shiny e2e suite is running")
+  } else {
+    p <- here::here("tests", "expected_skips.yaml")
+    entries <- if (file.exists(p)) yaml::read_yaml(p)$expected_skips else list()
+    files <- vapply(entries, function(e) e$file %||% "", character(1))
+    expect_true(
+      "test-shiny_e2e.R" %in% files,
+      label = paste0("the shiny e2e suite is not running (RUN_SHINY_E2E=", optin,
+                     ", shinytest2 installed=", have, ") and has no entry in ",
+                     "tests/expected_skips.yaml, so 332 lines of browser tests ",
+                     "are absent from the suite with nothing recording it"))
+  }
+})
+
+# Opt-in rather than incidental. Without this the file would start running the
+# moment anyone installed shinytest2 for an unrelated reason, and would then
+# fail on the missing browser or the missing candidate pool, which reads as a
+# regression rather than as a suite that was never wired up.
+if (!identical(tolower(Sys.getenv("RUN_SHINY_E2E", "")), "true")) {
+  skip(paste("shiny e2e suite is opt-in: set RUN_SHINY_E2E=true, and see the",
+             "header of this file for the three prerequisites CI does not have"))
+}
+
 skip_if_not_installed("shinytest2")
 
 library(shinytest2)

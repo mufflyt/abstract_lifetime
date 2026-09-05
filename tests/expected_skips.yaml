@@ -180,8 +180,15 @@ expected_skips:
   - file: test-shiny_e2e.R
     test: (code run outside of `test_that()`)
     reason: >
-      shinytest2 is not installed, in CI or locally, so this file asserts
-      nothing anywhere while still appearing in the suite as a test file.
+      The browser suite is opt-in and off by default. It needs three things CI
+      does not have: shinytest2, a Chrome or Chromium install for the headless
+      session, and data/processed/pubmed_candidates.csv, which is gitignored at
+      130 MB and which every screen these tests drive renders. The file no
+      longer contributes zero rows: a floor assertion runs in every environment
+      and fails if this entry is ever removed, so the gap cannot go unrecorded.
     to_enable: >
-      Add any::shinytest2 to the workflow package lists, or retire the file.
-      Leaving a zero-assertion file in place misrepresents end-to-end coverage.
+      Locally, install shinytest2 and run with RUN_SHINY_E2E=true. Not worth
+      enabling in CI: installing shinytest2 there would launch a browser against
+      an app with no candidate pool to display, which produces failures rather
+      than coverage. Revisit if the candidate index lands and a Chrome step is
+      added.
