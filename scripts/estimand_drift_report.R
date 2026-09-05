@@ -65,7 +65,9 @@ fingerprint <- list(
     counted_as_published = paste(
       "classification == 'definite', or a reviewer decision of match;",
       "in either case only if the credited publication's print issue date is",
-      "on or after the congress date (PI decision, 2026-09-05)"),
+      "on or after the congress date, and never against a human no_match",
+      "(PI decisions, 2026-09-05)"),
+    human_no_match_overrides = "yes; an AUTO no_match does not",
     pre_congress_excluded = "always; no classification or reviewer verdict overrides it",
     n_events            = sum(d$final_published %in% TRUE)
   ),

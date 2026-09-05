@@ -1,5 +1,40 @@
 # NEWS
 
+## 2026-09-05 - the reviewer outranks the score
+
+The second outcome decision of the day, and the smaller one: 171 becomes 170.
+
+A reviewer who looked at a candidate publication and said it was not the
+abstract's paper now outranks a `definite` score. That is not a new principle in
+this repository. The deduplication step already throws away AUTO rows for any
+abstract a human has touched, on the grounds that a person's judgment beats a
+prefill. The decision extends it one level, so a person's judgment also beats
+the algorithm's classification.
+
+The framing that reached the decision was "four abstracts counted published
+against a human no_match". Only one of them is that. Three carry AUTO rows whose
+own notes record `classification=reject`, a scoring vocabulary this pipeline no
+longer uses, sitting against a current classification of `definite`. No person
+has ever looked at them. An AUTO no_match contradicting a definite score is the
+algorithm disagreeing with itself, and treating it as a veto would let a
+superseded run overrule the current one. So the rule applies to human decisions
+only, and those three stay as classified.
+
+The real case is AAGL2021_030. R01 recorded no_match, R02 recorded match, and
+five days later R02 recorded no_match. Two reviewers, both finishing on
+no_match, and the outcome column said published because the score was definite.
+
+This decision moves the median, which the pre-congress one did not: 13.7 months
+becomes 13.6, because the abstract removed had an interval of 34.6 months, well
+above the middle of the distribution.
+
+One trap worth recording. The cascade needs to know who made a decision to tell
+a human from a prefill, so it joins the reviewer column. Left in place that
+widened the analytical dataset from 93 columns to 94 and tripped the
+documentation-drift test, which is exactly the guard working: a rule change
+should not silently change the shape of the dataset. The column is dropped again
+once it has been used.
+
 ## 2026-09-05 - the denominator question, answered
 
 The rule is now: a publication that appeared before the congress cannot count as

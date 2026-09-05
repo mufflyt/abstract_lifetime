@@ -1,8 +1,8 @@
 predictor,retention_count,retention_frequency,n_boot,interpretation
-n_authors,480,96,500,robust
-is_rct,474,94.8,500,robust
-is_academic,252,50.4,500,unstable - not a reliable finding
-is_us_based,174,34.8,500,unstable - not a reliable finding
-gender_unified,161,32.2,500,unstable - not a reliable finding
-is_multicenter,149,29.8,500,unstable - not a reliable finding
-log_sample_size,130,26,500,unstable - not a reliable finding
+is_rct,476,95.2,500,robust
+n_authors,476,95.2,500,robust
+is_academic,237,47.4,500,unstable - not a reliable finding
+is_us_based,172,34.4,500,unstable - not a reliable finding
+is_multicenter,154,30.8,500,unstable - not a reliable finding
+gender_unified,146,29.2,500,unstable - not a reliable finding
+log_sample_size,139,27.8,500,unstable - not a reliable finding

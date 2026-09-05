@@ -124,9 +124,31 @@ fp <- function(classification, decision) {
                          dedup_decisions_for_analysis(d))$final_published
 }
 
-test_that("definite overrides a human no_match (branch 1 before branch 3)", {
-  # 4 abstracts in the real cohort. Documented, not endorsed.
-  expect_true(fp("definite", "no_match"))
+test_that("a human no_match overrides a definite classification", {
+  # PI decision, 2026-09-05. Reversed: `definite` used to win outright, which
+  # counted AAGL2021_030 as published after two reviewers had rejected it.
+  expect_false(fp("definite", "no_match"))
+})
+
+test_that("an AUTO no_match does not override a definite classification", {
+  # Deliberately asymmetric. An AUTO row is a prefill of the algorithm's own
+  # verdict, so an AUTO no_match against a `definite` classification is the
+  # algorithm contradicting itself; in every real case the AUTO note records a
+  # superseded scoring vocabulary. Three abstracts depend on this staying TRUE:
+  # AAGL2013_050, AAGL2014_053, AAGL2015_029, none of which a human has seen.
+  d <- dec("A1", "AUTO", "no_match", "2026-04-20 10:00:00")
+  out <- assign_final_published(res("A1", "definite"),
+                                dedup_decisions_for_analysis(d))
+  expect_true(out$final_published)
+})
+
+test_that("a human no_match still loses to nothing else", {
+  # It outranks the classification, not the pre-congress rule, which is an
+  # eligibility test rather than a judgment about the match.
+  d <- dec("A1", "R01", "no_match", "2026-04-20 10:00:00")
+  out <- assign_final_published(res("A1", "definite", months_to_pub = -2),
+                                dedup_decisions_for_analysis(d))
+  expect_false(out$final_published)
 })
 
 test_that("definite overrides a reviewer skip", {

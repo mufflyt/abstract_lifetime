@@ -203,14 +203,57 @@ test_that("final_published follows from the deduplicated decisions", {
   j <- f |> select(abstract_id, final_published) |>
     inner_join(kept |> select(abstract_id, manual_decision), by = "abstract_id")
   skip_if(nrow(j) == 0, "no overlap")
-  # A "match" that is not published, or a "no_match" that is, means the outcome
-  # column and the decision log disagree about the same abstract.
-  bad_match <- sum(j$manual_decision == "match" & !(j$final_published %in% c(TRUE, "TRUE")))
-  bad_no    <- sum(j$manual_decision == "no_match" & (j$final_published %in% c(TRUE, "TRUE")))
+  # The outcome column may diverge from the decision log, but only for reasons
+  # that were decided rather than accumulated. Two exist, both PI decisions of
+  # 2026-09-05 and both recorded in docs/OUTCOME_DEFINITION.md:
+  #
+  #   1. A publication predating the congress is never counted, whatever the
+  #      reviewer said. That is an eligibility rule, not a judgment about the
+  #      match, so a `match` on such an abstract is correctly unpublished.
+  #   2. A HUMAN no_match overrides the algorithm; an AUTO no_match does not.
+  #      An AUTO row is a prefill of the algorithm's own verdict, so an AUTO
+  #      no_match sitting against a `definite` classification is the algorithm
+  #      contradicting itself.
+  #
+  # Anything outside those two is a genuine disagreement.
+  j <- j |>
+    left_join(f |> select(abstract_id, months_to_pub), by = "abstract_id") |>
+    left_join(kept |> select(abstract_id, reviewer), by = "abstract_id")
+
+  pre_congress <- !is.na(j$months_to_pub) & j$months_to_pub < 0
+  is_auto      <- !is.na(j$reviewer) & j$reviewer == "AUTO"
+  published    <- j$final_published %in% c(TRUE, "TRUE")
+
+  bad_match <- sum(j$manual_decision == "match" & !published & !pre_congress)
+  bad_no    <- sum(j$manual_decision == "no_match" & published & !is_auto)
+
   expect_equal(bad_match + bad_no, 0L,
-               label = sprintf(paste("%d 'match' decisions are not counted as published",
-                                     "and %d 'no_match' decisions are"),
+               label = sprintf(paste("%d 'match' decisions are unpublished for a reason",
+                                     "other than the pre-congress rule, and %d human",
+                                     "'no_match' decisions are counted published"),
                                bad_match, bad_no))
+})
+
+test_that("an AUTO no_match against a definite classification is a stale prefill", {
+  # Not a defect in the cascade, but worth counting: these are AUTO rows whose
+  # own note records a superseded scoring vocabulary and which contradict the
+  # classification the current scorer assigns. Three abstracts, none seen by a
+  # human. If the prefill is ever regenerated they should disappear; if the
+  # count grows, something is writing stale decisions again.
+  need(P_DEC, P_FINAL)
+  source(here::here("R", "utils_decisions.R"))
+  d <- dec(); f <- readr::read_csv(P_FINAL, show_col_types = FALSE)
+  kept <- dedup_decisions_for_analysis(d)
+  j <- f |> select(abstract_id, classification, final_published) |>
+    inner_join(kept |> select(abstract_id, reviewer, manual_decision),
+               by = "abstract_id")
+  stale <- j |> filter(reviewer == "AUTO", manual_decision == "no_match",
+                       classification == "definite")
+  expect_lte(
+    nrow(stale), 3L,
+    label = sprintf(paste("%d AUTO no_match rows contradict a definite",
+                          "classification, up from the 3 known stale prefills: %s"),
+                    nrow(stale), paste(utils::head(stale$abstract_id, 5), collapse = ", ")))
 })
 
 # ============================================================

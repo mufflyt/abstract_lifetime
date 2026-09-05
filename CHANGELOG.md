@@ -9,6 +9,54 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-05] - A human no_match supersedes the algorithm
+
+### Changed
+
+- **PI decision: a human `no_match` overrides a `definite` classification.**
+  The branch now sits above `classification == "definite"`, extending the
+  principle already used in `dedup_decisions_for_analysis()`, that a person
+  outranks a prefill, one level further so that a person also outranks the
+  score.
+- **The numerator moves from 171 to 170** and the rate from 16.3% to 16.2%
+  (95% CI 14.1-18.5). Unlike the pre-congress decision this one also moves the
+  median time to publication, 13.7 to 13.6 months (IQR 5.7-22.4), because the
+  abstract removed had an interval of 34.6 months.
+- The rule is restricted to human decisions. Of the four abstracts counted
+  published against a `no_match`, only one is human: AAGL2021_030, where R01
+  recorded `no_match`, R02 recorded `match` and then `no_match` five days
+  later. The other three carry AUTO rows whose notes record
+  `classification=reject`, a vocabulary this pipeline no longer uses, against a
+  current classification of `definite`. They are fossils of a superseded
+  scoring run, and letting them override would give an old run authority over
+  the current one.
+
+### Fixed
+
+- `assign_final_published()` needs `reviewer` to tell a human decision from a
+  prefill. Joined and left in place it widened the analytical dataset from 93
+  columns to 94 and tripped the documentation-drift test; it is now dropped
+  again unless the caller already had it.
+
+### Changed (tests)
+
+- `test-cycle22_decision_log.R` required the outcome column to agree with the
+  surviving decision for every abstract. Two decisions now break that on
+  purpose, so it asserts the narrower contract: every divergence must be
+  explained either by the pre-congress rule or by the AUTO exemption, and a
+  human `no_match` counted published is still a failure. A companion test
+  counts the stale AUTO rows and fails if more than the three known appear.
+- The BVA gate's "definite overrides a human no_match" case is inverted, and
+  two cases added: an AUTO `no_match` must NOT override, and a human
+  `no_match` must not override the pre-congress rule, which is an eligibility
+  test rather than a judgment about the match.
+
+### Note
+
+- `is_academic` bootstrap retention fell again, 50.4% to 47.4%. It now survives
+  fewer than half of resamples.
+- Manifest down to 21; the cycle22 decision-log entry is resolved and removed.
+
 ## [2026-09-05] - The pre-congress exclusion is absolute
 
 ### Changed
