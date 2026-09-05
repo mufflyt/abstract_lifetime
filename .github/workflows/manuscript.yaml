@@ -1,0 +1,102 @@
+# Render every manuscript document on every push.
+#
+# Why this exists: the three .Rmd files under docs/ are the study's actual
+# written output, and until now nothing rendered them in CI. Their chunks read
+# output/ and data/processed/ at knit time, so a renamed column, a deleted
+# file, or a stale hard-coded object name breaks the manuscript while the whole
+# test suite stays green. That failure is invisible until someone renders by
+# hand, which by definition happens late.
+#
+# This job renders each document from a clean checkout and fails if any of them
+# errors. It deliberately does NOT compare against the committed .docx: git
+# does not preserve mtimes and a byte comparison of Word output is noisy
+# (timestamps, revision ids). tests/testthat/test-cycle08_reproducibility_contracts.R
+# already covers "the committed .docx is not older than its .Rmd" locally.
+
+name: manuscript
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: manuscript-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      # word_document needs pandoc; nothing here needs LaTeX.
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::rmarkdown
+            any::knitr
+            any::here
+            any::readr
+            any::dplyr
+            any::tibble
+            any::yaml
+            any::config
+
+      # Every document is attempted even after one fails, so a single run
+      # reports every broken manuscript rather than only the first.
+      - name: Render docs/*.Rmd
+        run: |
+          rmds <- sort(list.files("docs", pattern = "\\.Rmd$", full.names = TRUE))
+          if (!length(rmds)) stop("no .Rmd found under docs/")
+          outdir <- file.path(tempdir(), "rendered")
+          dir.create(outdir, showWarnings = FALSE, recursive = TRUE)
+
+          failures <- character(0)
+          for (rmd in rmds) {
+            cat("\n=== rendering", rmd, "===\n")
+            ok <- tryCatch({
+              rmarkdown::render(rmd, output_dir = outdir,
+                                envir = new.env(parent = globalenv()),
+                                quiet = TRUE)
+              TRUE
+            }, error = function(e) {
+              cat("FAILED:", conditionMessage(e), "\n")
+              FALSE
+            })
+            cat(if (ok) "ok\n" else "failed\n")
+            if (!ok) failures <- c(failures, rmd)
+          }
+
+          cat("\n--- render summary ---\n")
+          cat("attempted:", length(rmds), " failed:", length(failures), "\n")
+          if (length(failures)) {
+            cat(paste0("  ", failures, collapse = "\n"), "\n")
+            stop(sprintf("%d manuscript(s) failed to render", length(failures)))
+          }
+          cat("All manuscripts rendered.\n")
+
+          file.copy(list.files(outdir, full.names = TRUE), ".", overwrite = TRUE)
+        shell: Rscript {0}
+
+      - name: Upload rendered documents
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-manuscripts
+          path: |
+            *.docx
+            *.html
+          if-no-files-found: warn
+          retention-days: 14
