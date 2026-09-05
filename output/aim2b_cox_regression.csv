@@ -1,7 +1,7 @@
 term,estimate,std.error,statistic,p.value,conf.low,conf.high
-is_rctTRUE,2.152,0.206,3.715,0,1.436,3.225
-is_academicTRUE,0.642,0.174,-2.547,0.011,0.456,0.903
-is_us_basedTRUE,1.368,0.239,1.309,0.191,0.856,2.185
-n_authors,1.258,0.071,3.237,0.001,1.095,1.446
-gender_unifiedmale,0.772,0.157,-1.656,0.098,0.568,1.049
-is_multicenterTRUE,1.392,0.275,1.204,0.229,0.812,2.387
+is_rctTRUE,2.172,0.207,3.754,0,1.449,3.255
+is_academicTRUE,0.649,0.175,-2.481,0.013,0.461,0.913
+is_us_basedTRUE,1.354,0.239,1.267,0.205,0.847,2.165
+n_authors,1.252,0.071,3.164,0.002,1.089,1.439
+gender_unifiedmale,0.78,0.157,-1.582,0.114,0.574,1.061
+is_multicenterTRUE,1.402,0.275,1.228,0.219,0.818,2.403

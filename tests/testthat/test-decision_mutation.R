@@ -31,7 +31,7 @@ res <- function(id, classification, months_to_pub = 12) {
 # ------------------------------------------------------------
 fixture <- list(
   results = bind_rows(
-    res("A1", "definite"),   # human said no_match; branch 1 still wins
+    res("A1", "definite"),   # human said no_match; the human now wins
     res("A2", "probable"),   # human match
     res("A3", "probable"),   # human skip -> NA
     res("A4", "possible"),   # AUTO only -> keeps AUTO's no_match
@@ -40,7 +40,8 @@ fixture <- list(
     res("A7", "probable"),   # AUTO newer than human: human must still win
     res("A8", "probable"),   # two human rows; the LATER one must win
     res("A9", "excluded", months_to_pub = -2),  # no reviewer; FALSE, not NA
-    res("A10", "definite", months_to_pub = -0.5) # definite must NOT override either
+    res("A10", "definite", months_to_pub = -0.5), # definite must NOT override either
+    res("A11", "definite")   # AUTO no_match must NOT beat definite
   ),
   decisions = bind_rows(
     dec("A1", "R01",   "no_match", "2026-04-20 10:00:00"),
@@ -52,7 +53,8 @@ fixture <- list(
     dec("A7", "AUTO", "no_match", "2099-01-01 00:00:00"),
     dec("A8", "R01",   "no_match", "2026-04-18 10:00:00"),
     dec("A8", "R02",   "match",    "2026-04-22 10:00:00"),
-    dec("A10", "R01",  "match",    "2026-04-22 10:00:00")
+    dec("A10", "R01",  "match",    "2026-04-22 10:00:00"),
+    dec("A11", "AUTO", "no_match", "2026-04-22 10:00:00")
   )
 )
 
@@ -75,7 +77,7 @@ check_invariants <- function(dedup_fn, assign_fn, summary_fn) {
   note(nrow(dd) == length(unique(dd$abstract_id)), "one_row_per_abstract")
   note(identical(dd$reviewer[dd$abstract_id == "A7"], "R01"), "human_beats_newer_auto")
   note(identical(dd$reviewer[dd$abstract_id == "A4"], "AUTO"), "auto_kept_when_alone")
-  note(isTRUE(get("A1")), "definite_wins")
+  note(isFALSE(get("A1")), "human_no_match_beats_definite")
   note(isTRUE(get("A2")), "human_match_promotes")
   note(is.na(get("A3")), "skip_on_probable_is_na")
   note(isFALSE(get("A4")), "auto_only_resolves_false")
@@ -86,6 +88,7 @@ check_invariants <- function(dedup_fn, assign_fn, summary_fn) {
   note(isTRUE(get("A8")), "latest_human_decision_applied")
   note(isFALSE(get("A9")), "excluded_without_reviewer_is_false")
   note(isFALSE(get("A10")), "definite_does_not_override_precongress")
+  note(isTRUE(get("A11")), "auto_no_match_does_not_beat_definite")
   note(nrow(fp) == nrow(fixture$results), "no_row_duplication_after_join")
   note(identical(s$n_evaluated, s$n_cohort - s$n_pending), "denominator_definition")
   note(identical(s$n_published + s$n_not_published, s$n_evaluated), "parts_close")

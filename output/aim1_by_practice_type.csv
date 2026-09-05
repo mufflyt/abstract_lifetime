@@ -1,6 +1,6 @@
 practice_type,n,n_published,rate,availability_among_published,availability_among_unpublished,outcome_conditional_stratifier
-community,3,3,100,84.2,2.5,TRUE
-research_institute,3,3,100,84.2,2.5,TRUE
-academic,155,135,87.1,84.2,2.5,TRUE
-military_va,4,3,75,84.2,2.5,TRUE
-private_practice,1,0,0,84.2,2.5,TRUE
+community,3,3,100,84.1,2.6,TRUE
+research_institute,3,3,100,84.1,2.6,TRUE
+academic,155,134,86.5,84.1,2.6,TRUE
+military_va,4,3,75,84.1,2.6,TRUE
+private_practice,1,0,0,84.1,2.6,TRUE

@@ -1,11 +1,11 @@
 metric,value
-n_published,171
-n_with_dates,171
+n_published,170
+n_with_dates,170
 n_pre_congress,0
 n_undated,0
-median_months,13.7
+median_months,13.6
 q1_months,5.7
-q3_months,22.6
-mean_months,16.8
+q3_months,22.4
+mean_months,16.7
 min_months,0.5
 max_months,149.8

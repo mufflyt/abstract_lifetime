@@ -24,9 +24,10 @@ outcome:
   definition: matched to a full publication that appeared after the congress
   counted_as_published: classification == 'definite', or a reviewer decision of match;
     in either case only if the credited publication's print issue date is on or after
-    the congress date (PI decision, 2026-09-05)
+    the congress date, and never against a human no_match (PI decisions, 2026-09-05)
+  human_no_match_overrides: yes; an AUTO no_match does not
   pre_congress_excluded: always; no classification or reviewer verdict overrides it
-  n_events: 171
+  n_events: 170
 time:
   origin: congress date
   censoring: administrative at the end of the search window

@@ -84,7 +84,8 @@ assign_final_published <- function(results, decisions_deduped) {
     }
   }
 
-  join_cols <- intersect(c("abstract_id", "manual_decision", "manual_pmid"),
+  join_cols <- intersect(c("abstract_id", "manual_decision", "manual_pmid",
+                           "reviewer"),
                          names(decisions_deduped))
 
   # The pre-congress guard needs the interval. Every production caller passes a
@@ -95,7 +96,12 @@ assign_final_published <- function(results, decisions_deduped) {
          "pre-congress exclusion cannot be applied. See docs/OUTCOME_DEFINITION.md.")
   }
 
-  results |>
+  # `reviewer` is joined only so the human-versus-AUTO distinction can be made
+  # below. It is dropped again unless the caller already had it, so this change
+  # does not widen the analytical dataset's schema.
+  reviewer_was_present <- "reviewer" %in% names(results)
+
+  out <- results |>
     left_join(select(decisions_deduped, all_of(join_cols)), by = "abstract_id") |>
     mutate(
       # PI decision, 2026-09-05: a publication that appeared before the
@@ -117,6 +123,21 @@ assign_final_published <- function(results, decisions_deduped) {
       # on the evidence that does exist.
       final_published = case_when(
         !is.na(.data$months_to_pub) & .data$months_to_pub < 0 ~ FALSE,
+        # PI decision, 2026-09-05: a HUMAN no_match supersedes the algorithm.
+        # A person who looked at the candidate and rejected it outranks a
+        # `definite` score, which is the repository's existing principle
+        # (human outranks AUTO in dedup_decisions_for_analysis) applied one
+        # level further.
+        #
+        # Deliberately restricted to human decisions. An AUTO row is a prefill
+        # of the algorithm's own verdict, so an AUTO no_match sitting against a
+        # `definite` classification is the algorithm contradicting itself, and
+        # in every such case here the AUTO note records a superseded
+        # vocabulary (`classification=reject`) from an earlier scoring run. The
+        # current classification is authoritative over its own fossil; a human
+        # is authoritative over both.
+        .data$manual_decision == "no_match" &
+          !is.na(.data$reviewer) & .data$reviewer != "AUTO" ~ FALSE,
         classification == "definite" ~ TRUE,
         manual_decision == "match" ~ TRUE,
         manual_decision == "no_match" ~ FALSE,
@@ -130,6 +151,11 @@ assign_final_published <- function(results, decisions_deduped) {
         .data$best_pmid
       }
     )
+
+  if (!reviewer_was_present && "reviewer" %in% names(out)) {
+    out <- select(out, -"reviewer")
+  }
+  out
 }
 
 #' Summarise the publication rate and its denominator

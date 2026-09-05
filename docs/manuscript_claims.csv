@@ -2,27 +2,27 @@ claim_id,claim,value,unit,source_file,source_expr,tolerance,appears_in
 cohort_total,Abstracts in the assembled cohort,1106,count,output/aim1_publication_rate.csv,"d$value[d$metric == ""total_abstracts""]",0,README.md; docs/COHORT_ASSEMBLY.md; abstract_results_section.Rmd
 cohort_evaluated,Abstracts evaluated (the denominator),1051,count,output/aim1_publication_rate.csv,"d$value[d$metric == ""n_evaluated""]",0,README.md; docs/OUTCOME_DEFINITION.md
 cohort_unresolved,Abstracts whose match was never resolved and are held out of the denominator,55,count,output/aim1_publication_rate.csv,"d$value[d$metric == ""pending_review""]",0,README.md; docs/ADJUDICATION.md
-cohort_not_published,Evaluated abstracts not matched to a publication,880,count,output/aim1_publication_rate.csv,"d$value[d$metric == ""not_published""]",0,docs/COHORT_ASSEMBLY.md
-n_published,Abstracts reaching full publication,171,count,output/aim1_publication_rate.csv,"d$value[d$metric == ""published""]",0,README.md; abstract_results_section.Rmd
-publication_rate,Publication rate among evaluated abstracts,16.3,percent,output/aim1_publication_rate.csv,"d$value[d$metric == ""publication_rate""]",0.05,README.md; NEWS.md; abstract_results_section.Rmd
-publication_rate_ci_lower,Wilson lower bound on the publication rate,14.2,percent,output/aim1_publication_rate.csv,"d$value[d$metric == ""ci_lower""]",0.05,README.md
-publication_rate_ci_upper,Wilson upper bound on the publication rate,18.6,percent,output/aim1_publication_rate.csv,"d$value[d$metric == ""ci_upper""]",0.05,README.md
-ttp_n_with_dates,Published abstracts with a usable interval,171,count,output/aim2_time_to_pub.csv,"d$value[d$metric == ""n_with_dates""]",0,docs/RESULTS_PROVENANCE.md
+cohort_not_published,Evaluated abstracts not matched to a publication,881,count,output/aim1_publication_rate.csv,"d$value[d$metric == ""not_published""]",0,docs/COHORT_ASSEMBLY.md
+n_published,Abstracts reaching full publication,170,count,output/aim1_publication_rate.csv,"d$value[d$metric == ""published""]",0,README.md; abstract_results_section.Rmd
+publication_rate,Publication rate among evaluated abstracts,16.2,percent,output/aim1_publication_rate.csv,"d$value[d$metric == ""publication_rate""]",0.05,README.md; NEWS.md; abstract_results_section.Rmd
+publication_rate_ci_lower,Wilson lower bound on the publication rate,14.1,percent,output/aim1_publication_rate.csv,"d$value[d$metric == ""ci_lower""]",0.05,README.md
+publication_rate_ci_upper,Wilson upper bound on the publication rate,18.5,percent,output/aim1_publication_rate.csv,"d$value[d$metric == ""ci_upper""]",0.05,README.md
+ttp_n_with_dates,Published abstracts with a usable interval,170,count,output/aim2_time_to_pub.csv,"d$value[d$metric == ""n_with_dates""]",0,docs/RESULTS_PROVENANCE.md
 ttp_n_pre_congress,Published abstracts dated before their congress and excluded from the interval,0,count,output/aim2_time_to_pub.csv,"d$value[d$metric == ""n_pre_congress""]",0,docs/RESULTS_PROVENANCE.md
-ttp_median,Median months from congress to publication,13.7,months,output/aim2_time_to_pub.csv,"d$value[d$metric == ""median_months""]",0.05,README.md; abstract_results_section.Rmd
+ttp_median,Median months from congress to publication,13.6,months,output/aim2_time_to_pub.csv,"d$value[d$metric == ""median_months""]",0.05,README.md; abstract_results_section.Rmd
 ttp_q1,First quartile of months to publication,5.7,months,output/aim2_time_to_pub.csv,"d$value[d$metric == ""q1_months""]",0.05,README.md
-ttp_q3,Third quartile of months to publication,22.6,months,output/aim2_time_to_pub.csv,"d$value[d$metric == ""q3_months""]",0.05,README.md
-cox_rct_hr,Hazard ratio for randomized design,2.152,hazard_ratio,output/aim2b_cox_regression.csv,"d$estimate[d$term == ""is_rctTRUE""]",0.005,README.md; docs/STATISTICAL_ANALYSIS.md
-cox_academic_hr,Hazard ratio for academic affiliation,0.642,hazard_ratio,output/aim2b_cox_regression.csv,"d$estimate[d$term == ""is_academicTRUE""]",0.005,README.md; docs/STATISTICAL_ANALYSIS.md
-cox_nauthors_hr,Hazard ratio per additional author averaged over follow-up,1.258,hazard_ratio,output/aim2b_cox_regression.csv,"d$estimate[d$term == ""n_authors""]",0.005,docs/STATISTICAL_ANALYSIS.md
-ph_global_p,Global Schoenfeld test for proportional hazards,0.041,p_value,output/cox_ph_assumption.csv,d$p_value[1],5e-4,docs/STATISTICAL_ANALYSIS.md
-ph_remediated_p,Global Schoenfeld test after stratifying on the violating term,0.704,p_value,output/cox_ph_assumption.csv,d$remediated_global_p[1],5e-4,docs/STATISTICAL_ANALYSIS.md
+ttp_q3,Third quartile of months to publication,22.4,months,output/aim2_time_to_pub.csv,"d$value[d$metric == ""q3_months""]",0.05,README.md
+cox_rct_hr,Hazard ratio for randomized design,2.172,hazard_ratio,output/aim2b_cox_regression.csv,"d$estimate[d$term == ""is_rctTRUE""]",0.005,README.md; docs/STATISTICAL_ANALYSIS.md
+cox_academic_hr,Hazard ratio for academic affiliation,0.649,hazard_ratio,output/aim2b_cox_regression.csv,"d$estimate[d$term == ""is_academicTRUE""]",0.005,README.md; docs/STATISTICAL_ANALYSIS.md
+cox_nauthors_hr,Hazard ratio per additional author averaged over follow-up,1.252,hazard_ratio,output/aim2b_cox_regression.csv,"d$estimate[d$term == ""n_authors""]",0.005,docs/STATISTICAL_ANALYSIS.md
+ph_global_p,Global Schoenfeld test for proportional hazards,0.043,p_value,output/cox_ph_assumption.csv,d$p_value[1],5e-4,docs/STATISTICAL_ANALYSIS.md
+ph_remediated_p,Global Schoenfeld test after stratifying on the violating term,0.67,p_value,output/cox_ph_assumption.csv,d$remediated_global_p[1],5e-4,docs/STATISTICAL_ANALYSIS.md
 sens_definite_only_rate,Publication rate counting definite matches only,11.8,percent,output/sensitivity_analyses.csv,"d$rate[d$scenario == ""Definite only""]",0.05,docs/STATISTICAL_ANALYSIS.md
 sens_definite_probable_rate,Publication rate counting definite and probable matches,19.2,percent,output/sensitivity_analyses.csv,"d$rate[d$scenario == ""Definite + probable""]",0.05,docs/STATISTICAL_ANALYSIS.md
 cox_model_n,Abstracts in the Cox model frame,1027,count,output/cox_ph_support.csv,"d$value[d$metric == ""cox_n""]",0,docs/STATISTICAL_ANALYSIS.md
-cox_model_events,Events in the Cox model,171,count,output/cox_ph_support.csv,"d$value[d$metric == ""cox_events""]",0,docs/STATISTICAL_ANALYSIS.md
-ph_global_p_without_violator,Global Schoenfeld test with the violating term removed,0.5274,p_value,output/cox_ph_support.csv,"d$value[d$metric == ""ph_global_p_without_violator""]",5e-4,docs/STATISTICAL_ANALYSIS.md; appendix A16
-aic_proportional,AIC of the proportional-hazards Cox fit,2306.6,aic,output/cox_ph_support.csv,"d$value[d$metric == ""aic_proportional""]",0.05,docs/STATISTICAL_ANALYSIS.md; appendix A16
-aic_time_varying,AIC of the time-varying Cox fit,2298.5,aic,output/cox_ph_support.csv,"d$value[d$metric == ""aic_time_varying""]",0.05,docs/STATISTICAL_ANALYSIS.md; appendix A16
-schoenfeld_rho_violator,Spearman correlation of the violator Schoenfeld residuals with time,0.261,correlation,output/cox_ph_support.csv,"d$value[d$metric == ""schoenfeld_rho_violator""]",5e-4,docs/STATISTICAL_ANALYSIS.md; appendix A16
+cox_model_events,Events in the Cox model,170,count,output/cox_ph_support.csv,"d$value[d$metric == ""cox_events""]",0,docs/STATISTICAL_ANALYSIS.md
+ph_global_p_without_violator,Global Schoenfeld test with the violating term removed,0.4757,p_value,output/cox_ph_support.csv,"d$value[d$metric == ""ph_global_p_without_violator""]",5e-4,docs/STATISTICAL_ANALYSIS.md; appendix A16
+aic_proportional,AIC of the proportional-hazards Cox fit,2294.1,aic,output/cox_ph_support.csv,"d$value[d$metric == ""aic_proportional""]",0.05,docs/STATISTICAL_ANALYSIS.md; appendix A16
+aic_time_varying,AIC of the time-varying Cox fit,2286.3,aic,output/cox_ph_support.csv,"d$value[d$metric == ""aic_time_varying""]",0.05,docs/STATISTICAL_ANALYSIS.md; appendix A16
+schoenfeld_rho_violator,Spearman correlation of the violator Schoenfeld residuals with time,0.253,correlation,output/cox_ph_support.csv,"d$value[d$metric == ""schoenfeld_rho_violator""]",5e-4,docs/STATISTICAL_ANALYSIS.md; appendix A16
 author_ceiling_pct,Share of the Cox model frame at the author-count ceiling,49.3,percent,output/cox_ph_support.csv,"d$value[d$metric == ""violator_pct_at_ceiling""]",0.05,README.md; docs/STATISTICAL_ANALYSIS.md; appendix A16

@@ -2236,3 +2236,89 @@ file, and it fails loudly if any of them is still counted as published.
 described as not sampling-robust; it is now retained in only about half of
 resamples and should be read as suggestive at most. Its leave-one-congress-out
 behaviour and its direction are unchanged.
+
+## A20. A Human `no_match` Supersedes the Algorithm
+
+**PI decision, 2026-09-05.** The second of the two outcome decisions taken that
+day, and the smaller of them: the numerator moves from 171 to 170.
+
+### A20.1 The rule
+
+A reviewer who examined a candidate publication and recorded `no_match`
+outranks a `definite` classification. The branch is placed above
+`classification == "definite"` in `assign_final_published()`, which is where the
+override previously failed.
+
+This is not a new principle. `dedup_decisions_for_analysis()` already discards
+AUTO rows for any abstract a human has touched, on the grounds that a person's
+judgment supersedes a prefill. The decision extends that one level: a person's
+judgment also supersedes the score.
+
+### A20.2 Why it applies to humans only
+
+The framing that reached this decision was "four abstracts counted published
+against a human no_match". Only one of the four is that.
+
+| abstract | reviewer | decision trail |
+|---|---|---|
+| AAGL2013_050 | AUTO | `classification=reject, score=5.50` |
+| AAGL2014_053 | AUTO | `classification=reject, score=3.80` |
+| AAGL2015_029 | AUTO | `classification=reject, score=6.00` |
+| **AAGL2021_030** | R01, R02 | R01 `no_match`; R02 `match`; R02 `no_match` five days later |
+
+The first three were never seen by a person. Their AUTO notes record
+`classification=reject`, a vocabulary this pipeline no longer uses, against a
+current classification of `definite`. They are fossils of an earlier scoring
+run, and an AUTO `no_match` contradicting a `definite` score is the algorithm
+disagreeing with itself rather than evidence about the abstract. Letting them
+override the classification would have given a superseded run authority over
+the current one.
+
+AAGL2021_030 is the real case. Two reviewers, and the later of R02's two
+decisions is `no_match`, so the surviving deduplicated decision is a considered
+human rejection. It was counted published anyway.
+
+### A20.3 What moved
+
+| quantity | before | after |
+|---|---:|---:|
+| Published | 171 | **170** |
+| Publication rate | 16.3% | **16.2%** (95% CI 14.1-18.5) |
+| Denominator | 1,051 | 1,051 |
+| Median time to publication | 13.7 mo | **13.6 mo** |
+| IQR | 5.7-22.6 | 5.7-22.4 |
+| Cox events | 171 | 170 |
+| PH global p | 0.041 | 0.043 |
+
+Unlike the pre-congress decision, this one moves the median. AAGL2021_030 had an
+interval of 34.6 months, well above the median, so removing it shortens the
+distribution slightly. The Cox model keeps its 1,027 observations and loses one
+event.
+
+### A20.4 A schema trap
+
+The cascade needs `reviewer` to tell a human decision from a prefill, so
+`assign_final_published()` joins it. Left there, it widened
+`final_analytical_dataset.csv` from 93 columns to 94 and tripped the
+documentation-drift test. The column is now dropped again unless the caller
+already had it, so the rule can distinguish reviewers without changing the
+dataset's shape.
+
+### A20.5 What the decision-log test now asserts
+
+`test-cycle22_decision_log.R` required the outcome column to agree with the
+surviving decision for every abstract. Two PI decisions now break that on
+purpose: a pre-congress publication is never counted whatever the reviewer said,
+and an AUTO `no_match` does not override a classification. The test asserts the
+narrower, truer contract: every divergence must be explained by one of those two
+rules, and a human `no_match` counted as published is still a failure.
+
+A companion test counts the stale AUTO rows and fails if the count rises above
+the three known. If the prefill is ever regenerated they should disappear; if
+more appear, something is writing superseded decisions again.
+
+### A20.6 Still open
+
+Whether the three stale AUTO prefills should be regenerated or deleted is not
+decided here. They do not change any number today, because the classification
+they contradict is what the analysis uses.

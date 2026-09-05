@@ -28,6 +28,34 @@ Code: `assign_final_published()`, `R/utils_decisions.R:70-93`.
 
 ## Clause-by-clause
 
+**Can a reviewer's `no_match` be overridden by the algorithm?**
+No, when the reviewer is human. **PI decision, 2026-09-05: a human `no_match`
+supersedes the classification.** The branch sits above
+`classification == "definite"`, so a person who looked at the candidate and
+rejected it outranks a definite score. This is the repository's existing
+principle, that a human outranks AUTO in `dedup_decisions_for_analysis()`,
+applied one level further.
+
+The rule is deliberately restricted to human decisions. An `AUTO` row is a
+prefill of the algorithm's own verdict, so an AUTO `no_match` sitting against a
+`definite` classification is the algorithm contradicting itself rather than a
+judgment about the abstract. In all three such cases the AUTO note records
+`classification=reject`, a scoring vocabulary this pipeline no longer uses, so
+the row is a fossil of an earlier run and the current classification is
+authoritative over it. A human is authoritative over both.
+
+One abstract changed hands: **AAGL2021_030**, where R01 recorded `no_match`,
+R02 recorded `match` and then `no_match` five days later. Two reviewers, both
+finishing on `no_match`, and the outcome column had said published because the
+score was `definite`. The numerator moves from 171 to 170 and the rate from
+16.3% to 16.2%.
+
+Three abstracts remain counted published against an AUTO `no_match`
+(AAGL2013_050, AAGL2014_053, AAGL2015_029). None has been seen by a human.
+`tests/testthat/test-cycle22_decision_log.R` counts them and fails if the count
+grows, so a regenerated prefill that reintroduced stale decisions would be
+caught.
+
 **Does publication before the conference count?**
 No, without exception. **PI decision, 2026-09-05: a reviewer's `match` does not
 override the pre-congress exclusion.**
