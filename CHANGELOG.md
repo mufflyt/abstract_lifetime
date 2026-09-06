@@ -9,6 +9,42 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-06] - A Limitations section, and the numbers behind it
+
+### Added
+
+- `## Limitations` in `docs/abstract_results_section.Rmd`. The manuscript had
+  no Limitations section at all. Five constraints are now stated as measured
+  quantities rather than generic caveats, every figure derived at knit time:
+  the truncated non-random cohort (1,154 of 7,711 supplement items, position
+  odds ratio 0.607, p = 0.080); coverage that varies from 11.2% to 25.0% across
+  congresses, so year-to-year comparisons span different fractions of
+  differently sized meetings; two congresses that contribute almost nothing to
+  the model; a numerator counted per abstract rather than per paper; and the
+  pre-congress rule.
+- `scripts/cohort_coverage_by_year.R` and `output/cohort_coverage_by_year.csv`.
+  The 1,154-of-7,711 figure was only derivable from
+  `data/cache/crossref_supplements/`, which is gitignored, so a reviewer could
+  not recompute the central limitation of the study. The per-year counts are now
+  a tracked artifact the manuscript reads.
+
+### Changed
+
+- README states what "supplement item" means: a Crossref record whose `page`
+  begins with `S`. The November publication-date window used to retrieve them
+  also returns 526 regular articles across the twelve years, so an unfiltered
+  count of the same query gives 8,237 and does not reproduce 7,711. The number
+  was correct; the filter that defines it was recorded only in a detection note
+  three documents away.
+- The `expected_failures.yaml` entry for covariate missingness named the wrong
+  remedy. It offered "improve sample-size extraction for the affected
+  congresses", but `abstract_text` is empty for 100% of 2017 and 2018 and for no
+  other year, and `affiliation_raw` is empty for exactly the same two years:
+  those congresses use a third supplement markup format, the same gap that hid
+  affiliations until 2026-09-04. There is no text to extract a sample size from,
+  so the parser has to be fixed first. The entry now says so and quantifies the
+  cost: 12 of 90 and 7 of 95 evaluated abstracts reach the model.
+
 ## [2026-09-05] - One Figure 1
 
 ### Removed
