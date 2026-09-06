@@ -346,7 +346,11 @@ worktree. Full inventory and the list of invariants that have **no** test:
 
 1. **The cohort is truncated, and it is not a random sample.** The
    ScienceDirect listing scraper captures only the first ~100 items per congress
-   supplement, against 392–852 items deposited in Crossref: 1,154 of 7,711
+   supplement, against 392–852 supplement items deposited in Crossref: 1,154 of
+   7,711. "Supplement items" means records whose Crossref `page` begins with
+   `S`; the November publication-date window used to retrieve them also returns
+   526 regular articles across the twelve years, so an unfiltered count of the
+   same query gives 8,237 and does not reproduce this number
    overall. The captured set is the **first N pages of each supplement in
    printed order**, ending at S26–S60 against supplements running to S136–S286.
 

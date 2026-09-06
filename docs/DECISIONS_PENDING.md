@@ -78,9 +78,9 @@ Work an item by deciding the question in **Decision needed**, then either make t
 
 ### 8. model covariate missingness does not vary sharply by congress year
 
-**What fails.** sample_size missingness ranges from 13.3% (2013) to 92.6% (2018) across congresses. The logistic model deletes rows with any missing covariate and log_sample_size is a term, so 2017 and 2018 are almost entirely absent from the model that estimates the predictors. 2018 also carries the highest reported publication rate.
+**What fails.** sample_size missingness ranges from 13.3% (2013) to 92.6% (2018) across congresses. The logistic model deletes rows with any missing covariate and log_sample_size is a term, so 2017 and 2018 are almost entirely absent from the model that estimates the predictors: they contribute 12 of 90 and 7 of 95 evaluated abstracts. 2018 also carries the highest reported publication rate, 25.3%. The cause is upstream of extraction. abstract_text is empty for 100% of 2017 and 2018 and for no other year (2012-2016 81.5%, 2019-2023 100%), and affiliation_raw is empty for exactly the same two years. Those congresses use a third ScienceDirect markup format, the same gap that hid affiliations until 2026-09-04. There is no text to extract a sample size from.
 
-**Decision needed.** Improve sample-size extraction for the affected congresses, drop the term, or report the model cohort's year composition as a limitation.
+**Decision needed.** Improving sample-size extraction is NOT currently an option: it presupposes text that does not exist for these two congresses. The available choices are to fix the 2017/2018 parser first and then re-extract, to drop the log_sample_size term, or to report the model cohort's year composition as a limitation.
 
 **Documented in.** tests/loop/LEDGER.md cycle 12
 

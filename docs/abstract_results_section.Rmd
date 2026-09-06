@@ -173,6 +173,84 @@ accuracy <- val$value[val$metric == "accuracy"]
 # Multicenter
 n_multicenter <- sum(d$is_multicenter, na.rm = TRUE)
 n_funded <- sum(d$has_funding, na.rm = TRUE)
+
+# ---- Limitations -----------------------------------------------------------
+# Every number in the Limitations section is derived here.
+# output/cohort_coverage_by_year.csv is written by
+# scripts/cohort_coverage_by_year.R from the Crossref deposit and is tracked
+# precisely so a reviewer can recompute the truncation figure without the
+# gitignored API cache.
+cov <- readr::read_csv(here::here("output", "cohort_coverage_by_year.csv"),
+                       show_col_types = FALSE, progress = FALSE)
+n_supp_total   <- sum(cov$supplement_items)
+n_captured_tot <- sum(cov$captured)
+pct_captured   <- round(100 * n_captured_tot / n_supp_total, 1)
+cov_lo <- min(cov$coverage_pct); cov_hi <- max(cov$coverage_pct)
+cov_lo_yr <- cov$congress_year[which.min(cov$coverage_pct)]
+cov_hi_yr <- cov$congress_year[which.max(cov$coverage_pct)]
+supp_lo <- min(cov$supplement_items); supp_hi <- max(cov$supplement_items)
+
+# Position-in-programme bias, from scripts/cohort_truncation_bias.R.
+tb <- tryCatch(readr::read_csv(here::here("output", "cohort_truncation_bias.csv"),
+                               show_col_types = FALSE, progress = FALSE),
+               error = function(e) NULL)
+tb_get <- function(k, d = NA_real_) {
+  if (is.null(tb) || !(k %in% tb$metric)) return(d)
+  as.numeric(tb$value[tb$metric == k][1])
+}
+pos_or <- tb_get("position_odds_ratio"); pos_p <- tb_get("position_p_value")
+
+# Congresses whose abstract text never parsed, and what that costs the model.
+.ac <- readr::read_csv(here::here("data", "processed", "abstracts_cleaned.csv"),
+                       show_col_types = FALSE, progress = FALSE)
+txt_by_yr <- .ac |>
+  dplyr::group_by(congress_year) |>
+  dplyr::summarise(pct_text = 100 * mean(!is.na(abstract_text) &
+                                           nchar(abstract_text) > 0), .groups = "drop")
+no_text_yrs <- sort(txt_by_yr$congress_year[txt_by_yr$pct_text == 0])
+no_text_txt <- paste(no_text_yrs, collapse = " and ")
+
+# The final analytical dataset is read here rather than reused from `d`
+# above: `d` is output/abstracts_with_matches.csv, which precedes the outcome
+# cascade and carries no final_published column.
+.fad <- readr::read_csv(here::here("output", "final_analytical_dataset.csv"),
+                        show_col_types = FALSE, progress = FALSE)
+.mv <- intersect(c("is_rct", "sample_size", "is_academic", "is_us_based",
+                   "n_authors", "gender_unified", "is_multicenter"), names(.fad))
+mdl_yr <- .fad |>
+  dplyr::filter(!is.na(final_published)) |>
+  dplyr::group_by(congress_year) |>
+  dplyr::summarise(evaluated = dplyr::n(),
+                   complete = sum(stats::complete.cases(dplyr::across(dplyr::all_of(.mv)))),
+                   .groups = "drop")
+mdl_gap <- mdl_yr[mdl_yr$congress_year %in% no_text_yrs, ]
+mdl_gap_txt <- paste(sprintf("%d of %d in %d", as.integer(mdl_gap$complete),
+                             as.integer(mdl_gap$evaluated),
+                             as.integer(mdl_gap$congress_year)), collapse = " and ")
+rate_yr <- .fad |>
+  dplyr::filter(!is.na(final_published)) |>
+  dplyr::group_by(congress_year) |>
+  dplyr::summarise(rate = 100 * mean(final_published), .groups = "drop")
+# The relevant comparison is the rate of the congresses the model drops, not
+# the global maximum: naming a year that is still IN the model would not
+# support the point.
+gap_rates <- rate_yr[rate_yr$congress_year %in% no_text_yrs, ]
+gap_rate_txt <- paste(sprintf("%.1f%% in %d", gap_rates$rate,
+                              as.integer(gap_rates$congress_year)), collapse = " and ")
+gap_best_yr  <- gap_rates$congress_year[which.max(gap_rates$rate)]
+gap_best_rk  <- rank(-rate_yr$rate)[rate_yr$congress_year == gap_best_yr]
+gap_best_rk_txt <- c("highest", "second-highest", "third-highest")[gap_best_rk]
+if (is.na(gap_best_rk_txt)) gap_best_rk_txt <- sprintf("%dth-highest", as.integer(gap_best_rk))
+
+# Publications credited to more than one abstract.
+shared_n <- tryCatch({
+  sp <- readr::read_csv(here::here("output", "shared_publication_matches.csv"),
+                        show_col_types = FALSE, progress = FALSE)
+  length(unique(sp$final_pmid))
+}, error = function(e) NA_integer_)
+n_pub_now <- sum(.fad$final_published, na.rm = TRUE)
+n_distinct_papers <- if (is.na(shared_n)) NA_integer_ else n_pub_now - shared_n
+n_pre_congress <- sum(!is.na(.fad$months_to_pub) & .fad$months_to_pub < 0, na.rm = TRUE)
 ```
 
 ## Introduction
@@ -307,3 +385,17 @@ Publication rates varied by subspecialty division: general OB/GYN (`r sub_spec$r
 ### Abstract-to-Publication Fidelity
 
 Among matched abstract-publication pairs, `r title_changed_pct`% had substantial title changes (Jaccard similarity <0.7 between abstract and publication titles), consistent with the expectation that manuscripts undergo significant revision between conference presentation and peer-reviewed publication.
+
+## Limitations
+
+Five features of the cohort constrain how these estimates should be read. They are stated as measured quantities rather than as generic caveats.
+
+**The cohort is a truncated, non-random slice of each programme.** The ScienceDirect issue listing returns at most about 100 records per request and repeats the first page for every subsequent offset, so abstraction captured `r format(n_captured_tot, big.mark = ",")` of the `r format(n_supp_total, big.mark = ",")` supplement items deposited in Crossref across the `r nrow(cov)` congresses (`r pct_captured`%). The captured records are not a random sample of each meeting: they are the first pages of each supplement in printed order. Within that window, publication rates decline across position quintiles, with an odds ratio of `r sprintf("%.3f", pos_or)` per quintile adjusted for congress year (p = `r sprintf("%.3f", pos_p)`). That association is not statistically significant, and the test cannot see beyond the captured window, but its direction implies that a complete congress would yield a rate at or below the one reported here. Randomized trials were more frequent in the last captured quintile, which acts in the opposite direction. The reported rate is therefore best interpreted as applying to early-programme oral presentations rather than to a full congress.
+
+**The captured fraction is not constant across congresses.** Supplement size fell from `r format(supp_hi, big.mark = ",")` items at its maximum to `r supp_lo` at its minimum while the per-congress capture ceiling did not, so coverage ranges from `r cov_lo`% (`r cov_lo_yr`) to `r cov_hi`% (`r cov_hi_yr`). Later congresses are represented by a proportionally deeper slice of their programme than earlier ones. Any comparison of publication rates across congress years is therefore a comparison across different fractions of differently sized meetings, and the apparent temporal trend should not be read as a change in conversion behaviour without accounting for this.
+
+**Two congresses contribute almost nothing to the multivariable model.** Abstract body text failed to parse for every record from `r no_text_txt`, which use a supplement markup format the extractor does not handle; no other congress is affected. Because sample size is recovered from that text and the logistic model deletes rows with any missing covariate, those congresses contribute only `r mdl_gap_txt` evaluated abstracts to the model. Their observed publication rates are `r gap_rate_txt`, and `r gap_best_yr` ranks `r gap_best_rk_txt` of the `r nrow(rate_yr)` congresses, so the abstracts removed by complete-case deletion are not missing at random with respect to the outcome. The modelled cohort is therefore not a random subset of the evaluated cohort, and the predictor estimates should be read as conditional on the congresses that survived deletion.
+
+**Publications are counted per abstract, not per paper.** `r if (!is.na(shared_n)) sprintf("%d publications are each credited to two abstracts, so the numerator of %d abstracts corresponds to %d distinct papers.", shared_n, n_pub_now, n_distinct_papers) else "A small number of publications are credited to more than one abstract."` Companion analyses presented separately and merged before submission are a genuine occurrence rather than a matching error, and counting per abstract follows the convention of the Cochrane review, but the numerator is not a count of unique manuscripts.
+
+**Abstracts whose credited publication predates the congress are counted as unpublished.** `r n_pre_congress` abstracts fall in this category. A paper appearing before the meeting cannot be a conference-to-publication conversion, so these are not treated as successes; they remain in the denominator because the abstract was still presented and still eligible to convert. Removing them from the denominator instead would raise the reported rate, and that choice is a protocol decision rather than a consequence of the data.
