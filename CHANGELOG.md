@@ -9,6 +9,30 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-06] - The Elsevier API route, tried rather than assumed
+
+### Added
+
+- `scripts/elsevier_api_probe.R`. A23 records that the cohort cannot be
+  completed because ScienceDirect returns HTTP 403. That 403 came from scraping
+  the HTML listing with rvest, so the obvious next move was Elsevier's official
+  API, which the repository had never called: there was no `api.elsevier`,
+  `elsapy` or `rscopus` anywhere in it.
+- Tried, with a self-service key on a personal network. `serial/title` and
+  `search/scopus` return 200; `search/sciencedirect` and `metadata/article`
+  return 401 AUTHORIZATION_ERROR; full-text article retrieval returns 403
+  AUTHENTICATION_ERROR. The key authenticates and is Scopus-entitled but has no
+  ScienceDirect entitlement.
+- Scopus is separately useless here, which is the more decisive finding: it does
+  not index the congress supplement at all. Both known 2022 supplement DOIs
+  return zero records, and a volume query returns only regular articles on
+  numbered pages. No amount of entitlement changes that.
+- The script exists so the attempt can be repeated rather than re-argued.
+  Elsevier entitlement is commonly IP-bound, so the same key may succeed inside
+  an institutional network; the script says so and reads `ELSEVIER_INSTTOKEN`
+  if the library issues one. The key itself lives in `.Renviron`, which is
+  gitignored, and appears nowhere in the repository.
+
 ## [2026-09-06] - A Limitations section, and the numbers behind it
 
 ### Added
