@@ -9,6 +9,34 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-06] - The oral/video boundary, ready for the PDFs
+
+### Added
+
+- `R/utils_toc.R` and `scripts/extract_session_boundaries.R`. Ten of the twelve
+  congresses are truncated: for 2012-2021 every captured record carries an
+  "Oral" heading, so abstraction stopped inside the oral block and an unknown
+  number of orals were never ingested. Crossref holds every supplement item with
+  its page but no session type. The one missing number per congress -- the page
+  where orals end -- is printed in the supplement's own table of contents, and
+  that is what these read.
+- The text parsing is separated from the PDF reading so it can be tested on
+  character vectors; 25 assertions cover the heading variants that actually
+  occur ("Video Sessions" in 2022, "Video Presentations" in 2023), sessions
+  split across repeated headings, cross-references in running text that look
+  like headings, and the case that matters most -- an unrecognised format
+  returns zero rows rather than a plausible single block, so a caller can tell
+  "parser failed" from "supplement has one session".
+- The driver validates itself before it is believed. 2022 and 2023 are ground
+  truth, because the web scrape ran past the end of their oral blocks into
+  video: oral ends S36 and S26 respectively. If the parser cannot reproduce a
+  boundary where the answer is known it writes nothing and exits non-zero, on
+  the principle that it must not be trusted where the answer is unknown.
+  Verified end to end on synthetic PDFs in both directions.
+- `pdftools` was already in the lockfile and `R/utils_pdf.R` already carries a
+  section-header state machine, so nothing new is required. `data/raw/` is
+  empty; the work is ten downloads.
+
 ## [2026-09-06] - The Elsevier API route, tried rather than assumed
 
 ### Added
