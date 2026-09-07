@@ -1,5 +1,53 @@
 # NEWS
 
+## 2026-09-07 - the cohort is two sampling frames
+
+The truncation was known. What was not known is that it does not apply to every
+congress, and that turns out to matter more than its size.
+
+Session labels are read from real `<h3 class="section-title">` headings, so
+every captured record carries an observed label rather than a default. In 2022
+and 2023 the capture ran past the end of the oral block into Video. A capture
+that reaches Video has exhausted the orals before it, so those two congresses
+hold all of their oral presentations -- 90 and 60. In 2012-2021 no Video record
+exists in any year, which means ingestion stopped while still inside the block.
+
+So ten congresses are front-truncated samples and two are complete censuses, and
+they report 13.8% and 30.7%. The headline 16.2% is a weighted average of two
+incompatible frames. It does not estimate a well-defined population quantity,
+and the Methods sentence describing the cohort as "all oral presentations" is
+accurate for two congresses of twelve.
+
+The direction makes it worse rather than better. Publication rate falls with
+position in the programme, so the truncated years' 13.8% is if anything an
+over-estimate of what those congresses would report complete. Finishing the job
+would push them down, away from 30.7% rather than towards it, which makes the
+gap a lower bound. Two things cut the other way and are recorded with it: RCTs
+cluster in the last captured quintile, and the two census congresses are the
+smallest programmes in the series, so a more selective meeting is a competing
+explanation that has nothing to do with sampling.
+
+This is not repairable by weighting. The unobserved abstracts are identified by
+their position in the printed programme, the rate varies with that position, and
+the size of the unobserved set is itself unknown. There is no sampling mechanism
+to model, so the remedy is acquisition.
+
+Both halves of that acquisition now exist and neither will run on a set it
+cannot vouch for. `scripts/extract_session_boundaries.R` reads the oral/video
+boundary out of a supplement's table of contents and refuses to write anything
+unless it independently reproduces the two boundaries already known from the web
+scrape, S36 and S26. `scripts/acquire_supplements.R` gates the raw inputs before
+that: it rejects HTML saved with a .pdf extension, identical bytes filed under
+two congress years, a missing validation control, and manifest rows with no
+recorded source. The duplicate-bytes check is the one worth naming, because two
+congresses producing the same boundary is what a correct result looks like.
+
+The remaining work is ten downloads. Everything downstream is written and tested
+against the years where the answer is already known.
+
+Appendix A25 carries the full argument; A24 records three corrections from the
+same week, two of which retracted claims this project had itself made.
+
 ## 2026-09-05 - a finding that did not survive measurement
 
 Two covariates, academic affiliation and US location, had never read an

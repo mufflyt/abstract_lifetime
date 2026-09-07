@@ -9,6 +9,32 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-07] - Two sampling frames, documented and illustrated
+
+### Added
+
+- `scripts/cohort_frame_composition.R`, `output/cohort_frame_composition.csv`
+  and `output/figures/cohort_frame_composition.png`. The finding that the cohort
+  is two sampling frames existed only in conversation; this makes it a
+  reproducible artifact and a two-panel figure carried in the README.
+- `docs/technical_appendix.Rmd` A25. A14 established that ingestion stops
+  mid-block and A23 measured what the truncation does to the rate; neither
+  noticed that the truncation does not apply to every congress. Ten are
+  front-truncated at 13.8% and two are complete censuses of their oral block at
+  30.7%, so the pooled 16.2% averages two incompatible frames. A25 also records
+  why weighting cannot repair it -- the unobserved abstracts are identified by
+  programme position, the rate varies with that position, and the size of the
+  unobserved set is unknown, so there is no sampling mechanism to model.
+
+### Changed
+
+- README carries the frame composition figure and table beside the existing
+  cohort charts, so a reader meets the caveat with the headline rather than
+  three documents later.
+- The README test badge read "900 passing, 4 failing" and had been stale for
+  some time. It now reads 1,870 passing with 21 registered expected failures,
+  which is what the suite gate reports.
+
 ## [2026-09-07] - Acquisition gate for the supplement PDFs; A24
 
 ### Added
