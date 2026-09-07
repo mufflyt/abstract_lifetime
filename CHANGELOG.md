@@ -9,6 +9,43 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-07] - Acquisition gate for the supplement PDFs; A24
+
+### Added
+
+- `R/utils_acquisition.R` and `scripts/acquire_supplements.R`, covering steps 2
+  and 3 of the boundary-recovery mandate. The recovery turns twelve PDFs into
+  twelve numbers no reader can check by eye, so the identity of the inputs is
+  part of the evidence rather than housekeeping. The gate rejects HTML saved
+  with a `.pdf` extension (a saved paywall or login page has a plausible size
+  and a plausible name and parses to nothing), zero-byte files, unreadable
+  files, filenames carrying no congress year, identical bytes assigned to two
+  years, any missing congress, a missing 2022 or 2023 validation control, and
+  manifest rows with no recorded `source_url`. It reports every problem rather
+  than the first, and exits non-zero.
+- The manifest is written even when the gate fails, because its blank
+  provenance columns are what a human fills in; provenance already typed is
+  carried forward by `sha256`, so re-downloading a file that changes its bytes
+  correctly loses its old provenance rather than inheriting it.
+- 18 assertions cover the failure modes directly, including the one that would
+  otherwise look like success: the same download saved under two years produces
+  two identical boundaries and reads as agreement between congresses.
+- Nothing in the frozen code path changed. Cohort logic, parser rules,
+  page-boundary semantics and adjudication criteria are untouched, so step 4's
+  requirement to run `scripts/extract_session_boundaries.R` unchanged against
+  the complete set remains literally satisfiable.
+
+- `docs/technical_appendix.Rmd` A24 records three corrections from 2026-09-06
+  that had been stated only in conversation. They were asked to be preserved as
+  evidence the pipeline falsifies assumptions rather than supporting the initial
+  story, and that is only checkable if they sit with the supporting evidence:
+  the 7,711 "discrepancy" that was not one and exposed a reproducibility gap
+  instead; the recent-year detection-artifact hypothesis that testing did not
+  support and which was abandoned rather than kept as a caveat; and the
+  ScienceDirect 403, which is an anti-scraping block *and* an entitlement wall
+  rather than only the former. Two of the three corrected assertions this
+  project had itself made.
+
 ## [2026-09-06] - The oral/video boundary, ready for the PDFs
 
 ### Added
