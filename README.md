@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![R >= 4.4](https://img.shields.io/badge/R-%3E%3D%204.4-blue.svg)](https://www.r-project.org/)
-[![Tests](https://img.shields.io/badge/tests-900%20passing%2C%204%20failing-yellow.svg)](docs/VALIDATION.md)
+[![Tests](https://img.shields.io/badge/tests-1%2C870%20passing%2C%2021%20registered-brightgreen.svg)](docs/VALIDATION.md)
 [![Shiny App](https://img.shields.io/badge/Shiny-Live%20App-orange.svg)](https://mufflyt.shinyapps.io/aagl-adjudication/)
 
 **Publication Rate, Time to Publication, and Predictors of Full Publication
@@ -53,6 +53,38 @@ above, asserts nothing about its own arithmetic beyond the tier partition
 checked in `test-cycle05_flow_fidelity_tables.R`.
 
 ![Classification-tier breakdown of the same cohort: 131 definite, 81 probable, 142 possible, 39 whose top candidate was scored as pre-conference, 713 no match or no candidates.](output/figures/classification_tiers.png)
+
+### The cohort is two sampling frames
+
+The chart above treats all twelve congresses alike. They are not alike. Session
+labels are read from real section headings, so every captured record carries an
+observed label, and in 2022 and 2023 the capture ran **past** the end of the
+oral block into Video. A capture that reaches Video has exhausted the orals
+before it, so those two congresses hold **all** of their oral presentations. In
+2012–2021 no Video record exists at all, which means ingestion stopped while
+still inside the oral block.
+
+![Two-panel bar chart by congress year. Upper panel, reported publication rate: ten front-truncated congresses from 2012 to 2021 range from 5.6 to 25.3 percent, while the two census congresses 2022 and 2023 reach 31.1 and 30.0 percent. Lower panel, share of the supplement captured: front-truncated years range from 11.2 to 21.0 percent and the census years 20.1 and 25.0 percent.](output/figures/cohort_frame_composition.png)
+
+| frame | congresses | evaluated | published | rate |
+|---|---|---|---|---|
+| Census of orals | 2 | 150 | 46 | **30.7%** |
+| Front-truncated | 10 | 901 | 124 | **13.8%** |
+| Pooled | 12 | 1,051 | 170 | 16.2% |
+
+The headline 16.2% is a weighted average of two incompatible frames, so it does
+not estimate a well-defined population quantity. Because publication rate falls
+with position in the programme, completing the truncated frames would push their
+13.8% **down**, widening the gap rather than closing it — the difference is a
+lower bound. Full reasoning, including the competing explanation that the census
+congresses are simply the two smallest and most selective meetings, is in
+[technical appendix A25](docs/technical_appendix.Rmd).
+
+Recovering the ten missing boundaries is an acquisition problem, not a modelling
+one: `scripts/acquire_supplements.R` gates the raw PDFs and
+`scripts/extract_session_boundaries.R` reads the oral/video boundary out of each
+supplement's table of contents, validating itself against 2022 and 2023 where
+the answer is already known.
 
 Two counts of "pre-conference" appear in these figures and they are not the
 same. The scorer flags **39** abstracts whose *top candidate* predates the

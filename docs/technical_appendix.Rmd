@@ -2639,3 +2639,78 @@ inside an institutional network.
 The common thread is that each correction narrowed what the study may claim
 rather than widening it, and that two of the three corrected assertions this
 project had itself made.
+
+## A25. The Cohort Is Two Sampling Frames
+
+A14 established that ingestion stops mid-block. A23 measured what the truncation
+does to the rate. Neither noticed that the truncation does not apply to every
+congress, and that is the more consequential fact: ten congresses are
+front-truncated samples and two are complete censuses of their oral block, and
+the two groups report publication rates differing by more than a factor of two.
+
+### A25.1 The evidence is a section heading, not an inference
+
+`R/01d_tag_session_type.R` reads real `<h3 class="section-title">` nodes from the
+issue listing and carries the current heading forward to each item beneath it.
+Every captured record therefore has an observed session label; none is defaulted.
+That is what makes the following table evidence rather than assumption.
+
+| congresses | captured session labels | what it means |
+|---|---|---|
+| 2012–2021 | Oral only, no Video row in any year | ingestion stopped while still inside the oral block |
+| 2022, 2023 | Oral then Video (10 and 38 video records) | ingestion ran past the end of the oral block |
+
+A capture that reaches Video has necessarily exhausted the orals before it. So
+2022 holds all 90 of its oral presentations and 2023 all 60, while the other ten
+congresses hold the first ~95 of an unknown larger number.
+
+### A25.2 The two frames do not report the same quantity
+
+| frame | congresses | evaluated | published | rate |
+|---|---|---|---|---|
+| Census of orals | 2 | 150 | 46 | **30.7%** |
+| Front-truncated | 10 | 901 | 124 | **13.8%** |
+| Pooled | 12 | 1,051 | 170 | 16.2% |
+
+The pooled 16.2% is a weighted average of a census of two small recent
+congresses and a front-slice of ten larger older ones. It is not an estimate of
+a well-defined population quantity, and the Methods statement describing the
+cohort as "all oral presentations" is accurate for two congresses of twelve.
+
+### A25.3 The direction of the truncation bias widens the gap
+
+Publication rate declines across position quintiles within the captured window
+(A23: OR 0.607, p = 0.080). Front positions therefore publish more, so the
+truncated years' 13.8% is if anything an over-estimate of what those congresses
+would report on complete data. Completing those frames would push them down,
+away from the census years' 30.7% rather than towards it. The gap between the
+frames is a lower bound.
+
+Two observations cut the other way and are recorded so the case is not
+overstated. Randomised trials are more frequent in the last captured quintile,
+and the census congresses are the two smallest programmes in the series (497 and
+392 supplement items against 663–901 earlier), so a genuinely more selective
+meeting is a competing explanation for their higher rate that has nothing to do
+with sampling.
+
+### A25.4 Why this is not fixable by weighting
+
+Front truncation is not random missingness. The unobserved abstracts are
+identified by their position in the printed programme, the observed rate varies
+with that position, and the size of the unobserved set is itself unknown because
+the oral block's end page is unknown for ten congresses. There is no sampling
+mechanism to model. The remedy is acquisition, not adjustment:
+`scripts/extract_session_boundaries.R` recovers the block boundary from the
+supplement table of contents, and `scripts/acquire_supplements.R` gates the
+inputs it needs.
+
+### A25.5 The decision this forces
+
+Either the ten historical boundaries are recovered and the twelve-year cohort
+becomes a genuine census throughout, or the primary analysis narrows to the
+congresses with complete enumeration. Reporting a pooled figure across two
+incompatible frames is the one option that is not defensible, and choosing
+between the other two is a PI decision rather than an engineering one.
+
+`scripts/cohort_frame_composition.R` regenerates the table above and
+`output/figures/cohort_frame_composition.png`.
