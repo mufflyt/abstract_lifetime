@@ -2585,3 +2585,57 @@ publication rate declines weakly across the captured window (OR 0.607,
 p = 0.080); and the reported 16.2% is therefore best read as an estimate for
 early-programme oral presentations, with a possible downward correction of
 unknown size if applied to a complete congress.
+
+## A24. Three Corrections, Recorded Because They Cut Against the Story
+
+This section exists because a claim was made that the pipeline is used to
+falsify assumptions rather than to support the initial narrative. That claim is
+only checkable if the falsifications are written down where the supporting
+evidence is, so the three from 2026-09-06 are recorded here with the reasoning
+that produced them, including the two that were mine.
+
+**A reported discrepancy in the supplement denominator was not real.** The
+README states the cohort as 1,154 of 7,711 supplement items. An independent
+recount of the same Crossref cache returned 8,237 and this was raised as a
+contradiction. It was not: 7,711 counts records whose `page` begins with `S`,
+which is what a supplement item is, and the November publication-date window
+used to retrieve them also returns 526 regular articles published that month.
+The published figure was correct throughout. What was wrong was its
+reproducibility -- the filter defining "supplement item" was recorded only in a
+detection note in `FAILURE_MODES.md` F1, three documents away from the number it
+defines, so recomputing it without that note gives a different answer. The
+filter is now stated beside the figure, and
+`scripts/cohort_coverage_by_year.R` writes the per-year counts to a tracked
+artifact rather than leaving them derivable only from a gitignored API cache.
+
+**The hypothesis that recent-year publication rates were a detection artifact
+did not survive testing.** Rates rise sharply in later congresses (5.6% in 2017
+to 31.1% in 2022) despite later congresses having *less* time to publish, which
+is the wrong direction for follow-up and suggested that recent papers were
+simply easier to match. The data do not support it. Abstract text is absent for
+100% of 2017 and 2018, and those two congresses sit at opposite extremes of the
+rate distribution -- 5.6% and 25.3% -- which is the clearest available evidence
+that text availability is not what drives matching. Text availability correlates
+with rate at only r = +0.179; median candidate counts *fall* over time (49 to
+29) rather than rising, so the search became more precise rather than more
+permissive; and congress year itself is the strongest correlate at r = +0.636.
+The hypothesis was abandoned rather than retained as a caveat.
+
+**The ScienceDirect 403 was described as an anti-scraping block rather than an
+access wall. It is both.** A23 recorded the cohort as uncompletable because
+ScienceDirect returns HTTP 403, and that 403 came from scraping HTML with
+`rvest`, so the conclusion was too strong: the official API had never been
+called, and there was no `api.elsevier`, `elsapy` or `rscopus` anywhere in the
+repository. The correction in the other direction is equally real. Called with a
+self-service key, `search/sciencedirect` and `metadata/article` return 401 and
+full-text retrieval returns 403; the key authenticates and is Scopus-entitled
+but carries no ScienceDirect entitlement. Scopus is separately useless here and
+that finding is independent of any key: it does not index the congress
+supplement at all, with both known 2022 supplement DOIs returning zero records.
+`scripts/elsevier_api_probe.R` exists so this is re-run rather than re-argued,
+since Elsevier entitlement is commonly IP-bound and the same key may succeed
+inside an institutional network.
+
+The common thread is that each correction narrowed what the study may claim
+rather than widening it, and that two of the three corrected assertions this
+project had itself made.
