@@ -1,2 +1,2 @@
-test,p_value,violating_terms,remediation,remediated_global_p
-cox_zph_global,0.01,is_us_based|n_authors,time_varying:n_authors;strata:is_us_based,0.607
+test,p_value,violating_terms,remediation,remediated_global_p,remediated_global_p_status,violators_dropped_global_p,n_violators,production_model
+cox_zph_global,0.01,is_us_based|n_authors,strata:is_us_based;strata_binned:n_authors,0.607,ok,0.263,2,cox_model_production.rds

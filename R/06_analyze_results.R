@@ -10,6 +10,7 @@ library(cli)
 library(config)
 source(here("R", "utils_congresses.R"))
 source(here("R", "utils_decisions.R"))
+source(here("R", "utils_ph.R"))
 
 cfg <- config::get(file = here("config.yml"))
 
@@ -546,119 +547,128 @@ if (nrow(published) > 0 && "months_to_pub" %in% names(published)) {
           # is the sensitivity analysis for the covariates that did NOT
           # violate: if their hazard ratios survive that change, they do not
           # depend on how the violating term was handled.
+          # PH diagnostics. Every step below works for zero, one or many
+          # violating covariates; see R/utils_ph.R for why the production model
+          # is the stratified one and not the tt() fit.
           ph_test <- tryCatch(cox.zph(cox_model), error = function(e) NULL)
-          if (!is.null(ph_test)) {
-            ph_tab <- as.data.frame(ph_test$table)
-            ph_tab$term <- rownames(ph_tab)
-            ph_global_p <- ph_tab$p[ph_tab$term == "GLOBAL"]
+          ident <- ph_identify_violators(ph_test, cox_formula_parts, PH_ALPHA)
+          ph_global_p <- ident$global_p
+          violators <- ident$violators
 
+          if (nrow(ident$table) > 0) {
             write_csv(
-              ph_tab |>
-                select(term, chisq, df, p) |>
-                mutate(across(where(is.numeric), ~ round(.x, 4))),
+              ident$table |> mutate(across(where(is.numeric), ~ round(.x, 4))),
               here("output", "cox_ph_terms.csv"))
+          }
 
-            violators <- ph_tab$term[ph_tab$term != "GLOBAL" & ph_tab$p < PH_ALPHA]
-            violators <- intersect(violators, cox_formula_parts)
+          plan <- ph_plan_remediation(violators, cox_data)
+          fits <- list(original = cox_model)
+          prod_fit <- NULL
+          drop_p <- NA_real_
 
-            remediation <- "none_needed"
-            remediated_p <- NA_real_
+          if (length(violators) > 0) {
+            cli_alert_warning(
+              "PH violated (global p = {round(ph_global_p, 3)}); term(s): {paste(violators, collapse = ', ')}")
 
-            if (ph_global_p < PH_ALPHA && length(violators) > 0) {
-              cli_alert_warning(
-                "PH violated (global p = {round(ph_global_p, 3)}); term(s): {paste(violators, collapse = ', ')}")
-
-              num_viol <- violators[vapply(violators,
-                function(v) is.numeric(cox_data[[v]]), logical(1))]
-              cat_viol <- setdiff(violators, num_viol)
-
-              # (1) Stratified fit: every violator absorbed into strata().
-              strat_parts <- setdiff(cox_formula_parts, violators)
-              if (length(strat_parts) >= 1) {
-                strat_formula <- as.formula(paste(
-                  "Surv(time, event) ~", paste(strat_parts, collapse = " + "), "+",
-                  paste(sprintf("strata(%s)", violators), collapse = " + ")))
-                cox_strat <- tryCatch(coxph(strat_formula, data = cox_data),
-                                      error = function(e) NULL)
-                if (!is.null(cox_strat)) {
-                  write_csv(
-                    tidy(cox_strat, exponentiate = TRUE, conf.int = TRUE) |>
-                      mutate(across(where(is.numeric), ~ round(.x, 3))),
-                    here("output", "aim2b_cox_regression_stratified.csv"))
-                  saveRDS(cox_strat, here("data", "processed", "cox_model_stratified.rds"))
-                  strat_zph <- tryCatch(cox.zph(cox_strat), error = function(e) NULL)
-                  if (!is.null(strat_zph)) {
-                    remediated_p <- unname(strat_zph$table["GLOBAL", "p"])
-                  }
-                  cli_alert_success(
-                    "Stratified sensitivity fit saved (global p = {round(remediated_p, 3)})")
-                }
-              }
-
-              # (2) Time-varying fit for numeric violators: the effect is kept
-              #     and its drift with time is estimated rather than averaged.
-              if (length(num_viol) > 0) {
-                tv_formula <- as.formula(paste(
-                  "Surv(time, event) ~", paste(cox_formula_parts, collapse = " + "), "+",
-                  paste(sprintf("tt(%s)", num_viol), collapse = " + ")))
-                cox_tv <- tryCatch(
-                  coxph(tv_formula, data = cox_data,
-                        tt = function(x, t, ...) x * log(t)),
-                  error = function(e) { cli_alert_warning("tt() fit failed: {e$message}"); NULL })
-
-                if (!is.null(cox_tv)) {
-                  write_csv(
-                    tidy(cox_tv, exponentiate = TRUE, conf.int = TRUE) |>
-                      mutate(across(where(is.numeric), ~ round(.x, 3))),
-                    here("output", "aim2b_cox_regression_timevarying.csv"))
-                  saveRDS(cox_tv, here("data", "processed", "cox_model_timevarying.rds"))
-
-                  # The hazard ratio implied at a set of follow-up times. A
-                  # constant HR is what the PH model reported; these are what
-                  # it was averaging over.
-                  b <- coef(cox_tv); V <- vcov(cox_tv)
-                  tv_rows <- lapply(num_viol, function(v) {
-                    i1 <- match(v, names(b)); i2 <- match(sprintf("tt(%s)", v), names(b))
-                    if (is.na(i1) || is.na(i2)) return(NULL)
-                    do.call(rbind, lapply(PH_TV_MONTHS, function(mo) {
-                      L <- numeric(length(b)); L[i1] <- 1; L[i2] <- log(mo)
-                      est <- sum(L * b)
-                      se  <- sqrt(as.numeric(t(L) %*% V %*% L))
-                      tibble(term = v, months = mo,
-                             hazard_ratio = round(exp(est), 3),
-                             conf_low  = round(exp(est - 1.96 * se), 3),
-                             conf_high = round(exp(est + 1.96 * se), 3))
-                    }))
-                  })
-                  tv_rows <- bind_rows(tv_rows)
-                  if (nrow(tv_rows) > 0) {
-                    write_csv(tv_rows, here("output", "cox_time_varying_hr.csv"))
-                  }
-                  cli_alert_success(
-                    "Time-varying fit saved for {paste(num_viol, collapse = ', ')}")
-                }
-              }
-
-              remediation <- paste(c(
-                if (length(num_viol) > 0) paste0("time_varying:", paste(num_viol, collapse = "|")),
-                if (length(cat_viol) > 0) paste0("strata:", paste(cat_viol, collapse = "|"))
-              ), collapse = ";")
-            } else {
-              cli_alert_success("PH assumption holds (global p = {round(ph_global_p, 3)})")
+            # Production: each violator remediated by its own registered rule.
+            prod_formula <- ph_production_formula(cox_formula_parts, plan)
+            prod_fit <- tryCatch(coxph(prod_formula, data = cox_data),
+                                 error = function(e) NULL)
+            if (!is.null(prod_fit)) {
+              fits$production <- prod_fit
+              write_csv(
+                tidy(prod_fit, exponentiate = TRUE, conf.int = TRUE) |>
+                  mutate(across(where(is.numeric), ~ round(.x, 3))),
+                here("output", "aim2b_cox_regression_stratified.csv"))
+              saveRDS(prod_fit, here("data", "processed", "cox_model_stratified.rds"))
+              saveRDS(prod_fit, here("data", "processed", "cox_model_production.rds"))
             }
 
-            # Row 1 stays `cox_zph_global` with a `p_value` column: readers
-            # downstream (docs/abstract_results_section.Rmd, the semantics
-            # tests) index it positionally. New facts are added as columns.
-            write_csv(
-              tibble(test = "cox_zph_global",
-                     p_value = round(ph_global_p, 3),
-                     violating_terms = if (length(violators) > 0)
-                       paste(violators, collapse = "|") else NA_character_,
-                     remediation = remediation,
-                     remediated_global_p = round(remediated_p, 3)),
-              here("output", "cox_ph_assumption.csv"))
+            # Diagnostic only: drop every violator. Reported so the production
+            # remediation can be compared against simply deleting the problem.
+            drop_terms <- setdiff(cox_formula_parts, violators)
+            if (length(drop_terms) >= 1) {
+              drop_fit <- tryCatch(
+                coxph(as.formula(paste("Surv(time, event) ~",
+                                       paste(drop_terms, collapse = " + "))),
+                      data = cox_data), error = function(e) NULL)
+              if (!is.null(drop_fit)) {
+                fits$violators_dropped <- drop_fit
+                drop_p <- ph_retest(drop_fit)$global_p
+              }
+            }
+
+            # Sensitivity: numeric violators keep their effect and gain a
+            # log-time interaction. cox.zph is undefined here by construction.
+            tv_formula <- ph_timevarying_formula(cox_formula_parts, plan)
+            if (!is.null(tv_formula)) {
+              cox_tv <- tryCatch(
+                coxph(tv_formula, data = cox_data,
+                      tt = function(x, t, ...) x * log(t)),
+                error = function(e) { cli_alert_warning("tt() fit failed: {e$message}"); NULL })
+              if (!is.null(cox_tv)) {
+                fits$time_varying <- cox_tv
+                write_csv(
+                  tidy(cox_tv, exponentiate = TRUE, conf.int = TRUE) |>
+                    mutate(across(where(is.numeric), ~ round(.x, 3))),
+                  here("output", "aim2b_cox_regression_timevarying.csv"))
+                saveRDS(cox_tv, here("data", "processed", "cox_model_timevarying.rds"))
+
+                tv_vars <- plan$variable[!is.na(plan$sensitivity) &
+                                           plan$sensitivity == "time_varying"]
+                b <- coef(cox_tv); V <- vcov(cox_tv)
+                tv_rows <- bind_rows(lapply(tv_vars, function(v) {
+                  i1 <- match(v, names(b)); i2 <- match(sprintf("tt(%s)", v), names(b))
+                  if (is.na(i1) || is.na(i2)) return(NULL)
+                  do.call(rbind, lapply(PH_TV_MONTHS, function(mo) {
+                    L <- numeric(length(b)); L[i1] <- 1; L[i2] <- log(mo)
+                    est <- sum(L * b); se <- sqrt(as.numeric(t(L) %*% V %*% L))
+                    tibble(term = v, months = mo,
+                           hazard_ratio = round(exp(est), 3),
+                           conf_low = round(exp(est - 1.96 * se), 3),
+                           conf_high = round(exp(est + 1.96 * se), 3))
+                  }))
+                }))
+                if (nrow(tv_rows) > 0)
+                  write_csv(tv_rows, here("output", "cox_time_varying_hr.csv"))
+                cli_alert_success(
+                  "Time-varying sensitivity fit saved for {paste(tv_vars, collapse = ', ')}")
+              }
+            }
+          } else {
+            cli_alert_success("PH assumption holds (global p = {round(ph_global_p, 3)})")
           }
+
+          retest <- ph_retest(prod_fit)
+          cmp <- ph_model_comparison(fits)
+          if (nrow(cmp) > 0) write_csv(cmp, here("output", "cox_ph_model_comparison.csv"))
+
+          # Per-violator record: what violated, how badly, what was done, why.
+          if (nrow(plan) > 0) {
+            vt <- ident$table
+            write_csv(
+              plan |>
+                left_join(vt |> select(variable = term, ph_chisq = chisq,
+                                       ph_df = df, ph_p = p), by = "variable") |>
+                mutate(across(where(is.numeric), ~ round(.x, 4))),
+              here("output", "cox_ph_remediation.csv"))
+          }
+
+          remediation <- if (nrow(plan) == 0) "none_needed" else
+            paste(sprintf("%s:%s", plan$remediation, plan$variable), collapse = ";")
+
+          write_csv(
+            tibble(test = "cox_zph_global",
+                   p_value = round(ph_global_p, 3),
+                   violating_terms = if (length(violators) > 0)
+                     paste(violators, collapse = "|") else NA_character_,
+                   remediation = remediation,
+                   remediated_global_p = round(retest$global_p, 3),
+                   remediated_global_p_status = retest$status,
+                   violators_dropped_global_p = round(drop_p, 3),
+                   n_violators = length(violators),
+                   production_model = "cox_model_production.rds"),
+            here("output", "cox_ph_assumption.csv"))
         }
       } else {
         cli_alert_warning("Too few complete cases ({nrow(cox_data)}) for Cox PH")

@@ -1,0 +1,3 @@
+variable,variable_type,remediation,sensitivity,rationale,ph_chisq,ph_df,ph_p
+is_us_based,logical,strata,NA,"A binary violator moves into strata(), absorbing its baseline hazard.",7.8052,1,0.0052
+n_authors,numeric,strata_binned,time_varying,"A numeric violator is stratified on its distinct values for the production fit so the PH assumption can be re-tested, and additionally fitted with a log-time interaction as a sensitivity analysis, which keeps the effect estimable but makes cox.zph undefined.",8.8748,1,0.0029
