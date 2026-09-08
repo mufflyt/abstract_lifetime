@@ -10,7 +10,16 @@ library(dplyr)
 
 d <- read_csv(here::here("output", "abstracts_with_matches.csv"), show_col_types = FALSE)
 s <- read_csv(here::here("output", "sensitivity_analyses.csv"), show_col_types = FALSE)
-cox <- read_csv(here::here("output", "aim2b_cox_regression.csv"), show_col_types = FALSE)
+# The ORIGINAL Cox fit, retained for the PH diagnostic only. Its hazard ratios
+# must not reach the prose: its proportional-hazards assumption is violated,
+# which is the whole reason a remediated model exists.
+cox_original <- read_csv(here::here("output", "aim2b_cox_regression.csv"), show_col_types = FALSE)
+# The PRODUCTION model: every PH violator remediated by its registered rule.
+# Reported estimates come from here. A stratified violator has no constant
+# hazard ratio by construction, so it is absent from this table rather than
+# being reported with the value the violated model happened to produce.
+.cox_prod_path <- here::here("output", "aim2b_cox_regression_stratified.csv")
+cox <- if (file.exists(.cox_prod_path)) read_csv(.cox_prod_path, show_col_types = FALSE) else cox_original
 logit <- read_csv(here::here("output", "aim3_logistic_regression.csv"), show_col_types = FALSE)
 pub_yr <- read_csv(here::here("output", "aim1_by_congress_year.csv"), show_col_types = FALSE)
 prac <- read_csv(here::here("output", "aim1_by_practice_type.csv"), show_col_types = FALSE)
@@ -98,6 +107,12 @@ cox_label <- c(is_rctTRUE = "randomized design",
                gender_unifiedmale = "inferred male first author",
                is_multicenterTRUE = "multicenter conduct",
                has_fundingTRUE = "reported funding")
+# cox_label is keyed on COEFFICIENT names ("is_us_basedTRUE"), but cox.zph
+# reports VARIABLE names ("is_us_based"), so PH violators missed the lookup
+# entirely and printed raw. Try the coefficient name, then the bare variable.
+cox_label <- c(cox_label, stats::setNames(
+  unname(cox_label), sub("(TRUE|male)$", "", names(cox_label))))
+cox_label <- cox_label[!duplicated(names(cox_label))]
 pretty_term <- function(x) {
   out <- unname(cox_label[x]); ifelse(is.na(out), x, out)
 }
@@ -117,14 +132,50 @@ cox_sig_txt <- if (nrow(cox_sig) == 0) {
 }
 cox_ns_txt <- paste(pretty_term(setdiff(cox_terms$term, cox_sig$term)), collapse = ", ")
 
+# Every value below is read off the diagnostics artifact, including the
+# remediation actually applied and the post-remediation test, so the prose
+# cannot describe one model while quoting another.
+.ph_rem <- if ("remediation" %in% names(ph_csv)) ph_csv$remediation[1] else NA_character_
+.ph_rem_p <- if ("remediated_global_p" %in% names(ph_csv)) ph_csv$remediated_global_p[1] else NA_real_
+.ph_rem_status <- if ("remediated_global_p_status" %in% names(ph_csv)) ph_csv$remediated_global_p_status[1] else NA_character_
+.ph_rem_txt <- function(code) {
+  parts <- strsplit(strsplit(code, ";", fixed = TRUE)[[1]], ":", fixed = TRUE)
+  paste(vapply(parts, function(x) {
+    how <- switch(x[1],
+      strata = "stratification", strata_binned = "stratification",
+      time_varying = "a time-varying coefficient", x[1])
+    sprintf("%s by %s", pretty_term(x[2]), how)
+  }, character(1)), collapse = ", and ")
+}
 ph_txt <- if (!ph_violated) {
   sprintf("the proportional-hazards assumption was satisfied (global Schoenfeld p%s)",
           fmt_p(ph_global_p))
 } else {
-  sprintf(paste("the global Schoenfeld test was significant (p%s), attributable to %s;",
-                "every other covariate satisfied proportional hazards"),
-          fmt_p(ph_global_p), paste(pretty_term(ph_violators), collapse = " and "))
+  sprintf(paste("the global Schoenfeld test was significant (p%s), attributable to %s.",
+                "Each violating covariate was remediated -- %s -- and the reported",
+                "hazard ratios come from that remediated model%s"),
+          fmt_p(ph_global_p),
+          paste(pretty_term(ph_violators), collapse = " and "),
+          .ph_rem_txt(.ph_rem),
+          if (identical(.ph_rem_status, "ok") && !is.na(.ph_rem_p))
+            sprintf(", which satisfies proportional hazards (global p%s)", fmt_p(.ph_rem_p))
+          else "")
 }
+# A stratified covariate has no constant hazard ratio, so it cannot appear
+# among the reported estimates. Naming the omission is the point.
+# Only covariates actually stratified lose their hazard ratio, and only those
+# given a time-varying sensitivity fit have a trajectory to point at. Naming
+# the full violator set in both places would assert two things that are false.
+.rem_path <- here::here("output", "cox_ph_remediation.csv")
+.rem_tbl <- if (file.exists(.rem_path)) read_csv(.rem_path, show_col_types = FALSE) else NULL
+.strat_vars <- if (!is.null(.rem_tbl))
+  .rem_tbl$variable[grepl("^strata", .rem_tbl$remediation)] else character(0)
+ph_absent_txt <- if (length(.strat_vars) > 0) {
+  sprintf("%s %s absorbed into the model's strata and therefore %s no single hazard ratio.",
+          paste(pretty_term(.strat_vars), collapse = " and "),
+          if (length(.strat_vars) > 1) "are" else "is",
+          if (length(.strat_vars) > 1) "have" else "has")
+} else ""
 
 tv_path <- here::here("output", "cox_time_varying_hr.csv")
 tv_txt <- if (file.exists(tv_path)) {
@@ -376,7 +427,7 @@ Among published abstracts with a resolvable publication date (n = `r ttp$value[t
 
 ### Predictors of Publication
 
-In multivariable Cox regression, `r ph_txt`. `r tv_txt` Significant predictors of publication velocity were `r cox_sig_txt`. `r if (nchar(cox_ns_txt) > 0) sprintf("The remaining covariates -- %s -- were not significant.", cox_ns_txt)` In logistic regression, US-based affiliation was `r if (us_or_p < 0.05) "associated with higher odds of publication" else "not significantly associated with the odds of publication"` (OR `r round(us_or, 2)`, 95% CI `r round(us_or_lo, 2)`-`r round(us_or_hi, 2)`, p`r fmt_p(us_or_p)`).
+In multivariable Cox regression, `r ph_txt`. `r ph_absent_txt` `r tv_txt` Significant predictors of publication velocity were `r cox_sig_txt`. `r if (nchar(cox_ns_txt) > 0) sprintf("The remaining covariates -- %s -- were not significant.", cox_ns_txt)` In logistic regression, US-based affiliation was `r if (us_or_p < 0.05) "associated with higher odds of publication" else "not significantly associated with the odds of publication"` (OR `r round(us_or, 2)`, 95% CI `r round(us_or_lo, 2)`-`r round(us_or_hi, 2)`, p`r fmt_p(us_or_p)`).
 
 ### Subspecialty Variation
 

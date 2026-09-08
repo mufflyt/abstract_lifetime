@@ -1,0 +1,5 @@
+model,aic,n_terms,delta_aic_vs_original
+original,2294.71,6,0
+production,1676.94,6,-617.77
+violators_dropped,2303.12,4,8.41
+time_varying,2287.3,7,-7.4
