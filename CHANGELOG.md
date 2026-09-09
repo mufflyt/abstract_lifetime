@@ -9,6 +9,41 @@ they describe. `NEWS.md` carries the same history with fuller narrative, and
 
 ## [Unreleased]
 
+## [2026-09-09] - PH diagnostics for any number of violators
+
+### Fixed
+
+- `R/utils_ph.R` replaces a reporting defect that no test could see. The old
+  code built two sensitivity fits, reported the global Schoenfeld p of the
+  first, and labelled it with a description of the second, so the committed
+  artifact paired `time_varying:n_authors;strata:is_us_based` with a p computed
+  from a model that stratified on both. There was no production model applying a
+  type-appropriate rule per violator, and no model comparison at all.
+- The manuscript was reading `aim2b_cox_regression.csv`, the ORIGINAL fit whose
+  PH assumption is violated, and reporting its hazard ratios as the study's
+  results. It now reads the production model and states that a stratified
+  covariate has no constant hazard ratio.
+- `pretty_term()` silently failed on violator names: `cox_label` is keyed on
+  coefficient names (`is_us_basedTRUE`) while `cox.zph` reports variable names
+  (`is_us_based`), so violators printed raw in the prose.
+
+### Added
+
+- `scripts/ph_diagnostics_figure.R` and `output/figures/ph_remediation.png`,
+  carried in the README. The figure makes one thing visible that the table
+  hides: the time-varying fit has no Schoenfeld p because `cox.zph` rejects
+  `tt()` terms, which is an absence with a reason rather than a failed model.
+- `scripts/completion_report.R` prints the repository's state from artifacts
+  rather than from prose, including the blockers.
+- `docs/technical_appendix.Rmd` A26 documents the registry, the `cox.zph`
+  constraint, what each of the four models is for, and what this did not fix.
+
+### Changed
+
+- README limitation 0 records that the committed analytic outputs are not
+  reproducible from the committed inputs: re-running gives 172 published and
+  16.4% against the committed 170 and 16.2%. Unresolved, and a PI decision.
+
 ## [2026-09-07] - Two sampling frames, documented and illustrated
 
 ### Added
