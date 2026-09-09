@@ -120,6 +120,20 @@ zero for them — see [Known limitations](#known-limitations).
 
 ![Cox proportional hazards forest plot showing hazard ratios with 95% confidence intervals for randomized design, academic affiliation, US location, author count, inferred male first author and multicenter conduct.](output/figures/figure5_cox_forest.png)
 
+Two covariates violate proportional hazards -- US-based affiliation and author
+count -- so the forest plot above comes from the **remediated** model, not the
+original fit. Each violator is remediated by a rule keyed on its type, and a
+stratified covariate has no constant hazard ratio, so neither appears among the
+estimates.
+
+![Two-panel bar chart comparing four Cox models. Upper panel, global Schoenfeld p: the original fit is 0.010, below the 0.05 threshold; the production model reaches 0.607; dropping both violators reaches 0.263; the time-varying fit has no bar, annotated as not defined because cox.zph rejects tt() terms. Lower panel, change in AIC against the original: production is 617.8 lower, dropping violators is 8.4 higher, time-varying is 7.4 lower.](output/figures/ph_remediation.png)
+
+Dropping the violators is kept only as a diagnostic: it fits worse and recovers
+proportional hazards less convincingly than remediating them. The time-varying
+fit has no Schoenfeld p at all, because `survival::cox.zph()` refuses to run on
+models containing `tt()` terms -- absent for a reason rather than a failure.
+Full reasoning in [technical appendix A26](docs/technical_appendix.Rmd).
+
 Randomized design (HR 2.00, 95% CI 1.34–3.00) is associated with faster
 publication. **Academic affiliation is not** (HR 1.10, 0.78–1.55, p = 0.59):
 the apparent protective effect reported earlier was an artefact of deriving
@@ -375,6 +389,16 @@ worktree. Full inventory and the list of invariants that have **no** test:
 [docs/VALIDATION.md](docs/VALIDATION.md).
 
 ## Known limitations
+
+0. **The committed analytic outputs are not reproducible from the committed
+   inputs.** Re-running `R/06_analyze_results.R` yields 172 published and 16.4%
+   against the committed 170 and 16.2%. The outputs are stale relative to their
+   own inputs, so the headline in this README and in the manuscript is not what
+   the pipeline currently produces. This is unresolved and is a decision for the
+   PI: either the regenerated figures are correct and the manuscript updates, or
+   something drifted upstream that should not have. Run
+   `Rscript scripts/completion_report.R` for the current machine-derived state.
+
 
 1. **The cohort is truncated, and it is not a random sample.** The
    ScienceDirect listing scraper captures only the first ~100 items per congress

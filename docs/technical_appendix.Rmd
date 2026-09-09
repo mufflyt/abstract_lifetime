@@ -2714,3 +2714,95 @@ between the other two is a PI decision rather than an engineering one.
 
 `scripts/cohort_frame_composition.R` regenerates the table above and
 `output/figures/cohort_frame_composition.png`.
+
+## A26. Proportional Hazards: Remediating an Arbitrary Set of Violators
+
+The Cox model has two covariates whose hazard ratios are not constant over
+follow-up. How they are handled determines which model the manuscript is
+allowed to quote, and the previous implementation answered that question
+inconsistently.
+
+### A26.1 The defect was in the reporting, not the loop
+
+The earlier code did treat violators as vectors. It built two sensitivity fits:
+`strata()` on every violator, and `tt()` on the numeric ones. It then wrote the
+global Schoenfeld p of the **first** into the diagnostics artifact while
+labelling it with a description of the **second**:
+
+```
+remediation         = "time_varying:n_authors;strata:is_us_based"
+remediated_global_p = 0.607
+```
+
+0.607 came from a model that stratified on both, including on a numeric
+covariate. The label and the number described different fits, and nothing
+compared them. There was no production model that applied a type-appropriate
+rule to each violator, and no model comparison of any kind was computed.
+
+### A26.2 A constraint that shapes the whole design
+
+`survival::cox.zph()` refuses to run on a model containing `tt()` terms:
+
+> function not defined for models with tt() terms
+
+A time-varying remediation therefore **cannot** produce a post-remediation
+global PH p. Any pipeline that reports one for a `tt()` model is reporting a
+number computed from some other fit. This is not a limitation of the
+implementation; it is a property of the test, and it is why the production model
+is the one whose PH is re-testable rather than the one that keeps the effect
+estimable.
+
+### A26.3 What each model is for
+
+| model | role | global PH p | ΔAIC |
+|---|---|---|---|
+| Original | as fitted; violates PH | 0.010 | 0 |
+| **Production** | each violator remediated by its registered rule | **0.607** | −617.8 |
+| Violators dropped | diagnostic only, never quoted | 0.263 | +8.4 |
+| Time-varying | sensitivity; keeps the effect estimable | not defined | −7.4 |
+
+The production model is what the manuscript reports. Dropping the violators is
+kept only so the remediation can be compared against simply deleting the
+problem, and it is worse on both counts: it fits less well and it does not
+recover proportional hazards as convincingly.
+
+### A26.4 The rules are a registry, and it fails closed
+
+`R/utils_ph.R` keys remediation on variable type rather than on position or
+name. A logical or categorical violator is stratified. A numeric violator is
+stratified for the production fit and additionally given a log-time interaction
+as a sensitivity analysis. A violator whose type has no registered rule **stops
+the run**: a silently unremediated violator is indistinguishable in the output
+from one that never violated, which is precisely the failure this section
+exists to prevent.
+
+Two further refusals are deliberate. `ph_retest()` reports *why* a
+post-remediation p is unavailable rather than returning a bare `NA`, so a
+missing diagnostic cannot be mistaken for a passing one. And
+`ph_production_formula()` rejects a right-hand side of nothing but `strata()`
+terms, which estimates no coefficients at all.
+
+### A26.5 A stratified covariate has no hazard ratio
+
+This is the consequence that reaches the prose. `is_us_based` and `n_authors`
+are absorbed into the model's strata, so the production model reports no hazard
+ratio for either. The manuscript previously read `aim2b_cox_regression.csv` --
+the original fit, whose PH assumption is violated -- and reported its hazard
+ratios as the study's results. It now reads the production model and says
+plainly that those two covariates have no single hazard ratio, pointing to the
+time-varying fit for how the effect of author count changes with follow-up.
+
+### A26.6 What this did not fix
+
+Re-running `R/06_analyze_results.R` from committed inputs produces a different
+analytic dataset from the committed one: 172 published against 170, 16.4%
+against 16.2%. The committed outputs are stale relative to their own inputs.
+That is a reproducibility defect and it moves a reported number, so it is a
+decision for the PI rather than something a diagnostics refactor may absorb.
+Every regenerated output was reverted; `scripts/regen_ph_diagnostics.R` writes
+the new PH artifacts from the committed dataset so nothing else moves, and
+becomes unnecessary once the staleness is resolved.
+
+`scripts/ph_diagnostics_figure.R` draws the table above, and
+`scripts/completion_report.R` prints the repository's state from artifacts
+rather than from prose.

@@ -1,5 +1,46 @@
 # NEWS
 
+## 2026-09-09 - the diagnostics described a different model than the one they reported
+
+Two covariates violate proportional hazards, and the code that reported on that
+was wrong in a way no test could see. It built two sensitivity fits, wrote the
+global Schoenfeld p of the first into the diagnostics artifact, and labelled it
+with a description of the second. The committed file read
+
+    remediation         = "time_varying:n_authors;strata:is_us_based"
+    remediated_global_p = 0.607
+
+where 0.607 came from a model that stratified on both. The label and the number
+described different fits. There was no production model applying a
+type-appropriate rule to each violator, and no model comparison at all.
+
+A property of the test drove the redesign. survival::cox.zph refuses to run on
+any model containing tt() terms, so a time-varying remediation cannot produce a
+post-remediation PH p. Any pipeline reporting one has taken it from a different
+fit, which is exactly what happened here. The production model is now the one
+whose PH can be re-tested; the time-varying fit is retained as a sensitivity
+analysis with its own evidence.
+
+Remediation is now a registry keyed on variable type rather than on position,
+and it fails closed: a violator whose type has no rule stops the run, because a
+silently unremediated violator looks identical in the output to one that never
+violated. Zero, one and many violators are all first-class, with 37 assertions
+covering the cases -- including two violators of different types, which is the
+shape the production data actually has.
+
+The consequence that reaches the manuscript is larger than the diagnostics. The
+prose was reading the ORIGINAL Cox fit -- the one whose assumption is violated
+-- and reporting its hazard ratios as the study's results. It now reads the
+remediated model and states that a stratified covariate has no constant hazard
+ratio, rather than quoting the number the violated model happened to produce.
+
+One thing this work uncovered and did not fix. Re-running the analysis from
+committed inputs produces 172 published and 16.4%, against the committed 170 and
+16.2%. The committed outputs are stale relative to their own inputs. That moves
+a reported number, so it belongs to the PI and not to a diagnostics refactor;
+every regenerated output was reverted and the finding is recorded rather than
+absorbed.
+
 ## 2026-09-07 - the cohort is two sampling frames
 
 The truncation was known. What was not known is that it does not apply to every

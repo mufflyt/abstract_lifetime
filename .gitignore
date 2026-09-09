@@ -39,6 +39,7 @@ output/figures/*
 # Exceptions: figures embedded in README.md
 !output/figures/classification_tiers.png
 !output/figures/cohort_frame_composition.png
+!output/figures/ph_remediation.png
 !output/figures/figure2_km_curve.png
 !output/figures/figure3_km_by_year.png
 !output/figures/figure4_subgroup_rates.png
